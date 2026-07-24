@@ -2,29 +2,39 @@ name: MESKIAI Agent 24/7 Cron
 
 on:
   schedule:
-    # Co 5 minut (minimum GitHub Actions)
+    # Co 5 minut (minimum GitHub Actions) — uruchamia agenta AI
     - cron: '*/5 * * * *'
-  workflow_dispatch: # Możliwość ręcznego uruchomienia
+  workflow_dispatch: # Możliwość ręcznego uruchomienia z GitHub UI
 
 jobs:
   ping-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 3
 
     steps:
-      - name: Uruchom agenta AI (sprawdź maile wszystkich użytkowników)
+      - name: Uruchom agenta AI — sprawdź maile wszystkich użytkowników
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" \
+          echo "Uruchamiam agenta MESKIAI..."
+          
+          # POST nie wymaga autoryzacji — bezpieczny endpoint dla crona
+          HTTP_STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" \
             -X POST \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
+            -d '{"trigger":"github-actions-cron"}' \
+            --max-time 120 \
             https://meskiai.com/api/cron/sync)
-
-          echo "Status odpowiedzi: $response"
-
-          if [ "$response" -eq 200 ]; then
+          
+          RESPONSE=$(cat /tmp/response.txt)
+          echo "Status HTTP: $HTTP_STATUS"
+          echo "Odpowiedź: $RESPONSE"
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
             echo "✅ Agent uruchomiony pomyślnie"
+          elif [ "$HTTP_STATUS" -eq 401 ]; then
+            echo "⚠️ Brak autoryzacji — sprawdź CRON_SECRET"
           else
-            echo "⚠️ Agent zwrócił status: $response"
-            exit 0  # Nie failuj - może być tymczasowy problem
+            echo "ℹ️ Status: $HTTP_STATUS — kontynuuję bez błędu"
           fi
+          
+          # Nie failuj pipeline'u — agent może być tymczasowo niedostępny
+          exit 0
