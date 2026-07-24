@@ -1,0 +1,1 @@
+export async function createAppleCalendarEvent(appleId: string, appPassword: string, event: { title: string; start: string; end: string; description?: string }) { console.log('Mock Apple Calendar Event creation:', { appleId, event }); return { success: true, error: null }; }

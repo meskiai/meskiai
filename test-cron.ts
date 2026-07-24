@@ -1,0 +1,1 @@
+import { runSync } from './lib/cron'; async function testCron() { console.log('Starting runSync manually...'); try { await runSync(); console.log('runSync finished successfully.'); } catch (err) { console.error('runSync failed:', err); } } testCron();

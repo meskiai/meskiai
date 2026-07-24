@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                      String  @id @default(cuid())
+  userId                  String
+  type                    String
+  provider                String
+  providerAccountId       String
+  refresh_token           String?  @db.Text
+  access_token            String?  @db.Text
+  expires_at              Int?
+  token_type              String?
+  scope                   String?
+  id_token                String?  @db.Text
+  session_state           String?
+  refresh_token_expires_in Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  settings      UserSettings?
+  threads       Thread[]
+  invoices      Invoice[]
+  leads         Lead[]
+  
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  subscriptionStatus     String?   @default("inactive")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model UserSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  autoReply          Boolean  @default(false)
+  onboardingDone     Boolean  @default(false)
+  businessContext    String?  @db.Text
+  companyName        String?
+  companyNip         String?
+  companyAddress     String?
+  companyBankAccount String?
+  defaultVatRate     String?  @default("23%")
+  replyTone          String?  @default("PROFESJONALNY")
+
+  emailsSentThisMonth         Int      @default(0)
+  competitorSearchesThisMonth Int      @default(0)
+  leadSearchesThisMonth       Int      @default(0)
+
+  // Agent 24/7 tracking
+  lastAgentRunAt     DateTime?
+  agentEmailsProcessed Int     @default(0)
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  userId    String
+  threadId  String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails     Email[]
+  status     ThreadStatus @default(PENDING_APPROVAL)
+  draftReply String?      @db.Text
+  updatedAt  DateTime     @updatedAt
+}
+
+model Email {
+  id         String   @id @default(cuid())
+  threadId   String
+  messageId  String   @unique
+  from       String
+  to         String
+  subject    String
+  snippet    String
+  body       String?  @db.Text
+  receivedAt DateTime
+  isFromAgent Boolean @default(false)
+  thread     Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+enum ThreadStatus {
+  PENDING_APPROVAL
+  REPLIED
+  IGNORED
+  AUTO_REPLIED
+  REQUIRES_ATTENTION
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  userId         String
+  invoiceNumber  String        @unique
+  clientName     String
+  clientNip      String?
+  clientAddress  String
+  totalAmount    Float
+  status         InvoiceStatus @default(DRAFT)
+  issueDate      DateTime      @default(now())
+  dueDate        DateTime?
+  saleDate       DateTime?
+  
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int
+  unitPrice   Float
+  vatRate     String   @default("23%")
+  
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String   @db.Text
+  source      String
+  probability Int      @default(0)
+  status      LeadStatus @default(NEW)
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  REJECTED
+}
