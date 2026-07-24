@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "MESKIAI — AI Email Agent",
   description: "MESKIAI is an AI-powered email assistant that automatically reads, analyzes and replies to your business emails 24/7. Designed for B2B companies to automate client communication.",
   keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "MESKIAI"],
+  verification: {
+    google: "s7pLe9Qvw4VmJCsUfAfeMhgYj1YzYXLcCnFdHczK-V8",
+  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
@@ -30,6 +33,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://meskiai.com"),
 };
+
 
 
 import { Providers } from "./providers";
