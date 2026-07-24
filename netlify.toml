@@ -1,2 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_STRIPE_PRICE_MAX,NEXT_PUBLIC_STRIPE_PRICE_PRO,NEXT_PUBLIC_STRIPE_PRICE_BASIC,STRIPE_WEBHOOK_SECRET"
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
