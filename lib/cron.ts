@@ -3,6 +3,25 @@ import { getGmailClient, sendEmail } from './gmail';
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
 
+// ─── Retry helper — Neon free tier usypia bazę, przy przebudzeniu może być ECONNRESET ──
+async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): Promise<T> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const msg = err?.message ?? '';
+      const isRetryable = msg.includes('ECONNRESET') || msg.includes('fetch failed') || msg.includes('NeonDbError');
+      if (isRetryable && i < retries - 1) {
+        console.log(`[Agent AI] Baza danych się budzi — ponowna próba ${i + 1}/${retries - 1} za ${delayMs}ms...`);
+        await new Promise(r => setTimeout(r, delayMs * (i + 1)));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error('Wyczerpano próby połączenia z bazą danych.');
+}
+
 // ─── Guard ────────────────────────────────────────────────────────────────────
 const g = global as any;
 const POLL_INTERVAL_MS = Number(process.env.CRON_INTERVAL_MS ?? 120_000);
@@ -31,10 +50,10 @@ export async function runSync() {
   g.__aiRunning = true;
 
   try {
-    // Pobierz wszystkich użytkowników z kontem Google i ustawieniami
-    const users = await prisma.user.findMany({
+    // Pobierz wszystkich użytkowników — retry gdy Neon budzi się ze snu
+    const users = await withRetry(() => prisma.user.findMany({
       include: { settings: true, accounts: true }
-    });
+    }));
 
     // Przetwarzaj tylko tych którzy mają konto Google OAuth
     const candidates = users.filter(u =>
