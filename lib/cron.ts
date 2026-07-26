@@ -250,7 +250,7 @@ async function processMessage({
 
   try {
     const { text } = await generateText({
-      model: googleAI('gemini-2.0-flash'),
+      model: googleAI('gemini-2.5-flash'),
       system: buildSystemPrompt(settings),
       prompt: `Od: ${from}\nTemat: ${subject}\n\nTreść:\n${body || msgData.data.snippet}`
     });
