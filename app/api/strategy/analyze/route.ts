@@ -59,44 +59,59 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-Jesteś elitarnym Agentem Strategicznym AI, doradcą biznesowym klasy Premium.
-Poniżej znajduje się tekst pobrany ze strony internetowej klienta (lub z instrukcji analizy na podstawie URL).
-Strona: ${targetUrl}
-Treść strony:
+Jesteś elitarnym Agentem Strategicznym AI, Głównym Analitykiem Danych w firmie doradczej wielkiej czwórki (Big 4).
+Otrzymałeś zlecenie przeprowadzenia głębokiego audytu biznesowego i strategicznego dla poniższej domeny/strony.
+
+Strona docelowa: ${targetUrl}
+Zeskrapowana treść strony (może być ucięta):
 ${pageText}
 
-Przeanalizuj tę stronę lub branżę i wygeneruj odpowiedź JSON:
-1. "products" - wylistuj max 5 głównych usług lub produktów firmy.
-2. "additions" - 5 genialnych dodatków podnoszących konwersję (np. kalkulator AI).
-3. "competitors" - 4-6 głównych konkurentów rynkowych, ich oferta i zagrożenie (Wysokie/Średnie/Niskie), oraz "url" (prawdziwy adres strony www konkurenta).
-4. "salesSuggestions" - 5-6 ultra-praktycznych wskazówek sprzedażowych B2B/B2C.
-5. "estimatedStats" - szacunkowe statystyki miesięczne wygenerowane "na oko":
-   - "theirClients" (number) - szacunkowa liczba klientów konkurencji (np. 1500)
-   - "ourPotentialClients" (number) - szacunkowa liczba klientów, którą firma mogłaby zdobyć przy lepszym marketingu (np. 3500)
-6. "websiteStats" - 3 obiekty ze sztucznymi statystykami strony, np. {"label": "Miesięczny Ruch", "value": "12.5k"}, {"label": "Wsp. Odrzuceń", "value": "45%"}
+Twoim zadaniem jest wygenerować ULTRA-PROFESJONALNY raport analityczny w formacie JSON.
+Nie zgaduj "na oko" w sposób amatorski - przeprowadź rzetelną dedukcję, wyliczając realistyczne metryki na podstawie natury branży, dostępnych danych oraz rynkowych benchmarków. Zwróć dane po polsku.
+
+Wymagane sekcje:
+1. "marketOverview": Zwięzłe podsumowanie rynku docelowego dla tej firmy, główny trend oraz szacowany roczny wzrost (np. "+12.5% YoY").
+2. "swotAnalysis": Klasyczna analiza SWOT (Strengths, Weaknesses, Opportunities, Threats), po 3-4 punkty na każdą kategorię.
+3. "keyMetrics": Kluczowe twarde metryki rynkowe:
+   - "seoDifficulty": Trudność pozycjonowania w tej branży (od 1 do 100).
+   - "averageCpc": Średni koszt kliknięcia w Google Ads dla tej branży (np. "3.50 PLN").
+   - "marginPotential": Potencjał marżowości ("Niski", "Średni", "Wysoki", "Bardzo Wysoki").
+4. "competitors": Lista 4 konkretnych, faktycznie istniejących głównych konkurentów na rynku (polskim lub globalnym zależy od profilu), wraz z ich:
+   - "name": Nazwa firmy
+   - "url": Prawdziwy adres URL
+   - "trafficEstimate": Szacowany miesięczny ruch (np. "150k - 200k")
+   - "mainAdvantage": Ich główna przewaga konkurencyjna
+   - "strategyGap": Luka w ich strategii, którą klient może wykorzystać
+5. "actionPlan": 3 konkretne, zaawansowane kroki strategiczne (To-Do) do wdrożenia w celu przejęcia leadów od konkurencji.
 `;
 
     const { object } = await generateObject({
       model: google("gemini-flash-latest"),
       schema: z.object({
-        products: z.array(z.string()),
-        additions: z.array(z.string()),
+        marketOverview: z.object({
+          summary: z.string(),
+          mainTrend: z.string(),
+          estimatedGrowth: z.string()
+        }),
+        swotAnalysis: z.object({
+          strengths: z.array(z.string()),
+          weaknesses: z.array(z.string()),
+          opportunities: z.array(z.string()),
+          threats: z.array(z.string())
+        }),
+        keyMetrics: z.object({
+          seoDifficulty: z.number(),
+          averageCpc: z.string(),
+          marginPotential: z.string()
+        }),
         competitors: z.array(z.object({
           name: z.string(),
           url: z.string(),
-          offer: z.string(),
-          interest: z.string(),
-          howToStandOut: z.string()
+          trafficEstimate: z.string(),
+          mainAdvantage: z.string(),
+          strategyGap: z.string()
         })),
-        salesSuggestions: z.array(z.string()),
-        estimatedStats: z.object({
-          theirClients: z.number(),
-          ourPotentialClients: z.number()
-        }),
-        websiteStats: z.array(z.object({
-          label: z.string(),
-          value: z.string()
-        }))
+        actionPlan: z.array(z.string())
       }),
       prompt,
     });

@@ -1472,3 +1472,13 @@ input:checked + .slider:before { transform: translateX(16px); }
     padding: 20px 16px !important;
   }
 }
+
+@keyframes pulseRing {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.pulseRing {
+  animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
