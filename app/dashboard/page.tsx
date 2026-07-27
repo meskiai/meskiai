@@ -1449,6 +1449,50 @@ export default function Dashboard() {
                         </>
                       )}
                     </div>
+
+                    {/* Modest Glassmorphism Credit Card Graphic */}
+                    <div style={{ marginTop: '24px', marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+                      <div style={{
+                        width: '100%', maxWidth: '320px', aspectRatio: '1.586', borderRadius: '16px', padding: '24px',
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02))',
+                        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid var(--glass-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.2)',
+                        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                        position: 'relative', overflow: 'hidden'
+                      }}>
+                        {/* Ambient glow inside the card */}
+                        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px', background: 'var(--primary)', filter: 'blur(40px)', opacity: 0.25, borderRadius: '50%' }}></div>
+                        <div style={{ position: 'absolute', bottom: '-40px', left: '-20px', width: '100px', height: '100px', background: 'var(--accent)', filter: 'blur(40px)', opacity: 0.15, borderRadius: '50%' }}></div>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 }}>
+                          <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '1px', color: 'var(--foreground)', opacity: 0.8 }}>MESKIAI</span>
+                          {/* Fake EMV Chip */}
+                          <div style={{ width: '36px', height: '26px', borderRadius: '6px', background: 'linear-gradient(135deg, #ffd700, #daa520)', border: '1px solid rgba(0,0,0,0.1)', opacity: 0.9, position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '30%', left: '0', right: '0', height: '1px', background: 'rgba(0,0,0,0.2)' }}></div>
+                            <div style={{ position: 'absolute', top: '60%', left: '0', right: '0', height: '1px', background: 'rgba(0,0,0,0.2)' }}></div>
+                            <div style={{ position: 'absolute', top: '0', bottom: '0', left: '30%', width: '1px', background: 'rgba(0,0,0,0.2)' }}></div>
+                            <div style={{ position: 'absolute', top: '0', bottom: '0', left: '70%', width: '1px', background: 'rgba(0,0,0,0.2)' }}></div>
+                          </div>
+                        </div>
+                        
+                        <div style={{ zIndex: 1, marginTop: 'auto' }}>
+                          <div style={{ fontSize: '1.35rem', letterSpacing: '4px', fontFamily: 'monospace', color: 'var(--foreground)', opacity: 0.9, marginBottom: '12px', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                            •••• •••• •••• {cardInfo?.last4 || "0000"}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--subtext)', marginBottom: '2px' }}>Posiadacz</span>
+                              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                {session?.user?.name || session?.user?.email?.split('@')[0] || "KLIENT"}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 800, fontStyle: 'italic', color: 'var(--foreground)', opacity: 0.7 }}>
+                              {cardInfo?.brand?.toUpperCase() || "STRIPE"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     {cancelAtPeriodEnd && expiryDate && (
                       <div className={styles.cancelNotice}>⚠️ Wygasa <strong>{expiryDate}</strong> — pełny dostęp do tego dnia.</div>
                     )}
