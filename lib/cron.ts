@@ -303,7 +303,12 @@ async function processMessage({
     const priceId      = user.stripePriceId;
     const PRICE_BASIC  = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
     const PRICE_PRO    = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    
+    // Użytkownik musi mieć aktywną subskrypcję, żeby agent odpowiadał
+    const hasActiveSub = priceId === PRICE_BASIC || priceId === PRICE_PRO;
+    
     const limitExceeded =
+      !hasActiveSub || // Jeśli nie ma aktywnej subskrypcji, traktujemy jako przekroczony limit
       (priceId === PRICE_BASIC && emailsSent >= 50) ||
       (priceId === PRICE_PRO   && emailsSent >= 1000);
 

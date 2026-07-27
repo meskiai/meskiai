@@ -46,7 +46,10 @@ export async function POST(req: Request) {
       try {
         await prisma.userSettings.upsert({
           where: { userId: session.user.id },
-          update: { appPassword: cleanedPassword },
+          update: { 
+            appPassword: cleanedPassword,
+            autoReply: true // Automatycznie włącz agenta po podłączeniu
+          },
           create: {
             userId: session.user.id,
             appPassword: cleanedPassword,
