@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Inteligentny asystent e-mail dla Twojej firmy.",
   keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "meskiai"],
   verification: {
-    google: "s7pLe9Qvw4VmJCsUfAfeMhgYj1YzYXLcCnFdHczK-V8",
+    google: "8vBRb58Hy261nwNRfWy_qTdnez3reAy6dGjoMhfUGqU",
   },
   icons: {
     icon: "/logo.png",
