@@ -42,6 +42,19 @@ export async function POST(
       where: { userId: session.user.id }
     });
 
+    if (userSettings) {
+      const isBasic = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+      const isPro = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+      const emailsCount = userSettings.emailsSentThisMonth || 0;
+
+      if (isBasic && emailsCount >= 50) {
+        return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (50) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
+      }
+      if (isPro && emailsCount >= 1000) {
+        return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (1000) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+      }
+    }
+
     if (!userSettings?.appPassword) {
       return NextResponse.json({ 
         error: "Brak skonfigurowanego Hasła Aplikacji Google. Przejdź do zakładki Konfiguracja i wpisz hasło aplikacji." 

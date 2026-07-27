@@ -37,14 +37,14 @@ export async function POST(req: Request) {
       }
     });
 
-    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
 
     if (isBasic && leadsCount >= 20) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit propozycji klientów dla pakietu BASIC (20)." }, { status: 403 });
+      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu BASIC (20). Zrób upgrade pakietu, aby kontynuować." }, { status: 403 });
     }
     if (isPro && leadsCount >= 200) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit propozycji klientów dla pakietu PRO (200)." }, { status: 403 });
+      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu PRO (200). Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
     }
 
     // Generate 5 leads using Gemini

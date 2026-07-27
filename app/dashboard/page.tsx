@@ -86,6 +86,21 @@ export default function Dashboard() {
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
+  // Computed Limits
+  const pid = subscriptionData?.stripePriceId;
+  const isBasic = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+  const isPro = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+  const isMax = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+  const isUnlimited = isMax;
+  
+  const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
+  const searchesUsed = subscriptionData?.competitorSearchesThisMonth || 0;
+  const emailLimit = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
+  const searchLimit = isBasic ? 10 : isPro ? 100 : isMax ? Infinity : 0;
+
+  const isEmailLimitReached = !isUnlimited && emailsUsed >= emailLimit && emailLimit > 0;
+  const isSearchLimitReached = !isUnlimited && searchesUsed >= searchLimit && searchLimit > 0;
+
   const fetchSettings = async () => {
     try {
       const res = await fetch(`/api/settings?t=${Date.now()}`);
@@ -384,6 +399,10 @@ export default function Dashboard() {
   };
 
   const handleSendLeadEmail = async () => {
+    if (isEmailLimitReached) {
+      alert("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      return;
+    }
     if (!contactingLead || !contactEmail || !contactSubject || !contactBody) {
       alert("Proszę wypełnić wszystkie pola (E-mail, Temat, Treść).");
       return;
@@ -418,6 +437,10 @@ export default function Dashboard() {
   };
 
   const handleAnalyzeStrategy = async () => {
+    if (isSearchLimitReached) {
+      alert("Wykorzystałeś swój miesięczny limit analiz strategii. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      return;
+    }
     if (!strategyUrl) {
       alert("Proszę podać adres URL strony.");
       return;
@@ -550,6 +573,10 @@ export default function Dashboard() {
   };
 
   const handleSendReply = async () => {
+    if (isEmailLimitReached) {
+      alert("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      return;
+    }
     if (!selectedThread) return;
     if (!editedReply.trim()) {
       alert("Odpowiedź nie może być pusta! Wpisz coś ręcznie lub wygeneruj z AI.");

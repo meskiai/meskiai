@@ -36,6 +36,17 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    const isBasic = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const emailsCount = userSettings.emailsSentThisMonth || 0;
+
+    if (isBasic && emailsCount >= 50) {
+      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (50) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
+    }
+    if (isPro && emailsCount >= 1000) {
+      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (1000) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+    }
+
     // Send via SMTP using Gmail App Password
     await sendReplySMTP(
       session.user.email!,
@@ -45,11 +56,17 @@ export async function POST(req: Request) {
       body
     );
 
-    // Oznacz leada jako skontaktowanego
-    await prisma.lead.update({
-      where: { id: leadId },
-      data: { status: "CONTACTED" }
-    });
+    // Oznacz leada jako skontaktowanego i inkrementuj licznik e-maili
+    await prisma.$transaction([
+      prisma.lead.update({
+        where: { id: leadId },
+        data: { status: "CONTACTED" }
+      }),
+      prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { emailsSentThisMonth: { increment: 1 } }
+      })
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

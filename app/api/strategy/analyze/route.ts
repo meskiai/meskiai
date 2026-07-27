@@ -24,16 +24,15 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Brak użytkownika" }, { status: 404 });
 
-    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-
+    const isBasic = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const searchesCount = user.settings?.competitorSearchesThisMonth || 0;
 
-    if (isBasic && searchesCount >= 20) {
-      return NextResponse.json({ error: "Wykorzystałeś limit wyszukiwań dla pakietu BASIC (20)." }, { status: 403 });
+    if (isBasic && searchesCount >= 10) {
+      return NextResponse.json({ error: "Wykorzystałeś limit analiz (10) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
     }
     if (isPro && searchesCount >= 100) {
-      return NextResponse.json({ error: "Wykorzystałeś limit wyszukiwań dla pakietu PRO (100)." }, { status: 403 });
+      return NextResponse.json({ error: "Wykorzystałeś limit analiz (100) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
     }
 
     let pageText = "";
