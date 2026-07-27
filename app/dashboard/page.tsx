@@ -1597,7 +1597,7 @@ export default function Dashboard() {
                   <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>Raport Witryny</h2>
                   <p style={{ color: "var(--subtext)", fontSize: "1rem", margin: 0 }}>Wprowadź adres URL, aby pobrać informacje i wygenerować raport rynkowy.</p>
                   
-                  <div style={{ marginTop: '24px', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+                  <div style={{ marginTop: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', overflow: 'hidden', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', boxShadow: 'var(--mac-shadow), var(--glass-reflection)' }}>
                     {strategyResults && !isAnalyzingStrategy ? (
                       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
@@ -1654,7 +1654,7 @@ export default function Dashboard() {
                     
                     {/* Traffic & Potential Stats (Minimalist row) */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)' }}>
                         <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '20px', fontWeight: 600 }}>Szacunkowy Ruch</div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           {strategyResults.websiteStats?.map((stat: any, i: number) => (
@@ -1666,7 +1666,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)' }}>
                         <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '20px', fontWeight: 600 }}>Potencjał Klientów</div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                           <div>
@@ -1692,7 +1692,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Competitors */}
-                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)' }}>
                       <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', fontWeight: 600 }}>Analiza Konkurencji</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         {strategyResults.competitors?.map((comp: any, i: number) => (
