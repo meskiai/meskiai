@@ -49,10 +49,6 @@ export async function runSync() {
   g.__aiRunning = now;
 
   try {
-    const PRICE_BASIC = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-    const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-
     const users = await withRetry(() => prisma.user.findMany({
       include: { settings: true }
     }));
@@ -60,7 +56,7 @@ export async function runSync() {
     // Bierzemy pod uwagę tylko tych, którzy mają aktywną subskrypcję LUB mają już hasło aplikacji (dla darmowych testów)
     const candidates = users.filter(u => 
       u.email && 
-      (u.settings?.appPassword || u.stripePriceId === PRICE_BASIC || u.stripePriceId === PRICE_PRO || u.stripePriceId === PRICE_MAX)
+      (u.settings?.appPassword || u.subscriptionStatus === 'active' || u.subscriptionStatus === 'trialing')
     );
 
     if (candidates.length === 0) {
