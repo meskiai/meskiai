@@ -2150,7 +2150,19 @@ export default function Dashboard() {
 
                   {/* Step 2 */}
                   <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>2</div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>2</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz POP w Gmailu</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Zaznacz opcję <strong>"Włącz POP dla poczty otrzymywanej od tej chwili"</strong> i kliknij Zapisz Zmiany.</p>
+                    </div>
+                    <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Ustawienia POP <ExternalLink size={14} style={{ marginLeft: '6px' }} />
+                    </a>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>3</div>
                     <div style={{ flex: 1 }}>
                       <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Utwórz Hasło Aplikacji</h4>
                       <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Google poprosi Cię o podanie nazwy (np. "Meski AI"). <br/><em style={{ opacity: 0.8 }}>Wymaga włączonego logowania dwuetapowego (2FA) na koncie Google.</em></p>
@@ -2160,9 +2172,9 @@ export default function Dashboard() {
                     </a>
                   </div>
 
-                  {/* Step 3 */}
+                  {/* Step 4 */}
                   <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px 20px', display: 'flex', alignItems: 'flex-start', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0, marginTop: '4px' }}>3</div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0, marginTop: '4px' }}>4</div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       <div>
                         <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Wklej wygenerowane 16-literowe hasło</h4>
