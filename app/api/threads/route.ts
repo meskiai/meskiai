@@ -15,7 +15,7 @@ export async function GET(req: Request) {
   try {
     const threads = await prisma.thread.findMany({
       where: { userId: session.user.id },
-      take: 50,
+      take: 500, // Zwiększony limit z 50 do 500, aby zakładki Wysłane i Spam nie znikały
       include: {
         emails: {
           orderBy: { receivedAt: 'desc' }
