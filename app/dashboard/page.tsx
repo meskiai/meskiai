@@ -2138,8 +2138,8 @@ export default function Dashboard() {
                   <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>1</div>
                     <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz dostęp w Gmailu</h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Zaznacz opcję <strong>"Włącz IMAP"</strong> i kliknij Zapisz Zmiany na dole strony.</p>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz protokół POP3</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Zaznacz opcję <strong>"Włącz POP dla wszystkich wiadomości"</strong> (w zakładce Przekazywanie i POP/IMAP) i kliknij Zapisz Zmiany na dole strony.</p>
                     </div>
                     <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
                       Otwórz Gmail <ExternalLink size={14} style={{ marginLeft: '6px' }} />
