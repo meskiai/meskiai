@@ -2247,7 +2247,11 @@ export default function Dashboard() {
                       >
                         <div className={styles.threadHeader}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span className={styles.sender}>{latestEmail.from.split('<')[0]}</span>
+                            <span className={styles.sender}>
+                              {currentTab === "SENT" || latestEmail.isFromAgent 
+                                ? `Do: ${latestEmail.to.split('<')[0]}` 
+                                : latestEmail.from.split('<')[0]}
+                            </span>
                             <span className={styles.date}>{new Date(latestEmail.receivedAt).toLocaleDateString()}</span>
                           </div>
                           <button 
