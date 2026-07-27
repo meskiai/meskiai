@@ -269,15 +269,15 @@ async function processMessage({
     const { text } = await generateText({
       model: googleAI('gemini-flash-latest'),
       system: buildSystemPrompt(settings),
-      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\n\nTreść:\n${msg.text}`
+      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść:\n${msg.text}`
     });
 
     const aiText  = text.trim();
-    const upper   = aiText.toUpperCase().slice(0, 30);
+    const upper   = aiText.toUpperCase().slice(0, 50);
 
-    if (upper.startsWith('BOT')) {
+    if (upper.includes('BOT') || upper.includes('SPAM') || upper.includes('IGNORE')) {
       await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
-      console.log(`[Agent AI] Wykryto bota → IGNORED`);
+      console.log(`[Agent AI] Wykryto bota/spam → IGNORED`);
       return;
     }
 
@@ -303,7 +303,12 @@ async function processMessage({
       (priceId === PRICE_BASIC && emailsSent >= 50) ||
       (priceId === PRICE_PRO   && emailsSent >= 1000);
 
-    if (isAutoReplyOn && !limitExceeded) {
+    // ZABEZPIECZENIE: Jeśli mail jest starszy niż 48 godzin (użytkownik pobrał złą opcją całą historię)
+    // AI nie wyśle na niego auto-odpowiedzi. Zostanie stworzony jedynie szkic.
+    const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
+    const isTooOld = messageAgeHours > 48;
+
+    if (isAutoReplyOn && !limitExceeded && !isTooOld) {
       // ── AUTO-WYŚLIJ ──
       const replyTo = msg.from.replace(/.*<(.+)>.*/, '$1').trim() || msg.from;
       
@@ -338,16 +343,21 @@ async function processMessage({
       console.log(`[Agent AI] ✅ Auto-odpowiedź wysłana → ${replyTo}`);
     } else {
       // ── ZAPISZ SZKIC ──
-      const notice = isAutoReplyOn && limitExceeded
-        ? '\n\n[LIMIT]: Miesięczny limit auto-odpowiedzi wyczerpany. Szkic zapisany.'
-        : '';
+      let notice = '';
+      if (!hasActiveSub) {
+        notice = '\n\n[LIMIT]: Brak aktywnej subskrypcji. Szkic zapisany.';
+      } else if (limitExceeded) {
+        notice = '\n\n[LIMIT]: Miesięczny limit auto-odpowiedzi wyczerpany. Szkic zapisany.';
+      } else if (isTooOld) {
+        notice = '\n\n[BEZPIECZEŃSTWO]: Wiadomość jest starsza niż 48h. Ze względów bezpieczeństwa utworzono tylko szkic (uniknięcie spamu do starych wątków).';
+      }
 
       await prisma.thread.update({
         where: { id: dbThread.id },
         data:  { draftReply: aiText + notice }
       });
 
-      const why = !isAutoReplyOn ? 'autoReply=OFF' : 'limit wyczerpany';
+      const why = isTooOld ? 'zbyt stary e-mail' : (!isAutoReplyOn ? 'autoReply=OFF' : 'limit wyczerpany');
       console.log(`[Agent AI] 📝 Szkic zapisany (${why})`);
     }
   } catch (aiErr: any) {
@@ -371,13 +381,14 @@ function buildSystemPrompt(settings: any): string {
       ? 'Odpowiedź maksymalnie 2-3 zdania. Żadnych długich uprzejmości.'
       : 'Pisz profesjonalnie i oficjalnie.';
 
-  return `Jesteś asystentem AI ds. e-maili pracującym 24/7.
+  return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7.
 Firma: "${ctx}"
 Ton: ${tone} — ${toneInstr}
 
 ZASADY:
-1. Jeśli wiadomość to absolutny spam, reklama, newsletter, bot, systemowa lub śmieciowa oferta → odpowiedz TYLKO: BOT
-2. Jeśli wiadomość jest ściśle ważna, pilna, biznesowo krytyczna lub wymaga podjęcia decyzji przez właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION  
-3. Dla zwykłych wiadomości: napisz odpowiedź w odpowiednim tonie i języku. Podpisz się jako profesjonalny Asystent z firmy klienta (na podstawie podanej bazy wiedzy/strony www), a nie jako zewnętrzny asystent. Nie dodawaj 'MESKIAI'.
-4. Nie pisz żadnych meta-komentarzy. Odpowiadaj bezpośrednio treścią maila.`;
+1. BARDZO WAŻNE (SPAM): Jeśli wiadomość to jakikolwiek newsletter, reklama, zimny mail (cold mailing), oferta marketingowa, powiadomienie z portalu społecznościowego, automatyczne powiadomienie o logowaniu lub śmieciowa oferta → odpowiedz TYLKO JEDNYM SŁOWEM: SPAM
+2. BARDZO WAŻNE (KRYTYCZNE): Jeśli wiadomość jest ściśle ważna, pilna, biznesowo krytyczna, wymaga zwrotu pieniędzy, dotyczy spraw prawnych, jest groźbą, wymaga podjęcia ludzkiej decyzji przez właściciela lub negocjacji kontraktu → odpowiedz TYLKO: REQUIRES_ATTENTION  
+3. Dla normalnych, codziennych pytań od klientów lub partnerów biznesowych: napisz odpowiedź w odpowiednim tonie i języku. Podpisz się jako profesjonalny asystent z firmy klienta (na podstawie podanej bazy wiedzy), a nie jako "asystent AI".
+4. Nie wymyślaj cenników, jeśli nie masz ich podanych. W przypadku pytań o coś, czego nie wiesz, odpowiedz REQUIRES_ATTENTION.
+5. Nie pisz żadnych meta-komentarzy, przywitań typu "Oto odpowiedź". Generuj wyłącznie czystą treść maila do wysłania.`;
 }
