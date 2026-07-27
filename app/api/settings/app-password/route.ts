@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       const isTimeout = validationResult.error?.includes('Timeout') || validationResult.error?.includes('czas oczekiwania');
       
       if (!isTimeout) {
-        return NextResponse.json({ error: `Nie udało się połączyć. Upewnij się, że wpisałeś poprawne hasło oraz włączyłeś IMAP w opcjach Gmail. Szczegóły: ${validationResult.error}` }, { status: 400 });
+        return NextResponse.json({ error: `Nie udało się połączyć. Upewnij się, że wpisałeś poprawne hasło oraz włączyłeś POP3 w opcjach Gmail. Szczegóły: ${validationResult.error}` }, { status: 400 });
       }
       
       // If it's a timeout, we log it but continue saving, because Google tarpits bad passwords 
