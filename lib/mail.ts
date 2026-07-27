@@ -1,6 +1,6 @@
 import { simpleParser } from 'mailparser';
 import nodemailer from 'nodemailer';
-import imaps from 'imap-simple';
+import { ImapFlow } from 'imapflow';
 
 export interface FetchedEmail {
   pop3Uid: string; // we keep the name pop3Uid for DB backwards compatibility, but it will store IMAP UID
@@ -14,87 +14,80 @@ export interface FetchedEmail {
   date: Date;
 }
 
-const getImapConfig = (email: string, appPassword: string) => ({
-  imap: {
-    user: email,
-    password: appPassword,
+const getImapClient = (email: string, appPassword: string) => {
+  return new ImapFlow({
     host: 'imap.gmail.com',
     port: 993,
-    tls: true,
-    tlsOptions: { rejectUnauthorized: false },
-    authTimeout: 10000,
-  }
-});
+    secure: true,
+    auth: {
+      user: email,
+      pass: appPassword
+    },
+    logger: false, // Set to true for debugging if needed
+    tls: { rejectUnauthorized: false }
+  });
+};
 
 /**
- * Fetches unread emails via IMAP.
+ * Fetches unread emails via IMAP using ImapFlow.
  * Connects to imap.gmail.com:993
  * Skips UIDs that are already present in knownUids array.
  */
 export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, knownUids: string[]): Promise<FetchedEmail[]> {
-  const config = getImapConfig(email, appPassword);
-  
-  let connection;
+  const client = getImapClient(email, appPassword);
   const fetchedEmails: FetchedEmail[] = [];
 
   try {
-    connection = await imaps.connect(config);
-    await connection.openBox('INBOX');
+    await client.connect();
+    const lock = await client.getMailboxLock('INBOX');
+    
+    try {
+      // Pobierz wiadomości z flagą UNSEEN (nieprzeczytane)
+      // fetch() returns an async generator
+      for await (let msg of client.fetch({ seen: false }, { source: true, uid: true })) {
+        const uid = msg.uid.toString();
+        
+        if (knownUids.includes(uid)) continue;
 
-    // Fetch emails from the last 7 days to avoid fetching entire history,
-    // or fetch UNSEEN. Let's fetch UNSEEN.
-    const searchCriteria = ['UNSEEN'];
-    const fetchOptions = {
-      bodies: ['HEADER', 'TEXT', ''],
-      markSeen: false,
-      struct: true
-    };
+        try {
+          const parsed: any = await simpleParser(msg.source as Buffer);
 
-    const messages = await connection.search(searchCriteria, fetchOptions);
+          const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
+          const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
+          const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
+          const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
 
-    for (const item of messages) {
-      const uid = item.attributes.uid.toString();
-      
-      if (knownUids.includes(uid)) continue;
+          let inReplyTo = parsed.inReplyTo;
+          if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
 
-      const all = item.parts.find((part: any) => part.which === '');
-      const idHeader = "Imap-Id: " + item.attributes.uid + "\r\n";
-      
-      try {
-        const bodyContent = all ? all.body : '';
-        const parsed = await simpleParser(idHeader + bodyContent);
+          let references = parsed.references;
+          if (typeof references === 'string') references = [references];
 
-        const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
-        const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
-        const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
-        const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
-
-        let inReplyTo = parsed.inReplyTo;
-        if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
-
-        let references = parsed.references;
-        if (typeof references === 'string') references = [references];
-
-        fetchedEmails.push({
-          pop3Uid: uid, // Keeping the field name pop3Uid for DB compat
-          messageId,
-          inReplyTo,
-          references: references as string[] | undefined,
-          from: fromAddr,
-          to: toAddr,
-          subject: parsed.subject || '(Brak tematu)',
-          text: parsed.text || '',
-          date: parsed.date || new Date()
-        });
-      } catch (err: any) {
-        console.error(`[Agent AI] Błąd parsowania wiadomości IMAP UID ${uid}:`, err.message);
+          fetchedEmails.push({
+            pop3Uid: uid,
+            messageId,
+            inReplyTo,
+            references: references as string[] | undefined,
+            from: fromAddr,
+            to: toAddr,
+            subject: parsed.subject || '(Brak tematu)',
+            text: parsed.text || '',
+            date: parsed.date || new Date()
+          });
+        } catch (err: any) {
+          console.error(`[Agent AI] Błąd parsowania wiadomości IMAP UID ${uid}:`, err.message);
+        }
       }
+    } finally {
+      lock.release();
     }
     
-    connection.end();
+    await client.logout();
   } catch (error: any) {
-    console.error('[Agent AI] Błąd połączenia IMAP:', error);
-    if (connection) connection.end();
+    console.error('[Agent AI] Błąd połączenia IMAP (ImapFlow):', error);
+    try {
+      await client.logout();
+    } catch (e) {}
     throw error;
   }
 
@@ -153,9 +146,10 @@ export async function sendReplySMTP(
  * Validates IMAP credentials by attempting a connection.
  */
 export async function validateImapCredentials(email: string, appPassword: string): Promise<boolean> {
+  const client = getImapClient(email, appPassword);
   try {
-    const connection = await imaps.connect(getImapConfig(email, appPassword));
-    connection.end();
+    await client.connect();
+    await client.logout();
     return true;
   } catch (error) {
     return false;
@@ -163,12 +157,14 @@ export async function validateImapCredentials(email: string, appPassword: string
 }
 
 export async function validateImapCredentialsDetailed(email: string, appPassword: string): Promise<{isValid: boolean, error?: string}> {
+  const client = getImapClient(email, appPassword);
+  
   try {
-    const connectPromise = imaps.connect(getImapConfig(email, appPassword));
+    const connectPromise = client.connect();
     const timeoutPromise = new Promise<any>((_, reject) => setTimeout(() => reject(new Error('Przekroczono czas oczekiwania (Timeout). Serwery Google nie odpowiadają. Spróbuj ponownie.')), 10000));
     
-    const connection = await Promise.race([connectPromise, timeoutPromise]);
-    connection.end();
+    await Promise.race([connectPromise, timeoutPromise]);
+    await client.logout();
     
     return { isValid: true };
   } catch (error: any) {

@@ -183,10 +183,20 @@ async function processMessage({
   let dbThread: any;
   if (!existing) {
     if (!dbThreadId) {
-      // Nowy wątek
-      dbThread = await prisma.thread.create({
-        data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
-      });
+      // Sprawdzamy czy wątek o takim threadId nie został już utworzony (np. w innej równoległej transakcji)
+      let existingThread = await prisma.thread.findUnique({ where: { threadId: messageId } });
+      
+      if (existingThread) {
+        dbThread = await prisma.thread.update({
+          where: { id: existingThread.id },
+          data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+        });
+      } else {
+        // Nowy wątek
+        dbThread = await prisma.thread.create({
+          data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
+        });
+      }
     } else {
       // Istniejący wątek
       dbThread = await prisma.thread.update({
