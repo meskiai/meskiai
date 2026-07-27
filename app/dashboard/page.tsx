@@ -86,6 +86,12 @@ export default function Dashboard() {
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
+  // Toast Notification State
+  const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
   // Computed Limits
   const getTier = (priceId: string | null | undefined) => {
     if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
@@ -221,7 +227,7 @@ export default function Dashboard() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert("Błąd podczas tworzenia sesji płatności");
+        showToast("Błąd podczas tworzenia sesji płatności", "error");
         setIsRedirectingToCheckout(false);
       }
     } catch (e) {
@@ -240,12 +246,12 @@ export default function Dashboard() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert("Błąd podczas otwierania panelu zarządzania subskrypcją.");
+        showToast("Błąd podczas otwierania panelu zarządzania subskrypcją.", "error");
         setIsOpeningPortal(false);
       }
     } catch (e) {
       console.error(e);
-      alert("Błąd połączenia.");
+      showToast("Błąd połączenia.", "error");
       setIsOpeningPortal(false);
     }
   };
@@ -274,13 +280,13 @@ export default function Dashboard() {
       const data = await res.json();
       if (data.success) {
         setCancelAtPeriodEnd(true);
-        alert("Subskrypcja zostanie anulowana z końcem bieżącego okresu rozliczeniowego. Zachowasz dostęp do tego dnia.");
+        showToast("Subskrypcja zostanie anulowana z końcem bieżącego okresu rozliczeniowego. Zachowasz dostęp do tego dnia.", "info");
       } else {
-        alert("Błąd: " + (data.error || "Nie udało się anulować subskrypcji."));
+        showToast("Błąd: " + (data.error || "Nie udało się anulować subskrypcji."), "error");
       }
     } catch (e) {
       console.error(e);
-      alert("Błąd połączenia.");
+      showToast("Błąd połączenia.", "error");
     } finally {
       setIsCancelingSubscription(false);
     }
@@ -288,7 +294,7 @@ export default function Dashboard() {
 
   const handleSaveSettings = async (type: 'company' | 'knowledge' | 'all') => {
     if ((type === 'knowledge' || type === 'all') && businessContext.trim().length < 20) {
-      alert("Baza wiedzy musi zawierać minimum 20 znaków, aby Agent AI mógł skutecznie działać.");
+      showToast("Baza wiedzy musi zawierać minimum 20 znaków, aby Agent AI mógł skutecznie działać.", "error");
       return;
     }
 
@@ -307,12 +313,12 @@ export default function Dashboard() {
         } catch(e){}
         throw new Error(errMsg);
       }
-      alert("Zapisano pomyślnie!");
+      showToast("Zapisano pomyślnie!", "success");
       if (type === 'company' || type === 'all') setIsEditingCompany(false);
       if (type === 'knowledge' || type === 'all') setIsEditingKnowledge(false);
     } catch (e: any) {
       console.error(e);
-      alert(`Wystąpił błąd podczas zapisywania: ${e.message}`);
+      showToast(`Wystąpił błąd podczas zapisywania: ${e.message}`, "error");
     } finally {
       setSavingSettings(false);
     }
@@ -346,7 +352,7 @@ export default function Dashboard() {
 
   const handleGenerateLeads = async () => {
     if (!businessContext || businessContext.length < 20) {
-      alert("Twoja baza wiedzy jest pusta lub zbyt krótka. Uzupełnij opis firmy w Ustawieniach, aby AI wiedziało dla kogo szukać klientów.");
+      showToast("Twoja baza wiedzy jest pusta lub zbyt krótka. Uzupełnij opis firmy w Ustawieniach, aby AI wiedziało dla kogo szukać klientów.", "error");
       return;
     }
     setGeneratingLeads(true);
@@ -356,11 +362,11 @@ export default function Dashboard() {
       if (res.ok) {
         await fetchLeads();
       } else {
-        alert(data.error || "Błąd podczas szukania klientów");
+        showToast(data.error || "Błąd podczas szukania klientów", "error");
       }
     } catch (e) {
       console.error(e);
-      alert("Błąd połączenia z serwerem");
+      showToast("Błąd połączenia z serwerem", "error");
     } finally {
       setGeneratingLeads(false);
     }
@@ -400,12 +406,12 @@ export default function Dashboard() {
         setContactSubject(data.subject || "");
         setContactBody(data.body || "");
       } else {
-        alert(data.error || "Nie udało się wygenerować maila. Możesz wpisać treść ręcznie.");
+        showToast(data.error || "Nie udało się wygenerować maila. Możesz wpisać treść ręcznie.", "error");
         // We do not close the modal so the user can type manually
       }
     } catch (e) {
       console.error(e);
-      alert("Błąd połączenia z serwerem. Możesz wpisać treść ręcznie.");
+      showToast("Błąd połączenia z serwerem. Możesz wpisać treść ręcznie.", "error");
     } finally {
       setIsGeneratingEmail(false);
     }
@@ -413,11 +419,11 @@ export default function Dashboard() {
 
   const handleSendLeadEmail = async () => {
     if (isEmailLimitReached) {
-      alert("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      showToast("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.", "error");
       return;
     }
     if (!contactingLead || !contactEmail || !contactSubject || !contactBody) {
-      alert("Proszę wypełnić wszystkie pola (E-mail, Temat, Treść).");
+      showToast("Proszę wypełnić wszystkie pola (E-mail, Temat, Treść).", "error");
       return;
     }
 
@@ -437,13 +443,13 @@ export default function Dashboard() {
       if (res.ok) {
         setContactingLead(null);
         await fetchLeads();
-        alert("Wiadomość została wysłana, a lead zarchiwizowany!");
+        showToast("Wiadomość została wysłana, a lead zarchiwizowany!", "success");
       } else {
         const data = await res.json();
-        alert(data.error || "Nie udało się wysłać maila.");
+        showToast(data.error || "Nie udało się wysłać maila.", "error");
       }
     } catch (e) {
-      alert("Błąd połączenia z serwerem.");
+      showToast("Błąd połączenia z serwerem.", "error");
     } finally {
       setIsSendingEmail(false);
     }
@@ -451,11 +457,11 @@ export default function Dashboard() {
 
   const handleAnalyzeStrategy = async () => {
     if (isSearchLimitReached) {
-      alert("Wykorzystałeś swój miesięczny limit analiz strategii. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      showToast("Wykorzystałeś swój miesięczny limit analiz strategii. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.", "error");
       return;
     }
     if (!strategyUrl) {
-      alert("Proszę podać adres URL strony.");
+      showToast("Proszę podać adres URL strony.", "error");
       return;
     }
     
@@ -490,12 +496,12 @@ export default function Dashboard() {
         localStorage.setItem("meskiStrategyUrl", strategyUrl);
         localStorage.setItem("meskiStrategyResults", JSON.stringify(data));
       } else {
-        alert(data.error || "Wystąpił błąd podczas analizy strony.");
+        showToast(data.error || "Wystąpił błąd podczas analizy strony.", "error");
       }
     } catch (e) {
       clearInterval(stepsInterval);
       console.error(e);
-      alert("Błąd połączenia podczas analizy.");
+      showToast("Błąd połączenia podczas analizy.", "error");
     } finally {
       setIsAnalyzingStrategy(false);
     }
@@ -588,12 +594,12 @@ export default function Dashboard() {
 
   const handleSendReply = async () => {
     if (isEmailLimitReached) {
-      alert("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.");
+      showToast("Wykorzystałeś swój miesięczny limit wysłanych e-maili. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.", "error");
       return;
     }
     if (!selectedThread) return;
     if (!editedReply.trim()) {
-      alert("Odpowiedź nie może być pusta! Wpisz coś ręcznie lub wygeneruj z AI.");
+      showToast("Odpowiedź nie może być pusta! Wpisz coś ręcznie lub wygeneruj z AI.", "error");
       return;
     }
     
@@ -609,11 +615,11 @@ export default function Dashboard() {
         setSelectedThread(null);
       } else {
         const errData = await res.json();
-        alert("Błąd podczas wysyłania wiadomości: " + (errData.error || "Nieznany błąd serwera."));
+        showToast("Błąd podczas wysyłania wiadomości: " + (errData.error || "Nieznany błąd serwera."), "error");
       }
     } catch (e: any) {
       console.error(e);
-      alert("Błąd połączenia: " + e.message);
+      showToast("Błąd połączenia: " + e.message, "error");
     } finally {
       setSending(false);
     }
@@ -2129,70 +2135,7 @@ export default function Dashboard() {
                 )}
               </div>
               
-              {/* Contact Lead Modal */}
-              {contactingLead && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Sparkles size={20} style={{ color: 'var(--primary)' }} />
-                      Napisz (Cold Email) do: {contactingLead.name}
-                    </h3>
-                    
-                    {isGeneratingEmail ? (
-                      <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--subtext)' }}>
-                        <RefreshCw size={32} className="animate-spin" style={{ margin: '0 auto 16px', color: 'var(--primary)' }} />
-                        <p>Agent AI analizuje profil firmy i pisze spersonalizowanego maila...</p>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>E-mail Odbiorcy</label>
-                          <input 
-                            type="email"
-                            value={contactEmail}
-                            onChange={(e) => setContactEmail(e.target.value)}
-                            placeholder="np. kontakt@firma.pl"
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Temat Wiadomości</label>
-                          <input 
-                            type="text"
-                            value={contactSubject}
-                            onChange={(e) => setContactSubject(e.target.value)}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Treść Wiadomości</label>
-                          <textarea 
-                            value={contactBody}
-                            onChange={(e) => setContactBody(e.target.value)}
-                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', minHeight: '200px', resize: 'vertical' }}
-                          />
-                        </div>
-                        
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-                          <button 
-                            onClick={() => setContactingLead(null)}
-                            style={{ background: 'transparent', color: 'var(--subtext)', border: '1px solid var(--border)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}
-                          >
-                            Anuluj
-                          </button>
-                          <button 
-                            onClick={handleSendLeadEmail}
-                            disabled={isSendingEmail}
-                            style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: isSendingEmail ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
-                          >
-                            {isSendingEmail ? <><RefreshCw size={16} className="animate-spin" /> Wysyłam...</> : <><Send size={16} /> Wyślij</>}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Modal moved to the root to fix position: fixed centering issues */}
             </div>
           )}
 
@@ -2384,7 +2327,7 @@ export default function Dashboard() {
                                 setEditedReply(data.draftReply || "");
                                 await fetchThreads();
                               } else {
-                                alert("Nie udało się wygenerować odpowiedzi.");
+                                showToast("Nie udało się wygenerować odpowiedzi.", "error");
                                 setEditedReply("");
                               }
                             } catch (e) {
@@ -2491,6 +2434,97 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* Contact Lead Modal (moved to root for proper fixed positioning) */}
+      {contactingLead && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in-up" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '92%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={20} style={{ color: 'var(--primary)' }} />
+              Napisz (Cold Email) do: {contactingLead.name}
+            </h3>
+            
+            {isGeneratingEmail ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--subtext)' }}>
+                <RefreshCw size={32} className="animate-spin" style={{ margin: '0 auto 16px', color: 'var(--primary)' }} />
+                <p>Agent AI analizuje profil firmy i pisze spersonalizowanego maila...</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>E-mail Odbiorcy</label>
+                  <input 
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="np. kontakt@firma.pl"
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Temat Wiadomości</label>
+                  <input 
+                    type="text"
+                    value={contactSubject}
+                    onChange={(e) => setContactSubject(e.target.value)}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Treść Wiadomości</label>
+                  <textarea 
+                    value={contactBody}
+                    onChange={(e) => setContactBody(e.target.value)}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', minHeight: '200px', resize: 'vertical' }}
+                  />
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+                  <button 
+                    onClick={() => setContactingLead(null)}
+                    style={{ background: 'transparent', color: 'var(--subtext)', border: '1px solid var(--border)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    Anuluj
+                  </button>
+                  <button 
+                    onClick={handleSendLeadEmail}
+                    disabled={isSendingEmail}
+                    style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: isSendingEmail ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    {isSendingEmail ? <><RefreshCw size={16} className="animate-spin" /> Wysyłam...</> : <><Send size={16} /> Wyślij</>}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Toast Notification Overlay */}
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: toast.type === 'error' ? 'var(--error-bg, rgba(255, 59, 48, 0.9))' : toast.type === 'success' ? 'var(--success-bg, rgba(52, 199, 89, 0.9))' : 'var(--card-bg)',
+          color: 'white',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+          zIndex: 10000,
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          animation: 'fadeInUpToast 0.3s ease-out forwards',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          {toast.type === 'error' ? <AlertCircle size={20} /> : toast.type === 'success' ? <CheckCircle size={20} /> : <Info size={20} />}
+          <span style={{ fontWeight: 500, fontSize: '0.95rem' }}>{toast.message}</span>
         </div>
       )}
     </div>
