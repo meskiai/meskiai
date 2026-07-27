@@ -65,6 +65,7 @@ model VerificationToken {
 model UserSettings {
   id                 String   @id @default(cuid())
   userId             String   @unique
+  appPassword        String?
   autoReply          Boolean  @default(false)
   onboardingDone     Boolean  @default(false)
   businessContext    String?  @db.Text
@@ -72,6 +73,7 @@ model UserSettings {
   companyNip         String?
   companyAddress     String?
   companyBankAccount String?
+  companyWebsite     String?
   defaultVatRate     String?  @default("23%")
   replyTone          String?  @default("PROFESJONALNY")
 
@@ -101,6 +103,7 @@ model Email {
   id         String   @id @default(cuid())
   threadId   String
   messageId  String   @unique
+  pop3Uid    String?  @unique
   from       String
   to         String
   subject    String

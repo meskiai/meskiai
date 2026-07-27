@@ -1,9 +1,9 @@
 import { prisma } from './prisma';
-import { getGmailClient, sendEmail } from './gmail';
+import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
 
-// ─── Retry helper — Neon free tier usypia bazę, przy przebudzeniu może być ECONNRESET ──
+// ─── Retry helper ──
 async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
@@ -30,10 +30,8 @@ export function startCron() {
   if (g.__aiCronStarted) return;
   g.__aiCronStarted = true;
 
-  console.log(`\n🤖 [Agent AI] CRON 24/7 uruchomiony — interwał: ${POLL_INTERVAL_MS / 1000}s`);
-  console.log(`   Działa niezależnie od sesji użytkownika i stanu przeglądarki.\n`);
+  console.log(`\n🤖 [Agent AI] CRON 24/7 uruchomiony (IMAP/SMTP) — interwał: ${POLL_INTERVAL_MS / 1000}s\n`);
 
-  // Uruchom natychmiast przy starcie
   runSync().catch(err => console.error('[Agent AI] Błąd przy starcie:', err));
 
   setInterval(() => {
@@ -43,35 +41,33 @@ export function startCron() {
 
 // ─── Główna synchronizacja ────────────────────────────────────────────────────
 export async function runSync() {
-  if (g.__aiRunning) {
-    console.log('[Agent AI] Poprzedni cykl jeszcze trwa — pomijam.');
+  const now = Date.now();
+  // Zabezpieczenie przed przerwaniem funkcji serwerless (Netlify 10s)
+  if (g.__aiRunning && (now - g.__aiRunning < 12 * 1000)) {
+    console.log('[Agent AI] Poprzedni cykl jeszcze trwa w tle — pomijam.');
     return;
   }
-  g.__aiRunning = true;
+  g.__aiRunning = now;
 
   try {
-    // Pobierz wszystkich użytkowników — retry gdy Neon budzi się ze snu
     const users = await withRetry(() => prisma.user.findMany({
-      include: { settings: true, accounts: true }
+      include: { settings: true }
     }));
 
-    // Przetwarzaj tylko tych którzy mają konto Google OAuth
-    const candidates = users.filter(u =>
-      u.accounts.some((a: any) => a.provider === 'google')
-    );
+    // Przetwarzaj tylko użytkowników, którzy mają podane hasło aplikacji
+    const candidates = users.filter(u => u.settings?.appPassword && u.email);
 
     if (candidates.length === 0) {
-      console.log('[Agent AI] Brak użytkowników z kontem Google — pomijam.');
+      console.log('[Agent AI] Brak użytkowników ze skonfigurowanym Hasłem Aplikacji (IMAP) — pomijam.');
       return;
     }
 
-    // Sprawdź ilu ma autoReply=true
     const active = candidates.filter(u => u.settings?.autoReply === true);
     console.log(`[Agent AI] Sprawdzam ${candidates.length} użytkownika(ów), ${active.length} z autoReply=ON`);
 
     for (const user of candidates) {
       await processUser(user).catch(err =>
-        console.error(`[Agent AI] Błąd dla ${user.email ?? user.id}:`, err)
+        console.error(`[Agent AI] Błąd dla ${user.email}:`, err)
       );
     }
 
@@ -88,57 +84,43 @@ async function processUser(user: any) {
   const userId = user.id;
   const settings = user.settings;
 
-  // Czy auto-odpowiedź jest włączona dla tego użytkownika
   const isAutoReplyOn: boolean = settings?.autoReply === true;
 
-  // Nawet jeśli autoReply=false, importujemy i klasyfikujemy maile (zapisujemy szkice)
-  // Pomijamy tylko użytkowników bez żadnych ustawień (nowi, nie skonfigurowani)
-  if (!settings) {
-    console.log(`[Agent AI] ${user.email ?? userId}: brak ustawień — pomijam.`);
+  if (!settings?.appPassword) {
+    console.log(`[Agent AI] ${user.email}: brak hasła aplikacji — pomijam.`);
     return;
   }
 
-  if (!settings.businessContext) {
-    console.log(`[Agent AI] ${user.email ?? userId}: brak opisu firmy — pomijam (nie skonfigurowano).`);
-    return;
-  }
-
-  // Pobierz klienta Gmail (odświeża token automatycznie)
-  let gmail: any;
+  let messages: FetchedEmail[] = [];
   try {
-    gmail = await getGmailClient(userId);
+    const existingEmails = await prisma.email.findMany({
+      where: { thread: { userId }, pop3Uid: { not: null } },
+      select: { pop3Uid: true }
+    });
+    const knownUids = existingEmails.map(e => e.pop3Uid as string);
+    messages = await fetchUnreadEmailsPOP3(user.email!, settings.appPassword!, knownUids);
   } catch (err: any) {
-    console.warn(`[Agent AI] ${user.email ?? userId}: brak dostępu Gmail — ${err.message}`);
+    console.warn(`[Agent AI] ${user.email}: brak dostępu POP3 (Błędne hasło lub wyłączony POP3) — ${err.message}`);
     return;
   }
 
-  // Pobierz nieprzeczytane wiadomości
-  const res = await gmail.users.messages.list({
-    userId: 'me',
-    q: 'is:unread',
-    maxResults: 20
-  });
-
-  const messages: any[] = res.data.messages ?? [];
-
-  // Zawsze zapisuj czas ostatniego sprawdzenia skrzynki
+  // Zapisz czas ost. sprawdzenia
   await prisma.userSettings.update({
     where: { userId },
     data: { lastAgentRunAt: new Date() }
-  }).catch(() => {}); // Nie blokuj jeśli update się nie uda
+  }).catch(() => {});
 
   if (messages.length === 0) {
-    console.log(`[Agent AI] ${user.email ?? userId}: brak nowych wiadomości.`);
+    console.log(`[Agent AI] ${user.email}: brak nowych wiadomości (POP3).`);
     return;
   }
 
-  console.log(`[Agent AI] ${user.email ?? userId}: ${messages.length} nieprzeczytanych. autoReply=${isAutoReplyOn}`);
+  console.log(`[Agent AI] ${user.email}: ${messages.length} nieprzeczytanych. autoReply=${isAutoReplyOn}`);
 
   let processed = 0;
   for (const msg of messages) {
-    if (!msg.id) continue;
-    await processMessage({ userId, user, settings, isAutoReplyOn, gmail, messageId: msg.id })
-      .catch(err => console.error(`[Agent AI] Błąd wiadomości ${msg.id}:`, err));
+    await processMessage({ userId, user, settings, isAutoReplyOn, msg })
+      .catch(err => console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err));
     processed++;
   }
 
@@ -152,20 +134,20 @@ async function processUser(user: any) {
 
 // ─── Przetwarzanie jednej wiadomości ─────────────────────────────────────────
 async function processMessage({
-  userId, user, settings, isAutoReplyOn, gmail, messageId
+  userId, user, settings, isAutoReplyOn, msg
 }: {
   userId: string;
   user: any;
   settings: any;
   isAutoReplyOn: boolean;
-  gmail: any;
-  messageId: string;
+  msg: FetchedEmail;
 }) {
-  // Sprawdź duplikat w bazie
+  const messageId = msg.messageId;
+
+  // Sprawdź duplikat
   const existing = await prisma.email.findUnique({ where: { messageId } });
 
   if (existing) {
-    // Ponów tylko jeśli poprzedni draft się nie udał
     const thread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
     const needsRetry =
       thread &&
@@ -175,42 +157,41 @@ async function processMessage({
     if (!needsRetry) return;
   }
 
-  // Pobierz pełną wiadomość
-  const msgData = await gmail.users.messages.get({
-    userId: 'me',
-    id: messageId,
-    format: 'full'
-  });
+  // Heurystyki antyspamowe
+  const isBot = /noreply|no-reply|daemon|mailer-daemon/i.test(msg.from);
 
-  const payload = msgData.data.payload;
-  const headers: any[] = payload?.headers ?? [];
-  const threadId = msgData.data.threadId || messageId;
+  // Znalezienie właściwego wątku
+  // Szukamy maila o In-Reply-To, żeby dopiąć do tego samego wątku
+  let dbThreadId: string | undefined;
+  
+  if (msg.inReplyTo) {
+    const parentEmail = await prisma.email.findUnique({ where: { messageId: msg.inReplyTo }});
+    if (parentEmail) {
+      dbThreadId = parentEmail.threadId;
+    }
+  }
+  
+  if (!dbThreadId && msg.references && msg.references.length > 0) {
+    // Szukamy jakiegokolwiek maila z references
+    const refEmails = await prisma.email.findMany({ 
+      where: { messageId: { in: msg.references } }
+    });
+    if (refEmails.length > 0) {
+      dbThreadId = refEmails[0].threadId;
+    }
+  }
 
-  const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value ?? '(brak tematu)';
-  const from    = headers.find((h: any) => h.name?.toLowerCase() === 'from')?.value    ?? 'nieznany';
-  const to      = headers.find((h: any) => h.name?.toLowerCase() === 'to')?.value      ?? '';
-
-  // Heurystyka: bot/newsletter?
-  const listUnsub  = headers.find((h: any) => h.name?.toLowerCase() === 'list-unsubscribe');
-  const precedence = headers.find((h: any) => h.name?.toLowerCase() === 'precedence');
-  const isBot =
-    !!listUnsub ||
-    (precedence?.value?.toLowerCase().includes('bulk')) ||
-    /noreply|no-reply|daemon|mailer-daemon/i.test(from);
-
-  const body = extractBody(payload);
-
-  // Upsert wątku
-  let dbThread = await prisma.thread.findUnique({ where: { threadId } });
-
+  let dbThread: any;
   if (!existing) {
-    if (!dbThread) {
+    if (!dbThreadId) {
+      // Nowy wątek
       dbThread = await prisma.thread.create({
-        data: { threadId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
+        data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
       });
     } else {
+      // Istniejący wątek
       dbThread = await prisma.thread.update({
-        where: { id: dbThread.id },
+        where: { id: dbThreadId },
         data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
       });
     }
@@ -219,22 +200,28 @@ async function processMessage({
       data: {
         threadId:   dbThread.id,
         messageId,
-        from, to, subject,
-        snippet:    msgData.data.snippet ?? '',
-        body:       body || (msgData.data.snippet ?? ''),
-        receivedAt: msgData.data.internalDate
-          ? new Date(Number(msgData.data.internalDate))
-          : new Date(),
+        pop3Uid:    msg.pop3Uid,
+        from:       msg.from, 
+        to:         msg.to, 
+        subject:    msg.subject,
+        snippet:    msg.text.substring(0, 100),
+        body:       msg.text,
+        receivedAt: msg.date,
         isFromAgent: false
       }
     });
   } else {
     dbThread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
+    if (!existing.pop3Uid && msg.pop3Uid) {
+      await prisma.email.update({
+        where: { messageId: existing.messageId },
+        data: { pop3Uid: msg.pop3Uid }
+      }).catch(() => {});
+    }
   }
 
   if (!dbThread) return;
 
-  // Boty — oznacz i pomiń
   if (isBot) {
     if (dbThread.status !== 'IGNORED') {
       await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
@@ -242,17 +229,16 @@ async function processMessage({
     return;
   }
 
-  // Już obsłużone
   if (dbThread.status === 'AUTO_REPLIED' || dbThread.status === 'REQUIRES_ATTENTION') return;
 
   // ── Generuj odpowiedź AI ──────────────────────────────────────────────────
-  console.log(`[Agent AI] Generuję odpowiedź AI dla wątku ${threadId} (from: ${from})`);
+  console.log(`[Agent AI] Generuję odpowiedź AI dla wątku ${dbThread.threadId} (from: ${msg.from})`);
 
   try {
     const { text } = await generateText({
-      model: googleAI('gemini-2.5-flash'),
+      model: googleAI('gemini-flash-latest'),
       system: buildSystemPrompt(settings),
-      prompt: `Od: ${from}\nTemat: ${subject}\n\nTreść:\n${body || msgData.data.snippet}`
+      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\n\nTreść:\n${msg.text}`
     });
 
     const aiText  = text.trim();
@@ -260,7 +246,7 @@ async function processMessage({
 
     if (upper.startsWith('BOT')) {
       await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
-      console.log(`[Agent AI] Wykryto bota → IGNORED (${threadId})`);
+      console.log(`[Agent AI] Wykryto bota → IGNORED`);
       return;
     }
 
@@ -269,11 +255,10 @@ async function processMessage({
         where: { id: dbThread.id },
         data: { status: 'REQUIRES_ATTENTION', draftReply: null }
       });
-      console.log(`[Agent AI] Wymaga uwagi → REQUIRES_ATTENTION (${threadId})`);
+      console.log(`[Agent AI] Wymaga uwagi → REQUIRES_ATTENTION`);
       return;
     }
 
-    // Sprawdź limit wysyłania
     const emailsSent   = settings?.emailsSentThisMonth ?? 0;
     const priceId      = user.stripePriceId;
     const PRICE_BASIC  = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
@@ -284,8 +269,11 @@ async function processMessage({
 
     if (isAutoReplyOn && !limitExceeded) {
       // ── AUTO-WYŚLIJ ──
-      const replyTo = from.replace(/.*<(.+)>.*/, '$1').trim() || from;
-      await sendEmail(userId, replyTo, `Re: ${subject}`, aiText, threadId);
+      const replyTo = msg.from.replace(/.*<(.+)>.*/, '$1').trim() || msg.from;
+      
+      const referencesStr = (msg.references ? msg.references.join(' ') + ' ' : '') + messageId;
+
+      await sendReplySMTP(user.email!, settings.appPassword!, replyTo, `Re: ${msg.subject}`, aiText, messageId, referencesStr);
 
       await prisma.thread.update({
         where: { id: dbThread.id },
@@ -303,7 +291,7 @@ async function processMessage({
           messageId:  `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           from:       user.email ?? 'Agent AI MESKIAI',
           to:         replyTo,
-          subject:    `Re: ${subject}`,
+          subject:    `Re: ${msg.subject}`,
           snippet:    aiText.substring(0, 150),
           body:       aiText,
           receivedAt: new Date(),
@@ -311,7 +299,7 @@ async function processMessage({
         }
       });
 
-      console.log(`[Agent AI] ✅ Auto-odpowiedź wysłana → ${replyTo} (${threadId})`);
+      console.log(`[Agent AI] ✅ Auto-odpowiedź wysłana → ${replyTo}`);
     } else {
       // ── ZAPISZ SZKIC ──
       const notice = isAutoReplyOn && limitExceeded
@@ -324,10 +312,10 @@ async function processMessage({
       });
 
       const why = !isAutoReplyOn ? 'autoReply=OFF' : 'limit wyczerpany';
-      console.log(`[Agent AI] 📝 Szkic zapisany (${why}) → ${threadId}`);
+      console.log(`[Agent AI] 📝 Szkic zapisany (${why})`);
     }
   } catch (aiErr: any) {
-    console.error(`[Agent AI] ❌ Błąd AI dla ${threadId}:`, aiErr.message ?? aiErr);
+    console.error(`[Agent AI] ❌ Błąd AI:`, aiErr.message ?? aiErr);
     await prisma.thread.update({
       where: { id: dbThread.id },
       data:  { draftReply: `[BŁĄD AI]: ${aiErr.message ?? 'Nieznany błąd'}. Ponowna próba za chwilę.` }
@@ -335,45 +323,7 @@ async function processMessage({
   }
 }
 
-// ─── Odnowienie Gmail Watch (Pub/Sub) ─────────────────────────────────────────
-export async function renewGmailWatches() {
-  if (!process.env.GMAIL_PUBSUB_TOPIC) return;
-  try {
-    const users = await prisma.user.findMany({ include: { accounts: true } });
-    for (const user of users.filter(u => u.accounts.length > 0)) {
-      try {
-        const gmail = await getGmailClient(user.id);
-        await gmail.users.watch({
-          userId: 'me',
-          requestBody: { topicName: process.env.GMAIL_PUBSUB_TOPIC, labelIds: ['INBOX'] }
-        });
-        console.log(`[Agent AI] Gmail watch odnowiony dla ${user.email}`);
-      } catch (e: any) {
-        console.warn(`[Agent AI] Watch error ${user.email}: ${e.message}`);
-      }
-    }
-  } catch (e) {
-    console.error('[Agent AI] renewGmailWatches error:', e);
-  }
-}
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function extractBody(payload: any): string {
-  if (!payload) return '';
-  if (payload.parts?.length) {
-    // Preferuj text/plain
-    const plain = payload.parts.find((p: any) => p.mimeType === 'text/plain');
-    if (plain?.body?.data) return Buffer.from(plain.body.data, 'base64').toString('utf-8');
-    // Rekurencja przez multipart
-    for (const part of payload.parts) {
-      const r = extractBody(part);
-      if (r) return r;
-    }
-  }
-  if (payload.body?.data) return Buffer.from(payload.body.data, 'base64').toString('utf-8');
-  return '';
-}
-
 function buildSystemPrompt(settings: any): string {
   const tone = settings?.replyTone ?? 'PROFESJONALNY';
   const ctx  = settings?.businessContext ?? 'Firma dbająca o profesjonalną obsługę klienta.';
@@ -390,8 +340,8 @@ Firma: "${ctx}"
 Ton: ${tone} — ${toneInstr}
 
 ZASADY:
-1. Jeśli wiadomość to newsletter/bot/system → odpowiedz TYLKO: BOT
-2. Jeśli wiadomość jest pilna i wymaga decyzji właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION  
-3. Dla zwykłych wiadomości: napisz odpowiedź w odpowiednim tonie i języku. Podpisz się jako "Asystent AI | MESKIAI".
+1. Jeśli wiadomość to absolutny spam, reklama, newsletter, bot, systemowa lub śmieciowa oferta → odpowiedz TYLKO: BOT
+2. Jeśli wiadomość jest ściśle ważna, pilna, biznesowo krytyczna lub wymaga podjęcia decyzji przez właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION  
+3. Dla zwykłych wiadomości: napisz odpowiedź w odpowiednim tonie i języku. Podpisz się jako profesjonalny Asystent z firmy klienta (na podstawie podanej bazy wiedzy/strony www), a nie jako zewnętrzny asystent. Nie dodawaj 'MESKIAI'.
 4. Nie pisz żadnych meta-komentarzy. Odpowiadaj bezpośrednio treścią maila.`;
 }
