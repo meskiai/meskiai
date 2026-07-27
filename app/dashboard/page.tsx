@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [showGuide, setShowGuide] = useState(false);
   const [guideIndex, setGuideIndex] = useState(0);
 
-  const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "COMPANY" | "STRATEGY" | "ACCOUNT">("INBOX");
+  const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "STRATEGY" | "ACCOUNT">("INBOX");
   const [businessContext, setBusinessContext] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [companyNip, setCompanyNip] = useState("");
@@ -1059,13 +1059,6 @@ export default function Dashboard() {
             </button>
           )}
           
-          <button 
-            className={`${styles.navItem} ${currentTab === "COMPANY" ? styles.active : ""}`}
-            onClick={() => { setCurrentTab("COMPANY"); setSelectedThread(null); }}
-          >
-            <Building size={18} /> Dane Firmy
-          </button>
-
         </div>
 
         <div className={styles.userSection}>
@@ -1463,129 +1456,7 @@ export default function Dashboard() {
             );
           })()}
 
-          {/* COMPANY VIEW */}
-          {currentTab === "COMPANY" && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "32px", overflowY: "auto", display: "flex", justifyContent: "center" }}>
-              <div style={{ maxWidth: "600px", width: "100%" }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h2 style={{ fontSize: "1.5rem", color: "var(--foreground)", margin: 0 }}>Dane Firmy (Wystawca)</h2>
-                  {!isEditingCompany && (
-                    <button className="btn btn-secondary" onClick={() => setIsEditingCompany(true)} style={{ padding: '6px 16px' }}>
-                      ✏️ Edytuj
-                    </button>
-                  )}
-                </div>
-                <p style={{ color: "var(--subtext)", marginBottom: "24px", lineHeight: 1.5 }}>
-                  Wprowadź dane swojej firmy, które będą automatycznie używane przy wystawianiu faktur przez Agenta AI.
-                </p>
-                
-                {!isEditingCompany ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: 'var(--card-bg)', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Nazwa Firmy</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>{companyName || <span style={{ color: 'var(--subtext)' }}>—</span>}</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '40px' }}>
-                      <div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>NIP</div>
-                        <div style={{ fontSize: '1rem', color: 'var(--foreground)' }}>{companyNip || <span style={{ color: 'var(--subtext)' }}>—</span>}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Domyślny VAT</div>
-                        <div style={{ fontSize: '1rem', color: 'var(--foreground)' }}>{defaultVatRate || <span style={{ color: 'var(--subtext)' }}>—</span>}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Adres</div>
-                      <div style={{ fontSize: '1rem', color: 'var(--foreground)', whiteSpace: 'pre-wrap' }}>{companyAddress || <span style={{ color: 'var(--subtext)' }}>—</span>}</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Konto Bankowe</div>
-                      <div style={{ fontSize: '1rem', color: 'var(--foreground)', fontFamily: 'monospace' }}>{companyBankAccount || <span style={{ color: 'var(--subtext)' }}>—</span>}</div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Nazwa Firmy</label>
-                        <input 
-                          type="text"
-                          className={styles.input}
-                          value={companyName}
-                          onChange={(e) => setCompanyName(e.target.value)}
-                          placeholder="np. Moja Firma Sp. z o.o."
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>NIP</label>
-                        <input 
-                          type="text"
-                          className={styles.input}
-                          value={companyNip}
-                          onChange={(e) => setCompanyNip(e.target.value)}
-                          placeholder="np. 1234567890"
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Adres</label>
-                        <textarea 
-                          className={styles.textarea}
-                          value={companyAddress}
-                          onChange={(e) => setCompanyAddress(e.target.value)}
-                          placeholder="np. ul. Testowa 1&#10;00-001 Warszawa"
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)', height: '80px', resize: 'vertical' }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Konto Bankowe</label>
-                        <input 
-                          type="text"
-                          className={styles.input}
-                          value={companyBankAccount}
-                          onChange={(e) => setCompanyBankAccount(e.target.value)}
-                          placeholder="np. PL 12 3456 7890 0000 0000 0000 0000"
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Domyślna Stawka VAT</label>
-                        <select 
-                          className={styles.input}
-                          value={defaultVatRate}
-                          onChange={(e) => setDefaultVatRate(e.target.value)}
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
-                        >
-                          <option value="23%">23% (Stawka podstawowa)</option>
-                          <option value="8%">8% (Stawka obniżona)</option>
-                          <option value="5%">5% (Stawka preferencyjna)</option>
-                          <option value="0%">0% (Eksport / WDT)</option>
-                          <option value="ZW">ZW (Zwolnienie np. usługi medyczne)</option>
-                        </select>
-                      </div>
-                    </div>
 
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      {(companyName || companyNip) && (
-                        <button className="btn btn-secondary" onClick={() => setIsEditingCompany(false)} style={{ flex: 1, padding: "12px" }}>Anuluj</button>
-                      )}
-                      <button 
-                        className="btn btn-primary" 
-                        style={{ flex: 2, padding: "12px", display: "flex", justifyContent: "center", gap: "8px" }}
-                        onClick={() => handleSaveSettings('company')}
-                        disabled={savingSettings}
-                      >
-                        {savingSettings ? <RefreshCw className={styles['animate-spin']} size={18} /> : <Building size={18} />}
-                        Zapisz Dane Firmy
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* STRATEGY VIEW */}
           {currentTab === "STRATEGY" && (
