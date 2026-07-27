@@ -88,12 +88,12 @@ export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, 
     }
     
     if (client.usable) {
-      await client.logout();
+      client.close();
     }
   } catch (error: any) {
     console.error('[Agent AI] Błąd połączenia IMAP (ImapFlow):', error.message);
     try {
-      if (client.usable) await client.logout();
+      client.close();
     } catch (e) {}
     throw error;
   }
