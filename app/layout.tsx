@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "meskiai",
+  title: "MESKIAI",
   description: "Inteligentny asystent e-mail dla Twojej firmy.",
   keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "meskiai"],
   verification: {

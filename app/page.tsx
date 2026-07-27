@@ -68,7 +68,7 @@ export default function Home() {
               alt="MESKIAI logo"
               style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)' }}
             />
-            <span>meskiai</span>
+            <span>MESKIAI</span>
           </div>
           
           <div className={styles.navActions}>
@@ -181,7 +181,7 @@ export default function Home() {
         </h1>
         
         <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`}>
-          Pierwszy na świecie inteligentny asystent, który zarządza Twoją pocztą, kontaktuje się z nowymi klientami i wystawia faktury. Całkowicie na autopilocie.
+          Aplikacja MESKIAI to innowacyjny panel zarządzania Twoim wirtualnym asystentem e-mail. Logowanie za pomocą Google pozwala nam na bezpieczną identyfikację Twojego konta w naszym systemie. Aplikacja nie wymaga i nie prosi o dostęp do czytania Twoich skrzynek pocztowych przez interfejs API Google.
         </h2>
         
         <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`}>
