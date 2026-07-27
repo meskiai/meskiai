@@ -23,7 +23,15 @@ export async function GET(req: Request) {
   }
 
   console.log('[Cron] GET /api/cron/sync — triggered by Vercel Cron or manual call');
-  await runSync();
+  
+  // Wrap in a 25-second timeout to prevent cron-job.org from failing with 30s timeout.
+  // The runSync() promise will continue executing in the background up to maxDuration (300s)
+  // even after we return the HTTP 200 response to cron-job.org.
+  await Promise.race([
+    runSync(),
+    new Promise(resolve => setTimeout(resolve, 25000))
+  ]);
+
   return NextResponse.json({ ok: true, trigger: 'cron' });
 }
 
@@ -49,6 +57,11 @@ export async function POST(req: Request) {
   }
 
   console.log(`[Cron] POST /api/cron/sync — trigger: ${trigger}`);
-  await runSync();
+  
+  await Promise.race([
+    runSync(),
+    new Promise(resolve => setTimeout(resolve, 25000))
+  ]);
+
   return NextResponse.json({ ok: true, trigger });
 }
