@@ -134,7 +134,7 @@ export async function POST(
     let errorMessage = error?.message || "Nieznany błąd serwera";
 
     if (errorMessage.toLowerCase().includes("invalid login") || errorMessage.toLowerCase().includes("authentication")) {
-      errorMessage = "Błąd uwierzytelniania SMTP. Sprawdź czy Hasło Aplikacji Google jest poprawne i czy IMAP jest włączony w Gmailu.";
+      errorMessage = "Błąd uwierzytelniania SMTP. Sprawdź czy Hasło Aplikacji Google jest poprawne i czy POP3 jest włączony w Gmailu.";
     } else if (errorMessage.toLowerCase().includes("econnrefused") || errorMessage.toLowerCase().includes("timeout")) {
       errorMessage = "Nie można połączyć się z serwerem SMTP Gmail. Sprawdź połączenie internetowe.";
     }

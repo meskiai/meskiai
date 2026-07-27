@@ -2325,7 +2325,7 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  {selectedThread.status === 'PENDING_APPROVAL' && (
+                  {(selectedThread.status === 'PENDING_APPROVAL' || selectedThread.status === 'REQUIRES_ATTENTION') && (
                     <div className={styles.approvalSection}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2375,7 +2375,7 @@ export default function Dashboard() {
                     </div>
                   )}
                   
-                  {selectedThread.status !== 'PENDING_APPROVAL' && (
+                  {(selectedThread.status !== 'PENDING_APPROVAL' && selectedThread.status !== 'REQUIRES_ATTENTION') && (
                     <div className={styles.approvalSection}>
                       <div className={styles.successMessage}>
                         {selectedThread.status === 'IGNORED' ? (
