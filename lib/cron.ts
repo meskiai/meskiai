@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
+import { fetchUnreadEmailsIMAP, sendReplySMTP, FetchedEmail } from './mail';
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
 
@@ -95,12 +95,11 @@ async function processUser(user: any) {
   try {
     const existingEmails = await prisma.email.findMany({
       where: { thread: { userId }, pop3Uid: { not: null } },
-      select: { pop3Uid: true }
     });
     const knownUids = existingEmails.map(e => e.pop3Uid as string);
-    messages = await fetchUnreadEmailsPOP3(user.email!, settings.appPassword!, knownUids);
+    messages = await fetchUnreadEmailsIMAP(user.email!, settings.appPassword!, knownUids);
   } catch (err: any) {
-    console.warn(`[Agent AI] ${user.email}: brak dostępu POP3 (Błędne hasło lub wyłączony POP3) — ${err.message}`);
+    console.warn(`[Agent AI] ${user.email}: brak dostępu IMAP (Błędne hasło lub wyłączony IMAP) — ${err.message}`);
     return;
   }
 
