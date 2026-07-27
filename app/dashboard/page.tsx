@@ -87,6 +87,14 @@ export default function Dashboard() {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Computed Limits
+  const getTier = (priceId: string | null | undefined) => {
+    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
+    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
+    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+    return 0;
+  };
+  const userTier = getTier(subscriptionData?.stripePriceId);
+
   const pid = subscriptionData?.stripePriceId;
   const isBasic = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
   const isPro = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;

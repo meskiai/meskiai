@@ -37,14 +37,17 @@ export async function POST(
       return NextResponse.json({ error: "Thread not found or unauthorized" }, { status: 404 });
     }
 
-    // Get user's app password for SMTP
-    const userSettings = await prisma.userSettings.findUnique({
-      where: { userId: session.user.id }
+    // Get user and their app password for SMTP
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { settings: true }
     });
+    
+    const userSettings = user?.settings;
 
     if (userSettings) {
-      const isBasic = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-      const isPro = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+      const isBasic = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+      const isPro = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
       const emailsCount = userSettings.emailsSentThisMonth || 0;
 
       if (isBasic && emailsCount >= 50) {

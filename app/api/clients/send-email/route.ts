@@ -25,10 +25,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Lead not found" }, { status: 404 });
     }
 
-    // Get user's app password
-    const userSettings = await prisma.userSettings.findUnique({
-      where: { userId: session.user.id }
+    // Get user and their app password
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { settings: true }
     });
+    
+    const userSettings = user?.settings;
 
     if (!userSettings?.appPassword) {
       return NextResponse.json({ 
@@ -36,8 +39,8 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const isBasic = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = userSettings.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const emailsCount = userSettings.emailsSentThisMonth || 0;
 
     if (isBasic && emailsCount >= 50) {
