@@ -66,7 +66,7 @@ export default function Home() {
             <img
               src="/logo.png"
               alt="MESKIAI logo"
-              style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)' }}
+              style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }}
             />
             <span>MESKIAI</span>
           </div>

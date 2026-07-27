@@ -714,7 +714,7 @@ export default function Dashboard() {
             <img
               src="/logo.png"
               alt="MESKIAI"
-              style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'var(--logo-filter)' }}
+              style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }}
             />
             <span style={{ fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.5px', color: 'var(--foreground)' }}>MESKIAI</span>
           </div>
@@ -1029,7 +1029,7 @@ export default function Dashboard() {
             <img
               src="/logo.png"
               alt="MESKIAI"
-              style={{ width: '26px', height: '26px', objectFit: 'contain', filter: 'var(--logo-filter)', flexShrink: 0 }}
+              style={{ width: '26px', height: '26px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any, flexShrink: 0 }}
             />
             MESKIAI
             {silentSyncing && <RefreshCw size={12} className={styles['animate-spin']} color="var(--subtext)" style={{ marginLeft: "4px" }} />}
