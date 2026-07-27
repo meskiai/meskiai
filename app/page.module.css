@@ -28,10 +28,10 @@
   content: '';
   position: absolute;
   border-radius: 50%;
-  filter: blur(140px);
   opacity: 0.4;
   animation: float 25s infinite alternate ease-in-out;
   mix-blend-mode: normal;
+  will-change: transform;
 }
 
 [data-theme="dark"] .ambientBackground::before,

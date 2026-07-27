@@ -15,9 +15,9 @@
   content: '';
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
   opacity: 0.5;
   animation: float 20s infinite alternate ease-in-out;
+  will-change: transform;
 }
 
 .ambientBackground::before {
