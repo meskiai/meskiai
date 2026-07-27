@@ -192,10 +192,26 @@ async function processMessage({
           data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
         });
       } else {
-        // Nowy wątek
-        dbThread = await prisma.thread.create({
-          data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
-        });
+        // Nowy wątek z zabezpieczeniem przed wyścigiem (Race Condition)
+        try {
+          dbThread = await prisma.thread.create({
+            data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
+          });
+        } catch (err: any) {
+          if (err.code === 'P2002' || err.code === '23505') {
+            const recoveredThread = await prisma.thread.findUnique({ where: { threadId: messageId } });
+            if (recoveredThread) {
+              dbThread = await prisma.thread.update({
+                where: { id: recoveredThread.id },
+                data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+              });
+            } else {
+              throw err;
+            }
+          } else {
+            throw err;
+          }
+        }
       }
     } else {
       // Istniejący wątek
@@ -221,7 +237,7 @@ async function processMessage({
         }
       });
     } catch (err: any) {
-      if (err.code === 'P2002') {
+      if (err.code === 'P2002' || err.code === '23505') {
         console.warn(`[Agent AI] Wiadomość o ID ${messageId} już istnieje (wyścig równoległych procesów). Pomijam duplikat.`);
         return; // Przerywamy przetwarzanie tej wiadomości
       }
