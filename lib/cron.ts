@@ -67,6 +67,10 @@ export async function runSync() {
     const active = candidates.filter(u => u.settings?.autoReply === true);
     console.log(`[Agent AI] Sprawdzam ${candidates.length} użytkownika(ów) łącznie, w tym ${active.length} z włączonym auto-reply (autoReply=ON)`);
 
+    // Tasujemy (shuffle) kandydatów, aby w przypadku ucięcia procesu przez Vercel po 300s, 
+    // sprawiedliwie przydzielać czas procesora (zapobiega to pomijaniu użytkowników z końca listy)
+    candidates.sort(() => Math.random() - 0.5);
+
     const chunkSize = 5;
     for (let i = 0; i < candidates.length; i += chunkSize) {
       const chunk = candidates.slice(i, i + chunkSize);
@@ -323,14 +327,24 @@ async function processMessage({
     const priceId      = user.stripePriceId;
     const PRICE_BASIC  = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
     const PRICE_PRO    = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const PRICE_MAX    = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
     
     // Użytkownik musi mieć aktywną subskrypcję, żeby agent odpowiadał
-    const hasActiveSub = priceId === PRICE_BASIC || priceId === PRICE_PRO;
+    const hasActiveSub = 
+      user.subscriptionStatus === 'active' || 
+      user.subscriptionStatus === 'trialing' ||
+      priceId === PRICE_BASIC || 
+      priceId === PRICE_PRO ||
+      priceId === PRICE_MAX;
+      
+    let monthlyLimit = 0;
+    if (hasActiveSub) {
+      if (priceId === PRICE_MAX) monthlyLimit = 5000;
+      else if (priceId === PRICE_PRO) monthlyLimit = 1000;
+      else monthlyLimit = 50; // Domyślnie Basic lub nieznany plan, ale aktywny
+    }
     
-    const limitExceeded =
-      !hasActiveSub || // Jeśli nie ma aktywnej subskrypcji, traktujemy jako przekroczony limit
-      (priceId === PRICE_BASIC && emailsSent >= 50) ||
-      (priceId === PRICE_PRO   && emailsSent >= 1000);
+    const limitExceeded = !hasActiveSub || emailsSent >= monthlyLimit;
 
     if (isAutoReplyOn && !limitExceeded) {
       // ── AUTO-WYŚLIJ ──
