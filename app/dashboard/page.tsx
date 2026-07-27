@@ -127,10 +127,15 @@ export default function Dashboard() {
           setCompanyNip(data.settings.companyNip || "");
           setCompanyAddress(data.settings.companyAddress || "");
           setCompanyBankAccount(data.settings.companyBankAccount || "");
-          setStrategyUrl(data.settings.companyWebsite || "https://meskiai.com");
+          setStrategyUrl(data.settings.companyWebsite || "");
           setDefaultVatRate(data.settings.defaultVatRate || "23%");
           setReplyTone(data.settings.replyTone || "PROFESJONALNY");
           
+          if (!data.settings.companyWebsite) {
+            setStrategyResults(null);
+            localStorage.removeItem("meskiStrategyResults");
+          }
+
           if (data.settings.businessContext) setIsEditingKnowledge(false);
           else setIsEditingKnowledge(true);
 
@@ -534,10 +539,7 @@ export default function Dashboard() {
       }
       fetchThreads();
       fetchLeads();
-      
-      const savedStrategyUrl = localStorage.getItem("meskiStrategyUrl");
       const savedStrategyResults = localStorage.getItem("meskiStrategyResults");
-      if (savedStrategyUrl) setStrategyUrl(savedStrategyUrl);
       if (savedStrategyResults) {
         try {
           const parsed = JSON.parse(savedStrategyResults);
