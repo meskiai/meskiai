@@ -127,7 +127,7 @@ export default function Dashboard() {
           setCompanyNip(data.settings.companyNip || "");
           setCompanyAddress(data.settings.companyAddress || "");
           setCompanyBankAccount(data.settings.companyBankAccount || "");
-          setStrategyUrl(data.settings.companyWebsite || "");
+          setStrategyUrl(data.settings.companyWebsite || "https://meskiai.com");
           setDefaultVatRate(data.settings.defaultVatRate || "23%");
           setReplyTone(data.settings.replyTone || "PROFESJONALNY");
           
@@ -1026,7 +1026,7 @@ export default function Dashboard() {
                 Przypomnij później
               </button>
               <button 
-                onClick={() => { setShowUpgradeReminder(false); setDashboardMode(null); setCurrentTab('ACCOUNT'); }} 
+                onClick={() => { setShowUpgradeReminder(false); window.location.href = '/#cennik'; }} 
                 className="btn btn-primary" 
                 style={{ padding: '12px 24px', fontWeight: 600, background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', border: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}
               >
