@@ -534,10 +534,10 @@ export default function Dashboard() {
         } catch (e) {}
       }
       
-      // Auto-refresh every 15 seconds (reduced from 30)
+      // Auto-refresh co 60 sekund (aby nie zapychać serwera ciągłymi połączeniami IMAP dla wszystkich użytkowników)
       const interval = setInterval(() => {
         handleSync(true);
-      }, 15000);
+      }, 60000);
       
       const hasSeenWelcome = sessionStorage.getItem("meskiHasSeenWelcome");
       if (!hasSeenWelcome) {
@@ -559,23 +559,24 @@ export default function Dashboard() {
     }
   }, [status]);
 
-  // handleSync — pyta serwer o nowe maile I uruchamia cron dla bieżącego użytkownika
+  // handleSync — odświeża widok (w tle tylko odpytuje bazę, przyciskiem wymusza globalny IMAP)
   const handleSync = async (isSilent = false) => {
     if (isSilent) setSilentSyncing(true);
     else setSyncing(true);
 
     try {
-      // /api/cron/sync uruchamia pełną synchronizację server-side (działa też bez sesji)
-      const res = await fetch('/api/cron/sync', { method: 'POST' });
-      if (res.ok) {
-        await fetchThreads();
-        // Odśwież też czas ostatniego uruchomienia
-        const settingsRes = await fetch(`/api/settings?t=${Date.now()}`);
-        if (settingsRes.ok) {
-          const d = await settingsRes.json();
-          if (d.subscriptionData?.lastAgentRunAt) setLastAgentRunAt(d.subscriptionData.lastAgentRunAt);
-          if (d.subscriptionData?.agentEmailsProcessed !== undefined) setAgentEmailsProcessed(d.subscriptionData.agentEmailsProcessed);
-        }
+      if (!isSilent) {
+        // /api/cron/sync uruchamia pełną synchronizację server-side (dla wszystkich)
+        await fetch('/api/cron/sync', { method: 'POST' });
+      }
+      
+      await fetchThreads();
+      // Odśwież też czas ostatniego uruchomienia
+      const settingsRes = await fetch(`/api/settings?t=${Date.now()}`);
+      if (settingsRes.ok) {
+        const d = await settingsRes.json();
+        if (d.subscriptionData?.lastAgentRunAt) setLastAgentRunAt(d.subscriptionData.lastAgentRunAt);
+        if (d.subscriptionData?.agentEmailsProcessed !== undefined) setAgentEmailsProcessed(d.subscriptionData.agentEmailsProcessed);
       }
     } catch (e) {
       console.error('Sync error:', e);
