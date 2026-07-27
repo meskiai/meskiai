@@ -11,105 +11,88 @@ export interface FetchedEmail {
   to: string;
   subject: string;
   text: string;
-  date: Date;
-}
-
-const getImapClient = (email: string, appPassword: string) => {
-  return new ImapFlow({
-    host: 'imap.gmail.com',
-    port: 993,
-    secure: true,
-    auth: {
-      user: email,
-      pass: appPassword
-    },
-    logger: false, // Set to true for debugging if needed
-    tls: { rejectUnauthorized: false }
-  });
-};
+import Pop3Command from 'node-pop3';
 
 /**
- * Fetches unread emails via IMAP using ImapFlow.
- * Connects to imap.gmail.com:993
+ * Fetches emails via POP3.
+ * Connects to pop.gmail.com:995
  * Skips UIDs that are already present in knownUids array.
  */
-export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, knownUids: string[]): Promise<FetchedEmail[]> {
-  const client = getImapClient(email, appPassword);
+export async function fetchUnreadEmailsPOP3(email: string, appPassword: string, knownUids: string[]): Promise<FetchedEmail[]> {
+  const pop3 = new Pop3Command({
+    user: email,
+    password: appPassword,
+    host: 'pop.gmail.com',
+    port: 995,
+    tls: true
+  });
+  
   const fetchedEmails: FetchedEmail[] = [];
 
-  // Zapobiega "unhandledRejection" gdy serwer (np. Google) nagle zerwie gniazdo
-  client.on('error', err => {
-    console.warn(`[Agent AI] Background IMAP Error (${email}):`, err.message);
-  });
-
   try {
-    // Timeout 15 sekund na samo połączenie IMAP
+    // Timeout 15 sekund na pobranie całej listy POP3
     let timeoutId: any;
-    const connectPromise = client.connect();
-    const timeoutPromise = new Promise((_, reject) => 
+    const connectPromise = pop3.UIDL();
+    const timeoutPromise = new Promise<any>((_, reject) => 
       timeoutId = setTimeout(() => {
-        try { client.close(); } catch(e) {}
-        reject(new Error('IMAP connection timed out (Google ban active)'));
+        try { pop3.QUIT(); } catch(e) {}
+        reject(new Error('POP3 connection timed out (Google ban active)'));
       }, 15000)
     );
     
-    await Promise.race([connectPromise, timeoutPromise]);
+    // Zwraca tablicę: [ [1, "uid1"], [2, "uid2"] ]
+    const uidlList = await Promise.race([connectPromise, timeoutPromise]);
     clearTimeout(timeoutId);
     
-    const lock = await client.getMailboxLock('INBOX');
-    
-    try {
-      // Pobierz wiadomości z flagą UNSEEN (nieprzeczytane)
-      // fetch() returns an async generator
-      for await (let msg of client.fetch({ seen: false }, { source: true, uid: true })) {
-        const uid = msg.uid.toString();
+    // Szukamy nowych UID
+    for (const item of uidlList) {
+      if (!item || item.length < 2) continue;
+      const msgNum = item[0];
+      const uid = item[1];
+      
+      if (knownUids.includes(uid)) continue;
+      
+      try {
+        const rawMsg = await pop3.RETR(msgNum);
+        const parsed: any = await simpleParser(rawMsg);
         
-        if (knownUids.includes(uid)) continue;
-
-        try {
-          const parsed: any = await simpleParser(msg.source as Buffer);
-
-          const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
-          const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
-          const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
-          const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
-
-          let inReplyTo = parsed.inReplyTo;
-          if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
-
-          let references = parsed.references;
-          if (typeof references === 'string') references = [references];
-
-          fetchedEmails.push({
-            pop3Uid: uid,
-            messageId,
-            inReplyTo,
-            references: references as string[] | undefined,
-            from: fromAddr,
-            to: toAddr,
-            subject: parsed.subject || '(Brak tematu)',
-            text: parsed.text || '',
-            date: parsed.date || new Date()
-          });
-        } catch (err: any) {
-          console.error(`[Agent AI] Błąd parsowania wiadomości IMAP UID ${uid}:`, err.message);
-        }
+        const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
+        const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
+        const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
+        const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
+        
+        let inReplyTo = parsed.inReplyTo;
+        if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
+        
+        let references = parsed.references;
+        if (typeof references === 'string') references = [references];
+        
+        fetchedEmails.push({
+          pop3Uid: uid,
+          messageId,
+          inReplyTo,
+          references: references as string[] | undefined,
+          from: fromAddr,
+          to: toAddr,
+          subject: parsed.subject || '(Brak tematu)',
+          text: parsed.text || '',
+          date: parsed.date || new Date()
+        });
+      } catch (err: any) {
+        console.error(`[Agent AI] Błąd parsowania wiadomości POP3 UID ${uid}:`, err.message);
       }
-    } finally {
-      lock.release();
     }
     
-    if (client.usable) {
-      client.close();
-    }
-  } catch (error: any) {
-    console.error('[Agent AI] Błąd połączenia IMAP (ImapFlow):', error.message);
     try {
-      client.close();
-    } catch (e) {}
+      await pop3.QUIT();
+    } catch(e) {}
+    
+  } catch (error: any) {
+    console.error('[Agent AI] Błąd połączenia POP3:', error.message);
+    try { pop3.QUIT(); } catch (e) {}
     throw error;
   }
-
+  
   return fetchedEmails;
 }
 
