@@ -135,55 +135,54 @@ export async function sendReplySMTP(
  * Validates IMAP credentials by attempting a connection.
  */
 export async function validateImapCredentials(email: string, appPassword: string): Promise<boolean> {
-  const client = new ImapFlow({
-    host: 'imap.gmail.com',
-    port: 993,
-    secure: true,
-    auth: {
-      user: email,
-      pass: appPassword
-    },
-    logger: false,
-    tls: { rejectUnauthorized: false }
+  const pop3 = new Pop3Command({
+    user: email,
+    password: appPassword,
+    host: 'pop.gmail.com',
+    port: 995,
+    tls: true,
+    tlsOptions: { rejectUnauthorized: false }
   });
 
   try {
-    await client.connect();
-    await client.logout();
+    await pop3.UIDL();
+    await pop3.QUIT();
     return true;
   } catch (error) {
+    try { await pop3.QUIT(); } catch (e) {}
     return false;
   }
 }
 
 export async function validateImapCredentialsDetailed(email: string, appPassword: string): Promise<{isValid: boolean, error?: string}> {
-  const client = new ImapFlow({
-    host: 'imap.gmail.com',
-    port: 993,
-    secure: true,
-    auth: {
-      user: email,
-      pass: appPassword
-    },
-    logger: false,
-    tls: { rejectUnauthorized: false, family: 4 as any }
+  const pop3 = new Pop3Command({
+    user: email,
+    password: appPassword,
+    host: 'pop.gmail.com',
+    port: 995,
+    tls: true,
+    tlsOptions: { rejectUnauthorized: false }
   });
 
   try {
-    // Netlify functions time out at 10s. We enforce an 8s timeout here to leave 2s for response.
-    const connectPromise = client.connect();
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Przekroczono czas oczekiwania (Timeout). Serwery Google nie odpowiadają. Spróbuj ponownie.')), 8000));
+    const connectPromise = pop3.UIDL().then(() => true);
+    const timeoutPromise = new Promise<boolean>((_, reject) => setTimeout(() => reject(new Error('Przekroczono czas oczekiwania (Timeout). Serwery Google nie odpowiadają. Spróbuj ponownie.')), 8000));
     
     await Promise.race([connectPromise, timeoutPromise]);
     
-    // Don't wait for logout if it hangs.
-    client.logout().catch(() => {});
-    client.close();
+    await pop3.QUIT();
     
     return { isValid: true };
   } catch (error: any) {
-    // If it fails or times out, close the connection forcefully
-    client.close();
-    return { isValid: false, error: error?.message || String(error) };
+    try { await pop3.QUIT(); } catch (e) {}
+    
+    let errMsg = error?.message || String(error);
+    if (errMsg.includes('SYS/PERM')) {
+      errMsg = 'Włącz obsługę POP3 w ustawieniach Gmaila ("Włącz POP dla wszystkich wiadomości").';
+    } else if (errMsg.includes('Invalid credentials') || errMsg.includes('login failed') || errMsg.includes('Web login required')) {
+       errMsg = 'Nieprawidłowe hasło aplikacji lub błędny adres e-mail.';
+    }
+    
+    return { isValid: false, error: errMsg };
   }
 }
