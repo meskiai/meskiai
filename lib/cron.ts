@@ -42,8 +42,7 @@ export function startCron() {
 // ─── Główna synchronizacja ────────────────────────────────────────────────────
 export async function runSync() {
   const now = Date.now();
-  // Zabezpieczenie przed przerwaniem funkcji serwerless (Netlify 10s)
-  if (g.__aiRunning && (now - g.__aiRunning < 12 * 1000)) {
+  if (g.__aiRunning && (now - g.__aiRunning < 120 * 1000)) {
     console.log('[Agent AI] Poprzedni cykl jeszcze trwa w tle — pomijam.');
     return;
   }
@@ -54,16 +53,15 @@ export async function runSync() {
       include: { settings: true }
     }));
 
-    // Przetwarzaj tylko użytkowników, którzy mają podane hasło aplikacji
     const candidates = users.filter(u => u.settings?.appPassword && u.email);
 
     if (candidates.length === 0) {
-      console.log('[Agent AI] Brak użytkowników ze skonfigurowanym Hasłem Aplikacji (IMAP) — pomijam.');
+      console.log('[Agent AI] Brak użytkowników ze skonfigurowanym Hasłem Aplikacji (POP3) — pomijam.');
       return;
     }
 
     const active = candidates.filter(u => u.settings?.autoReply === true);
-    console.log(`[Agent AI] Sprawdzam ${candidates.length} użytkownika(ów), ${active.length} z autoReply=ON`);
+    console.log(`[Agent AI] Sprawdzam ${candidates.length} użytkownika(ów) łącznie, w tym ${active.length} z włączonym auto-reply (autoReply=ON)`);
 
     for (const user of candidates) {
       await processUser(user).catch(err =>
@@ -99,7 +97,7 @@ async function processUser(user: any) {
     const knownUids = existingEmails.map(e => e.pop3Uid as string);
     messages = await fetchUnreadEmailsPOP3(user.email!, settings.appPassword!, knownUids);
   } catch (err: any) {
-    console.warn(`[Agent AI] ${user.email}: brak dostępu IMAP (Błędne hasło lub wyłączony IMAP) — ${err.message}`);
+    console.warn(`[Agent AI] ${user.email}: brak dostępu POP3 (Błędne hasło) — ${err.message}`);
     return;
   }
 
@@ -110,7 +108,7 @@ async function processUser(user: any) {
   }).catch(() => {});
 
   if (messages.length === 0) {
-    console.log(`[Agent AI] ${user.email}: brak nowych wiadomości (IMAP).`);
+    console.log(`[Agent AI] ${user.email}: brak nowych wiadomości (POP3).`);
     return;
   }
 
