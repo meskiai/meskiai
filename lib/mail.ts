@@ -37,6 +37,11 @@ export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, 
   const client = getImapClient(email, appPassword);
   const fetchedEmails: FetchedEmail[] = [];
 
+  // Zapobiega "unhandledRejection" gdy serwer (np. Google) nagle zerwie gniazdo
+  client.on('error', err => {
+    console.warn(`[Agent AI] Background IMAP Error (${email}):`, err.message);
+  });
+
   try {
     await client.connect();
     const lock = await client.getMailboxLock('INBOX');
@@ -82,11 +87,13 @@ export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, 
       lock.release();
     }
     
-    await client.logout();
-  } catch (error: any) {
-    console.error('[Agent AI] Błąd połączenia IMAP (ImapFlow):', error);
-    try {
+    if (client.usable) {
       await client.logout();
+    }
+  } catch (error: any) {
+    console.error('[Agent AI] Błąd połączenia IMAP (ImapFlow):', error.message);
+    try {
+      if (client.usable) await client.logout();
     } catch (e) {}
     throw error;
   }
@@ -147,27 +154,32 @@ export async function sendReplySMTP(
  */
 export async function validateImapCredentials(email: string, appPassword: string): Promise<boolean> {
   const client = getImapClient(email, appPassword);
+  client.on('error', () => {}); // ignore bg errors
   try {
     await client.connect();
-    await client.logout();
+    if (client.usable) await client.logout();
     return true;
   } catch (error) {
+    try { if (client.usable) await client.logout(); } catch (e) {}
     return false;
   }
 }
 
 export async function validateImapCredentialsDetailed(email: string, appPassword: string): Promise<{isValid: boolean, error?: string}> {
   const client = getImapClient(email, appPassword);
+  client.on('error', () => {}); // ignore bg errors
   
   try {
     const connectPromise = client.connect();
     const timeoutPromise = new Promise<any>((_, reject) => setTimeout(() => reject(new Error('Przekroczono czas oczekiwania (Timeout). Serwery Google nie odpowiadają. Spróbuj ponownie.')), 10000));
     
     await Promise.race([connectPromise, timeoutPromise]);
-    await client.logout();
+    if (client.usable) await client.logout();
     
     return { isValid: true };
   } catch (error: any) {
+    try { if (client.usable) await client.logout(); } catch (e) {}
+    
     let errMsg = error?.message || String(error);
     
     if (errMsg.includes('Invalid credentials') || errMsg.includes('login failed') || errMsg.includes('Web login required') || errMsg.includes('AUTHENTICATIONFAILED')) {
