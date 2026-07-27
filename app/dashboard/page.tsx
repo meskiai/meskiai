@@ -146,6 +146,15 @@ export default function Dashboard() {
           if (data.subscriptionData) {
             setSubscriptionStatus(data.subscriptionData.subscriptionStatus);
             setSubscriptionData(data.subscriptionData);
+            
+            // Show guide for first-time subscribed users
+            if (data.subscriptionData.subscriptionStatus === 'active') {
+              if (!localStorage.getItem('hasSeenGuide')) {
+                setShowGuide(true);
+                setGuideIndex(0);
+                localStorage.setItem('hasSeenGuide', 'true');
+              }
+            }
             if (data.subscriptionData.lastAgentRunAt) {
               setLastAgentRunAt(data.subscriptionData.lastAgentRunAt);
             }
