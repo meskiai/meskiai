@@ -264,7 +264,6 @@ export default function Home() {
               <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
               <li><CheckCircle size={18} /> Propozycje klientów (limit 10 B2B)</li>
               <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
-              <li style={{ color: 'var(--subtext)' }}><CheckCircle size={18} style={{ opacity: 0.5 }} /> Brak opcji zmiany tonu agenta (Tylko PRO/MAX)</li>
             </ul>
             
             <button 
@@ -301,6 +300,7 @@ export default function Home() {
               <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
               <li><CheckCircle size={18} /> Propozycje klientów (limit 200 B2B)</li>
               <li><CheckCircle size={18} /> Cold Email (Generowanie AI)</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
             </ul>
             
             <button 
@@ -333,6 +333,7 @@ export default function Home() {
               <li><CheckCircle size={18} /> Nielimitowane wyszukiwania konkurencji</li>
               <li><CheckCircle size={18} /> Nielimitowane propozycje klientów</li>
               <li><CheckCircle size={18} /> Nielimitowany Cold Email</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
               <li><CheckCircle size={18} /> Dedykowany Account Manager</li>
             </ul>
             
