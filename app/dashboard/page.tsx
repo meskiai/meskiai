@@ -2122,8 +2122,8 @@ export default function Dashboard() {
 
           {/* APP PASSWORD PROMPT */}
           {!hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
-            <div style={{ padding: "40px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100%", flex: 1, width: "100%" }}>
-              <div style={{ maxWidth: "600px", width: "100%", background: "var(--card-bg)", borderRadius: "16px", padding: "32px", border: "1px solid var(--border)", boxShadow: "var(--mac-shadow)" }}>
+            <div className="animate-fade-in" style={{ padding: "40px 20px", display: "flex", justifyContent: "center", alignItems: "flex-start", height: "100%", flex: 1, width: "100%", overflowY: "auto" }}>
+              <div style={{ maxWidth: "600px", width: "100%", background: "var(--card-bg)", borderRadius: "16px", padding: "24px", border: "1px solid var(--border)", boxShadow: "var(--mac-shadow)", margin: "0 auto" }}>
                 <div style={{ textAlign: "center", marginBottom: "24px" }}>
                   <div style={{ width: "64px", height: "64px", borderRadius: "32px", background: "rgba(255, 59, 48, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                     <ShieldAlert size={32} color="var(--danger)" />
