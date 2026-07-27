@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { prisma } from '../../../../lib/prisma';
-import { validateImapCredentialsDetailed } from '../../../../lib/mail';
+import { validatePop3CredentialsDetailed } from '../../../../lib/mail';
 
 import { runSync } from '../../../../lib/cron';
 
@@ -23,15 +23,15 @@ export async function POST(req: Request) {
     // Usuń spacje (często ludzie kopiują hasła Google ze spacjami: "abcd efgh ijkl mnop")
     const cleanedPassword = appPassword.replace(/\s+/g, '');
 
-    // Zwaliduj hasło logując się przez IMAP
-    const validationResult = await validateImapCredentialsDetailed(session.user.email, cleanedPassword);
+    // Zwaliduj hasło logując się przez POP3
+    const validationResult = await validatePop3CredentialsDetailed(session.user.email, cleanedPassword);
 
     if (!validationResult.isValid) {
-      console.error("[IMAP Validation Failed]", validationResult.error);
+      console.error("[POP3 Validation Failed]", validationResult.error);
       const isTimeout = validationResult.error?.includes('Timeout') || validationResult.error?.includes('czas oczekiwania');
       
       if (!isTimeout) {
-        return NextResponse.json({ error: `Nie udało się połączyć. Upewnij się, że wpisałeś poprawne hasło oraz włączyłeś POP3 w opcjach Gmail. Szczegóły: ${validationResult.error}` }, { status: 400 });
+        return NextResponse.json({ error: `Nie udało się połączyć. Upewnij się, że wpisałeś poprawne hasło. Szczegóły: ${validationResult.error}` }, { status: 400 });
       }
       
       // If it's a timeout, we log it but continue saving, because Google tarpits bad passwords 
