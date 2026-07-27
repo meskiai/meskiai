@@ -12,6 +12,7 @@ export async function GET(req: Request) {
 
     const leads = await prisma.lead.findMany({
       where: { userId: session.user.id },
+      take: 100,
       orderBy: [
         { probability: 'desc' },
         { createdAt: 'desc' }

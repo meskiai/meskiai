@@ -41,6 +41,10 @@ export default function Dashboard() {
   const [companyBankAccount, setCompanyBankAccount] = useState("");
   const [defaultVatRate, setDefaultVatRate] = useState("23%");
   const [replyTone, setReplyTone] = useState("PROFESJONALNY");
+  const [hasAppPassword, setHasAppPassword] = useState<boolean>(false);
+  const [appPasswordInput, setAppPasswordInput] = useState("");
+  const [appPasswordError, setAppPasswordError] = useState("");
+  const [savingAppPassword, setSavingAppPassword] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [tourStep, setTourStep] = useState(0);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -86,11 +90,13 @@ export default function Dashboard() {
         const data = await res.json();
         if (data.settings) {
           setAutoReply(data.settings.autoReply);
+          setHasAppPassword(data.settings.hasAppPassword);
           setBusinessContext(data.settings.businessContext || "");
           setCompanyName(data.settings.companyName || "");
           setCompanyNip(data.settings.companyNip || "");
           setCompanyAddress(data.settings.companyAddress || "");
           setCompanyBankAccount(data.settings.companyBankAccount || "");
+          setStrategyUrl(data.settings.companyWebsite || "");
           setDefaultVatRate(data.settings.defaultVatRate || "23%");
           setReplyTone(data.settings.replyTone || "PROFESJONALNY");
           
@@ -101,7 +107,7 @@ export default function Dashboard() {
           else setIsEditingCompany(true);
 
           if (!data.settings.onboardingDone) {
-            router.push("/onboarding");
+            setTourStep(1);
           }
 
           let isCheckingOut = false;
@@ -405,6 +411,13 @@ export default function Dashboard() {
     setIsAnalyzingStrategy(true);
     setStrategyResults(null);
     try {
+      // Save website to account
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyWebsite: strategyUrl })
+      });
+
       const res = await fetch("/api/strategy/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1052,12 +1065,7 @@ export default function Dashboard() {
           >
             <Building size={18} /> Dane Firmy
           </button>
-          <button 
-            className={`${styles.navItem} ${currentTab === "ACCOUNT" ? styles.active : ""}`}
-            onClick={() => { setCurrentTab("ACCOUNT"); setSelectedThread(null); fetchSubscriptionDetails(); }}
-          >
-            <User size={18} /> Moje Konto
-          </button>
+
         </div>
 
         <div className={styles.userSection}>
@@ -1074,7 +1082,7 @@ export default function Dashboard() {
               : '1px solid var(--glass-border)',
             marginBottom: '8px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: lastAgentRunAt ? '4px' : '0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0' }}>
               {/* Pulsujący wskaźnik */}
               <div style={{ position: 'relative', width: '8px', height: '8px', flexShrink: 0 }}>
                 <div style={{
@@ -1099,17 +1107,7 @@ export default function Dashboard() {
                 {autoReply ? 'Agent aktywny 24/7' : 'Agent wyłączony'}
               </span>
             </div>
-            {lastAgentRunAt && (
-              <div style={{ fontSize: '0.68rem', color: 'var(--subtext)', paddingLeft: '16px', lineHeight: 1.4 }}>
-                Ostatnie sprawdzenie: {new Date(lastAgentRunAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                {agentEmailsProcessed > 0 && ` · ${agentEmailsProcessed} e-maili`}
-              </div>
-            )}
-            {!lastAgentRunAt && autoReply && (
-              <div style={{ fontSize: '0.68rem', color: 'var(--subtext)', paddingLeft: '16px' }}>
-                Pierwsze sprawdzenie za chwilę…
-              </div>
-            )}
+
           </div>
 
           <div className={styles.settingToggle} style={{ position: 'relative' }}>
@@ -1130,37 +1128,21 @@ export default function Dashboard() {
           
           <div style={{ position: 'relative' }}>
             <div 
-              className={styles.avatarRow} 
+              className={`${styles.avatarRow} ${currentTab === "ACCOUNT" ? styles.active : ""}`} 
               onClick={() => {
-                setShowProfileMenu(!showProfileMenu);
+                setCurrentTab("ACCOUNT");
+                setDashboardMode("MAIL");
+                fetchSubscriptionDetails();
               }}
               style={{ cursor: 'pointer' }}
             >
               <div className={styles.avatar}>
                 {session?.user?.image ? <img src={session.user.image} alt="User" /> : <User size={16} />}
               </div>
-              <span style={{ fontSize: "0.85rem", color: "var(--subtext)", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>
-                {session?.user?.email?.split('@')[0]}
+              <span style={{ fontSize: "0.85rem", color: "var(--subtext)", overflow: "hidden", textOverflow: "ellipsis", flex: 1, fontWeight: currentTab === "ACCOUNT" ? 600 : 400 }}>
+                {session?.user?.name || session?.user?.email?.split('@')[0]}
               </span>
             </div>
-            
-            {showProfileMenu && (
-              <div className={`animate-fade-in ${styles.profileDropdown}`}>
-                <button className={styles.dropdownItem} onClick={() => { setCurrentTab("ACCOUNT"); setDashboardMode("MAIL"); fetchSubscriptionDetails(); setShowProfileMenu(false); }}>
-                  <Settings size={16} />
-                  Ustawienia Konta
-                </button>
-                <button className={styles.dropdownItem} onClick={() => router.push("/")}>
-                  <Home size={16} />
-                  Strona Główna
-                </button>
-                <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }}></div>
-                <button className={styles.dropdownItem} onClick={() => signOut({ callbackUrl: "/" })} style={{ color: 'var(--danger)' }}>
-                  <LogOut size={16} />
-                  Wyloguj się
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </aside>
@@ -1449,6 +1431,31 @@ export default function Dashboard() {
                   );
                 })()}
 
+                {/* ── Row 4: Integracje ── */}
+                <div className={styles.accountSectionCard} style={{ marginTop: "24px" }}>
+                  <div className={styles.accountSectionHeader}>
+                    <ShieldAlert size={13} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                    <span>Integracja E-mail</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--foreground)" }}>Hasło Aplikacji Google</div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Zmień hasło w przypadku błędu połączenia</div>
+                    </div>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={async () => {
+                        // Reset it locally and let the user enter a new one in the INBOX tab
+                        setHasAppPassword(false);
+                        setCurrentTab("INBOX");
+                      }}
+                      style={{ fontSize: "0.85rem", padding: "6px 12px" }}
+                    >
+                      Zmień hasło
+                    </button>
+                  </div>
+                </div>
+
               </div>
             );
           })()}
@@ -1594,8 +1601,17 @@ export default function Dashboard() {
                           <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Adres strony</div>
                           <div style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--foreground)' }}>{strategyUrl}</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34c759', fontWeight: 500, fontSize: '0.9rem' }}>
-                          Raport zapisany
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <span style={{ color: '#34c759', fontWeight: 500, fontSize: '0.9rem' }}>Raport zapisany</span>
+                          <button
+                            onClick={() => {
+                              setStrategyResults(null);
+                              localStorage.removeItem("meskiStrategyResults");
+                            }}
+                            style={{ background: 'rgba(120,120,128,0.1)', color: 'var(--foreground)', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}
+                          >
+                            Zmień stronę
+                          </button>
                         </div>
                       </div>
                     ) : (
@@ -1606,7 +1622,7 @@ export default function Dashboard() {
                             type="url"
                             value={strategyUrl}
                             onChange={(e) => setStrategyUrl(e.target.value)}
-                            placeholder="np. apple.com"
+                            placeholder="np. twojastrona.pl"
                             style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 12px', color: 'var(--foreground)', fontSize: '1rem', outline: 'none' }}
                           />
                         </div>
@@ -1616,7 +1632,7 @@ export default function Dashboard() {
                           style={{ background: '#007aff', color: 'white', border: 'none', padding: '0 24px', borderRadius: '10px', fontWeight: 500, fontSize: '0.95rem', cursor: (isAnalyzingStrategy || !strategyUrl) ? 'not-allowed' : 'pointer', opacity: (isAnalyzingStrategy || !strategyUrl) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px' }}
                         >
                           {isAnalyzingStrategy && <RefreshCw className="animate-spin" size={16} />}
-                          {isAnalyzingStrategy ? 'Pobieranie...' : 'Analizuj'}
+                          {isAnalyzingStrategy ? 'Pobieranie...' : 'Zapisz i Analizuj'}
                         </button>
                       </div>
                     )}
@@ -2050,8 +2066,91 @@ export default function Dashboard() {
 
 
 
+          {/* APP PASSWORD PROMPT */}
+          {!hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
+            <div style={{ padding: "40px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100%", flex: 1, width: "100%" }}>
+              <div style={{ maxWidth: "600px", width: "100%", background: "var(--card-bg)", borderRadius: "16px", padding: "32px", border: "1px solid var(--border)", boxShadow: "var(--mac-shadow)" }}>
+                <div style={{ textAlign: "center", marginBottom: "24px" }}>
+                  <div style={{ width: "64px", height: "64px", borderRadius: "32px", background: "rgba(255, 59, 48, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <ShieldAlert size={32} color="var(--danger)" />
+                  </div>
+                  <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "8px" }}>Wymagane Hasło Aplikacji Google</h2>
+                  <p style={{ color: "var(--subtext)", lineHeight: 1.5 }}>
+                    Aby Agent AI mógł bezpiecznie czytać i odpowiadać na Twoje maile bez przerw, musisz wygenerować <strong>Hasło Aplikacji</strong> w swoim koncie Google.
+                  </p>
+                </div>
+
+                <div style={{ background: "rgba(0,0,0,0.02)", padding: "20px", borderRadius: "12px", marginBottom: "24px", border: "1px solid var(--border)" }}>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "12px", color: "var(--foreground)" }}>Jak połączyć konto w 2 minuty?</h3>
+                  <ol style={{ paddingLeft: "20px", color: "var(--subtext)", display: "flex", flexDirection: "column", gap: "10px", margin: 0 }}>
+                    <li><strong>Włącz IMAP w Gmailu:</strong> Wejdź na Gmail, kliknij zębatkę (Ustawienia) ➔ Zobacz wszystkie ustawienia ➔ zakładka <em>Przekazywanie i POP/IMAP</em> ➔ zaznacz <strong>"Włącz IMAP"</strong> i Zapisz.</li>
+                    <li>Zaloguj się do Google i przejdź do <a href="https://myaccount.google.com/security" target="_blank" rel="noreferrer" style={{ color: "var(--primary)", textDecoration: "none" }}>Ustawień Bezpieczeństwa</a>.</li>
+                    <li>Upewnij się, że masz włączoną <strong>Weryfikację dwuetapową</strong> (to wymóg Google).</li>
+                    <li>W pasku wyszukiwania u góry wpisz <strong>"Hasła aplikacji"</strong> (App passwords) i utwórz nowe hasło nazywając je np. "Meski AI".</li>
+                    <li>Skopiuj wygenerowane 16-literowe hasło bez spacji i wklej je poniżej.</li>
+                  </ol>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--subtext)" }}>Wklej Hasło Aplikacji Google (16 liter)</label>
+                  <input 
+                    type="text" 
+                    value={appPasswordInput}
+                    onChange={e => {
+                      setAppPasswordInput(e.target.value);
+                      setAppPasswordError("");
+                    }}
+                    placeholder="np. abcd efgh ijkl mnop"
+                    className={styles.input}
+                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1rem" }}
+                  />
+                  {appPasswordError && (
+                    <div style={{ color: "var(--danger)", fontSize: "0.85rem", background: "rgba(255,59,48,0.1)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,59,48,0.2)" }}>
+                      {appPasswordError}
+                    </div>
+                  )}
+                  <button 
+                    className="btn btn-primary"
+                    disabled={savingAppPassword || !appPasswordInput.trim()}
+                    onClick={async () => {
+                      setSavingAppPassword(true);
+                      setAppPasswordError("");
+                      try {
+                        const res = await fetch("/api/settings/app-password", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ appPassword: appPasswordInput })
+                        });
+                        
+                        let data: any = {};
+                        try {
+                          data = await res.json();
+                        } catch(e) {}
+                        
+                        if (res.ok) {
+                          setHasAppPassword(true);
+                          fetch('/api/cron/sync', { method: 'POST' }).catch(() => {});
+                          fetchThreads(); 
+                        } else {
+                          setAppPasswordError(data.error || "Serwer odrzucił połączenie. Upewnij się, że wpisałeś poprawne hasło.");
+                        }
+                      } catch(e) {
+                        setAppPasswordError("Błąd połączenia z serwerem. Spróbuj ponownie.");
+                      }
+                      setSavingAppPassword(false);
+                    }}
+                    style={{ padding: "14px", width: "100%", display: "flex", justifyContent: "center", gap: "8px", marginTop: "8px" }}
+                  >
+                    {savingAppPassword ? <RefreshCw className={styles['animate-spin']} size={18} /> : <CheckCircle size={18} />}
+                    Zapisz i podłącz skrzynkę
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* THREADS LIST (INBOX, SENT, SPAM) */}
-          {["INBOX", "SENT", "SPAM"].includes(currentTab) && (
+          {hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
             <div className={`animate-fade-in ${styles.threadListPanel}`}>
               <div className={styles.threadList}>
                 {filteredThreads.length === 0 && (
@@ -2102,7 +2201,7 @@ export default function Dashboard() {
           )}
 
           {/* THREAD VIEW */}
-          {["INBOX", "SENT", "SPAM"].includes(currentTab) && (
+          {hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
             <div className={`animate-fade-in animate-delay-1 ${styles.threadViewPanel}`}>
               {!selectedThread ? (
                 <div className={styles.emptyState}>Wybierz wiadomość z listy po lewej stronie.</div>
@@ -2236,7 +2335,7 @@ export default function Dashboard() {
               </div>
               <button 
                 className="btn btn-primary"
-                onClick={() => {
+                onClick={async () => {
                   if (tourStep === 1) {
                     setTourStep(2);
                   } else if (tourStep === 2) {
@@ -2244,6 +2343,15 @@ export default function Dashboard() {
                     setTourStep(3);
                   } else {
                     setTourStep(0);
+                    try {
+                      await fetch("/api/settings", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ onboardingDone: true })
+                      });
+                    } catch (e) {
+                      console.error("Failed to mark onboarding as done", e);
+                    }
                   }
                 }}
               >

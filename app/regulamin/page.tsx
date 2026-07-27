@@ -46,16 +46,22 @@ export default function RegulaminPage() {
           <section>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>1. Postanowienia Ogólne</h2>
             <p>
-              Niniejszy regulamin określa zasady korzystania z aplikacji internetowej MESKIAI. 
+              Niniejszy regulamin określa zasady korzystania z aplikacji internetowej meskiai. 
               Użytkownik zakładając konto i korzystając z usług akceptuje poniższe warunki.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>2. Usługi i Sztuczna Inteligencja</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>2. Integracje API, Usługi i Sztuczna Inteligencja</h2>
             <p>
-              Aplikacja MESKIAI świadczy usługi automatyzacji poczty e-mail oraz generowania propozycji B2B za pomocą 
-              modeli sztucznej inteligencji. Zastrzegamy, że modele AI mogą czasami generować nieprzewidywalne rezultaty. 
+              Aplikacja meskiai świadczy usługi automatyzacji poczty e-mail oraz generowania propozycji B2B za pomocą 
+              modeli sztucznej inteligencji. Logowanie do serwisu odbywa się za pośrednictwem bezpiecznego protokołu <strong>Google OAuth</strong>.
+              Aplikacja wykorzystuje <strong>Gmail API</strong> (za wyraźną zgodą Użytkownika) do odczytu i wysyłania wiadomości oraz 
+              usługę <strong>Google Gemini AI</strong> do ich przetwarzania. Cała infrastruktura serwerowa hostowana jest na niezawodnych platformach 
+              <strong>Netlify</strong> oraz <strong>Vercel</strong>, a zaszyfrowane dane przetrzymywane są w bazie <strong>Neon (PostgreSQL)</strong>.
+            </p>
+            <p style={{ marginTop: '12px' }}>
+              Zastrzegamy, że modele AI mogą czasami generować nieprzewidywalne rezultaty. 
               Użytkownik jest odpowiedzialny za nadzór nad wysyłanymi treściami i danymi wprowadzanymi do bazy wiedzy.
             </p>
           </section>

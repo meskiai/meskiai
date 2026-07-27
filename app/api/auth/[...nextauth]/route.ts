@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope:
-            "openid email profile https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send",
+            "openid email profile",
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
@@ -69,7 +69,7 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);

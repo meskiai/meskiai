@@ -48,7 +48,11 @@ export async function POST(
 Twoja firma zajmuje się i kieruje się następującymi zasadami:
 "${userSettings?.businessContext || "Firma dbająca o profesjonalną obsługę klienta."}"
 
-Zadanie: Napisz profesjonalną propozycję odpowiedzi na poniższego e-maila. Bądź uprzejmy i zwięzły, podpisz się jako "Asystent AI". Odpowiedź MUSI opierać się na zasadach i profilu Twojej firmy. NIE PISZ słów takich jak "CZŁOWIEK" ani "BOT", po prostu podaj gotowy tekst wiadomości.`,
+Zadanie: Napisz profesjonalną propozycję odpowiedzi na poniższego e-maila. Bądź uprzejmy i zwięzły. Podpisz się jako profesjonalny Asystent z firmy klienta (na podstawie podanej bazy wiedzy), a nie jako zewnętrzny asystent. Odpowiedź MUSI opierać się na zasadach i profilu Twojej firmy. NIE PISZ słów takich jak "CZŁOWIEK", "BOT", ani "MESKIAI". Podaj po prostu gotowy tekst wiadomości.
+
+ZASADY:
+1. Jeśli wiadomość to absolutny spam, reklama, newsletter, bot, systemowa lub śmieciowa oferta → odpowiedz TYLKO: BOT
+2. Jeśli wiadomość jest ściśle ważna, pilna, biznesowo krytyczna lub wymaga podjęcia decyzji przez właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION`,
       prompt: `
 Oto e-mail od: ${latestEmail.from}
 Temat: ${latestEmail.subject}

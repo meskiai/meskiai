@@ -75,9 +75,39 @@ export default function PrivacyPolicy() {
 
             {/* Section 4 */}
             <div className={`${styles.sectionCard} animate-fade-in-up animate-delay-6`}>
+              <div className={styles.sectionIcon}><ShieldCheck size={28} /></div>
+              <div className={styles.sectionContent}>
+                <h2>4. Zgodność z Google API (Limited Use)</h2>
+                <p>
+                  Aplikacja meskiai korzysta z dostępu do konta Gmail w celu odczytywania wiadomości i generowania automatycznych odpowiedzi. 
+                  Wykorzystanie i przekazywanie do jakiejkolwiek innej aplikacji informacji otrzymanych z interfejsów API Google będzie ściśle 
+                  przestrzegać <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'underline', color: 'var(--primary, #3b82f6)'}}>Zasad dotyczących danych użytkowników usług API Google</a> (Google API Services User Data Policy), w tym wymogów dotyczących ograniczonego użycia (Limited Use requirements).
+                </p>
+                <ul>
+                  <li><strong>Prywatność absolutna:</strong> Twoje e-maile są przetwarzane wyłącznie przez zautomatyzowane moduły AI w celu wygenerowania odpowiedzi. Żaden człowiek nie ma do nich dostępu.</li>
+                  <li><strong>Brak reklam:</strong> Dane pochodzące z przestrzeni roboczej Google (w tym e-maile) nigdy nie są wykorzystywane do kierowania reklam ani sprzedawane brokerom danych.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Section 5 */}
+            <div className={`${styles.sectionCard} animate-fade-in-up animate-delay-7`}>
+              <div className={styles.sectionIcon}><Database size={28} /></div>
+              <div className={styles.sectionContent}>
+                <h2>5. Dostawcy zewnętrzni i Płatności</h2>
+                <p>Korzystamy ze światowej klasy dostawców, aby zapewnić najwyższe bezpieczeństwo i niezawodność usług:</p>
+                <ul>
+                  <li><strong>Stripe:</strong> Obsługa bezpiecznych płatności i subskrypcji. meskiai nigdy nie przechowuje danych Twoich kart płatniczych.</li>
+                  <li><strong>Vercel / Netlify / Neon:</strong> Hosting aplikacji, utrzymanie systemów w trybie 24/7 oraz szyfrowana baza danych na terenie Unii Europejskiej.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Section 6 */}
+            <div className={`${styles.sectionCard} animate-fade-in-up animate-delay-8`}>
               <div className={styles.sectionIcon}><Cookie size={28} /></div>
               <div className={styles.sectionContent}>
-                <h2>4. Czyste Pliki Cookies</h2>
+                <h2>6. Czyste Pliki Cookies</h2>
                 <p>
                   Nasz system używa plików cookies wyłącznie w celach technicznych i utrzymania bezpieczeństwa (tzw. <em>Strictly Necessary Cookies</em>). Służą one do zachowania Twojej sesji logowania. 
                   <strong> Nie stosujemy</strong> inwazyjnych skryptów śledzących, nie handlujemy danymi analitycznymi i nie sprzedajemy profilu użytkownika podmiotom trzecim.
@@ -85,16 +115,16 @@ export default function PrivacyPolicy() {
               </div>
             </div>
 
-            {/* Section 5 */}
-            <div className={`${styles.sectionCard} animate-fade-in-up animate-delay-7`}>
+            {/* Section 7 */}
+            <div className={`${styles.sectionCard} animate-fade-in-up animate-delay-9`}>
               <div className={styles.sectionIcon}><CheckCircle size={28} /></div>
               <div className={styles.sectionContent}>
-                <h2>5. Pełnia Twoich Praw (RODO)</h2>
+                <h2>7. Pełnia Twoich Praw (RODO)</h2>
                 <p>Zgodnie z ogólnym rozporządzeniem o ochronie danych (RODO) przysługuje Ci absolutne prawo do kontroli nad swoimi informacjami. Masz prawo do:</p>
                 <ul>
                   <li>Dostępu do swoich danych oraz otrzymania ich czytelnej kopii.</li>
                   <li>Natychmiastowego sprostowania oraz ograniczenia przetwarzania.</li>
-                  <li>Bezwzględnego usunięcia danych z naszych serwerów (Prawo do bycia zapomnianym).</li>
+                  <li>Bezwzględnego usunięcia danych z naszych serwerów (Prawo do bycia zapomnianym) oraz cofnięcia uprawnień Google w dowolnym momencie.</li>
                 </ul>
                 <p>Aby zrealizować swoje prawa, wystarczy skontaktować się z nami z poziomu panelu klienta.</p>
               </div>

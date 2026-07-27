@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, defaultVatRate, replyTone } = await req.json();
+    const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, companyWebsite, defaultVatRate, replyTone } = await req.json();
 
     const dataToUpdate: any = {};
     if (autoReply !== undefined) dataToUpdate.autoReply = autoReply;
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     if (companyNip !== undefined) dataToUpdate.companyNip = companyNip;
     if (companyAddress !== undefined) dataToUpdate.companyAddress = companyAddress;
     if (companyBankAccount !== undefined) dataToUpdate.companyBankAccount = companyBankAccount;
+    if (companyWebsite !== undefined) dataToUpdate.companyWebsite = companyWebsite;
     if (defaultVatRate !== undefined) dataToUpdate.defaultVatRate = defaultVatRate;
     if (replyTone !== undefined) dataToUpdate.replyTone = replyTone;
 
@@ -31,13 +32,14 @@ export async function POST(req: Request) {
       update: dataToUpdate,
       create: { 
         userId: session.user.id, 
-        autoReply: autoReply ?? false,
+        autoReply: autoReply ?? true,
         onboardingDone: onboardingDone ?? false,
         businessContext: businessContext ?? "",
         companyName: companyName ?? null,
         companyNip: companyNip ?? null,
         companyAddress: companyAddress ?? null,
         companyBankAccount: companyBankAccount ?? null,
+        companyWebsite: companyWebsite ?? null,
         defaultVatRate: defaultVatRate ?? "23%",
         replyTone: replyTone ?? "PROFESJONALNY"
       }
@@ -63,7 +65,10 @@ export async function GET(req: Request) {
       include: { settings: true }
     });
 
-    const settings = user?.settings || { autoReply: false };
+    const settings = {
+      ...(user?.settings || { autoReply: false }),
+      hasAppPassword: !!user?.settings?.appPassword
+    };
     const subscriptionData = {
       subscriptionStatus: user?.subscriptionStatus || "inactive",
       stripePriceId: user?.stripePriceId || null,

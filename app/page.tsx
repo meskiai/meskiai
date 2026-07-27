@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
@@ -67,7 +68,7 @@ export default function Home() {
               alt="MESKIAI logo"
               style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)' }}
             />
-            <span>MESKIAI</span>
+            <span>meskiai</span>
           </div>
           
           <div className={styles.navActions}>
@@ -114,22 +115,24 @@ export default function Home() {
                     </div>
 
                     {/* Menu items */}
-                    <button
-                      onClick={() => { router.push('/dashboard'); setShowUserMenu(false); }}
-                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s' }}
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setShowUserMenu(false)}
+                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s', textDecoration: 'none' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <HomeIcon size={16} style={{ color: 'var(--subtext)' }} /> Panel
-                    </button>
-                    <button
-                      onClick={() => { router.push('/dashboard'); setShowUserMenu(false); }}
-                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s' }}
+                    </Link>
+                    <Link
+                      href="/dashboard?tab=account"
+                      onClick={() => setShowUserMenu(false)}
+                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s', textDecoration: 'none' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <Settings size={16} style={{ color: 'var(--subtext)' }} /> Ustawienia Konta
-                    </button>
+                    </Link>
 
                     <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
 
@@ -183,9 +186,9 @@ export default function Home() {
         
         <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`}>
           {status === "authenticated" ? (
-            <button className={styles.ctaBtnPrimary} onClick={() => router.push("/dashboard")}>
+            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{textDecoration: 'none'}}>
               Przejdź do Panelu <ArrowRight size={18} />
-            </button>
+            </Link>
           ) : (
             <>
               <button className={styles.ctaBtnPrimary} onClick={() => {
@@ -208,6 +211,14 @@ export default function Home() {
         <div className={styles.pricingHeader}>
           <h2 className="animate-fade-in-up">Moc obliczeniowa.<br/>Zamiast listy płac.</h2>
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
+        </div>
+        
+        <div className="animate-fade-in-up animate-delay-1" style={{ maxWidth: '800px', margin: '0 auto 40px auto', padding: '16px 24px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--subtext)', textAlign: 'left' }}>
+          <Mail size={22} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+          <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+            <strong style={{ display: 'block', color: 'var(--foreground)', marginBottom: '4px', fontSize: '1rem' }}>Ważna informacja przed zakupem</strong>
+            Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na to samo konto Gmail</strong>, na którym ma działać Agent AI. Asystent zostanie trwale przypisany do konta, z którego wykupiono pakiet, aby móc automatycznie odpisywać na Twoje e-maile.
+          </div>
         </div>
         
         <div className={styles.pricingGrid}>

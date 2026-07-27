@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { prisma } from '../../../lib/prisma';
-import { sendEmail } from '../../../lib/gmail';
+import { sendReplySMTP } from '../../../lib/mail';
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -16,32 +16,47 @@ export async function POST(req: Request) {
 
     const thread = await prisma.thread.findUnique({
       where: { id: threadId, userId: session.user.id },
-      include: { emails: { orderBy: { receivedAt: 'desc' }, take: 1 } }
+      include: { emails: { orderBy: { receivedAt: 'asc' } } }
     });
 
     if (!thread) return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     if (thread.emails.length === 0) return NextResponse.json({ error: 'No emails in thread' }, { status: 400 });
 
-    const latestEmail = thread.emails[0];
-    const replyTo = latestEmail.from.replace(/.*<(.+)>.*/, '$1');
+    const userSettings = await prisma.userSettings.findUnique({
+      where: { userId: session.user.id }
+    });
 
-    await sendEmail(session.user.id, replyTo, `Re: ${latestEmail.subject}`, replyBody, thread.threadId);
+    if (!userSettings?.appPassword) {
+      return NextResponse.json({ error: 'Brak hasła aplikacji Google. Skonfiguruj je w panelu.' }, { status: 400 });
+    }
 
-    // Mark as replied
+    const originalEmail = thread.emails.find(e => !e.isFromAgent) || thread.emails[0];
+    const replyTo = originalEmail.from.replace(/.*<(.+)>.*/, '$1').trim() || originalEmail.from;
+    const references = thread.emails.filter(e => !e.isFromAgent).map(e => e.messageId).join(' ');
+
+    await sendReplySMTP(
+      session.user.email!,
+      userSettings.appPassword,
+      replyTo,
+      `Re: ${originalEmail.subject}`,
+      replyBody,
+      originalEmail.messageId,
+      references
+    );
+
     await prisma.thread.update({
       where: { id: thread.id },
       data: { status: 'REPLIED', draftReply: null }
     });
 
-    // Record the sent email
     await prisma.email.create({
       data: {
         threadId: thread.id,
-        messageId: `sent-${Date.now()}`,
+        messageId: `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         from: session.user.email || 'Agent',
         to: replyTo,
-        subject: `Re: ${latestEmail.subject}`,
-        snippet: replyBody.substring(0, 100),
+        subject: `Re: ${originalEmail.subject}`,
+        snippet: replyBody.substring(0, 150),
         body: replyBody,
         receivedAt: new Date(),
         isFromAgent: true
@@ -49,8 +64,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return NextResponse.json({ error: 'Failed to send reply' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to send reply: ' + (error?.message || '') }, { status: 500 });
   }
 }

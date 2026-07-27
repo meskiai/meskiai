@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "MESKIAI — AI Email Agent",
-  description: "MESKIAI is an AI-powered email assistant that automatically reads, analyzes and replies to your business emails 24/7. Designed for B2B companies to automate client communication.",
-  keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "MESKIAI"],
+  title: "meskiai",
+  description: "Inteligentny asystent e-mail dla Twojej firmy.",
+  keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "meskiai"],
   verification: {
     google: "s7pLe9Qvw4VmJCsUfAfeMhgYj1YzYXLcCnFdHczK-V8",
   },
@@ -19,11 +13,11 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   openGraph: {
-    title: "MESKIAI — AI Email Agent",
-    description: "AI-powered email assistant that automatically replies to your business emails 24/7.",
+    title: "meskiai",
+    description: "Inteligentny asystent e-mail dla Twojej firmy.",
     images: [{ url: "/logo.png" }],
     url: "https://meskiai.com",
-    siteName: "MESKIAI",
+    siteName: "meskiai",
     type: "website",
   },
   metadataBase: new URL("https://meskiai.com"),
@@ -40,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${inter.variable}`} suppressHydrationWarning>
+    <html lang="pl" suppressHydrationWarning>
       <body>
         <Providers>
           {children}

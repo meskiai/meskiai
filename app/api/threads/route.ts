@@ -13,6 +13,7 @@ export async function GET(req: Request) {
   try {
     const threads = await prisma.thread.findMany({
       where: { userId: session.user.id },
+      take: 50,
       include: {
         emails: {
           orderBy: { receivedAt: 'desc' }

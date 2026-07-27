@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
-import { sendEmail } from "../../../../lib/gmail";
+import { sendReplySMTP } from "../../../../lib/mail";
 
 export async function POST(req: Request) {
   try {
@@ -25,8 +25,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Lead not found" }, { status: 404 });
     }
 
-    // Wyślij e-mail przez zintegrowane konto Google
-    await sendEmail(session.user.id, toEmail, subject, body);
+    // Get user's app password
+    const userSettings = await prisma.userSettings.findUnique({
+      where: { userId: session.user.id }
+    });
+
+    if (!userSettings?.appPassword) {
+      return NextResponse.json({ 
+        error: "Brak skonfigurowanego Hasła Aplikacji Google. Przejdź do panelu i wpisz hasło aplikacji." 
+      }, { status: 400 });
+    }
+
+    // Send via SMTP using Gmail App Password
+    await sendReplySMTP(
+      session.user.email!,
+      userSettings.appPassword,
+      toEmail,
+      subject,
+      body
+    );
 
     // Oznacz leada jako skontaktowanego
     await prisma.lead.update({

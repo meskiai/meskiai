@@ -8,19 +8,19 @@ export const handler = schedule('*/2 * * * *', async (event) => {
   const cronSecret = process.env.CRON_SECRET || '';
   
   try {
-    const response = await fetch(`${siteUrl}/api/cron/sync`, {
-      method: 'GET',
+    const response = await fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${cronSecret}`
       }
     });
     
-    if (!response.ok) {
+    if (!response.ok && response.status !== 202) {
       console.error(`[Netlify Cron] Błąd HTTP: ${response.status} ${response.statusText}`);
       return { statusCode: response.status };
     }
     
-    console.log('[Netlify Cron] Sukces! Sprawdzono maile.');
+    console.log('[Netlify Cron] Sukces! Wyzwolono background function (202).');
     return { statusCode: 200 };
   } catch (error) {
     console.error('[Netlify Cron] Wyjątek podczas łączenia z API:', error);

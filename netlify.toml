@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npx prisma generate && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -8,3 +8,7 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
+  directory = "netlify/functions"

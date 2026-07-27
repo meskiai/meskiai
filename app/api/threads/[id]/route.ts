@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
-import { trashThread } from "../../../../lib/gmail";
 
 export async function DELETE(
   req: Request,
@@ -27,14 +26,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Thread not found or unauthorized" }, { status: 404 });
     }
 
-    // Try to trash the thread in Gmail
-    try {
-      await trashThread(session.user.id, thread.threadId);
-    } catch (e) {
-      console.warn("Could not trash thread in Gmail, it might be already deleted.", e);
-    }
-
-    // Delete thread (emails will cascade delete because of Prisma relation setup)
+    // Delete thread from DB (emails cascade delete via Prisma relation)
     await prisma.thread.delete({
       where: { id: threadId }
     });

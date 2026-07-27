@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     }
 
     const result = streamText({
-      model: google('gemini-2.5-flash'),
+      model: google('gemini-flash-latest'),
       system: `Jesteś Asystentem Kalendarza (AI).
 Twoim zadaniem jest pomaganie użytkownikowi w zarządzaniu jego kalendarzem. 
 Dziś jest: ${new Date().toLocaleString('pl-PL')}.

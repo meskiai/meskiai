@@ -101,12 +101,16 @@ export async function POST(req: Request) {
         });
 
         if (user) {
+          const periodEndTs = (subscription as any).current_period_end
+            || (subscription as any).items?.data?.[0]?.current_period_end
+            || (Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
+
           await prisma.user.update({
             where: { id: user.id },
             data: {
               stripeSubscriptionId: (subscription as any).id,
-              stripePriceId: (subscription as any).items.data[0].price.id,
-              stripeCurrentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+              stripePriceId: (subscription as any).items?.data?.[0]?.price?.id || "",
+              stripeCurrentPeriodEnd: new Date(periodEndTs * 1000),
               subscriptionStatus: (subscription as any).status,
             },
           });
