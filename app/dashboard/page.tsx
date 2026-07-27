@@ -2132,70 +2132,92 @@ export default function Dashboard() {
                   </p>
                 </div>
 
-                <div style={{ background: "rgba(0,0,0,0.02)", padding: "20px", borderRadius: "12px", marginBottom: "24px", border: "1px solid var(--border)" }}>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "12px", color: "var(--foreground)" }}>Jak połączyć konto w 2 minuty?</h3>
-                  <ol style={{ paddingLeft: "20px", color: "var(--subtext)", display: "flex", flexDirection: "column", gap: "10px", margin: 0 }}>
-                    <li><strong>Włącz IMAP w Gmailu:</strong> Wejdź na Gmail, kliknij zębatkę (Ustawienia) ➔ Zobacz wszystkie ustawienia ➔ zakładka <em>Przekazywanie i POP/IMAP</em> ➔ zaznacz <strong>"Włącz IMAP"</strong> i Zapisz.</li>
-                    <li>Zaloguj się do Google i przejdź do <a href="https://myaccount.google.com/security" target="_blank" rel="noreferrer" style={{ color: "var(--primary)", textDecoration: "none" }}>Ustawień Bezpieczeństwa</a>.</li>
-                    <li>Upewnij się, że masz włączoną <strong>Weryfikację dwuetapową</strong> (to wymóg Google).</li>
-                    <li>W pasku wyszukiwania u góry wpisz <strong>"Hasła aplikacji"</strong> (App passwords) i utwórz nowe hasło nazywając je np. "Meski AI".</li>
-                    <li>Skopiuj wygenerowane 16-literowe hasło bez spacji i wklej je poniżej.</li>
-                  </ol>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--subtext)" }}>Wklej Hasło Aplikacji Google (16 liter)</label>
-                  <input 
-                    type="text" 
-                    value={appPasswordInput}
-                    onChange={e => {
-                      setAppPasswordInput(e.target.value);
-                      setAppPasswordError("");
-                    }}
-                    placeholder="np. abcd efgh ijkl mnop"
-                    className={styles.input}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1rem" }}
-                  />
-                  {appPasswordError && (
-                    <div style={{ color: "var(--danger)", fontSize: "0.85rem", background: "rgba(255,59,48,0.1)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,59,48,0.2)" }}>
-                      {appPasswordError}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
+                  
+                  {/* Step 1 */}
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>1</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz dostęp w Gmailu</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Zaznacz opcję <strong>"Włącz IMAP"</strong> i kliknij Zapisz Zmiany na dole strony.</p>
                     </div>
-                  )}
-                  <button 
-                    className="btn btn-primary"
-                    disabled={savingAppPassword || !appPasswordInput.trim()}
-                    onClick={async () => {
-                      setSavingAppPassword(true);
-                      setAppPasswordError("");
-                      try {
-                        const res = await fetch("/api/settings/app-password", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ appPassword: appPasswordInput })
-                        });
-                        
-                        let data: any = {};
-                        try {
-                          data = await res.json();
-                        } catch(e) {}
-                        
-                        if (res.ok) {
-                          setHasAppPassword(true);
-                          fetch('/api/cron/sync', { method: 'POST' }).catch(() => {});
-                          fetchThreads(); 
-                        } else {
-                          setAppPasswordError(data.error || "Serwer odrzucił połączenie. Upewnij się, że wpisałeś poprawne hasło.");
-                        }
-                      } catch(e) {
-                        setAppPasswordError("Błąd połączenia z serwerem. Spróbuj ponownie.");
-                      }
-                      setSavingAppPassword(false);
-                    }}
-                    style={{ padding: "14px", width: "100%", display: "flex", justifyContent: "center", gap: "8px", marginTop: "8px" }}
-                  >
-                    {savingAppPassword ? <RefreshCw className={styles['animate-spin']} size={18} /> : <CheckCircle size={18} />}
-                    Zapisz i podłącz skrzynkę
-                  </button>
+                    <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Otwórz Gmail <ExternalLink size={14} style={{ marginLeft: '6px' }} />
+                    </a>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>2</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Utwórz Hasło Aplikacji</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Google poprosi Cię o podanie nazwy (np. "Meski AI"). <br/><em style={{ opacity: 0.8 }}>Wymaga włączonego logowania dwuetapowego (2FA) na koncie Google.</em></p>
+                    </div>
+                    <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Utwórz Hasło <ExternalLink size={14} style={{ marginLeft: '6px' }} />
+                    </a>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px 20px', display: 'flex', alignItems: 'flex-start', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0, marginTop: '4px' }}>3</div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Wklej wygenerowane 16-literowe hasło</h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Możesz wkleić je ze spacjami lub bez.</p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                        <input 
+                          type="text" 
+                          value={appPasswordInput}
+                          onChange={e => { setAppPasswordInput(e.target.value); setAppPasswordError(""); }}
+                          placeholder="xxxx xxxx xxxx xxxx"
+                          className={styles.input}
+                          style={{ flex: '1 1 200px', padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1.1rem", letterSpacing: '1px', minWidth: '0' }}
+                        />
+                        <button 
+                          className="btn btn-primary"
+                          disabled={savingAppPassword || !appPasswordInput.trim()}
+                          onClick={async () => {
+                            setSavingAppPassword(true);
+                            setAppPasswordError("");
+                            try {
+                              const res = await fetch("/api/settings/app-password", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ appPassword: appPasswordInput })
+                              });
+                              
+                              let data: any = {};
+                              try { data = await res.json(); } catch(e) {}
+                              
+                              if (res.ok) {
+                                setHasAppPassword(true);
+                                fetch('/api/cron/sync', { method: 'POST' }).catch(() => {});
+                                fetchThreads(); 
+                              } else {
+                                setAppPasswordError(data.error || "Serwer odrzucił połączenie. Upewnij się, że wkleiłeś poprawne hasło (to 16 znaków, a nie Twoje główne hasło do poczty).");
+                              }
+                            } catch(e) {
+                              setAppPasswordError("Błąd połączenia z serwerem. Spróbuj ponownie.");
+                            }
+                            setSavingAppPassword(false);
+                          }}
+                          style={{ padding: "12px 24px", whiteSpace: "nowrap", flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          {savingAppPassword ? <RefreshCw className={styles['animate-spin']} size={16} /> : <CheckCircle size={16} style={{ marginRight: '6px' }} />}
+                          Połącz z AI
+                        </button>
+                      </div>
+                      {appPasswordError && (
+                        <div style={{ color: "var(--danger)", fontSize: "0.85rem", background: "rgba(255,59,48,0.1)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,59,48,0.2)" }}>
+                          {appPasswordError}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
