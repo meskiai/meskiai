@@ -110,7 +110,7 @@ async function processUser(user: any) {
   }).catch(() => {});
 
   if (messages.length === 0) {
-    console.log(`[Agent AI] ${user.email}: brak nowych wiadomości (POP3).`);
+    console.log(`[Agent AI] ${user.email}: brak nowych wiadomości (IMAP).`);
     return;
   }
 
@@ -205,20 +205,28 @@ async function processMessage({
       });
     }
 
-    await prisma.email.create({
-      data: {
-        threadId:   dbThread.id,
-        messageId,
-        pop3Uid:    msg.pop3Uid,
-        from:       msg.from, 
-        to:         msg.to, 
-        subject:    msg.subject,
-        snippet:    msg.text.substring(0, 100),
-        body:       msg.text,
-        receivedAt: msg.date,
-        isFromAgent: false
+    try {
+      await prisma.email.create({
+        data: {
+          threadId:   dbThread.id,
+          messageId,
+          pop3Uid:    msg.pop3Uid,
+          from:       msg.from, 
+          to:         msg.to, 
+          subject:    msg.subject,
+          snippet:    msg.text.substring(0, 100),
+          body:       msg.text,
+          receivedAt: msg.date,
+          isFromAgent: false
+        }
+      });
+    } catch (err: any) {
+      if (err.code === 'P2002') {
+        console.warn(`[Agent AI] Wiadomość o ID ${messageId} już istnieje (wyścig równoległych procesów). Pomijam duplikat.`);
+        return; // Przerywamy przetwarzanie tej wiadomości
       }
-    });
+      throw err;
+    }
   } else {
     dbThread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
     if (!existing.pop3Uid && msg.pop3Uid) {
