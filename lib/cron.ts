@@ -141,6 +141,14 @@ async function processMessage({
 }) {
   const messageId = msg.messageId;
 
+  // ZABEZPIECZENIE: Jeśli mail jest starszy niż 48 godzin (użytkownik pobrał złą opcją całą historię)
+  // AI kompletnie go ignoruje. Nie jest nawet zapisywany do bazy danych, żeby nie śmiecić.
+  const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
+  if (messageAgeHours > 48) {
+    console.log(`[Agent AI] Wiadomość zbyt stara (${Math.round(messageAgeHours)}h) — całkowicie ignoruję.`);
+    return;
+  }
+
   // Sprawdź duplikat
   const existing = await prisma.email.findUnique({ where: { messageId } });
 
@@ -303,12 +311,7 @@ async function processMessage({
       (priceId === PRICE_BASIC && emailsSent >= 50) ||
       (priceId === PRICE_PRO   && emailsSent >= 1000);
 
-    // ZABEZPIECZENIE: Jeśli mail jest starszy niż 48 godzin (użytkownik pobrał złą opcją całą historię)
-    // AI nie wyśle na niego auto-odpowiedzi. Zostanie stworzony jedynie szkic.
-    const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
-    const isTooOld = messageAgeHours > 48;
-
-    if (isAutoReplyOn && !limitExceeded && !isTooOld) {
+    if (isAutoReplyOn && !limitExceeded) {
       // ── AUTO-WYŚLIJ ──
       const replyTo = msg.from.replace(/.*<(.+)>.*/, '$1').trim() || msg.from;
       
@@ -348,8 +351,6 @@ async function processMessage({
         notice = '\n\n[LIMIT]: Brak aktywnej subskrypcji. Szkic zapisany.';
       } else if (limitExceeded) {
         notice = '\n\n[LIMIT]: Miesięczny limit auto-odpowiedzi wyczerpany. Szkic zapisany.';
-      } else if (isTooOld) {
-        notice = '\n\n[BEZPIECZEŃSTWO]: Wiadomość jest starsza niż 48h. Ze względów bezpieczeństwa utworzono tylko szkic (uniknięcie spamu do starych wątków).';
       }
 
       await prisma.thread.update({
@@ -357,7 +358,7 @@ async function processMessage({
         data:  { draftReply: aiText + notice }
       });
 
-      const why = isTooOld ? 'zbyt stary e-mail' : (!isAutoReplyOn ? 'autoReply=OFF' : 'limit wyczerpany');
+      const why = !isAutoReplyOn ? 'autoReply=OFF' : 'limit wyczerpany';
       console.log(`[Agent AI] 📝 Szkic zapisany (${why})`);
     }
   } catch (aiErr: any) {

@@ -525,20 +525,35 @@ export default function Dashboard() {
     if (status === "unauthenticated") router.push("/");
     if (status === "authenticated") {
       const searchParams = new URLSearchParams(window.location.search);
-      if (searchParams.get("checkout") === "success") {
-        setLoading(true);
-        fetch("/api/stripe/verify", { method: "POST" })
-          .then(res => res.json())
-          .then(data => {
-            window.history.replaceState({}, document.title, window.location.pathname);
-            fetchSettings();
-          })
-          .catch(() => fetchSettings());
-      } else {
+      const isCheckout = searchParams.get("checkout") === "success";
+
+      const initDashboard = () => {
         fetchSettings();
+        fetchThreads();
+        fetchLeads();
+      };
+
+      if (isCheckout) {
+        setLoading(true);
+        const checkStripe = async (attempts = 0) => {
+          try {
+            const res = await fetch("/api/stripe/verify", { method: "POST" });
+            const data = await res.json();
+            if (data.success || attempts > 4) {
+              window.history.replaceState({}, document.title, window.location.pathname);
+              initDashboard();
+            } else {
+              setTimeout(() => checkStripe(attempts + 1), 1500);
+            }
+          } catch (e) {
+            initDashboard();
+          }
+        };
+        checkStripe();
+      } else {
+        initDashboard();
       }
-      fetchThreads();
-      fetchLeads();
+
       const savedStrategyResults = localStorage.getItem("meskiStrategyResults");
       if (savedStrategyResults) {
         try {
@@ -2208,8 +2223,8 @@ export default function Dashboard() {
                               
                               if (res.ok) {
                                 setHasAppPassword(true);
-                                fetch('/api/cron/sync', { method: 'POST' }).catch(() => {});
-                                fetchThreads(); 
+                                showToast("Hasło poprawne! Trwa pierwsza synchronizacja e-maili. Zajmie to około 1-2 minuty...", "success");
+                                handleSync();
                               } else {
                                 setAppPasswordError(data.error || "Serwer odrzucił połączenie. Upewnij się, że wkleiłeś poprawne hasło (to 16 znaków, a nie Twoje główne hasło do poczty).");
                               }
