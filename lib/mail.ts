@@ -43,7 +43,17 @@ export async function fetchUnreadEmailsIMAP(email: string, appPassword: string, 
   });
 
   try {
-    await client.connect();
+    // Timeout 15 sekund na samo połączenie IMAP
+    const connectPromise = client.connect();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => {
+        try { client.close(); } catch(e) {}
+        reject(new Error('IMAP connection timed out (Google ban active)'));
+      }, 15000)
+    );
+    
+    await Promise.race([connectPromise, timeoutPromise]);
+    
     const lock = await client.getMailboxLock('INBOX');
     
     try {

@@ -97,14 +97,7 @@ async function processUser(user: any) {
       where: { thread: { userId }, pop3Uid: { not: null } },
     });
     const knownUids = existingEmails.map(e => e.pop3Uid as string);
-    
-    // Zapobiegamy wiecznemu zawieszeniu jeśli Google nie odpowiada
-    const fetchPromise = fetchUnreadEmailsIMAP(user.email!, settings.appPassword!, knownUids);
-    const timeoutPromise = new Promise<FetchedEmail[]>((_, reject) => 
-      setTimeout(() => reject(new Error('IMAP connection timed out (Google ban active)')), 15000)
-    );
-    
-    messages = await Promise.race([fetchPromise, timeoutPromise]);
+    messages = await fetchUnreadEmailsIMAP(user.email!, settings.appPassword!, knownUids);
   } catch (err: any) {
     console.warn(`[Agent AI] ${user.email}: brak dostępu IMAP (Błędne hasło lub wyłączony IMAP) — ${err.message}`);
     return;
