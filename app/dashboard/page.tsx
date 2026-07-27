@@ -892,7 +892,7 @@ export default function Dashboard() {
             
             {/* Progress Bar */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '40px' }}>
-              {[0, 1, 2, 3, 4].map(idx => (
+              {[0, 1, 2, 3].map(idx => (
                 <div key={idx} style={{ height: '4px', width: '40px', borderRadius: '2px', background: idx === guideIndex ? 'var(--primary)' : 'rgba(255,255,255,0.1)', transition: 'background 0.3s' }}></div>
               ))}
             </div>
@@ -900,11 +900,11 @@ export default function Dashboard() {
             {guideIndex === 0 && (
               <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
-                  <Building size={48} />
+                  <Bot size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 1: Twoja Firma</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 1: Baza Wiedzy AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wejdź w zakładkę <strong>Moje Konto</strong> (klikając w swój awatar w lewym dolnym rogu). Uzupełnij <strong>Dane Firmy</strong> (Nazwa, NIP, Adres). Te informacje dodadzą wiarygodności podczas wysyłania ofert i posłużą też do fakturowania.
+                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów B2B i odpisywania na wiadomości.
                 </p>
               </div>
             )}
@@ -912,45 +912,33 @@ export default function Dashboard() {
             {guideIndex === 1 && (
               <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
-                  <Bot size={48} />
-                </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 2: Baza Wiedzy AI</h2>
-                <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów B2B i odpisywania na wiadomości.
-                </p>
-              </div>
-            )}
-
-            {guideIndex === 2 && (
-              <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
-                <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
                   <Mail size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 3: Agent Pocztowy AI</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 2: Agent Pocztowy AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
                   Na stronie głównej wejdź w <strong>Agent Pocztowy AI</strong>. Nowe maile trafiają tu bezpośrednio, a AI od razu pisze szkic idealnej odpowiedzi. Jeśli chcesz, aby asystent odpisywał samoczynnie w trybie 24/7, po prostu włącz suwak <strong>Auto-Reply (AI)</strong> na dole ekranu.
                 </p>
               </div>
             )}
 
-            {guideIndex === 3 && (
+            {guideIndex === 2 && (
               <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(16,185,129,0.2)', marginBottom: '16px' }}>
                   <Search size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Agent Strategiczny AI</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 3: Agent Strategiczny AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
                   Z poziomu ekranu powitalnego kliknij <strong>Agent Strategiczny AI</strong>. Podaj adres strony internetowej, a system natychmiast wyciągnie model biznesowy, zmapuje rynek i wyrzuci konkretne Action Plan'y jak pokonać konkurencję.
                 </p>
               </div>
             )}
 
-            {guideIndex === 4 && (
+            {guideIndex === 3 && (
               <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(139,92,246,0.2)', marginBottom: '16px' }}>
                   <Users size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 5: Baza Leadów B2B</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Baza Leadów B2B</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
                   Wybierz moduł <strong>Baza Leadów B2B</strong>. Kliknij wyszukiwanie klientów — AI samo znajdzie nowe firmy B2B pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
                 </p>
@@ -974,7 +962,7 @@ export default function Dashboard() {
                 </button>
               )}
 
-              {guideIndex < 4 ? (
+              {guideIndex < 3 ? (
                 <button 
                   onClick={() => setGuideIndex(guideIndex + 1)}
                   style={{ background: 'var(--foreground)', color: 'var(--background)', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
