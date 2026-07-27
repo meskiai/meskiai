@@ -42,7 +42,7 @@ export function startCron() {
 // ─── Główna synchronizacja ────────────────────────────────────────────────────
 export async function runSync() {
   const now = Date.now();
-  if (g.__aiRunning && (now - g.__aiRunning < 120 * 1000)) {
+  if (g.__aiRunning && (now - g.__aiRunning < 300 * 1000)) {
     console.log('[Agent AI] Poprzedni cykl jeszcze trwa w tle — pomijam.');
     return;
   }
@@ -63,9 +63,15 @@ export async function runSync() {
     const active = candidates.filter(u => u.settings?.autoReply === true);
     console.log(`[Agent AI] Sprawdzam ${candidates.length} użytkownika(ów) łącznie, w tym ${active.length} z włączonym auto-reply (autoReply=ON)`);
 
-    for (const user of candidates) {
-      await processUser(user).catch(err =>
-        console.error(`[Agent AI] Błąd dla ${user.email}:`, err)
+    const chunkSize = 5;
+    for (let i = 0; i < candidates.length; i += chunkSize) {
+      const chunk = candidates.slice(i, i + chunkSize);
+      await Promise.allSettled(
+        chunk.map(user => 
+          processUser(user).catch(err => 
+            console.error(`[Agent AI] Błąd dla ${user.email}:`, err)
+          )
+        )
       );
     }
 
