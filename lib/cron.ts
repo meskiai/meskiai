@@ -152,11 +152,11 @@ async function processMessage({
   const messageId = msg.messageId;
 
   // ZABEZPIECZENIE: Jeśli mail jest starszy niż 48 godzin (użytkownik pobrał złą opcją całą historię)
-  // AI kompletnie go ignoruje. Nie jest nawet zapisywany do bazy danych, żeby nie śmiecić.
+  // Oznaczamy go od razu jako IGNORED, żeby zapisać jego UID w bazie i więcej go nie pobierać!
   const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
-  if (messageAgeHours > 48) {
-    console.log(`[Agent AI] Wiadomość zbyt stara (${Math.round(messageAgeHours)}h) — całkowicie ignoruję.`);
-    return;
+  const isTooOld = messageAgeHours > 48;
+  if (isTooOld) {
+    console.log(`[Agent AI] Wiadomość zbyt stara (${Math.round(messageAgeHours)}h) — oznaczam jako zignorowaną.`);
   }
 
   // Sprawdź duplikat
@@ -179,7 +179,18 @@ async function processMessage({
   // Szukamy maila o In-Reply-To, żeby dopiąć do tego samego wątku
   let dbThreadId: string | undefined;
   
-  if (msg.inReplyTo) {
+  if (isTooOld) {
+    let historyThread = await prisma.thread.findUnique({ where: { threadId: `HISTORY_${userId}` } });
+    if (!historyThread) {
+      historyThread = await prisma.thread.create({
+        data: { threadId: `HISTORY_${userId}`, userId, status: 'IGNORED' }
+      }).catch(async (e) => {
+        // Zabezpieczenie przed Race Condition jeśli inny proces w tle właśnie to utworzył
+        return await prisma.thread.findUnique({ where: { threadId: `HISTORY_${userId}` } }) as any;
+      });
+    }
+    dbThreadId = historyThread?.id;
+  } else if (msg.inReplyTo) {
     const parentEmail = await prisma.email.findUnique({ where: { messageId: msg.inReplyTo }});
     if (parentEmail) {
       dbThreadId = parentEmail.threadId;
@@ -205,13 +216,13 @@ async function processMessage({
       if (existingThread) {
         dbThread = await prisma.thread.update({
           where: { id: existingThread.id },
-          data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+          data: { status: (isBot || isTooOld) ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
         });
       } else {
         // Nowy wątek z zabezpieczeniem przed wyścigiem (Race Condition)
         try {
           dbThread = await prisma.thread.create({
-            data: { threadId: messageId, userId, status: isBot ? 'IGNORED' : 'PENDING_APPROVAL' }
+            data: { threadId: messageId, userId, status: (isBot || isTooOld) ? 'IGNORED' : 'PENDING_APPROVAL' }
           });
         } catch (err: any) {
           if (err.code === 'P2002' || err.code === '23505') {
@@ -219,7 +230,7 @@ async function processMessage({
             if (recoveredThread) {
               dbThread = await prisma.thread.update({
                 where: { id: recoveredThread.id },
-                data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+                data: { status: (isBot || isTooOld) ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
               });
             } else {
               throw err;
@@ -233,7 +244,7 @@ async function processMessage({
       // Istniejący wątek
       dbThread = await prisma.thread.update({
         where: { id: dbThreadId },
-        data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+        data: { status: (isBot || isTooOld) ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
       });
     }
 
@@ -271,7 +282,7 @@ async function processMessage({
 
   if (!dbThread) return;
 
-  if (isBot) {
+  if (isBot || isTooOld) {
     if (dbThread.status !== 'IGNORED') {
       await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
     }
