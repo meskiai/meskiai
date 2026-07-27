@@ -1,6 +1,6 @@
 import { simpleParser } from 'mailparser';
 import nodemailer from 'nodemailer';
-import { ImapFlow } from 'imapflow';
+import Pop3Command from 'node-pop3';
 
 export interface FetchedEmail {
   pop3Uid: string; // we keep the name pop3Uid for DB backwards compatibility, but it will store IMAP UID
@@ -11,8 +11,8 @@ export interface FetchedEmail {
   to: string;
   subject: string;
   text: string;
-import Pop3Command from 'node-pop3';
-
+  date: Date;
+}
 /**
  * Fetches emails via POP3.
  * Connects to pop.gmail.com:995
