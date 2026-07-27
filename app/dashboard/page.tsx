@@ -279,8 +279,8 @@ export default function Dashboard() {
   };
 
   const handleSaveSettings = async (type: 'company' | 'knowledge' | 'all') => {
-    if ((type === 'knowledge' || type === 'all') && businessContext.trim().length < 60) {
-      alert("Baza wiedzy musi zawierać minimum 60 znaków, aby Agent AI mógł skutecznie działać.");
+    if ((type === 'knowledge' || type === 'all') && businessContext.trim().length < 20) {
+      alert("Baza wiedzy musi zawierać minimum 20 znaków, aby Agent AI mógł skutecznie działać.");
       return;
     }
 
@@ -292,14 +292,19 @@ export default function Dashboard() {
         body: JSON.stringify({ businessContext, companyName, companyNip, companyAddress, companyBankAccount, defaultVatRate, replyTone }),
       });
       if (!res.ok) {
-        throw new Error("Błąd zapisu na serwerze");
+        let errMsg = "Błąd zapisu na serwerze";
+        try {
+          const errData = await res.json();
+          if (errData.error) errMsg = errData.error;
+        } catch(e){}
+        throw new Error(errMsg);
       }
       alert("Zapisano pomyślnie!");
       if (type === 'company' || type === 'all') setIsEditingCompany(false);
       if (type === 'knowledge' || type === 'all') setIsEditingKnowledge(false);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Wystąpił błąd podczas zapisywania.");
+      alert(`Wystąpił błąd podczas zapisywania: ${e.message}`);
     } finally {
       setSavingSettings(false);
     }
@@ -332,7 +337,7 @@ export default function Dashboard() {
   };
 
   const handleGenerateLeads = async () => {
-    if (!businessContext || businessContext.length < 60) {
+    if (!businessContext || businessContext.length < 20) {
       alert("Twoja baza wiedzy jest pusta lub zbyt krótka. Uzupełnij opis firmy w Ustawieniach, aby AI wiedziało dla kogo szukać klientów.");
       return;
     }
@@ -2396,7 +2401,7 @@ export default function Dashboard() {
             </h3>
             
             <p style={{ color: 'var(--subtext)', lineHeight: 1.6, marginBottom: '24px', minHeight: '80px' }}>
-              {tourStep === 1 && "Aby AI mogło poprawnie odpowiadać, opisz swoją firmę w zakładce Baza Wiedzy (widzisz ją teraz za tym oknem). Napisz minimum 60 znaków – to kluczowe, by asystent miał z czego czerpać informacje!"}
+              {tourStep === 1 && "Aby AI mogło poprawnie odpowiadać, opisz swoją firmę w zakładce Baza Wiedzy (widzisz ją teraz za tym oknem). Napisz minimum 20 znaków – to kluczowe, by asystent miał z czego czerpać informacje!"}
               {tourStep === 2 && "Zwróć uwagę na górny pasek nawigacyjny. Widzisz ikonkę słońca/księżyca? Po kliknięciu w nią możesz w dowolnym momencie zmienić wygląd całej aplikacji z trybu ciemnego na jasny lub odwrotnie."}
               {tourStep === 3 && "Właśnie przeszliśmy do Skrzynki. Tutaj pojawiają się e-maile. Zwróć uwagę na lewy dolny róg menu (nad Twoim awatarem) – to suwak 'Auto-Reply (AI)'. Gdy go włączysz, sztuczna inteligencja zacznie wysyłać odpowiedzi całkowicie sama!"}
             </p>

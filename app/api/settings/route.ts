@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     const settings = await prisma.userSettings.upsert({
       where: { userId: session.user.id },
-      update: dataToUpdate,
+      update: Object.keys(dataToUpdate).length > 0 ? dataToUpdate : { businessContext: businessContext ?? "" },
       create: { 
         userId: session.user.id, 
         autoReply: autoReply ?? true,
@@ -53,9 +53,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ settings });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
+  } catch (error: any) {
+    console.error("Settings Update Error:", error);
+    return NextResponse.json({ error: `Failed to update settings: ${error?.message || "Unknown error"}` }, { status: 500 });
   }
 }
 

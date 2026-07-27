@@ -37,8 +37,8 @@ export async function POST(req: Request) {
       }
     });
 
-    const isBasic = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
 
     if (isBasic && leadsCount >= 20) {
       return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu BASIC (20). Zrób upgrade pakietu, aby kontynuować." }, { status: 403 });

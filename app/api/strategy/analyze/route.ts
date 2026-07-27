@@ -24,8 +24,8 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Brak użytkownika" }, { status: 404 });
 
-    const isBasic = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.settings?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const searchesCount = user.settings?.competitorSearchesThisMonth || 0;
 
     if (isBasic && searchesCount >= 10) {
