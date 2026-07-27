@@ -47,7 +47,6 @@ export default function Dashboard() {
   const [appPasswordError, setAppPasswordError] = useState("");
   const [savingAppPassword, setSavingAppPassword] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [tourStep, setTourStep] = useState(0);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showModuleSwitcher, setShowModuleSwitcher] = useState(false);
   const [showUpgradeReminder, setShowUpgradeReminder] = useState(false);
@@ -139,7 +138,8 @@ export default function Dashboard() {
           else setIsEditingCompany(true);
 
           if (!data.settings.onboardingDone) {
-            setTourStep(1);
+            setShowGuide(true);
+            setGuideIndex(0);
           }
 
           let isCheckingOut = false;
@@ -964,7 +964,10 @@ export default function Dashboard() {
                 </button>
               ) : (
                 <button 
-                  onClick={() => setShowGuide(false)}
+                  onClick={() => {
+                    setShowGuide(false);
+                    fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
+                  }}
                   style={{ background: 'transparent', color: 'var(--subtext)', border: 'none', padding: '12px 24px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 600 }}
                 >
                   Pomiń
@@ -980,7 +983,10 @@ export default function Dashboard() {
                 </button>
               ) : (
                 <button 
-                  onClick={() => setShowGuide(false)}
+                  onClick={() => {
+                    setShowGuide(false);
+                    fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
+                  }}
                   style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 16px rgba(59,130,246,0.4)' }}
                 >
                   Zacznijmy! <CheckCircle size={18} />
@@ -1214,14 +1220,6 @@ export default function Dashboard() {
           </div>
 
           <div className={styles.settingToggle} style={{ position: 'relative' }}>
-            {tourStep === 3 && (
-              <div style={{ position: 'absolute', bottom: '100%', right: '0', zIndex: 1001, marginBottom: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', color: 'var(--primary)', animation: 'bounce 2s infinite' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '1.1rem', background: 'var(--card-bg)', padding: '6px 12px', borderRadius: '12px', whiteSpace: 'nowrap', border: '2px solid var(--primary)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>Włącz Auto-Reply</span>
-                  <ArrowDown size={32} style={{ marginRight: '10px' }} />
-                </div>
-              </div>
-            )}
             <span className={styles.toggleLabel}>Auto-Reply (AI)</span>
             <label className={styles.switch}>
               <input type="checkbox" checked={autoReply} onChange={toggleAutoReply} />
@@ -1265,16 +1263,6 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 
             <div style={{ position: 'relative' }}>
-              {tourStep === 2 && (
-                <div style={{ position: 'absolute', top: '100%', right: '50%', zIndex: 1001, marginTop: '20px' }}>
-                  <div style={{ transform: 'translateX(50%)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'var(--primary)', animation: 'bounce 2s infinite' }}>
-                      <ArrowUpRight size={32} style={{ transform: 'rotate(-45deg)', marginBottom: '8px' }} />
-                      <span style={{ fontWeight: 'bold', fontSize: '1.1rem', background: 'var(--card-bg)', padding: '6px 12px', borderRadius: '12px', whiteSpace: 'nowrap', border: '2px solid var(--primary)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>Kliknij słońce / księżyc</span>
-                    </div>
-                  </div>
-                </div>
-              )}
               <ThemeToggle />
             </div>
             <button className="btn btn-secondary" style={{ padding: '6px 16px', fontSize: '0.85rem' }} onClick={() => handleSync(false)} disabled={syncing}>
@@ -1319,14 +1307,6 @@ export default function Dashboard() {
                 ) : (
                   <>
                     <div style={{ position: 'relative' }}>
-                      {tourStep === 1 && (
-                        <div style={{ position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', zIndex: 1001 }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--primary)', animation: 'bounce 2s infinite' }}>
-                            <span style={{ fontWeight: 'bold', fontSize: '1.1rem', background: 'var(--card-bg)', padding: '6px 12px', borderRadius: '12px', border: '2px solid var(--primary)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>Pisz tutaj!</span>
-                            <ArrowDown size={32} />
-                          </div>
-                        </div>
-                      )}
                       <textarea
                         className={styles.textarea}
                         style={{ height: "300px", marginBottom: "24px" }}
@@ -2374,66 +2354,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* ONBOARDING TOUR OVERLAY */}
-      {tourStep > 0 && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }}>
-          <div style={{
-            background: 'var(--card-bg)',
-            border: '1px solid var(--border)',
-            padding: '32px',
-            borderRadius: '16px',
-            maxWidth: '450px',
-            width: '100%',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-          }}>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '16px', color: 'var(--foreground)' }}>
-              Krok {tourStep} z 3: {tourStep === 1 ? 'Baza Wiedzy' : tourStep === 2 ? 'Motyw' : 'Poczta i Auto-Reply'}
-            </h3>
-            
-            <p style={{ color: 'var(--subtext)', lineHeight: 1.6, marginBottom: '24px', minHeight: '80px' }}>
-              {tourStep === 1 && "Aby AI mogło poprawnie odpowiadać, opisz swoją firmę w zakładce Baza Wiedzy (widzisz ją teraz za tym oknem). Napisz minimum 20 znaków – to kluczowe, by asystent miał z czego czerpać informacje!"}
-              {tourStep === 2 && "Zwróć uwagę na górny pasek nawigacyjny. Widzisz ikonkę słońca/księżyca? Po kliknięciu w nią możesz w dowolnym momencie zmienić wygląd całej aplikacji z trybu ciemnego na jasny lub odwrotnie."}
-              {tourStep === 3 && "Właśnie przeszliśmy do Skrzynki. Tutaj pojawiają się e-maile. Zwróć uwagę na lewy dolny róg menu (nad Twoim awatarem) – to suwak 'Auto-Reply (AI)'. Gdy go włączysz, sztuczna inteligencja zacznie wysyłać odpowiedzi całkowicie sama!"}
-            </p>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tourStep === 1 ? 'var(--primary)' : 'var(--border)' }} />
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tourStep === 2 ? 'var(--primary)' : 'var(--border)' }} />
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tourStep === 3 ? 'var(--primary)' : 'var(--border)' }} />
-              </div>
-              <button 
-                className="btn btn-primary"
-                onClick={async () => {
-                  if (tourStep === 1) {
-                    setTourStep(2);
-                  } else if (tourStep === 2) {
-                    setCurrentTab("INBOX");
-                    setTourStep(3);
-                  } else {
-                    setTourStep(0);
-                    try {
-                      await fetch("/api/settings", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ onboardingDone: true })
-                      });
-                    } catch (e) {
-                      console.error("Failed to mark onboarding as done", e);
-                    }
-                  }
-                }}
-              >
-                {tourStep < 3 ? 'Dalej' : 'Zakończ'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Contact Lead Modal (moved to root for proper fixed positioning) */}
       {contactingLead && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
