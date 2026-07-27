@@ -703,27 +703,40 @@ input:checked + .slider:before { transform: translateX(16px); }
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(6px, 1.2vh, 12px);
-  padding: clamp(10px, 1.5vw, 20px) clamp(12px, 2vw, 24px);
-  overflow: hidden; /* no scroll — everything must fit */
+  align-items: center;
+  gap: clamp(16px, 2.5vh, 24px);
+  padding: clamp(20px, 3vw, 40px) clamp(16px, 3vw, 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--background);
+}
+
+.accountInner {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.5vh, 24px);
 }
 
 /* ── User strip ─────────────────────────────────────── */
 .accountUserStrip {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 16px);
+  gap: 16px;
+  padding: clamp(16px, 2vw, 24px);
   background: var(--card-bg);
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--glass-border);
-  box-shadow: var(--mac-shadow);
+  box-shadow: var(--mac-shadow), var(--glass-reflection);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
   flex-shrink: 0;
 }
 
 .accountAvatarSm {
-  width: clamp(32px, 5vw, 44px);
-  height: clamp(32px, 5vw, 44px);
+  width: clamp(48px, 6vw, 64px);
+  height: clamp(48px, 6vw, 64px);
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary), #3b82f6);
   color: white;
@@ -731,9 +744,10 @@ input:checked + .slider:before { transform: translateX(16px); }
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: clamp(0.85rem, 2vw, 1.2rem);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
   flex-shrink: 0;
-  border: 2px solid var(--glass-border);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .accountUserMeta {
@@ -745,16 +759,17 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 .accountUserName {
-  font-size: clamp(0.78rem, 1.4vw, 0.92rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   font-weight: 700;
   color: var(--foreground);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.5px;
 }
 
 .accountUserEmail {
-  font-size: clamp(0.68rem, 1.1vw, 0.78rem);
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
   color: var(--subtext);
   white-space: nowrap;
   overflow: hidden;
@@ -798,9 +813,11 @@ input:checked + .slider:before { transform: translateX(16px); }
 /* ── Section cards ──────────────────────────────────── */
 .accountSectionCard {
   background: var(--card-bg);
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--glass-border);
-  box-shadow: var(--mac-shadow);
+  box-shadow: var(--mac-shadow), var(--glass-reflection);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
   flex-shrink: 0;
   overflow: hidden;
   display: flex;
@@ -811,32 +828,34 @@ input:checked + .slider:before { transform: translateX(16px); }
 .accountSectionHeader {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.5vw, 16px);
+  gap: 10px;
+  padding: clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 24px);
   border-bottom: 1px solid var(--glass-border);
-  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
   font-weight: 700;
   color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* 2-column info grid: label | value */
 .accountInfoGrid {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: clamp(5px, 0.8vh, 8px) clamp(12px, 2vw, 20px);
-  padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.5vw, 16px);
+  gap: clamp(10px, 1.5vh, 16px) clamp(20px, 4vw, 32px);
+  padding: clamp(16px, 2.5vw, 24px) clamp(16px, 2.5vw, 24px);
   align-items: center;
 }
 
 .infoLabel {
-  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   color: var(--subtext);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 .infoValue {
-  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   font-weight: 700;
   color: var(--foreground);
   text-align: right;
@@ -886,8 +905,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 /* Action button row */
 .accountBtnRow {
   display: flex;
-  gap: 6px;
-  padding: clamp(8px, 1vw, 10px) clamp(10px, 1.5vw, 16px);
+  gap: 12px;
+  padding: clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 24px);
   border-top: 1px solid var(--glass-border);
 }
 
@@ -895,16 +914,16 @@ input:checked + .slider:before { transform: translateX(16px); }
 .accountBtnPrimary,
 .accountBtnCancel {
   flex: 1;
-  padding: clamp(7px, 1vw, 9px) clamp(8px, 1.2vw, 12px);
-  border-radius: 8px;
+  padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
+  border-radius: 10px;
   font-weight: 600;
-  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: all 0.18s ease;
+  gap: 8px;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
@@ -925,8 +944,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .accountBtnCancel {
   flex: none;
-  width: calc(100% - clamp(20px, 3vw, 32px));
-  margin: 0 clamp(10px, 1.5vw, 16px) clamp(8px, 1vw, 10px);
+  width: calc(100% - clamp(32px, 5vw, 48px));
+  margin: 0 clamp(16px, 2.5vw, 24px) clamp(16px, 2.5vw, 24px);
   background: transparent;
   border: 1px solid rgba(239,68,68,0.3);
   color: #ef4444;
@@ -937,8 +956,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 .limitsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(6px, 1vw, 10px);
-  padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.5vw, 16px);
+  gap: clamp(16px, 2vw, 24px);
+  padding: clamp(16px, 2.5vw, 24px) clamp(16px, 2.5vw, 24px);
 }
 
 .limitItem {
@@ -955,21 +974,21 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .limitItemLabel {
   flex: 1;
-  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   font-weight: 600;
   color: var(--foreground);
   white-space: nowrap;
 }
 
 .limitItemCount {
-  font-size: clamp(0.65rem, 0.9vw, 0.75rem);
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .limitBar {
-  height: 5px;
-  background: rgba(255,255,255,0.06);
+  height: 8px;
+  background: rgba(120, 120, 128, 0.16);
   border-radius: 99px;
   overflow: hidden;
 }

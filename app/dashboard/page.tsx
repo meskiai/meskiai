@@ -1355,169 +1355,171 @@ export default function Dashboard() {
 
             return (
               <div className={`animate-fade-in ${styles.accountPage}`}>
+                <div className={styles.accountInner}>
 
-                {/* ── Row 1: User identity + quick-action buttons ── */}
-                <div className={styles.accountUserStrip}>
-                  <div className={styles.accountAvatarSm}>
-                    {session?.user?.email?.[0]?.toUpperCase() || "U"}
+                  {/* ── Row 1: User identity + quick-action buttons ── */}
+                  <div className={styles.accountUserStrip}>
+                    <div className={styles.accountAvatarSm}>
+                      {session?.user?.email?.[0]?.toUpperCase() || "U"}
+                    </div>
+                    <div className={styles.accountUserMeta}>
+                      <span className={styles.accountUserName}>
+                        {session?.user?.name || session?.user?.email?.split("@")[0] || "Użytkownik"}
+                      </span>
+                      <span className={styles.accountUserEmail}>{session?.user?.email}</span>
+                    </div>
+                    <div className={styles.accountQuickBtns}>
+                      <button
+                        className={styles.accountIconBtn}
+                        onClick={() => router.push("/")}
+                        title="Strona główna"
+                      >
+                        <Home size={16} />
+                      </button>
+                      <button
+                        className={`${styles.accountIconBtn} ${styles.accountIconBtnDanger}`}
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                        title="Wyloguj się"
+                      >
+                        <LogOut size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <div className={styles.accountUserMeta}>
-                    <span className={styles.accountUserName}>
-                      {session?.user?.name || session?.user?.email?.split("@")[0] || "Użytkownik"}
-                    </span>
-                    <span className={styles.accountUserEmail}>{session?.user?.email}</span>
-                  </div>
-                  <div className={styles.accountQuickBtns}>
-                    <button
-                      className={styles.accountIconBtn}
-                      onClick={() => router.push("/")}
-                      title="Strona główna"
-                    >
-                      <Home size={15} />
-                    </button>
-                    <button
-                      className={`${styles.accountIconBtn} ${styles.accountIconBtnDanger}`}
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                      title="Wyloguj się"
-                    >
-                      <LogOut size={15} />
-                    </button>
-                  </div>
-                </div>
 
-                {/* ── Row 2: Subscription info ── */}
-                <div className={styles.accountSectionCard}>
-                  <div className={styles.accountSectionHeader}>
-                    <Zap size={13} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                    <span>Subskrypcja</span>
-                    {cancelAtPeriodEnd ? (
-                      <span className={`${styles.infoBadge} ${styles.infoBadgeDanger}`} style={{ marginLeft: "auto" }}>Anulowana</span>
-                    ) : (
-                      <span className={`${styles.infoBadge} ${styles.infoBadgeSuccess}`} style={{ marginLeft: "auto" }}>✓ Aktywna</span>
+                  {/* ── Row 2: Subscription info ── */}
+                  <div className={styles.accountSectionCard}>
+                    <div className={styles.accountSectionHeader}>
+                      <Zap size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                      <span>Subskrypcja</span>
+                      {cancelAtPeriodEnd ? (
+                        <span className={`${styles.infoBadge} ${styles.infoBadgeDanger}`} style={{ marginLeft: "auto" }}>Anulowana</span>
+                      ) : (
+                        <span className={`${styles.infoBadge} ${styles.infoBadgeSuccess}`} style={{ marginLeft: "auto" }}>✓ Aktywna</span>
+                      )}
+                    </div>
+                    <div className={styles.accountInfoGrid}>
+                      <span className={styles.infoLabel}>Pakiet</span>
+                      <span className={styles.infoValue}>{planName}</span>
+                      <span className={styles.infoLabel}>Karta</span>
+                      <span className={styles.infoValue}>{cardBrandLabel || "Brak danych"}</span>
+                      {expiryDate && (
+                        <>
+                          <span className={styles.infoLabel}>{cancelAtPeriodEnd ? "Wygasa" : "Odnowienie"}</span>
+                          <span className={styles.infoValue}>{expiryDate}</span>
+                        </>
+                      )}
+                    </div>
+                    {cancelAtPeriodEnd && expiryDate && (
+                      <div className={styles.cancelNotice}>⚠️ Wygasa <strong>{expiryDate}</strong> — pełny dostęp do tego dnia.</div>
+                    )}
+                    <div className={styles.accountBtnRow}>
+                      <button onClick={handleOpenPortal} disabled={isOpeningPortal} className={styles.accountBtnSecondary}>
+                        {isOpeningPortal ? <RefreshCw className={styles["animate-spin"]} size={16} /> : <ExternalLink size={16} />}
+                        Zarządzaj (Stripe)
+                      </button>
+                      <button onClick={() => router.push("/#cennik")} className={styles.accountBtnPrimary}>
+                        <ArrowUpRight size={16} /> Upgrade
+                      </button>
+                    </div>
+                    {!cancelAtPeriodEnd && (
+                      <button onClick={handleCancelSubscription} disabled={isCancelingSubscription} className={styles.accountBtnCancel}>
+                        {isCancelingSubscription ? <RefreshCw className={styles["animate-spin"]} size={16} /> : <Trash2 size={16} />}
+                        Anuluj subskrypcję
+                      </button>
                     )}
                   </div>
-                  <div className={styles.accountInfoGrid}>
-                    <span className={styles.infoLabel}>Pakiet</span>
-                    <span className={styles.infoValue}>{planName}</span>
-                    <span className={styles.infoLabel}>Karta</span>
-                    <span className={styles.infoValue}>{cardBrandLabel || "Brak danych"}</span>
-                    {expiryDate && (
-                      <>
-                        <span className={styles.infoLabel}>{cancelAtPeriodEnd ? "Wygasa" : "Odnowienie"}</span>
-                        <span className={styles.infoValue}>{expiryDate}</span>
-                      </>
-                    )}
-                  </div>
-                  {cancelAtPeriodEnd && expiryDate && (
-                    <div className={styles.cancelNotice}>⚠️ Wygasa <strong>{expiryDate}</strong> — pełny dostęp do tego dnia.</div>
-                  )}
-                  <div className={styles.accountBtnRow}>
-                    <button onClick={handleOpenPortal} disabled={isOpeningPortal} className={styles.accountBtnSecondary}>
-                      {isOpeningPortal ? <RefreshCw className={styles["animate-spin"]} size={13} /> : <ExternalLink size={13} />}
-                      Zarządzaj (Stripe)
-                    </button>
-                    <button onClick={() => router.push("/#cennik")} className={styles.accountBtnPrimary}>
-                      <ArrowUpRight size={13} /> Upgrade
-                    </button>
-                  </div>
-                  {!cancelAtPeriodEnd && (
-                    <button onClick={handleCancelSubscription} disabled={isCancelingSubscription} className={styles.accountBtnCancel}>
-                      {isCancelingSubscription ? <RefreshCw className={styles["animate-spin"]} size={13} /> : <Trash2 size={13} />}
-                      Anuluj subskrypcję
-                    </button>
-                  )}
-                </div>
 
-                {/* ── Row 3: Usage limits ── */}
-                {(() => {
-                  const PRICE_BASIC = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-                  const PRICE_PRO   = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-                  const PRICE_MAX   = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-                  const pid         = subscriptionData?.stripePriceId;
-                  const isBasic     = pid === PRICE_BASIC;
-                  const isPro       = pid === PRICE_PRO;
-                  const isMax       = pid === PRICE_MAX;
-                  const isUnlimited = isMax;
+                  {/* ── Row 3: Usage limits ── */}
+                  {(() => {
+                    const PRICE_BASIC = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+                    const PRICE_PRO   = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+                    const PRICE_MAX   = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+                    const pid         = subscriptionData?.stripePriceId;
+                    const isBasic     = pid === PRICE_BASIC;
+                    const isPro       = pid === PRICE_PRO;
+                    const isMax       = pid === PRICE_MAX;
+                    const isUnlimited = isMax;
 
-                  const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
-                  const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
-                  const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
-                  const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 0;
-                  const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
-                  const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
-                  const limitFmt     = (n: number) => n === Infinity ? "∞" : n.toLocaleString("pl-PL");
-                  const barColor     = (pct: number) => pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#22c55e";
+                    const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
+                    const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
+                    const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
+                    const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 0;
+                    const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
+                    const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
+                    const limitFmt     = (n: number) => n === Infinity ? "∞" : n.toLocaleString("pl-PL");
+                    const barColor     = (pct: number) => pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#22c55e";
 
-                  return (
-                    <div className={styles.accountSectionCard}>
-                      <div className={styles.accountSectionHeader}>
-                        <BarChart2 size={13} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                        <span>Limity tego miesiąca</span>
-                        {isUnlimited && (
-                          <span className={`${styles.infoBadge} ${styles.infoBadgeSuccess}`} style={{ marginLeft: "auto" }}>MAX — bez limitów</span>
-                        )}
-                      </div>
-                      <div className={styles.limitsGrid}>
-                        {/* Email limit */}
-                        <div className={styles.limitItem}>
-                          <div className={styles.limitItemHeader}>
-                            <Mail size={12} style={{ color: "#3b82f6", flexShrink: 0 }} />
-                            <span className={styles.limitItemLabel}>E-maile</span>
-                            <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : emailPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
-                              {isUnlimited ? "∞" : `${emailsUsed} / ${limitFmt(emailLimit)}`}
-                            </span>
-                          </div>
-                          {!isUnlimited && (
-                            <div className={styles.limitBar}>
-                              <div className={styles.limitBarFill} style={{ width: `${emailPct}%`, background: `linear-gradient(90deg, ${barColor(emailPct)}, ${barColor(emailPct)}cc)` }} />
-                            </div>
+                    return (
+                      <div className={styles.accountSectionCard}>
+                        <div className={styles.accountSectionHeader}>
+                          <BarChart2 size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                          <span>Limity tego miesiąca</span>
+                          {isUnlimited && (
+                            <span className={`${styles.infoBadge} ${styles.infoBadgeSuccess}`} style={{ marginLeft: "auto" }}>MAX — bez limitów</span>
                           )}
                         </div>
-                        {/* Search limit */}
-                        <div className={styles.limitItem}>
-                          <div className={styles.limitItemHeader}>
-                            <Search size={12} style={{ color: "#10b981", flexShrink: 0 }} />
-                            <span className={styles.limitItemLabel}>Analizy URL</span>
-                            <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : searchPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
-                              {isUnlimited ? "∞" : `${searchesUsed} / ${limitFmt(searchLimit)}`}
-                            </span>
-                          </div>
-                          {!isUnlimited && (
-                            <div className={styles.limitBar}>
-                              <div className={styles.limitBarFill} style={{ width: `${searchPct}%`, background: `linear-gradient(90deg, ${barColor(searchPct)}, ${barColor(searchPct)}cc)` }} />
+                        <div className={styles.limitsGrid}>
+                          {/* Email limit */}
+                          <div className={styles.limitItem}>
+                            <div className={styles.limitItemHeader}>
+                              <Mail size={16} style={{ color: "#3b82f6", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>E-maile</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : emailPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${emailsUsed} / ${limitFmt(emailLimit)}`}
+                              </span>
                             </div>
-                          )}
+                            {!isUnlimited && (
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${emailPct}%`, background: `linear-gradient(90deg, ${barColor(emailPct)}, ${barColor(emailPct)}cc)` }} />
+                              </div>
+                            )}
+                          </div>
+                          {/* Search limit */}
+                          <div className={styles.limitItem}>
+                            <div className={styles.limitItemHeader}>
+                              <Search size={16} style={{ color: "#10b981", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>Analizy URL</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : searchPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${searchesUsed} / ${limitFmt(searchLimit)}`}
+                              </span>
+                            </div>
+                            {!isUnlimited && (
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${searchPct}%`, background: `linear-gradient(90deg, ${barColor(searchPct)}, ${barColor(searchPct)}cc)` }} />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
 
-                {/* ── Row 4: Integracje ── */}
-                <div className={styles.accountSectionCard} style={{ marginTop: "24px" }}>
-                  <div className={styles.accountSectionHeader}>
-                    <ShieldAlert size={13} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                    <span>Integracja E-mail</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
-                    <div>
-                      <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--foreground)" }}>Hasło Aplikacji Google</div>
-                      <div style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Zmień hasło w przypadku błędu połączenia</div>
+                  {/* ── Row 4: Integracje ── */}
+                  <div className={styles.accountSectionCard} style={{ marginTop: "8px" }}>
+                    <div className={styles.accountSectionHeader}>
+                      <ShieldAlert size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                      <span>Integracja E-mail</span>
                     </div>
-                    <button 
-                      className="btn btn-secondary" 
-                      onClick={async () => {
-                        // Reset it locally and let the user enter a new one in the INBOX tab
-                        setHasAppPassword(false);
-                        setCurrentTab("INBOX");
-                      }}
-                      style={{ fontSize: "0.85rem", padding: "6px 12px" }}
-                    >
-                      Zmień hasło
-                    </button>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px" }}>
+                      <div>
+                        <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "4px" }}>Hasło Aplikacji Google</div>
+                        <div style={{ fontSize: "0.9rem", color: "var(--subtext)" }}>Zmień hasło w przypadku błędu połączenia</div>
+                      </div>
+                      <button 
+                        className={styles.accountBtnSecondary}
+                        style={{ flex: "none", width: "auto" }}
+                        onClick={async () => {
+                          // Reset it locally and let the user enter a new one in the INBOX tab
+                          setHasAppPassword(false);
+                          setCurrentTab("INBOX");
+                        }}
+                      >
+                        Zmień hasło
+                      </button>
+                    </div>
                   </div>
+
                 </div>
-
               </div>
             );
           })()}
