@@ -213,11 +213,40 @@ export default function Home() {
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
         </div>
         
-        <div className="animate-fade-in-up animate-delay-1" style={{ maxWidth: '800px', margin: '0 auto 40px auto', padding: '16px 24px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--subtext)', textAlign: 'left' }}>
-          <Mail size={22} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
-            <strong style={{ display: 'block', color: 'var(--foreground)', marginBottom: '4px', fontSize: '1rem' }}>Ważna informacja przed zakupem</strong>
-            Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na to samo konto Gmail</strong>, na którym ma działać Agent AI. Asystent zostanie trwale przypisany do konta, z którego wykupiono pakiet, aby móc automatycznie odpisywać na Twoje e-maile.
+        <div className="animate-fade-in-up animate-delay-1" style={{ 
+          maxWidth: '800px', 
+          margin: '0 auto 48px auto', 
+          padding: '24px 32px', 
+          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02))',
+          backdropFilter: 'blur(30px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+          border: '1px solid var(--glass-border)',
+          boxShadow: 'var(--mac-shadow), inset 0 1px 1px rgba(255,255,255,0.2)',
+          borderRadius: '24px', 
+          display: 'flex', 
+          alignItems: 'flex-start', 
+          gap: '20px', 
+          color: 'var(--subtext)', 
+          textAlign: 'left',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Subtle glow effect in the background */}
+          <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
+          <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
+
+          <div style={{ 
+            width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, var(--primary), #3b82f6)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(0,122,255,0.25)' 
+          }}>
+            <Mail size={24} color="white" />
+          </div>
+          
+          <div style={{ fontSize: '1rem', lineHeight: '1.6', zIndex: 1 }}>
+            <h3 style={{ margin: '0 0 8px 0', color: 'var(--foreground)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.3px' }}>Ważna informacja przed zakupem</h3>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na konto Gmail firmowe</strong>, na którym ma działać Agent AI. Twój asystent zostanie trwale przypisany do konta, z którego wykupiono subskrypcję, aby móc płynnie zarządzać Twoją komunikacją biznesową.
+            </p>
           </div>
         </div>
         
