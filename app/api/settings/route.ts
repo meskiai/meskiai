@@ -13,6 +13,9 @@ export async function POST(req: Request) {
   }
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    const isBasic = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
+
     const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, companyWebsite, defaultVatRate, replyTone } = await req.json();
 
     const dataToUpdate: any = {};
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
     if (companyBankAccount !== undefined) dataToUpdate.companyBankAccount = companyBankAccount;
     if (companyWebsite !== undefined) dataToUpdate.companyWebsite = companyWebsite;
     if (defaultVatRate !== undefined) dataToUpdate.defaultVatRate = defaultVatRate;
-    if (replyTone !== undefined) dataToUpdate.replyTone = replyTone;
+    if (replyTone !== undefined && !isBasic) dataToUpdate.replyTone = replyTone;
 
     const settings = await prisma.userSettings.upsert({
       where: { userId: session.user.id },

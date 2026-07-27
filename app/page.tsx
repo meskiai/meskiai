@@ -230,11 +230,12 @@ export default function Home() {
             
             <ul className={styles.pricingFeatures}>
               <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
-              <li><CheckCircle size={18} /> Do 100 automatycznych e-maili miesięcznie</li>
-              <li><CheckCircle size={18} /> Do 20 wyszukań konkurencji miesięcznie</li>
+              <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
+              <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
               <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 20 B2B)</li>
+              <li><CheckCircle size={18} /> Propozycje klientów (limit 10 B2B)</li>
               <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
+              <li style={{ color: 'var(--subtext)' }}><CheckCircle size={18} style={{ opacity: 0.5 }} /> Brak opcji zmiany tonu agenta (Tylko PRO/MAX)</li>
             </ul>
             
             <button 

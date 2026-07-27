@@ -264,7 +264,7 @@ async function processMessage({
     const PRICE_BASIC  = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
     const PRICE_PRO    = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const limitExceeded =
-      (priceId === PRICE_BASIC && emailsSent >= 100) ||
+      (priceId === PRICE_BASIC && emailsSent >= 50) ||
       (priceId === PRICE_PRO   && emailsSent >= 1000);
 
     if (isAutoReplyOn && !limitExceeded) {

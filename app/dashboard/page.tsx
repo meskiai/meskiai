@@ -1233,12 +1233,15 @@ export default function Dashboard() {
                       />
                       
                       <div style={{ marginBottom: '24px' }}>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Ton odpowiedzi agenta AI</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>
+                          Ton odpowiedzi agenta AI {userTier <= 1 && <span style={{ color: '#f59e0b', fontWeight: 700, fontSize: '0.75rem' }}>(Wymaga planu PRO)</span>}
+                        </label>
                         <select 
                           className={styles.input}
                           value={replyTone}
                           onChange={(e) => setReplyTone(e.target.value)}
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
+                          disabled={userTier <= 1}
+                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)', opacity: userTier <= 1 ? 0.5 : 1, cursor: userTier <= 1 ? 'not-allowed' : 'auto' }}
                         >
                           <option value="PROFESJONALNY">Profesjonalny (Szanowny Panie / Z poważaniem)</option>
                           <option value="LUŹNY (CASUAL)">Luźny / Casual (Cześć / Pozdrawiam)</option>
@@ -1379,8 +1382,8 @@ export default function Dashboard() {
 
                   const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
                   const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
-                  const emailLimit   = isBasic ? 100 : isPro ? 1000 : isMax ? Infinity : 0;
-                  const searchLimit  = isBasic ? 20  : isPro ? 100  : isMax ? Infinity : 0;
+                  const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
+                  const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 0;
                   const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
                   const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
                   const limitFmt     = (n: number) => n === Infinity ? "∞" : n.toLocaleString("pl-PL");
