@@ -904,7 +904,7 @@ export default function Dashboard() {
                 </div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 1: Twoja Firma</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Niezależnie od wybranego modułu, wejdź w zakładkę <strong>Dane Firmy</strong>. Uzupełnij tam nazwę, NIP, adres i numer konta. Te dane są niezbędne do wystawiania poprawnych faktur dla Twoich klientów.
+                  Wejdź w zakładkę <strong>Moje Konto</strong> (klikając w swój awatar w lewym dolnym rogu). Uzupełnij <strong>Dane Firmy</strong> (Nazwa, NIP, Adres). Te informacje dodadzą wiarygodności podczas wysyłania ofert i posłużą też do fakturowania.
                 </p>
               </div>
             )}
@@ -916,7 +916,7 @@ export default function Dashboard() {
                 </div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 2: Baza Wiedzy AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wybierz moduł <strong>Agent Pocztowy</strong>, a następnie przejdź do zakładki Baza Wiedzy. Opisz tam szczegółowo czym zajmuje się Twoja firma. AI użyje tych informacji do generowania trafnych i profesjonalnych odpowiedzi.
+                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów B2B i odpisywania na wiadomości.
                 </p>
               </div>
             )}
@@ -926,9 +926,9 @@ export default function Dashboard() {
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
                   <Mail size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 3: Agent Pocztowy</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 3: Agent Pocztowy AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wchodzące maile trafiają do zakładki <strong>Do Akceptacji</strong>, gdzie AI proponuje gotową odpowiedź. Jeśli chcesz, aby sztuczna inteligencja odpisywała całkowicie samodzielnie, włącz przełącznik <strong>Auto-Reply (AI)</strong> na pasku bocznym.
+                  Na stronie głównej wejdź w <strong>Agent Pocztowy AI</strong>. Nowe maile trafiają tu bezpośrednio, a AI od razu pisze szkic idealnej odpowiedzi. Jeśli chcesz, aby asystent odpisywał samoczynnie w trybie 24/7, po prostu włącz suwak <strong>Auto-Reply (AI)</strong> na dole ekranu.
                 </p>
               </div>
             )}
@@ -940,7 +940,7 @@ export default function Dashboard() {
                 </div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Agent Strategiczny AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wybierz <strong>Agent Strategiczny AI</strong>. Wklej URL swojej strony, a system natychmiast wyciągnie ofertę, przeanalizuje rynek i podrzuci Ci konkretne, punktowe wskazówki, jak zwiększyć konwersję i poprawić ofertę na tle konkurencji.
+                  Z poziomu ekranu powitalnego kliknij <strong>Agent Strategiczny AI</strong>. Podaj adres strony internetowej, a system natychmiast wyciągnie model biznesowy, zmapuje rynek i wyrzuci konkretne Action Plan'y jak pokonać konkurencję.
                 </p>
               </div>
             )}
@@ -952,7 +952,7 @@ export default function Dashboard() {
                 </div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 5: Baza Leadów B2B</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wybierz <strong>Zdobądź Klientów</strong>. AI przeczesuje internet w poszukiwaniu firm pasujących do Twojej bazy wiedzy. Za jednym kliknięciem możesz wysłać im genialną, spersonalizowaną ofertę.
+                  Wybierz moduł <strong>Baza Leadów B2B</strong>. Kliknij wyszukiwanie klientów — AI samo znajdzie nowe firmy B2B pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
                 </p>
               </div>
             )}
