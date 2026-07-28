@@ -130,16 +130,25 @@ export async function runSync() {
       await Promise.allSettled(
         chunk.map(async (user) => {
           // Attempt to lock this user for 10 minutes to prevent concurrent serverless executions
-          const lockRes = await prisma.userSettings.updateMany({
-            where: {
-              userId: user.id,
-              OR: [{ runLockedUntil: null }, { runLockedUntil: { lt: new Date() } }],
-            },
-            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) },
-          });
-          
-          if (lockRes.count === 0) {
+          const settings = await prisma.userSettings.findUnique({
+            where: { userId: user.id },
+            select: { runLockedUntil: true }
+          }).catch(() => null);
+
+          const now = new Date();
+          if (settings?.runLockedUntil && settings.runLockedUntil > now) {
             console.log(`[Agent AI] 🔒 Użytkownik ${user.email} zablokowany przez inną instancję, pomijam.`);
+            return;
+          }
+
+          // Write the lock
+          const locked = await prisma.userSettings.update({
+            where: { userId: user.id },
+            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) }
+          }).catch(() => null);
+
+          if (!locked) {
+            console.log(`[Agent AI] 🔒 Błąd zapisu blokady dla ${user.email}, pomijam.`);
             return;
           }
 
@@ -147,7 +156,7 @@ export async function runSync() {
             await processUser(user);
           } finally {
             // Unlock after processing
-            await prisma.userSettings.updateMany({
+            await prisma.userSettings.update({
               where: { userId: user.id },
               data: { runLockedUntil: null },
             }).catch(() => {});
@@ -271,6 +280,13 @@ async function processMessage({
   msg: FetchedEmail;
   websiteContent?: string;
 }): Promise<boolean> {
+  // Sanitize null bytes (PostgreSQL does not support 0x00 bytes in text/varchar fields)
+  msg.from = cleanString(msg.from);
+  msg.to = cleanString(msg.to);
+  msg.subject = cleanString(msg.subject);
+  msg.text = cleanString(msg.text);
+  if (msg.messageId) msg.messageId = cleanString(msg.messageId);
+
   const messageId = msg.messageId || `<uid-${msg.pop3Uid}-${userId}@local>`;
 
   // Classify the message
@@ -438,12 +454,11 @@ async function processMessage({
 
   try {
     const { text } = await generateText({
-      model:  googleAI('gemini-1.5-pro-latest'),
+      model:  googleAI('gemini-pro-latest'),
       system: buildSystemPrompt(settings, websiteContent),
       prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść wiadomości:\n${(msg.text || '').substring(0, 3000)}`,
     });
-
-    const cleanedAiText = text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
+    const cleanedAiText = cleanString(text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
     const upper  = cleanedAiText.toUpperCase().slice(0, 80);
 
     // ── SPAM / BOT ───────────────────────────────────────────────────────────
@@ -467,6 +482,9 @@ async function processMessage({
       } else {
         ackText = parts[1]?.trim() || '';
       }
+
+      analysisText = cleanString(analysisText);
+      ackText = cleanString(ackText);
 
       if (ackText && ackText.length > 10) {
         const replyTo = extractEmail(msg.from);
@@ -611,4 +629,9 @@ Kiedy: pytanie o produkt/usługę/cennik/godziny/lokalizację/ofertę którą mo
 PRZED podjęciem decyzji o eskalacji: SPRAWDŹ czy odpowiedź nie znajduje się w treści strony firmowej powyżej.
 Format odpowiedzi: napisz kompletną treść e-maila.
 ZASADY: Podpisz się jako "Asystent [nazwa firmy]". NIE używaj słów "AI", "bot", "sztuczna inteligencja". Odpowiadaj w tym samym języku co nadawca. WYŁĄCZNIE czysta treść maila — zero meta-komentarzy, zero "Oto odpowiedź:". Jeśli czegoś naprawdę nie wiesz i nie ma tego na stronie → użyj Ścieżki 2.`;
+}
+
+function cleanString(str: string | null | undefined): string {
+  if (!str) return '';
+  return str.replace(/\0/g, ''); // Strip out PostgreSQL-incompatible null bytes (\u0000)
 }
