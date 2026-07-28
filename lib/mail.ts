@@ -1,7 +1,8 @@
 import { simpleParser } from 'mailparser';
 import nodemailer from 'nodemailer';
 import Pop3Command from 'node-pop3';
-import { PDFParse } from 'pdf-parse';
+// @ts-ignore
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 export interface FetchedEmail {
   pop3Uid: string;
@@ -98,8 +99,7 @@ export async function fetchUnreadEmailsPOP3(
           for (const att of parsed.attachments) {
             if (att.contentType === 'application/pdf' && att.content) {
               try {
-                const parser = new PDFParse({ data: att.content });
-                const pdfData = await parser.getText();
+                const pdfData = await pdfParse(att.content);
                 const pdfStr = pdfData.text.replace(/\s+/g, ' ').trim();
                 if (pdfStr) {
                   attachmentText += `\n\n--- ZAŁĄCZNIK PDF: ${att.filename || 'dokument.pdf'} ---\n${pdfStr.substring(0, 4000)}`;
