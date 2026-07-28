@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import Pop3Command from 'node-pop3';
 
 export interface FetchedEmail {
-  pop3Uid: string; // we keep the name pop3Uid for DB backwards compatibility, but it will store IMAP UID
+  pop3Uid: string;
   messageId: string;
   inReplyTo?: string;
   references?: string[];
@@ -13,12 +13,17 @@ export interface FetchedEmail {
   text: string;
   date: Date;
 }
+
 /**
- * Fetches emails via POP3.
- * Connects to pop.gmail.com:995
- * Skips UIDs that are already present in knownUids array.
+ * Fetches NEW emails via POP3, skipping:
+ * - Already known UIDs (already in DB)
+ * - Emails sent BY the account itself (to prevent reply loops)
  */
-export async function fetchUnreadEmailsPOP3(email: string, appPassword: string, knownUids: string[]): Promise<FetchedEmail[]> {
+export async function fetchUnreadEmailsPOP3(
+  email: string,
+  appPassword: string,
+  knownUids: string[]
+): Promise<FetchedEmail[]> {
   const pop3 = new Pop3Command({
     user: email,
     password: appPassword,
@@ -26,47 +31,66 @@ export async function fetchUnreadEmailsPOP3(email: string, appPassword: string, 
     port: 995,
     tls: true
   });
-  
+
   const fetchedEmails: FetchedEmail[] = [];
+  const emailLower = email.toLowerCase();
 
   try {
-    // Timeout 15 sekund na pobranie całej listy POP3
+    // 20s timeout to get the UID list
     let timeoutId: any;
-    const connectPromise = pop3.UIDL();
-    const timeoutPromise = new Promise<any>((_, reject) => 
+    const uidlPromise = pop3.UIDL();
+    const timeoutPromise = new Promise<any>((_, reject) =>
       timeoutId = setTimeout(() => {
-        try { pop3.QUIT(); } catch(e) {}
-        reject(new Error('POP3 connection timed out (Google ban active)'));
-      }, 15000)
+        try { pop3.QUIT(); } catch (e) {}
+        reject(new Error('POP3 connection timed out'));
+      }, 20000)
     );
-    
-    // Zwraca tablicę: [ [1, "uid1"], [2, "uid2"] ]
-    const uidlList = await Promise.race([connectPromise, timeoutPromise]);
+
+    const uidlList = await Promise.race([uidlPromise, timeoutPromise]);
     clearTimeout(timeoutId);
-    
-    // Szukamy nowych UID
+
+    const knownSet = new Set(knownUids);
+
     for (const item of uidlList) {
       if (!item || item.length < 2) continue;
       const msgNum = item[0];
       const uid = item[1];
-      
-      if (knownUids.includes(uid)) continue;
-      
+
+      // Skip already processed UIDs
+      if (knownSet.has(uid)) continue;
+
       try {
         const rawMsg = await pop3.RETR(msgNum);
         const parsed: any = await simpleParser(rawMsg);
-        
+
         const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
+        
+        // ── KRYTYCZNE: Pomijaj maile wysłane przez samego agenta (zapobiega pętli auto-reply) ──
+        if (fromAddr.toLowerCase() === emailLower) {
+          // Zapisujemy UID żeby następnym razem ten mail był pominięty szybciej
+          fetchedEmails.push({
+            pop3Uid: uid,
+            messageId: parsed.messageId || `self-${uid}`,
+            from: fromAddr,
+            to: email,
+            subject: parsed.subject || '',
+            text: '',
+            date: parsed.date || new Date(),
+            _isSelf: true
+          } as any);
+          continue;
+        }
+
         const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
         const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
         const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
-        
+
         let inReplyTo = parsed.inReplyTo;
         if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
-        
+
         let references = parsed.references;
         if (typeof references === 'string') references = [references];
-        
+
         fetchedEmails.push({
           pop3Uid: uid,
           messageId,
@@ -79,33 +103,30 @@ export async function fetchUnreadEmailsPOP3(email: string, appPassword: string, 
           date: parsed.date || new Date()
         });
       } catch (err: any) {
-        console.error(`[Agent AI] Błąd parsowania wiadomości POP3 UID ${uid}:`, err.message);
+        console.error(`[Agent AI] Błąd parsowania POP3 UID ${uid}:`, err.message);
       }
     }
-    
-    try {
-      await pop3.QUIT();
-    } catch(e) {}
-    
+
+    try { await pop3.QUIT(); } catch (e) {}
+
   } catch (error: any) {
     console.error('[Agent AI] Błąd połączenia POP3:', error.message);
     try { pop3.QUIT(); } catch (e) {}
     throw error;
   }
-  
+
   return fetchedEmails;
 }
 
 /**
- * Sends a reply via SMTP.
- * Connects to smtp.gmail.com:465
+ * Sends a reply via SMTP (smtp.gmail.com:465)
  */
 export async function sendReplySMTP(
-  email: string, 
-  appPassword: string, 
-  to: string, 
-  subject: string, 
-  text: string, 
+  email: string,
+  appPassword: string,
+  to: string,
+  subject: string,
+  text: string,
   inReplyToMessageId?: string,
   references?: string
 ) {
@@ -113,79 +134,63 @@ export async function sendReplySMTP(
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
-    auth: {
-      user: email,
-      pass: appPassword
-    }
+    auth: { user: email, pass: appPassword }
   });
 
-  const mailOptions: any = {
-    from: email,
-    to,
-    subject,
-    text
-  };
+  const mailOptions: any = { from: email, to, subject, text };
 
-  if (inReplyToMessageId) {
-    mailOptions.inReplyTo = inReplyToMessageId;
-  }
-  if (references) {
-    mailOptions.references = references;
-  } else if (inReplyToMessageId) {
-    mailOptions.references = inReplyToMessageId;
-  }
+  if (inReplyToMessageId) mailOptions.inReplyTo = inReplyToMessageId;
+  if (references) mailOptions.references = references;
+  else if (inReplyToMessageId) mailOptions.references = inReplyToMessageId;
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    return info;
-  } catch (error) {
-    console.error("[SMTP Send Error]", error);
-    throw error;
-  }
+  const info = await transporter.sendMail(mailOptions);
+  return info;
 }
 
 /**
- * Validates POP3 credentials by attempting a connection.
+ * Validates POP3 credentials with detailed error reporting.
  */
-export async function validatePop3Credentials(email: string, appPassword: string): Promise<boolean> {
-  const pop3 = new Pop3Command({ user: email, password: appPassword, host: 'pop.gmail.com', port: 995, tls: true });
-  try {
-    await pop3.UIDL();
-    try { await pop3.QUIT(); } catch(e) {}
-    return true;
-  } catch (error) {
-    try { await pop3.QUIT(); } catch(e) {}
-    return false;
-  }
-}
+export async function validatePop3CredentialsDetailed(
+  email: string,
+  appPassword: string
+): Promise<{ isValid: boolean; error?: string }> {
+  const pop3 = new Pop3Command({
+    user: email, password: appPassword,
+    host: 'pop.gmail.com', port: 995, tls: true
+  });
 
-export async function validatePop3CredentialsDetailed(email: string, appPassword: string): Promise<{isValid: boolean, error?: string}> {
-  const pop3 = new Pop3Command({ user: email, password: appPassword, host: 'pop.gmail.com', port: 995, tls: true });
-  
   try {
     let timeoutId: any;
     const connectPromise = pop3.UIDL();
-    const timeoutPromise = new Promise<any>((_, reject) => 
-      timeoutId = setTimeout(() => reject(new Error('Przekroczono czas oczekiwania (Timeout). Serwery Google nie odpowiadają. Spróbuj ponownie.')), 10000)
+    const timeoutPromise = new Promise<any>((_, reject) =>
+      timeoutId = setTimeout(() =>
+        reject(new Error('Przekroczono czas oczekiwania. Spróbuj ponownie.')), 12000)
     );
-    
+
     await Promise.race([connectPromise, timeoutPromise]);
     clearTimeout(timeoutId);
-    
-    try { await pop3.QUIT(); } catch(e) {}
-    
+    try { await pop3.QUIT(); } catch (e) {}
     return { isValid: true };
   } catch (error: any) {
-    try { await pop3.QUIT(); } catch (e) {}
-    
+    try { pop3.QUIT(); } catch (e) {}
     let errMsg = error?.message || String(error);
-    
-    if (errMsg.includes('Invalid credentials') || errMsg.includes('login failed') || errMsg.includes('Username and password not accepted') || errMsg.includes('Web login required') || errMsg.includes('AUTH')) {
-       errMsg = 'Nieprawidłowe hasło aplikacji lub błędny adres e-mail.';
-    } else if (errMsg.includes('POP3')) {
-       errMsg = 'Wystąpił błąd protokołu POP3.';
+    if (
+      errMsg.includes('Invalid credentials') ||
+      errMsg.includes('login failed') ||
+      errMsg.includes('Username and password not accepted') ||
+      errMsg.includes('Web login required') ||
+      errMsg.includes('AUTH')
+    ) {
+      errMsg = 'Nieprawidłowe hasło aplikacji lub błędny adres e-mail.';
+    } else if (errMsg.includes('POP access')) {
+      errMsg = 'POP3 nie jest włączony w ustawieniach Gmail. Włącz go w: Ustawienia → Przekazywanie i POP/IMAP.';
     }
-    
     return { isValid: false, error: errMsg };
   }
+}
+
+/** @deprecated Use validatePop3CredentialsDetailed instead */
+export async function validatePop3Credentials(email: string, appPassword: string): Promise<boolean> {
+  const result = await validatePop3CredentialsDetailed(email, appPassword);
+  return result.isValid;
 }

@@ -200,28 +200,29 @@ async function processMessage({
   const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
   const isTooOld = messageAgeHours > 48;
 
+  // Maile wysłane przez samego agenta (flaga z mail.ts) → zapisz UID i wyjdź
+  const isSelf = (msg as any)._isSelf === true;
+
   // Sprawdź duplikat
   const existing = await prisma.email.findUnique({ where: { messageId } });
   if (existing) {
-    const thread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
-    // Ponów tylko jeśli poprzednia próba AI zakończyła się błędem
-    const needsRetry = thread?.status === 'PENDING_APPROVAL' && 
-                       thread?.draftReply?.startsWith('[BŁĄD AI]');
-    if (!needsRetry) {
-      // Zaktualizuj UID jeśli brakowało
-      if (!existing.pop3Uid && msg.pop3Uid) {
-        await prisma.email.update({
-          where: { messageId },
-          data: { pop3Uid: msg.pop3Uid }
-        }).catch(() => {});
-      }
-      return;
+    // Zaktualizuj UID jeśli brakowało
+    if (!existing.pop3Uid && msg.pop3Uid) {
+      await prisma.email.update({
+        where: { messageId },
+        data: { pop3Uid: msg.pop3Uid }
+      }).catch(() => {});
     }
+    // Ponów tylko jeśli poprzednia próba AI zakończyła się błędem
+    const thread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
+    const needsRetry = thread?.status === 'PENDING_APPROVAL' &&
+                       thread?.draftReply?.startsWith('[BŁĄD AI]');
+    if (!needsRetry) return;
   }
 
   // Heurystyki antyspamowe
   const fromLower = msg.from.toLowerCase();
-  const isBot = /noreply|no-reply|daemon|mailer-daemon|@bounce|@notifications|@noreply/i.test(fromLower);
+  const isBot = /noreply|no-reply|daemon|mailer-daemon|@bounce|@notifications|@noreply/i.test(fromLower) || isSelf;
 
   // Znajdź lub utwórz wątek
   let dbThread: any;
@@ -260,9 +261,13 @@ async function processMessage({
     }
 
     if (dbThreadId) {
+      // Jeśli wątek był AUTO_REPLIED, a klient odpowiedział ponownie → resetuj do PENDING_APPROVAL
+      const existingThread = await prisma.thread.findUnique({ where: { id: dbThreadId } });
+      const newStatus = isBot ? 'IGNORED' : 
+        (existingThread?.status === 'AUTO_REPLIED' ? 'PENDING_APPROVAL' : existingThread?.status ?? 'PENDING_APPROVAL');
       dbThread = await prisma.thread.update({
         where: { id: dbThreadId },
-        data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
+        data: { status: newStatus, draftReply: null }
       });
     } else {
       // Nowy wątek
@@ -323,8 +328,9 @@ async function processMessage({
     return;
   }
 
-  // Wątek już obsłużony → pomijamy
-  if (dbThread.status === 'AUTO_REPLIED' || dbThread.status === 'REQUIRES_ATTENTION') return;
+  // Wątek już obsłużony w tym przebiegu (nie ma nowego klienta) → pomijamy
+  // AUTO_REPLIED jest resetowany wyżej gdy nowy mail przychodzi od klienta
+  if (dbThread.status === 'REQUIRES_ATTENTION') return;
 
   // ── Generuj odpowiedź AI ────────────────────────────────────────────────────
   console.log(`[Agent AI] Generuję odpowiedź AI dla: ${msg.subject} (od: ${msg.from})`);
