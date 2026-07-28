@@ -62,7 +62,23 @@ export async function fetchUnreadEmailsPOP3(
       if (knownSet.has(uid)) continue;
 
       try {
-        const rawMsg = await pop3.RETR(msgNum);
+        let retrTimeoutId: any;
+        const retrPromise = pop3.RETR(msgNum);
+        const retrTimeout = new Promise<any>((_, reject) =>
+          retrTimeoutId = setTimeout(() => {
+            reject(new Error('POP3 RETR timeout'));
+          }, 10000)
+        );
+
+        let rawMsg;
+        try {
+          rawMsg = await Promise.race([retrPromise, retrTimeout]);
+        } catch (e) {
+          console.warn(`POP3 RETR failed for msgNum ${msgNum}:`, e);
+          continue;
+        } finally {
+          clearTimeout(retrTimeoutId);
+        }
         const parsed: any = await simpleParser(rawMsg);
 
         const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
