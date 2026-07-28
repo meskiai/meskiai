@@ -26,8 +26,12 @@ export async function fetchUnreadEmailsPOP3(
   appPassword: string,
   knownUids: string[]
 ): Promise<FetchedEmail[]> {
+  // Gmail POP3 recent mode ensures we fetch all emails from the last 30 days,
+  // preventing emails from being permanently hidden after a transient connection failure.
+  const pop3Username = `recent:${email}`;
+
   const pop3 = new Pop3Command({
-    user: email,
+    user: pop3Username,
     password: appPassword,
     host: 'pop.gmail.com',
     port: 995,
