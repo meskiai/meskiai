@@ -407,7 +407,7 @@ async function processMessage({
 
   try {
     const { text } = await generateText({
-      model:  googleAI('gemini-flash-latest'),
+      model:  googleAI('gemini-1.5-pro-latest'),
       system: buildSystemPrompt(settings, websiteContent),
       prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść wiadomości:\n${(msg.text || '').substring(0, 3000)}`,
     });
