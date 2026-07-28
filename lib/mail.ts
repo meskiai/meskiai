@@ -57,7 +57,13 @@ export async function fetchUnreadEmailsPOP3(
 
     const knownSet = new Set(knownUids);
 
-    for (const item of uidlList) {
+    // Scan at most the 30 most recent messages in the inbox to avoid getting stuck on ancient mail
+    const maxScan = Math.min(30, uidlList.length);
+    const startIndex = uidlList.length - 1;
+    const endIndex = uidlList.length - maxScan;
+
+    for (let i = startIndex; i >= endIndex; i--) {
+      const item = uidlList[i];
       if (!item || item.length < 2) continue;
       const msgNum = item[0];
       const uid = item[1];
@@ -65,7 +71,55 @@ export async function fetchUnreadEmailsPOP3(
       // Skip already processed UIDs
       if (knownSet.has(uid)) continue;
 
+      // Limit to 10 new emails per sync cycle to prevent long timeouts and process recent emails instantly
+      if (fetchedEmails.length >= 10) {
+        console.log(`[POP3] Limit 10 nowych maili w jednym cyklu osiągnięty. Przerywam dalsze pobieranie.`);
+        break;
+      }
+
       try {
+        // Fetch only headers first to check the date and messageId quickly
+        let topTimeoutId: any;
+        const topPromise = pop3.TOP(msgNum, 0);
+        const topTimeout = new Promise<any>((_, reject) =>
+          topTimeoutId = setTimeout(() => {
+            reject(new Error('POP3 TOP timeout'));
+          }, 5000)
+        );
+
+        let headersRaw;
+        try {
+          headersRaw = await Promise.race([topPromise, topTimeout]);
+        } catch (e) {
+          console.warn(`POP3 TOP failed for msgNum ${msgNum}:`, e);
+          continue;
+        } finally {
+          clearTimeout(topTimeoutId);
+        }
+
+        const headersParsed: any = await simpleParser(headersRaw);
+        const msgDate = headersParsed.date || new Date();
+        let messageId = headersParsed.messageId || `uid-${uid}-${Date.now()}`;
+        let fromAddr = headersParsed.from?.value?.[0]?.address || headersParsed.from?.text || '';
+
+        const messageAgeHours = (Date.now() - msgDate.getTime()) / (1000 * 60 * 60);
+
+        // If the email is older than 48 hours or is from ourselves, skip full download and record it as processed
+        if (messageAgeHours > 48 || fromAddr.toLowerCase() === emailLower) {
+          fetchedEmails.push({
+            pop3Uid: uid,
+            messageId: messageId,
+            from: fromAddr || 'ignored@old.com',
+            to: email,
+            subject: headersParsed.subject || '(Old/Self skipped)',
+            text: '',
+            date: msgDate,
+            _isSelf: true // Ignores it in cron, but saves UID to database
+          } as any);
+          continue;
+        }
+
+        // It is a recent email, now fetch the full body
         let retrTimeoutId: any;
         const retrPromise = pop3.RETR(msgNum);
         const retrTimeout = new Promise<any>((_, reject) =>
@@ -85,7 +139,7 @@ export async function fetchUnreadEmailsPOP3(
         }
         const parsed: any = await simpleParser(rawMsg);
 
-        const fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
+        fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
         
         // ── KRYTYCZNE: Pomijaj maile wysłane przez samego agenta (zapobiega pętli auto-reply) ──
         if (fromAddr.toLowerCase() === emailLower) {
@@ -105,7 +159,7 @@ export async function fetchUnreadEmailsPOP3(
 
         const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
         const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
-        const messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
+        messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
 
         let inReplyTo = parsed.inReplyTo;
         if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
