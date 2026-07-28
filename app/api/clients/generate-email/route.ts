@@ -39,6 +39,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak bazy wiedzy. Uzupełnij opis firmy w Ustawieniach." }, { status: 400 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user || !['active', 'trialing'].includes(user.subscriptionStatus || '')) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Zrób upgrade, aby wygenerować wiadomość." }, { status: 403 });
+    }
+
     const { object } = await generateObject({
       model: googleAI("gemini-1.5-pro-latest"),
       system: `Jesteś ekspertem ds. sprzedaży B2B (B2B Sales Executive) reprezentującym firmę.

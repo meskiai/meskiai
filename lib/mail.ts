@@ -126,6 +126,17 @@ export async function fetchUnreadEmailsPOP3(
         });
       } catch (err: any) {
         console.error(`[Agent AI] Błąd parsowania POP3 UID ${uid}:`, err.message);
+        // Push a placeholder so the UID is recorded and not fetched infinitely
+        fetchedEmails.push({
+          pop3Uid: uid,
+          messageId: `broken-${uid}`,
+          from: 'unknown@error.com',
+          to: email,
+          subject: '(Błąd odczytu)',
+          text: '',
+          date: new Date(),
+          _isSelf: true // Treat as self to ignore it safely in cron
+        } as any);
       }
     }
 

@@ -83,6 +83,7 @@ model UserSettings {
 
   // Agent 24/7 tracking
   lastAgentRunAt       DateTime?
+  runLockedUntil       DateTime?
   agentEmailsProcessed Int      @default(0)
   lastMonthlyReset     DateTime?
 

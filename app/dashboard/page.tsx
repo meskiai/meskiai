@@ -108,8 +108,9 @@ export default function Dashboard() {
   
   const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
   const searchesUsed = subscriptionData?.competitorSearchesThisMonth || 0;
-  const emailLimit = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
-  const searchLimit = isBasic ? 10 : isPro ? 100 : isMax ? Infinity : 0;
+  // Fallback to basic limits if price ID is unknown (e.g. grandfathered plan)
+  const emailLimit = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 50;
+  const searchLimit = isBasic ? 10 : isPro ? 100 : isMax ? Infinity : 10;
 
   const isEmailLimitReached = !isUnlimited && emailsUsed >= emailLimit && emailLimit > 0;
   const isSearchLimitReached = !isUnlimited && searchesUsed >= searchLimit && searchLimit > 0;
@@ -708,7 +709,8 @@ export default function Dashboard() {
     if (currentTab === "INBOX") return t.status === "PENDING_APPROVAL";
     if (currentTab === "IMPORTANT") return t.status === "REQUIRES_ATTENTION";
     if (currentTab === "SENT") return t.status === "REPLIED" || t.status === "AUTO_REPLIED";
-    if (currentTab === "SPAM") return t.status === "IGNORED";
+    // Zabezpieczenie przed pobieraniem tysięcy maili ze sterty HISTORY
+    if (currentTab === "SPAM") return t.status === "IGNORED" && !t.threadId.startsWith("HISTORY_");
     return true;
   }).sort((a, b) => {
     const timeA = a.emails?.[0]?.receivedAt ? new Date(a.emails[0].receivedAt).getTime() : 0;

@@ -68,18 +68,8 @@ async function fetchWebsiteContent(url: string): Promise<string> {
   }
 }
 
-// ─── Global guard (prevents overlapping runs in same container) ─────────────────
-const g = global as any;
-
 // ─── Main entry point (called by Netlify background function every 2 min) ───────
 export async function runSync() {
-  const now = Date.now();
-  if (g.__aiRunning && now - g.__aiRunning < 13 * 60 * 1000) {
-    console.log('[Agent AI] Poprzedni cykl jeszcze trwa — pomijam.');
-    return;
-  }
-  g.__aiRunning = now;
-
   try {
     // Fetch ONLY users that are eligible:
     //  - active/trialing subscription
@@ -138,19 +128,37 @@ export async function runSync() {
     for (let i = 0; i < users.length; i += chunkSize) {
       const chunk = users.slice(i, i + chunkSize);
       await Promise.allSettled(
-        chunk.map(user =>
-          processUser(user).catch(err =>
-            console.error(`[Agent AI] Błąd dla ${user.email}:`, err?.message ?? err)
-          )
-        )
+        chunk.map(async (user) => {
+          // Attempt to lock this user for 10 minutes to prevent concurrent serverless executions
+          const lockRes = await prisma.userSettings.updateMany({
+            where: {
+              userId: user.id,
+              OR: [{ runLockedUntil: null }, { runLockedUntil: { lt: new Date() } }],
+            },
+            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) },
+          });
+          
+          if (lockRes.count === 0) {
+            console.log(`[Agent AI] 🔒 Użytkownik ${user.email} zablokowany przez inną instancję, pomijam.`);
+            return;
+          }
+
+          try {
+            await processUser(user);
+          } finally {
+            // Unlock after processing
+            await prisma.userSettings.updateMany({
+              where: { userId: user.id },
+              data: { runLockedUntil: null },
+            }).catch(() => {});
+          }
+        })
       );
     }
 
     console.log('[Agent AI] ✅ Cykl zakończony.');
   } catch (err: any) {
     console.error('[Agent AI] Krytyczny błąd runSync:', err?.message ?? err);
-  } finally {
-    g.__aiRunning = false;
   }
 }
 
@@ -263,7 +271,7 @@ async function processMessage({
   msg: FetchedEmail;
   websiteContent?: string;
 }): Promise<boolean> {
-  const messageId = msg.messageId;
+  const messageId = msg.messageId || `<uid-${msg.pop3Uid}-${userId}@local>`;
 
   // Classify the message
   const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
@@ -402,6 +410,23 @@ async function processMessage({
   // Thread already requires human attention — don't overwrite
   if (dbThread.status === 'REQUIRES_ATTENTION') return false;
 
+  // ── Anti-Loop Protection (Zabezpieczenie przed pętlą z autoresponderami) ──
+  // Check if we sent an automated reply to this exact thread in the last 15 minutes.
+  // If so, do not send another one to avoid infinite loops with ticketing systems.
+  const emailsInThread = await prisma.email.findMany({
+    where: { threadId: dbThread.id },
+    orderBy: { receivedAt: 'desc' },
+    take: 5
+  });
+  
+  const recentAutoReplies = emailsInThread.filter(
+    (e) => e.isFromAgent && (Date.now() - e.receivedAt.getTime() < 15 * 60 * 1000)
+  );
+  if (recentAutoReplies.length > 0) {
+    console.log(`[Agent AI] 🛑 Wykryto potencjalną pętlę w wątku ${dbThread.id}. Ignoruję auto-odpowiedź (cooldown).`);
+    return false;
+  }
+
   // ── Generate AI reply ────────────────────────────────────────────────────────
   console.log(`[Agent AI] 🤖 Generuję odpowiedź: "${msg.subject}" od ${msg.from}`);
 
@@ -412,11 +437,11 @@ async function processMessage({
       prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść wiadomości:\n${(msg.text || '').substring(0, 3000)}`,
     });
 
-    const aiText = text.trim();
-    const upper  = aiText.toUpperCase().slice(0, 80);
+    const cleanedAiText = text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
+    const upper  = cleanedAiText.toUpperCase().slice(0, 80);
 
     // ── SPAM / BOT ───────────────────────────────────────────────────────────
-    if (upper.startsWith('SPAM') || upper.startsWith('BOT') || upper.startsWith('IGNORE')) {
+    if (upper.includes('SPAM') || upper.includes('BOT') || upper.includes('IGNORE')) {
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
         .catch(() => {});
@@ -425,9 +450,8 @@ async function processMessage({
     }
 
     // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
-    if (upper.startsWith('REQUIRES_ATTENTION')) {
-      // Format: "REQUIRES_ATTENTION\n---\n[Analiza dla właściciela]\n---\n[Treść potwierdzenia dla klienta]"
-      const parts = aiText.split(/\n---\n/s);
+    if (upper.includes('REQUIRES_ATTENTION')) {
+      const parts = cleanedAiText.split(/\n[-*_]{3,}\n/s);
       let analysisText = '';
       let ackText = '';
       
@@ -435,11 +459,9 @@ async function processMessage({
         analysisText = parts[1]?.trim();
         ackText = parts[2]?.trim();
       } else {
-        // Fallback for older format
         ackText = parts[1]?.trim() || '';
       }
 
-      // Jeśli AI wygenerowała tekst potwierdzenia → wyślij go do klienta
       if (ackText && ackText.length > 10) {
         const replyTo = extractEmail(msg.from);
         const referencesStr = [...(msg.references ?? []), messageId].join(' ');
@@ -453,7 +475,6 @@ async function processMessage({
             messageId,
             referencesStr
           );
-          // Zapisz wysłane potwierdzenie w bazie
           await prisma.email.create({
             data: {
               threadId:    dbThread.id,
@@ -473,8 +494,6 @@ async function processMessage({
         }
       }
 
-      // Wątek idzie do zakładki Ważne (admin musi podjąć decyzję).
-      // Zapisujemy analizę i treść potwierdzenia w draftReply żeby właściciel to przeczytał
       const draftContent = analysisText 
         ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[WYSŁANE POTWIERDZENIE]:\n${ackText || '(brak)'}`
         : ackText || null;
@@ -495,22 +514,20 @@ async function processMessage({
       settings.appPassword!,
       replyTo,
       msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
-      aiText,
+      cleanedAiText,
       messageId,
       referencesStr
     );
 
-    // Mark thread as auto-replied and increment counter
     await Promise.all([
       prisma.thread.update({
         where: { id: dbThread.id },
         data: { status: 'AUTO_REPLIED', draftReply: null },
       }),
       prisma.userSettings.update({
-        where: { userId },
+        where: { userId: user.id },
         data: { emailsSentThisMonth: { increment: 1 } },
-      }),
-      // Save sent email record
+      }).catch(() => {}),
       prisma.email.create({
         data: {
           threadId:    dbThread.id,
@@ -518,8 +535,8 @@ async function processMessage({
           from:        user.email ?? 'Agent AI',
           to:          replyTo,
           subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
-          snippet:     aiText.substring(0, 150),
-          body:        aiText,
+          snippet:     cleanedAiText.substring(0, 150),
+          body:        cleanedAiText,
           receivedAt:  new Date(),
           isFromAgent: true,
         },
