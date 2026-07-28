@@ -10,10 +10,15 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
       return await fn();
     } catch (err: any) {
       const msg = err?.message ?? '';
-      const isRetryable = msg.includes('ECONNRESET') || msg.includes('fetch failed') || msg.includes('NeonDbError');
+      const isRetryable =
+        msg.includes('ECONNRESET') ||
+        msg.includes('fetch failed') ||
+        msg.includes('NeonDbError') ||
+        msg.includes('connection');
       if (isRetryable && i < retries - 1) {
-        console.log(`[Agent AI] Baza danych — ponowna próba ${i + 1}/${retries - 1} za ${delayMs * (i + 1)}ms...`);
-        await new Promise(r => setTimeout(r, delayMs * (i + 1)));
+        const wait = delayMs * (i + 1);
+        console.log(`[Agent AI] Baza danych — ponowna próba ${i + 1}/${retries - 1} za ${wait}ms...`);
+        await new Promise(r => setTimeout(r, wait));
       } else {
         throw err;
       }
@@ -22,67 +27,81 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
   throw new Error('Wyczerpano próby połączenia z bazą danych.');
 }
 
-// ─── Guard ─────────────────────────────────────────────────────────────────────
+// ─── Price limits ──────────────────────────────────────────────────────────────
+function getMonthlyLimit(stripePriceId: string | null): number {
+  const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+  const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+  if (stripePriceId === PRICE_MAX) return 5000;
+  if (stripePriceId === PRICE_PRO) return 1000;
+  return 50; // Basic (default for any active subscription)
+}
+
+// ─── Global guard (prevents overlapping runs in same container) ─────────────────
 const g = global as any;
 
+// ─── Main entry point (called by Netlify background function every 2 min) ───────
 export async function runSync() {
   const now = Date.now();
-  // Jeśli poprzedni cykl jeszcze trwa (mniej niż 14 minut temu), pomijamy
-  if (g.__aiRunning && (now - g.__aiRunning < 14 * 60 * 1000)) {
+  if (g.__aiRunning && now - g.__aiRunning < 13 * 60 * 1000) {
     console.log('[Agent AI] Poprzedni cykl jeszcze trwa — pomijam.');
     return;
   }
   g.__aiRunning = now;
 
   try {
-    // Pobierz TYLKO użytkowników którzy mają:
-    // 1. Email
-    // 2. Aktywną subskrypcję
-    // 3. Hasło aplikacji
-    // 4. Włączone auto-reply
-    const users = await withRetry(() => prisma.user.findMany({
-      where: {
-        email: { not: null },
-        subscriptionStatus: { in: ['active', 'trialing'] },
-        settings: {
-          appPassword: { not: null },
-          autoReply: true
-        }
-      },
-      include: { settings: true }
-    }));
+    // Fetch ONLY users that are eligible:
+    //  - active/trialing subscription
+    //  - has an app password
+    //  - has autoReply enabled
+    const users = await withRetry(() =>
+      prisma.user.findMany({
+        where: {
+          email: { not: null },
+          subscriptionStatus: { in: ['active', 'trialing'] },
+          settings: {
+            appPassword: { not: null },
+            autoReply: true,
+          },
+        },
+        include: { settings: true },
+      })
+    );
 
     if (users.length === 0) {
       console.log('[Agent AI] Brak aktywnych użytkowników do obsługi.');
       return;
     }
 
-    // Reset miesięcznego licznika jeśli mamy nowy miesiąc
+    // ── Monthly limit auto-reset ────────────────────────────────────────────────
+    // Stripe webhook also resets on invoice.payment_succeeded, this is a safety net
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     for (const user of users) {
       const s = user.settings;
       if (!s) continue;
       const lastReset = s.lastMonthlyReset ? new Date(s.lastMonthlyReset) : null;
-      const needsReset = !lastReset || 
-        lastReset.getMonth() !== currentMonth || 
+      const needsReset =
+        !lastReset ||
+        lastReset.getMonth() !== currentMonth ||
         lastReset.getFullYear() !== currentYear;
-      if (needsReset && (s.emailsSentThisMonth ?? 0) > 0) {
-        await prisma.userSettings.update({
-          where: { userId: user.id },
-          data: { emailsSentThisMonth: 0, lastMonthlyReset: new Date() }
-        }).catch(() => {});
+      if (needsReset) {
+        await prisma.userSettings
+          .update({
+            where: { userId: user.id },
+            data: { emailsSentThisMonth: 0, lastMonthlyReset: new Date() },
+          })
+          .catch(() => {});
         user.settings!.emailsSentThisMonth = 0;
-        console.log(`[Agent AI] Reset licznika miesięcznego dla ${user.email}`);
+        console.log(`[Agent AI] ↺ Reset licznika miesięcznego dla ${user.email}`);
       }
     }
 
-    // Losowe tasowanie żeby wszyscy mieli równą szansę na obsługę
+    // Shuffle for fair round-robin (avoids starvation when time is limited)
     users.sort(() => Math.random() - 0.5);
 
     console.log(`[Agent AI] Sprawdzam ${users.length} aktywnych użytkowników...`);
 
-    // Przetwarzaj po 3 naraz
+    // Process in batches of 3 concurrently
     const chunkSize = 3;
     for (let i = 0; i < users.length; i += chunkSize) {
       const chunk = users.slice(i, i + chunkSize);
@@ -103,44 +122,45 @@ export async function runSync() {
   }
 }
 
-// ─── Przetwarzanie jednego użytkownika ─────────────────────────────────────────
+// ─── Process a single user ─────────────────────────────────────────────────────
 async function processUser(user: any) {
-  const userId = user.id;
+  const userId   = user.id;
   const settings = user.settings;
 
+  // Guard: app password required
   if (!settings?.appPassword) {
     console.log(`[Agent AI] ${user.email}: brak hasła aplikacji — pomijam.`);
     return;
   }
 
-  // Sprawdź limit miesięczny
-  const priceId = user.stripePriceId;
-  const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-  const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-  const emailsSent = settings.emailsSentThisMonth ?? 0;
-
-  let monthlyLimit = 50; // Basic (default)
-  if (priceId === PRICE_MAX) monthlyLimit = 5000;
-  else if (priceId === PRICE_PRO) monthlyLimit = 1000;
-
-  if (emailsSent >= monthlyLimit) {
-    console.log(`[Agent AI] ${user.email}: limit miesięczny ${emailsSent}/${monthlyLimit} wyczerpany — pomijam.`);
+  // Guard: subscription must be active (double-check in case DB was stale)
+  if (user.subscriptionStatus !== 'active' && user.subscriptionStatus !== 'trialing') {
+    console.log(`[Agent AI] ${user.email}: brak aktywnej subskrypcji (${user.subscriptionStatus}) — pomijam.`);
     return;
   }
 
-  // Pobierz znane UID z bazy (żeby nie pobierać tych samych maili ponownie)
-  let knownUids: string[] = [];
-  try {
-    const existingEmails = await prisma.email.findMany({
-      where: { thread: { userId }, pop3Uid: { not: null } },
-      select: { pop3Uid: true }
-    });
-    knownUids = existingEmails.map(e => e.pop3Uid as string);
-  } catch (err: any) {
-    console.error(`[Agent AI] ${user.email}: błąd pobierania znanych UID:`, err?.message);
+  // Guard: monthly limit
+  const monthlyLimit = getMonthlyLimit(user.stripePriceId);
+  const emailsSent   = settings.emailsSentThisMonth ?? 0;
+  if (emailsSent >= monthlyLimit) {
+    console.log(`[Agent AI] ${user.email}: limit ${emailsSent}/${monthlyLimit} wyczerpany — pomijam.`);
+    return;
   }
 
-  // Pobierz nowe maile przez POP3
+  // Fetch known UIDs so POP3 can skip already-processed emails
+  let knownUids: string[] = [];
+  try {
+    const existing = await prisma.email.findMany({
+      where: { thread: { userId }, pop3Uid: { not: null } },
+      select: { pop3Uid: true },
+    });
+    knownUids = existing.map(e => e.pop3Uid as string);
+  } catch (err: any) {
+    console.error(`[Agent AI] ${user.email}: błąd pobierania znanych UID:`, err?.message);
+    // Non-fatal: continue with empty knownUids (may re-process, but won't break)
+  }
+
+  // Fetch new emails via POP3
   let messages: FetchedEmail[] = [];
   try {
     messages = await fetchUnreadEmailsPOP3(user.email!, settings.appPassword!, knownUids);
@@ -149,155 +169,161 @@ async function processUser(user: any) {
     return;
   }
 
-  // Zaktualizuj czas ostatniego sprawdzenia
-  await prisma.userSettings.update({
-    where: { userId },
-    data: { lastAgentRunAt: new Date() }
-  }).catch(() => {});
+  // Record last-run timestamp
+  await prisma.userSettings
+    .update({ where: { userId }, data: { lastAgentRunAt: new Date() } })
+    .catch(() => {});
 
   if (messages.length === 0) {
     console.log(`[Agent AI] ${user.email}: brak nowych wiadomości.`);
     return;
   }
 
-  console.log(`[Agent AI] ${user.email}: ${messages.length} nowych wiadomości.`);
+  console.log(`[Agent AI] ${user.email}: ${messages.length} nowych wiadomości do przetworzenia.`);
 
-  let processed = 0;
+  let replied = 0;
   for (const msg of messages) {
-    // Sprawdź czy nie przekroczono limitu w trakcie przetwarzania
-    const freshSettings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
-    const currentSent = freshSettings?.emailsSentThisMonth ?? emailsSent + processed;
+    // Re-check limit before each message (it may have been incremented by another parallel user)
+    const fresh = await prisma.userSettings
+      .findUnique({ where: { userId }, select: { emailsSentThisMonth: true } })
+      .catch(() => null);
+    const currentSent = fresh?.emailsSentThisMonth ?? emailsSent + replied;
     if (currentSent >= monthlyLimit) {
-      console.log(`[Agent AI] ${user.email}: osiągnięto limit w trakcie przetwarzania — zatrzymuję.`);
+      console.log(`[Agent AI] ${user.email}: limit osiągnięty w trakcie — zatrzymuję.`);
       break;
     }
 
-    await processMessage({ userId, user, settings, msg })
-      .catch(err => console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err?.message ?? err));
-    processed++;
+    const wasReplied = await processMessage({ userId, user, settings, msg }).catch(err => {
+      console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err?.message ?? err);
+      return false;
+    });
+
+    if (wasReplied) replied++;
   }
 
-  if (processed > 0) {
-    await prisma.userSettings.update({
-      where: { userId },
-      data: { agentEmailsProcessed: { increment: processed } }
-    }).catch(() => {});
+  if (replied > 0) {
+    await prisma.userSettings
+      .update({ where: { userId }, data: { agentEmailsProcessed: { increment: replied } } })
+      .catch(() => {});
   }
 }
 
-// ─── Przetwarzanie jednej wiadomości ──────────────────────────────────────────
+// ─── Process a single message. Returns true if an email was actually sent. ──────
 async function processMessage({
-  userId, user, settings, msg
+  userId,
+  user,
+  settings,
+  msg,
 }: {
   userId: string;
   user: any;
   settings: any;
   msg: FetchedEmail;
-}) {
+}): Promise<boolean> {
   const messageId = msg.messageId;
 
-  // Stare maile (>48h) → zapisz do bazy żeby zapamiętać UID, ale nie odpowiadaj
+  // Classify the message
   const messageAgeHours = (Date.now() - new Date(msg.date).getTime()) / (1000 * 60 * 60);
   const isTooOld = messageAgeHours > 48;
+  const isSelf   = (msg as any)._isSelf === true; // sent by the agent itself
+  const isBot    = isSelf ||
+    /noreply|no-reply|daemon|mailer-daemon|@bounce|@noreply/i.test(msg.from.toLowerCase());
 
-  // Maile wysłane przez samego agenta (flaga z mail.ts) → zapisz UID i wyjdź
-  const isSelf = (msg as any)._isSelf === true;
-
-  // Sprawdź duplikat
+  // ── Duplicate check ──────────────────────────────────────────────────────────
   const existing = await prisma.email.findUnique({ where: { messageId } });
   if (existing) {
-    // Zaktualizuj UID jeśli brakowało
+    // Patch missing UID
     if (!existing.pop3Uid && msg.pop3Uid) {
-      await prisma.email.update({
-        where: { messageId },
-        data: { pop3Uid: msg.pop3Uid }
-      }).catch(() => {});
+      await prisma.email
+        .update({ where: { messageId }, data: { pop3Uid: msg.pop3Uid } })
+        .catch(() => {});
     }
-    // Ponów tylko jeśli poprzednia próba AI zakończyła się błędem
-    const thread = await prisma.thread.findUnique({ where: { id: existing.threadId } });
-    const needsRetry = thread?.status === 'PENDING_APPROVAL' &&
-                       thread?.draftReply?.startsWith('[BŁĄD AI]');
-    if (!needsRetry) return;
+    // Only retry if previous AI attempt errored
+    const thread = await prisma.thread
+      .findUnique({ where: { id: existing.threadId } })
+      .catch(() => null);
+    const needsRetry =
+      thread?.status === 'PENDING_APPROVAL' &&
+      thread?.draftReply?.startsWith('[BŁĄD AI]');
+    if (!needsRetry) return false;
   }
 
-  // Heurystyki antyspamowe
-  const fromLower = msg.from.toLowerCase();
-  const isBot = /noreply|no-reply|daemon|mailer-daemon|@bounce|@notifications|@noreply/i.test(fromLower) || isSelf;
-
-  // Znajdź lub utwórz wątek
+  // ── Find or create the DB thread ─────────────────────────────────────────────
   let dbThread: any;
 
-  if (isTooOld) {
-    // Stare maile → jeden zbiorczy wątek HISTORY (nie zajmuje miejsca w panelu)
-    let historyThread = await prisma.thread.findUnique({
-      where: { threadId: `HISTORY_${userId}` }
-    });
+  if (isTooOld || isBot) {
+    // All old / bot emails go into one silent "HISTORY" thread per user
+    let historyThread = await prisma.thread
+      .findUnique({ where: { threadId: `HISTORY_${userId}` } })
+      .catch(() => null);
     if (!historyThread) {
-      historyThread = await prisma.thread.create({
-        data: { threadId: `HISTORY_${userId}`, userId, status: 'IGNORED' }
-      }).catch(async () =>
-        await prisma.thread.findUnique({ where: { threadId: `HISTORY_${userId}` } }) as any
-      );
+      historyThread = await prisma.thread
+        .create({ data: { threadId: `HISTORY_${userId}`, userId, status: 'IGNORED' } })
+        .catch(async () =>
+          prisma.thread.findUnique({ where: { threadId: `HISTORY_${userId}` } })
+        );
     }
-    if (!historyThread) return;
+    if (!historyThread) return false;
     dbThread = historyThread;
   } else {
-    // Nowe maile → znajdź istniejący wątek lub utwórz nowy
+    // Try to attach to an existing thread via In-Reply-To / References
     let dbThreadId: string | undefined;
 
-    // Szukaj po In-Reply-To
     if (msg.inReplyTo) {
-      const parent = await prisma.email.findUnique({ where: { messageId: msg.inReplyTo } });
+      const parent = await prisma.email
+        .findUnique({ where: { messageId: msg.inReplyTo }, select: { threadId: true } })
+        .catch(() => null);
       if (parent) dbThreadId = parent.threadId;
     }
 
-    // Szukaj po References
     if (!dbThreadId && msg.references?.length) {
-      const refs = await prisma.email.findMany({
-        where: { messageId: { in: msg.references } },
-        select: { threadId: true }
-      });
-      if (refs.length > 0) dbThreadId = refs[0].threadId;
+      const refs = await prisma.email
+        .findMany({
+          where: { messageId: { in: msg.references } },
+          select: { threadId: true },
+          take: 1,
+        })
+        .catch(() => []);
+      if (refs.length) dbThreadId = refs[0].threadId;
     }
 
     if (dbThreadId) {
-      // Jeśli wątek był AUTO_REPLIED, a klient odpowiedział ponownie → resetuj do PENDING_APPROVAL
-      const existingThread = await prisma.thread.findUnique({ where: { id: dbThreadId } });
-      const newStatus = isBot ? 'IGNORED' : 
-        (existingThread?.status === 'AUTO_REPLIED' ? 'PENDING_APPROVAL' : existingThread?.status ?? 'PENDING_APPROVAL');
+      // Existing thread — reset AUTO_REPLIED so we can respond again to a continued conversation
+      const existingThread = await prisma.thread
+        .findUnique({ where: { id: dbThreadId } })
+        .catch(() => null);
+      const newStatus =
+        existingThread?.status === 'REQUIRES_ATTENTION'
+          ? 'REQUIRES_ATTENTION' // keep — human must handle
+          : 'PENDING_APPROVAL';
       dbThread = await prisma.thread.update({
         where: { id: dbThreadId },
-        data: { status: newStatus, draftReply: null }
+        data: { status: newStatus, draftReply: null },
       });
     } else {
-      // Nowy wątek
-      try {
-        dbThread = await prisma.thread.create({
-          data: {
-            threadId: messageId,
-            userId,
-            status: isBot ? 'IGNORED' : 'PENDING_APPROVAL'
+      // Brand-new thread
+      dbThread = await prisma.thread
+        .create({ data: { threadId: messageId, userId, status: 'PENDING_APPROVAL' } })
+        .catch(async (err: any) => {
+          if (err.code === 'P2002' || err.code === '23505') {
+            const recovered = await prisma.thread.findUnique({ where: { threadId: messageId } });
+            if (!recovered) return null;
+            return prisma.thread.update({
+              where: { id: recovered.id },
+              data: { status: 'PENDING_APPROVAL', draftReply: null },
+            });
           }
+          throw err;
         });
-      } catch (err: any) {
-        if (err.code === 'P2002' || err.code === '23505') {
-          const recovered = await prisma.thread.findUnique({ where: { threadId: messageId } });
-          if (!recovered) return;
-          dbThread = await prisma.thread.update({
-            where: { id: recovered.id },
-            data: { status: isBot ? 'IGNORED' : 'PENDING_APPROVAL', draftReply: null }
-          });
-        } else throw err;
-      }
     }
   }
 
-  if (!dbThread) return;
+  if (!dbThread) return false;
 
-  // Zapisz email w bazie
+  // ── Save email to DB (so its UID is permanently remembered) ─────────────────
   if (!existing) {
-    try {
-      await prisma.email.create({
+    await prisma.email
+      .create({
         data: {
           threadId:    dbThread.id,
           messageId,
@@ -305,134 +331,145 @@ async function processMessage({
           from:        msg.from,
           to:          msg.to,
           subject:     msg.subject,
-          snippet:     msg.text.substring(0, 100),
-          body:        msg.text,
+          snippet:     (msg.text || '').substring(0, 100),
+          body:        msg.text || '',
           receivedAt:  msg.date,
-          isFromAgent: false
+          isFromAgent: false,
+        },
+      })
+      .catch(async (err: any) => {
+        if (err.code === 'P2002' || err.code === '23505') {
+          console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — pomijam.`);
+          return null;
         }
+        throw err;
       });
-    } catch (err: any) {
-      if (err.code === 'P2002' || err.code === '23505') {
-        console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — pomijam.`);
-        return;
-      }
-      throw err;
-    }
   }
 
-  // Stare maile i boty → koniec (UID zapisany, nie będziemy ich pobierać ponownie)
+  // Old / bot / self emails — UID saved, no AI needed
   if (isTooOld || isBot) {
     if (dbThread.status !== 'IGNORED') {
-      await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
+      await prisma.thread
+        .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
+        .catch(() => {});
     }
-    return;
+    return false;
   }
 
-  // Wątek już obsłużony w tym przebiegu (nie ma nowego klienta) → pomijamy
-  // AUTO_REPLIED jest resetowany wyżej gdy nowy mail przychodzi od klienta
-  if (dbThread.status === 'REQUIRES_ATTENTION') return;
+  // Thread already requires human attention — don't overwrite
+  if (dbThread.status === 'REQUIRES_ATTENTION') return false;
 
-  // ── Generuj odpowiedź AI ────────────────────────────────────────────────────
-  console.log(`[Agent AI] Generuję odpowiedź AI dla: ${msg.subject} (od: ${msg.from})`);
+  // ── Generate AI reply ────────────────────────────────────────────────────────
+  console.log(`[Agent AI] 🤖 Generuję odpowiedź: "${msg.subject}" od ${msg.from}`);
 
   try {
     const { text } = await generateText({
-      model: googleAI('gemini-flash-latest'),
+      model:  googleAI('gemini-flash-latest'),
       system: buildSystemPrompt(settings),
-      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść:\n${msg.text.substring(0, 3000)}`
+      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść:\n${(msg.text || '').substring(0, 3000)}`,
     });
 
     const aiText = text.trim();
-    const upper = aiText.toUpperCase().slice(0, 60);
+    const upper  = aiText.toUpperCase().slice(0, 80);
 
-    // AI zdecydowała że to spam lub bot
     if (upper.includes('SPAM') || upper.includes('BOT') || upper.includes('IGNORE')) {
-      await prisma.thread.update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } });
-      console.log(`[Agent AI] 🗑️ AI: spam/bot → IGNORED`);
-      return;
+      await prisma.thread
+        .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
+        .catch(() => {});
+      console.log(`[Agent AI] 🗑️ Spam/bot wykryty przez AI → IGNORED`);
+      return false;
     }
 
-    // AI zdecydowała że wymaga ludzkiej uwagi
     if (upper.includes('REQUIRES_ATTENTION')) {
-      await prisma.thread.update({
-        where: { id: dbThread.id },
-        data: { status: 'REQUIRES_ATTENTION', draftReply: null }
-      });
-      console.log(`[Agent AI] ⚠️ AI: wymaga uwagi → REQUIRES_ATTENTION`);
-      return;
+      await prisma.thread
+        .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: null } })
+        .catch(() => {});
+      console.log(`[Agent AI] ⚠️ Wymaga uwagi → REQUIRES_ATTENTION`);
+      return false;
     }
 
-    // ── Wyślij auto-odpowiedź ──────────────────────────────────────────────────
-    const replyTo = msg.from.replace(/.*<(.+)>.*/, '$1').trim() || msg.from;
-    const referencesStr = (msg.references ? msg.references.join(' ') + ' ' : '') + messageId;
+    // ── Send the reply via SMTP ──────────────────────────────────────────────
+    const replyTo      = extractEmail(msg.from);
+    const referencesStr = [...(msg.references ?? []), messageId].join(' ');
 
     await sendReplySMTP(
       user.email!,
       settings.appPassword!,
       replyTo,
-      `Re: ${msg.subject}`,
+      msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
       aiText,
       messageId,
       referencesStr
     );
 
-    // Zaktualizuj wątek i licznik
-    await prisma.thread.update({
-      where: { id: dbThread.id },
-      data: { status: 'AUTO_REPLIED', draftReply: null }
-    });
+    // Mark thread as auto-replied and increment counter
+    await Promise.all([
+      prisma.thread.update({
+        where: { id: dbThread.id },
+        data: { status: 'AUTO_REPLIED', draftReply: null },
+      }),
+      prisma.userSettings.update({
+        where: { userId },
+        data: { emailsSentThisMonth: { increment: 1 } },
+      }),
+      // Save sent email record
+      prisma.email.create({
+        data: {
+          threadId:    dbThread.id,
+          messageId:   `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          from:        user.email ?? 'Agent AI',
+          to:          replyTo,
+          subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
+          snippet:     aiText.substring(0, 150),
+          body:        aiText,
+          receivedAt:  new Date(),
+          isFromAgent: true,
+        },
+      }),
+    ]);
 
-    await prisma.userSettings.update({
-      where: { userId },
-      data: { emailsSentThisMonth: { increment: 1 } }
-    });
-
-    // Zapisz wysłaną odpowiedź
-    await prisma.email.create({
-      data: {
-        threadId:    dbThread.id,
-        messageId:   `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        from:        user.email ?? 'Agent AI',
-        to:          replyTo,
-        subject:     `Re: ${msg.subject}`,
-        snippet:     aiText.substring(0, 150),
-        body:        aiText,
-        receivedAt:  new Date(),
-        isFromAgent: true
-      }
-    });
-
-    console.log(`[Agent AI] ✅ Wysłano odpowiedź → ${replyTo} (temat: ${msg.subject})`);
-
+    console.log(`[Agent AI] ✅ Wysłano → ${replyTo} | "${msg.subject}"`);
+    return true;
   } catch (aiErr: any) {
-    console.error(`[Agent AI] ❌ Błąd AI/SMTP:`, aiErr?.message ?? aiErr);
-    await prisma.thread.update({
-      where: { id: dbThread.id },
-      data: { draftReply: `[BŁĄD AI]: ${aiErr?.message ?? 'Nieznany błąd'}. Ponowna próba za chwilę.` }
-    }).catch(() => {});
+    const errMsg = aiErr?.message ?? 'Nieznany błąd';
+    console.error(`[Agent AI] ❌ Błąd AI/SMTP: ${errMsg}`);
+    await prisma.thread
+      .update({
+        where: { id: dbThread.id },
+        data: { draftReply: `[BŁĄD AI]: ${errMsg}. Ponowna próba za chwilę.` },
+      })
+      .catch(() => {});
+    return false;
   }
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
+
+function extractEmail(raw: string): string {
+  const match = raw.match(/<(.+?)>/);
+  return match ? match[1].trim() : raw.trim();
+}
+
 function buildSystemPrompt(settings: any): string {
   const tone = settings?.replyTone ?? 'PROFESJONALNY';
   const ctx  = settings?.businessContext ?? 'Firma dbająca o profesjonalną obsługę klienta.';
 
   const toneInstr =
     tone === 'CASUALOWY'
-      ? 'Pisz nieformalnie, mów "Cześć", nie używaj "Szanowny Panie".'
+      ? 'Pisz nieformalnie, zacznij od "Cześć", nie używaj "Szanowny Panie".'
       : tone === 'KROTKI'
-      ? 'Odpowiedź maksymalnie 2-3 zdania. Żadnych długich uprzejmości.'
+      ? 'Odpowiedź maksymalnie 2-3 zdania. Zero zbędnych uprzejmości.'
       : 'Pisz profesjonalnie i oficjalnie.';
 
-  return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7.
-Firma: "${ctx}"
-Ton: ${tone} — ${toneInstr}
+  return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 w imieniu firmy.
+Kontekst firmy: "${ctx}"
+Ton komunikacji: ${tone} — ${toneInstr}
 
-ZASADY (przestrzegaj ściśle):
-1. SPAM: Jeśli wiadomość to newsletter, reklama, cold mailing, oferta marketingowa, powiadomienie z portalu, automatyczne powiadomienie systemowe → odpowiedz TYLKO jednym słowem: SPAM
-2. KRYTYCZNE: Jeśli wiadomość jest pilna biznesowo, dotyczy zwrotów pieniędzy, spraw prawnych, gróźb, wymaga decyzji właściciela, negocjacji kontraktu → odpowiedz TYLKO: REQUIRES_ATTENTION
-3. Normalne zapytania od klientów/partnerów: napisz pełną odpowiedź w odpowiednim języku i tonie. Podpisz się jako asystent firmy (bez słowa "AI"). 
-4. Nie wymyślaj cenników, dat, faktów — jeśli nie wiesz, napisz REQUIRES_ATTENTION.
-5. Generuj WYŁĄCZNIE czystą treść maila. Zero meta-komentarzy, zero "Oto odpowiedź:".`;
+ZASADY (przestrzegaj ściśle i bez wyjątków):
+1. SPAM: Newsletter, reklama, cold mailing, oferta handlowa, automatyczne powiadomienie, promocja, powiadomienie z platformy → odpowiedz TYLKO jednym słowem: SPAM
+2. KRYTYCZNE: Pilna sprawa biznesowa, reklamacja/zwrot pieniędzy, sprawa prawna, groźba, negocjacja kontraktu, prośba o decyzję właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION
+3. Normalne zapytania klientów lub partnerów: napisz kompletną, pomocną odpowiedź. Podpisz się jako "Asystent [nazwa firmy]" — nigdy nie używaj słów "AI" ani "bot".
+4. Nie zmyślaj cen, dat, faktów. Jeśli nie masz danych → napisz REQUIRES_ATTENTION.
+5. Generuj WYŁĄCZNIE czystą treść wiadomości. Żadnych meta-komentarzy ani słów "Oto odpowiedź:".
+6. Odpowiadaj w tym samym języku co nadawca.`;
 }

@@ -105,15 +105,27 @@ export async function POST(req: Request) {
             || (subscription as any).items?.data?.[0]?.current_period_end
             || (Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
 
+          const newStatus = (subscription as any).status as string;
+          const isActive = newStatus === 'active' || newStatus === 'trialing';
+
           await prisma.user.update({
             where: { id: user.id },
             data: {
               stripeSubscriptionId: (subscription as any).id,
               stripePriceId: (subscription as any).items?.data?.[0]?.price?.id || "",
               stripeCurrentPeriodEnd: new Date(periodEndTs * 1000),
-              subscriptionStatus: (subscription as any).status,
+              subscriptionStatus: newStatus,
             },
           });
+
+          // If subscription becomes inactive (past_due, unpaid, paused) → stop the agent
+          if (!isActive) {
+            await prisma.userSettings.updateMany({
+              where: { userId: user.id },
+              data: { autoReply: false },
+            }).catch(() => {});
+            console.log(`[Stripe] Subskrypcja ${newStatus} dla userId=${user.id} → autoReply=false`);
+          }
         }
         break;
       }
