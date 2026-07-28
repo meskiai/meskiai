@@ -36,6 +36,38 @@ function getMonthlyLimit(stripePriceId: string | null): number {
   return 50; // Basic (default for any active subscription)
 }
 
+// ─── Fetch & strip company website content (for AI context) ────────────────────
+async function fetchWebsiteContent(url: string): Promise<string> {
+  try {
+    if (!url) return '';
+    const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(fullUrl, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MailAgent/1.0)' }
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return '';
+    const html = await res.text();
+    // Strip tags and collapse whitespace
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    // Return first 4000 chars — enough context, not too expensive for AI
+    return text.substring(0, 4000);
+  } catch {
+    return '';
+  }
+}
+
 // ─── Global guard (prevents overlapping runs in same container) ─────────────────
 const g = global as any;
 
@@ -169,6 +201,15 @@ async function processUser(user: any) {
     return;
   }
 
+  // Fetch company website content once per cycle (used by AI for context)
+  let websiteContent = '';
+  if (settings.companyWebsite) {
+    websiteContent = await fetchWebsiteContent(settings.companyWebsite);
+    if (websiteContent) {
+      console.log(`[Agent AI] ${user.email}: pobrano treść strony (${websiteContent.length} znaków).`);
+    }
+  }
+
   // Record last-run timestamp
   await prisma.userSettings
     .update({ where: { userId }, data: { lastAgentRunAt: new Date() } })
@@ -193,7 +234,7 @@ async function processUser(user: any) {
       break;
     }
 
-    const wasReplied = await processMessage({ userId, user, settings, msg }).catch(err => {
+    const wasReplied = await processMessage({ userId, user, settings, msg, websiteContent }).catch(err => {
       console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err?.message ?? err);
       return false;
     });
@@ -214,11 +255,13 @@ async function processMessage({
   user,
   settings,
   msg,
+  websiteContent = '',
 }: {
   userId: string;
   user: any;
   settings: any;
   msg: FetchedEmail;
+  websiteContent?: string;
 }): Promise<boolean> {
   const messageId = msg.messageId;
 
@@ -365,8 +408,8 @@ async function processMessage({
   try {
     const { text } = await generateText({
       model:  googleAI('gemini-flash-latest'),
-      system: buildSystemPrompt(settings),
-      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść:\n${(msg.text || '').substring(0, 3000)}`,
+      system: buildSystemPrompt(settings, websiteContent),
+      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść wiadomości:\n${(msg.text || '').substring(0, 3000)}`,
     });
 
     const aiText = text.trim();
@@ -491,7 +534,7 @@ function extractEmail(raw: string): string {
   return match ? match[1].trim() : raw.trim();
 }
 
-function buildSystemPrompt(settings: any): string {
+function buildSystemPrompt(settings: any, websiteContent = ''): string {
   const tone = settings?.replyTone ?? 'PROFESJONALNY';
   const ctx  = settings?.businessContext ?? 'Firma dbająca o profesjonalną obsługę klienta.';
 
@@ -502,25 +545,30 @@ function buildSystemPrompt(settings: any): string {
       ? 'Odpowiedź maksymalnie 2-3 zdania. Zero zbędnych uprzejmości.'
       : 'Pisz profesjonalnie i oficjalnie.';
 
+  const websiteSection = websiteContent
+    ? `\n\n─── TREŚĆ STRONY FIRMOWEJ (źródło prawdy o ofercie, cenach, godzinach itp.) ───\n${websiteContent}\n────────────────────────────────────────────────────────────────────────────────`
+    : '';
+
   return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 jak doświadczony pracownik biurowy.
-Kontekst firmy: "${ctx}"
+Kontekst firmy: "${ctx}"${websiteSection}
 Ton komunikacji: ${tone} — ${toneInstr}
 
-ANALIZUJ każdy e-mail i wybierz jedną z trzech ścieżek:
+ANALIZUJ każdy e-mail i wybierz JEDNĄ z trzech ścieżek:
 
 ═══ ŚCIEŻKA 1 — SPAM (odrzuć bez śladu) ═══
 Kiedy: newsletter, reklama, cold mailing, oferta handlowa, automatyczne powiadomienie systemowe, promocja, niepożądana oferta.
 Format odpowiedzi: napisz TYLKO jedno słowo: SPAM
 
 ═══ ŚCIEŻKA 2 — WAŻNA SPRAWA (poinformuj klienta + przekaż właścicielowi) ═══
-Kiedy: reklamacja wymagająca decyzji, sprawa prawna lub finansowa, prośba o zwrot pieniędzy, negocjacja kontraktu, groźba, poważna skarga, pilna sprawa wymagająca decyzji zarządu, zamówienie na dużą kwotę wymagające potwierdzenia.
-Format odpowiedzi: napisz dokładnie w tym układzie (zachowaj separator):
+Kiedy: reklamacja wymagająca decyzji zarządu, sprawa prawna lub finansowa powyżej kompetencji pracownika, prośba o zwrot/rekompensatę, negocjacja kontraktu, groźba, POWAŻNA skarga, zamówienie niestandardowe. UWAGA: użyj tej ścieżki TYLKO gdy naprawdę nie możesz samodzielnie odpowiedzieć na podstawie dostępnych informacji.
+Format odpowiedzi — napisz DOKŁADNIE w tym układzie (zachowaj separator ---):
 REQUIRES_ATTENTION
 ---
-[tutaj wpisz uprzejme potwierdzenie dla klienta — napisz że jego wiadomość została przyjęta i przekazana do właściciela/zarządu, że wrócimy do niego jak najszybciej. Używaj tonu: ${tone}. Podpisz się jako Asystent firmy.]
+[uprzejme potwierdzenie dla klienta: poinformuj że wiadomość została przyjęta i przekazana do właściciela/zarządu, że wrócimy tak szybko jak to możliwe. Ton: ${tone}. Podpis: Asystent firmy.]
 
-═══ ŚCIEŻKA 3 — NORMALNA ODPOWIEDŹ (obsłuż samodzielnie) ═══
-Kiedy: pytanie o produkt/usługę, prośba o informacje, ogólne zapytanie, wiadomość którą możesz w pełni i kompetentnie obsłużyć.
-Format odpowiedzi: napisz kompletną treść odpowiedzi e-mail.
-ZASADY: Podpisz się jako "Asystent [nazwa firmy]". Nie używaj słów "AI", "bot", "sztuczna inteligencja". Nie zmyślaj cen, dat, faktów — jeśli brakuje Ci danych, użyj ŚCIEŻKI 2. Odpowiadaj w tym samym języku co nadawca. Generuj WYŁĄCZNIE czystą treść maila.`;
+═══ ŚCIEŻKA 3 — SAMODZIELNA ODPOWIEDŹ ═══
+Kiedy: pytanie o produkt/usługę/cennik/godziny/lokalizację/ofertę którą możesz znaleźć na stronie lub w kontekście, ogólne zapytanie, standardowe pytanie klienta.
+PRZED podjęciem decyzji o eskalacji: SPRAWDŹ czy odpowiedź nie znajduje się w treści strony firmowej powyżej.
+Format odpowiedzi: napisz kompletną treść e-maila.
+ZASADY: Podpisz się jako "Asystent [nazwa firmy]". NIE używaj słów "AI", "bot", "sztuczna inteligencja". Odpowiadaj w tym samym języku co nadawca. WYŁĄCZNIE czysta treść maila — zero meta-komentarzy, zero "Oto odpowiedź:". Jeśli czegoś naprawdę nie wiesz i nie ma tego na stronie → użyj Ścieżki 2.`;
 }
