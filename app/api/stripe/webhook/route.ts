@@ -120,7 +120,7 @@ export async function POST(req: Request) {
 
           // If subscription becomes inactive (past_due, unpaid, paused) → stop the agent
           if (!isActive) {
-            await prisma.userSettings.updateMany({
+            await prisma.userSettings.update({
               where: { userId: user.id },
               data: { autoReply: false },
             }).catch(() => {});
@@ -144,7 +144,7 @@ export async function POST(req: Request) {
             data: { subscriptionStatus: "canceled" },
           });
           // Turn off auto-reply when subscription expires
-          await prisma.userSettings.updateMany({
+          await prisma.userSettings.update({
             where: { userId: user.id },
             data:  { autoReply: false },
           });
