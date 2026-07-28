@@ -2270,7 +2270,11 @@ export default function Dashboard() {
                         className={`animate-fade-in ${styles.threadItem} ${selectedThread?.id === thread.id ? styles.selected : ''}`}
                         onClick={() => {
                           setSelectedThread(thread);
-                          setEditedReply(thread.draftReply || "");
+                          if (thread.status === 'REQUIRES_ATTENTION') {
+                            setEditedReply("");
+                          } else {
+                            setEditedReply(thread.draftReply || "");
+                          }
                         }}
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
@@ -2371,6 +2375,18 @@ export default function Dashboard() {
                           Generuj ponownie
                         </button>
                       </div>
+
+                      {selectedThread.status === 'REQUIRES_ATTENTION' && selectedThread.draftReply && (
+                        <div style={{ padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem', color: 'var(--foreground)' }}>
+                          <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', marginBottom: '8px', fontWeight: 600 }}>
+                            <AlertTriangle size={16} /> Analiza Agenta (Nie zostanie wysłana do klienta)
+                          </h4>
+                          <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                            {selectedThread.draftReply}
+                          </div>
+                        </div>
+                      )}
+
                       <textarea 
                         className={styles.textarea}
                         value={editedReply}
