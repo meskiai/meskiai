@@ -1825,31 +1825,54 @@ export default function Dashboard() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
                       
                       {/* Competitors Table/Cards */}
-                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', flex: 2 }}>
-                        <div style={{ fontSize: '0.95rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', fontWeight: 600 }}>Mapa Rynku</div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 24px 0' }}>Główni Konkurenci</h3>
+                      <div className="glass" style={{ padding: '32px', flex: 2, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontWeight: 600 }}>Mapa Rynku</div>
+                        <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 24px 0', letterSpacing: '-0.02em' }}>Główni Konkurenci</h3>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                           {strategyResults.competitors?.map((comp: any, i: number) => (
-                            <div key={i} style={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', transition: 'all 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(120,120,128,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--foreground)' }}>
+                            <div 
+                              key={i} 
+                              className="apple-competitor-card"
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(10, 132, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
                                     <Target size={20} />
                                   </div>
                                   <div>
-                                    <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--foreground)' }}>{comp.name}</div>
-                                    <a href={comp.url?.startsWith('http') ? comp.url : `https://${comp.url}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--primary)', textDecoration: 'none' }}>{comp.url}</a>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', letterSpacing: '-0.01em' }}>{comp.name}</div>
+                                    <a 
+                                      href={comp.url?.startsWith('http') ? comp.url : `https://${comp.url}`} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      style={{ fontSize: '0.85rem', color: 'var(--subtext)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', transition: 'color 0.2s' }}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--subtext)'}
+                                    >
+                                      {comp.url} <ArrowUpRight size={14} />
+                                    </a>
                                   </div>
                                 </div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textAlign: 'right' }}>
-                                  <div>Szacowany Ruch</div>
-                                  <div style={{ fontWeight: 600, color: 'var(--foreground)' }}>{comp.trafficEstimate}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(120, 120, 128, 0.08)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem' }}>
+                                  <Activity size={14} style={{ color: 'var(--subtext)' }} />
+                                  <span style={{ color: 'var(--subtext)' }}>Ruch:</span>
+                                  <strong style={{ color: 'var(--foreground)', fontWeight: 600 }}>{comp.trafficEstimate}</strong>
                                 </div>
                               </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                                <div><span style={{ color: 'var(--subtext)' }}>Przewaga:</span> <span style={{ color: 'var(--foreground)' }}>{comp.mainAdvantage}</span></div>
-                                <div><span style={{ color: 'var(--subtext)' }}>Ich luka:</span> <span style={{ color: '#007aff', fontWeight: 500 }}>{comp.strategyGap}</span></div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.95rem', borderTop: '1px solid rgba(120, 120, 128, 0.1)', paddingTop: '14px' }}>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <span style={{ color: 'var(--subtext)', flexShrink: 0, width: '75px' }}>Przewaga:</span>
+                                  <span style={{ color: 'var(--foreground)' }}>{comp.mainAdvantage}</span>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <span style={{ color: 'var(--subtext)', flexShrink: 0, width: '75px' }}>Luka:</span>
+                                  <span style={{ color: 'var(--foreground)', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                    <Sparkles size={14} style={{ color: '#ff9500' }} />
+                                    {comp.strategyGap}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           ))}
