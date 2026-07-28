@@ -7,11 +7,13 @@ async function triggerBackgroundSync() {
   const cronSecret = process.env.CRON_SECRET || '';
   
   try {
-    // Non-blocking trigger to background function
-    fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+    // Await the fetch so the request is actually sent before Lambda suspends.
+    // Netlify Background Functions return 202 Accepted instantly, so this will NOT time out.
+    const res = await fetch(`${siteUrl}/.netlify/functions/sync-background`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${cronSecret}` }
-    }).catch((e) => console.error("Background trigger failed:", e));
+    });
+    console.log(`[Cron] Background trigger response status: ${res.status}`);
   } catch (err) {
     console.error("Fetch throw:", err);
   }
