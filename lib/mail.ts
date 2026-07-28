@@ -1,6 +1,9 @@
 import { simpleParser } from 'mailparser';
 import nodemailer from 'nodemailer';
 import Pop3Command from 'node-pop3';
+// @ts-ignore
+import * as pdfParseModule from 'pdf-parse';
+const pdfParse = pdfParseModule.default || pdfParseModule;
 
 export interface FetchedEmail {
   pop3Uid: string;
@@ -91,6 +94,26 @@ export async function fetchUnreadEmailsPOP3(
         let references = parsed.references;
         if (typeof references === 'string') references = [references];
 
+        // ── KRYTYCZNE: Obsługa załączników PDF (dla umów/faktur) ──
+        let attachmentText = '';
+        if (parsed.attachments && parsed.attachments.length > 0) {
+          for (const att of parsed.attachments) {
+            if (att.contentType === 'application/pdf' && att.content) {
+              try {
+                const pdfData = await pdfParse(att.content);
+                const pdfStr = pdfData.text.replace(/\s+/g, ' ').trim();
+                if (pdfStr) {
+                  attachmentText += `\n\n--- ZAŁĄCZNIK PDF: ${att.filename || 'dokument.pdf'} ---\n${pdfStr.substring(0, 4000)}`;
+                }
+              } catch (pdfErr: any) {
+                console.error(`[Agent AI] Błąd parsowania PDF ${att.filename}:`, pdfErr.message);
+              }
+            }
+          }
+        }
+
+        const finalText = (parsed.text || '') + attachmentText;
+
         fetchedEmails.push({
           pop3Uid: uid,
           messageId,
@@ -99,7 +122,7 @@ export async function fetchUnreadEmailsPOP3(
           from: fromAddr,
           to: toAddr,
           subject: parsed.subject || '(Brak tematu)',
-          text: parsed.text || '',
+          text: finalText,
           date: parsed.date || new Date()
         });
       } catch (err: any) {

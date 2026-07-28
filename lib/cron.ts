@@ -426,9 +426,18 @@ async function processMessage({
 
     // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
     if (upper.startsWith('REQUIRES_ATTENTION')) {
-      // Format: "REQUIRES_ATTENTION\n---\n[treść potwierdzenia dla klienta]"
+      // Format: "REQUIRES_ATTENTION\n---\n[Analiza dla właściciela]\n---\n[Treść potwierdzenia dla klienta]"
       const parts = aiText.split(/\n---\n/s);
-      const ackText = parts[1]?.trim();
+      let analysisText = '';
+      let ackText = '';
+      
+      if (parts.length >= 3) {
+        analysisText = parts[1]?.trim();
+        ackText = parts[2]?.trim();
+      } else {
+        // Fallback for older format
+        ackText = parts[1]?.trim() || '';
+      }
 
       // Jeśli AI wygenerowała tekst potwierdzenia → wyślij go do klienta
       if (ackText && ackText.length > 10) {
@@ -464,9 +473,14 @@ async function processMessage({
         }
       }
 
-      // Wątek idzie do zakładki Ważne (admin musi podjąć decyzję)
+      // Wątek idzie do zakładki Ważne (admin musi podjąć decyzję).
+      // Zapisujemy analizę i treść potwierdzenia w draftReply żeby właściciel to przeczytał
+      const draftContent = analysisText 
+        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[WYSŁANE POTWIERDZENIE]:\n${ackText || '(brak)'}`
+        : ackText || null;
+
       await prisma.thread
-        .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: ackText || null } })
+        .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: draftContent } })
         .catch(() => {});
       console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${!!ackText})`);
       return false;
@@ -559,12 +573,15 @@ ANALIZUJ każdy e-mail i wybierz JEDNĄ z trzech ścieżek:
 Kiedy: newsletter, reklama, cold mailing, oferta handlowa, automatyczne powiadomienie systemowe, promocja, niepożądana oferta.
 Format odpowiedzi: napisz TYLKO jedno słowo: SPAM
 
-═══ ŚCIEŻKA 2 — WAŻNA SPRAWA (poinformuj klienta + przekaż właścicielowi) ═══
-Kiedy: reklamacja wymagająca decyzji zarządu, sprawa prawna lub finansowa powyżej kompetencji pracownika, prośba o zwrot/rekompensatę, negocjacja kontraktu, groźba, POWAŻNA skarga, zamówienie niestandardowe. UWAGA: użyj tej ścieżki TYLKO gdy naprawdę nie możesz samodzielnie odpowiedzieć na podstawie dostępnych informacji.
-Format odpowiedzi — napisz DOKŁADNIE w tym układzie (zachowaj separator ---):
+═══ ŚCIEŻKA 2 — WAŻNA SPRAWA / DOKUMENTY (poinformuj klienta + przeanalizuj dla właściciela) ═══
+Kiedy: wiadomość zawiera ZAŁĄCZNIK PDF (umowa, faktura, CV), jest to reklamacja wymagająca decyzji zarządu, sprawa prawna, prośba o zwrot/rekompensatę, negocjacja kontraktu, groźba, POWAŻNA skarga, zamówienie niestandardowe.
+UWAGA: jeśli w wiadomości jest załącznik PDF (wskazuje na to tekst "--- ZAŁĄCZNIK PDF: ... ---"), ZAWSZE użyj tej ścieżki i przeanalizuj dokument!
+Format odpowiedzi — napisz DOKŁADNIE w tym układzie (zachowaj podwójny separator ---):
 REQUIRES_ATTENTION
 ---
-[uprzejme potwierdzenie dla klienta: poinformuj że wiadomość została przyjęta i przekazana do właściciela/zarządu, że wrócimy tak szybko jak to możliwe. Ton: ${tone}. Podpis: Asystent firmy.]
+[ANALIZA: krótko i zwięźle napisz do właściciela firmy o co chodzi. Przeanalizuj treść maila oraz treść załącznika PDF (jeśli jest). Wypisz najważniejsze punkty dokumentu, kwoty, daty, strony umowy.]
+---
+[POTWIERDZENIE DLA KLIENTA: uprzejme potwierdzenie dla klienta, że wiadomość wraz z dokumentacją została przyjęta i przekazana do właściciela/zarządu, że wrócimy tak szybko jak to możliwe. Ton: ${tone}. Podpis: Asystent firmy.]
 
 ═══ ŚCIEŻKA 3 — SAMODZIELNA ODPOWIEDŹ ═══
 Kiedy: pytanie o produkt/usługę/cennik/godziny/lokalizację/ofertę którą możesz znaleźć na stronie lub w kontekście, ogólne zapytanie, standardowe pytanie klienta.
