@@ -15,9 +15,8 @@ Twoim zadaniem jest wygenerowanie profesjonalnej, uprzejmej i gotowej do wysłan
 Zachowaj oficjalny, lecz przyjazny ton (w języku polskim). 
 Jeśli e-mail jest skargą, bądź empatyczny. Jeśli to zapytanie, udziel wyczerpującej (lub wymijającej, z obietnicą kontaktu) odpowiedzi. 
 Odpowiadaj bezpośrednio treścią e-maila, bez żadnych wstępów w stylu "Oto moja propozycja".`;
-
     const result = await streamText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-flash-latest'),
       system: systemPrompt,
       prompt: `Oto treść wiadomości e-mail od klienta:\n\n"${prompt}"\n\nNapisz na nią odpowiedź:`,
     });
