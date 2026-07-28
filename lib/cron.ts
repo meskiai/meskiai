@@ -372,7 +372,8 @@ async function processMessage({
     const aiText = text.trim();
     const upper  = aiText.toUpperCase().slice(0, 80);
 
-    if (upper.includes('SPAM') || upper.includes('BOT') || upper.includes('IGNORE')) {
+    // ── SPAM / BOT ───────────────────────────────────────────────────────────
+    if (upper.startsWith('SPAM') || upper.startsWith('BOT') || upper.startsWith('IGNORE')) {
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
         .catch(() => {});
@@ -380,11 +381,51 @@ async function processMessage({
       return false;
     }
 
-    if (upper.includes('REQUIRES_ATTENTION')) {
+    // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
+    if (upper.startsWith('REQUIRES_ATTENTION')) {
+      // Format: "REQUIRES_ATTENTION\n---\n[treść potwierdzenia dla klienta]"
+      const parts = aiText.split(/\n---\n/s);
+      const ackText = parts[1]?.trim();
+
+      // Jeśli AI wygenerowała tekst potwierdzenia → wyślij go do klienta
+      if (ackText && ackText.length > 10) {
+        const replyTo = extractEmail(msg.from);
+        const referencesStr = [...(msg.references ?? []), messageId].join(' ');
+        try {
+          await sendReplySMTP(
+            user.email!,
+            settings.appPassword!,
+            replyTo,
+            msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
+            ackText,
+            messageId,
+            referencesStr
+          );
+          // Zapisz wysłane potwierdzenie w bazie
+          await prisma.email.create({
+            data: {
+              threadId:    dbThread.id,
+              messageId:   `ack-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              from:        user.email ?? 'Agent AI',
+              to:          replyTo,
+              subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
+              snippet:     ackText.substring(0, 150),
+              body:        ackText,
+              receivedAt:  new Date(),
+              isFromAgent: true
+            }
+          }).catch(() => {});
+          console.log(`[Agent AI] ✉️ Wysłano potwierdzenie do klienta → ${replyTo}`);
+        } catch (smtpErr: any) {
+          console.error(`[Agent AI] Błąd SMTP przy wysyłaniu potwierdzenia:`, smtpErr?.message);
+        }
+      }
+
+      // Wątek idzie do zakładki Ważne (admin musi podjąć decyzję)
       await prisma.thread
-        .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: null } })
+        .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: ackText || null } })
         .catch(() => {});
-      console.log(`[Agent AI] ⚠️ Wymaga uwagi → REQUIRES_ATTENTION`);
+      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${!!ackText})`);
       return false;
     }
 
@@ -461,15 +502,25 @@ function buildSystemPrompt(settings: any): string {
       ? 'Odpowiedź maksymalnie 2-3 zdania. Zero zbędnych uprzejmości.'
       : 'Pisz profesjonalnie i oficjalnie.';
 
-  return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 w imieniu firmy.
+  return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 jak doświadczony pracownik biurowy.
 Kontekst firmy: "${ctx}"
 Ton komunikacji: ${tone} — ${toneInstr}
 
-ZASADY (przestrzegaj ściśle i bez wyjątków):
-1. SPAM: Newsletter, reklama, cold mailing, oferta handlowa, automatyczne powiadomienie, promocja, powiadomienie z platformy → odpowiedz TYLKO jednym słowem: SPAM
-2. KRYTYCZNE: Pilna sprawa biznesowa, reklamacja/zwrot pieniędzy, sprawa prawna, groźba, negocjacja kontraktu, prośba o decyzję właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION
-3. Normalne zapytania klientów lub partnerów: napisz kompletną, pomocną odpowiedź. Podpisz się jako "Asystent [nazwa firmy]" — nigdy nie używaj słów "AI" ani "bot".
-4. Nie zmyślaj cen, dat, faktów. Jeśli nie masz danych → napisz REQUIRES_ATTENTION.
-5. Generuj WYŁĄCZNIE czystą treść wiadomości. Żadnych meta-komentarzy ani słów "Oto odpowiedź:".
-6. Odpowiadaj w tym samym języku co nadawca.`;
+ANALIZUJ każdy e-mail i wybierz jedną z trzech ścieżek:
+
+═══ ŚCIEŻKA 1 — SPAM (odrzuć bez śladu) ═══
+Kiedy: newsletter, reklama, cold mailing, oferta handlowa, automatyczne powiadomienie systemowe, promocja, niepożądana oferta.
+Format odpowiedzi: napisz TYLKO jedno słowo: SPAM
+
+═══ ŚCIEŻKA 2 — WAŻNA SPRAWA (poinformuj klienta + przekaż właścicielowi) ═══
+Kiedy: reklamacja wymagająca decyzji, sprawa prawna lub finansowa, prośba o zwrot pieniędzy, negocjacja kontraktu, groźba, poważna skarga, pilna sprawa wymagająca decyzji zarządu, zamówienie na dużą kwotę wymagające potwierdzenia.
+Format odpowiedzi: napisz dokładnie w tym układzie (zachowaj separator):
+REQUIRES_ATTENTION
+---
+[tutaj wpisz uprzejme potwierdzenie dla klienta — napisz że jego wiadomość została przyjęta i przekazana do właściciela/zarządu, że wrócimy do niego jak najszybciej. Używaj tonu: ${tone}. Podpisz się jako Asystent firmy.]
+
+═══ ŚCIEŻKA 3 — NORMALNA ODPOWIEDŹ (obsłuż samodzielnie) ═══
+Kiedy: pytanie o produkt/usługę, prośba o informacje, ogólne zapytanie, wiadomość którą możesz w pełni i kompetentnie obsłużyć.
+Format odpowiedzi: napisz kompletną treść odpowiedzi e-mail.
+ZASADY: Podpisz się jako "Asystent [nazwa firmy]". Nie używaj słów "AI", "bot", "sztuczna inteligencja". Nie zmyślaj cen, dat, faktów — jeśli brakuje Ci danych, użyj ŚCIEŻKI 2. Odpowiadaj w tym samym języku co nadawca. Generuj WYŁĄCZNIE czystą treść maila.`;
 }
