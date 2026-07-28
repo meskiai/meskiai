@@ -31,7 +31,7 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
 function getMonthlyLimit(stripePriceId: string | null): number {
   const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
   const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-  if (stripePriceId === PRICE_MAX) return 5000;
+  if (stripePriceId === PRICE_MAX) return Infinity;
   if (stripePriceId === PRICE_PRO) return 1000;
   return 50; // Basic (default for any active subscription)
 }
@@ -390,7 +390,13 @@ async function processMessage({
       })
       .catch(async (err: any) => {
         if (err.code === 'P2002' || err.code === '23505') {
-          console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — pomijam.`);
+          console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — aktualizuję pop3Uid.`);
+          if (msg.pop3Uid) {
+            await prisma.email.update({
+              where: { messageId },
+              data: { pop3Uid: msg.pop3Uid }
+            }).catch(() => {});
+          }
           return null;
         }
         throw err;
