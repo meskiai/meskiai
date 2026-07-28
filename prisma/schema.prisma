@@ -82,8 +82,9 @@ model UserSettings {
   leadSearchesThisMonth       Int      @default(0)
 
   // Agent 24/7 tracking
-  lastAgentRunAt     DateTime?
-  agentEmailsProcessed Int     @default(0)
+  lastAgentRunAt       DateTime?
+  agentEmailsProcessed Int      @default(0)
+  lastMonthlyReset     DateTime?
 
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
