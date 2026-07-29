@@ -1035,35 +1035,53 @@ export default function Dashboard() {
   return (
     <>
       {showUpgradeReminder && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="animate-fade-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', padding: '40px', borderRadius: '24px', maxWidth: '500px', width: '90%', textAlign: 'center', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', position: 'relative' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in" style={{ 
+            background: 'rgba(25, 25, 30, 0.75)', 
+            border: '1px solid rgba(255, 255, 255, 0.12)', 
+            padding: '48px 40px', 
+            borderRadius: '28px', 
+            maxWidth: '460px', 
+            width: '90%', 
+            textAlign: 'center', 
+            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)', 
+            backdropFilter: 'blur(50px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(50px) saturate(190%)',
+            position: 'relative' 
+          }}>
             <button 
               onClick={() => setShowUpgradeReminder(false)} 
-              style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', padding: '8px' }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
             >
-              <X size={24} />
+              <X size={18} />
             </button>
-            <div style={{ width: '64px', height: '64px', background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white' }}>
-              <Zap size={32} />
+            <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #a855f7, #6366f1)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(168, 85, 247, 0.3)' }}>
+              <Zap size={30} style={{ filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
             </div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)' }}>Odblokuj Pełen Potencjał</h2>
-            <p style={{ color: 'var(--subtext)', fontSize: '1.05rem', lineHeight: 1.5, marginBottom: '32px' }}>
-              Pamiętaj, że wyższe pakiety dają Ci znacznie więcej <strong>kredytów, możliwości zmiany tonu agenta i więcej generowanych leadów B2B</strong>. Przejdź na wyższy plan i zdominuj swój rynek!
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '32px' }}>
+              Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać **większe limity wysyłki e-maili, dodatkowe analizy klientów (leadów) B2B oraz zaawansowane analizy strategiczne**.
             </p>
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setShowUpgradeReminder(false)} 
-                className="btn btn-secondary" 
-                style={{ padding: '12px 24px', fontWeight: 600 }}
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
               >
-                Przypomnij później
+                Później
               </button>
               <button 
                 onClick={() => { setShowUpgradeReminder(false); window.location.href = '/#cennik'; }} 
-                className="btn btn-primary" 
-                style={{ padding: '12px 24px', fontWeight: 600, background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', border: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 600, fontSize: '0.85rem', background: 'linear-gradient(135deg, #a855f7, #6366f1)', border: 'none', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(168, 85, 247, 0.25)', transition: 'transform 0.2s, opacity 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
               >
-                Sprawdź Pakiety <ArrowRight size={18} />
+                Sprawdź Pakiety <ArrowRight size={16} />
               </button>
             </div>
           </div>
