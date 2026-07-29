@@ -354,18 +354,59 @@ async function processMessage({
       if (refs.length) dbThreadId = refs[0].threadId;
     }
 
+    // Subject-based fallback: some email clients strip In-Reply-To/References headers.
+    // Try to match by normalised subject (strip Re:/Odp:/Fwd:) to catch these edge cases.
+    if (!dbThreadId) {
+      const normaliseSubject = (s: string) =>
+        s.replace(/^(re|odp|fwd|fw|aw|vs|sv):\s*/gi, '').trim().toLowerCase();
+      const normalised = normaliseSubject(msg.subject);
+      if (normalised.length > 4) {
+        // Fetch threads for this user that have emails with a matching subject
+        const candidates = await prisma.email.findMany({
+          where: {
+            thread: { userId },
+            subject: { contains: normalised, mode: 'insensitive' },
+          },
+          select: { threadId: true },
+          orderBy: { receivedAt: 'desc' },
+          take: 1,
+        }).catch(() => []);
+        if (candidates.length) {
+          dbThreadId = candidates[0].threadId;
+          console.log(`[Agent AI] 🔍 Dopasowano wątek po temacie: "${msg.subject}" → threadId=${dbThreadId}`);
+        }
+      }
+    }
+
     if (dbThreadId) {
-      // Existing thread — reset AUTO_REPLIED so we can respond again to a continued conversation
+      // Existing thread — figure out the right status for the incoming reply
       const existingThread = await prisma.thread
         .findUnique({ where: { id: dbThreadId } })
         .catch(() => null);
-      const newStatus =
-        existingThread?.status === 'REQUIRES_ATTENTION'
-          ? 'REQUIRES_ATTENTION' // keep — human must handle
-          : 'PENDING_APPROVAL';
+
+      // KEY LOGIC: when a person replies to an agent auto-reply (AUTO_REPLIED)
+      // or continues a REPLIED thread, this conversation is now human-driven
+      // and MUST be shown in the "Ważne" (REQUIRES_ATTENTION) tab.
+      // Only already-REQUIRES_ATTENTION stays as-is (already escalated).
+      // IGNORED threads get re-activated to REQUIRES_ATTENTION (person returned).
+      let newStatus: string;
+      if (existingThread?.status === 'REQUIRES_ATTENTION') {
+        newStatus = 'REQUIRES_ATTENTION'; // already escalated — keep
+      } else if (
+        existingThread?.status === 'AUTO_REPLIED' ||
+        existingThread?.status === 'REPLIED'
+      ) {
+        // Person replied back to our auto-reply — escalate to Important!
+        newStatus = 'REQUIRES_ATTENTION';
+        console.log(`[Agent AI] 🔔 Klient odpowiedział na maila agenta w wątku ${dbThreadId} → REQUIRES_ATTENTION`);
+      } else {
+        // PENDING_APPROVAL or anything else — keep in inbox for review
+        newStatus = 'PENDING_APPROVAL';
+      }
+
       dbThread = await prisma.thread.update({
         where: { id: dbThreadId },
-        data: { status: newStatus, draftReply: null },
+        data: { status: newStatus as any, draftReply: null, updatedAt: new Date() },
       });
     } else {
       // Brand-new thread
