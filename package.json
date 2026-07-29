@@ -13,6 +13,7 @@
     "@ai-sdk/google": "^4.0.14",
     "@ai-sdk/react": "^4.0.32",
     "@auth/prisma-adapter": "^2.11.2",
+    "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.1.0",
     "@netlify/functions": "^5.3.0",
     "@next-auth/prisma-adapter": "^1.0.7",
