@@ -1531,10 +1531,13 @@ export default function Dashboard() {
 
                     const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
                     const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
+                    const leadsUsed:    number = subscriptionData?.leadSearchesThisMonth ?? 0;
                     const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
                     const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 0;
+                    const leadsLimit   = isBasic ? 20  : isPro ? 200  : isMax ? Infinity : 0;
                     const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
                     const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
+                    const leadsPct     = isUnlimited ? 0 : Math.min(100, Math.round((leadsUsed    / (leadsLimit   || 1)) * 100));
                     const limitFmt     = (n: number) => n === Infinity ? "∞" : n.toLocaleString("pl-PL");
                     const barColor     = (pct: number) => pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#22c55e";
 
@@ -1575,6 +1578,21 @@ export default function Dashboard() {
                             {!isUnlimited && (
                               <div className={styles.limitBar}>
                                 <div className={styles.limitBarFill} style={{ width: `${searchPct}%`, background: `linear-gradient(90deg, ${barColor(searchPct)}, ${barColor(searchPct)}cc)` }} />
+                              </div>
+                            )}
+                          </div>
+                          {/* Leads limit */}
+                          <div className={styles.limitItem}>
+                            <div className={styles.limitItemHeader}>
+                              <Users size={16} style={{ color: "#a855f7", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>Analizy Klientów (Leady)</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : leadsPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${leadsUsed} / ${limitFmt(leadsLimit)}`}
+                              </span>
+                            </div>
+                            {!isUnlimited && (
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${leadsPct}%`, background: `linear-gradient(90deg, ${barColor(leadsPct)}, ${barColor(leadsPct)}cc)` }} />
                               </div>
                             )}
                           </div>

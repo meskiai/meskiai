@@ -955,7 +955,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 /* ── Limits section ─────────────────────────────────── */
 .limitsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: clamp(16px, 2vw, 24px);
   padding: clamp(16px, 2.5vw, 24px) clamp(16px, 2.5vw, 24px);
 }

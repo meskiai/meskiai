@@ -72,6 +72,17 @@ export async function GET(req: Request) {
       include: { settings: true }
     });
 
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const leadSearchesThisMonth = await prisma.lead.count({
+      where: {
+        userId: session.user.id,
+        createdAt: { gte: startOfMonth }
+      }
+    });
+
     const settings = {
       ...(user?.settings || { autoReply: false }),
       hasAppPassword: !!user?.settings?.appPassword
@@ -83,6 +94,7 @@ export async function GET(req: Request) {
       // Usage counters for limits display
       emailsSentThisMonth: user?.settings?.emailsSentThisMonth ?? 0,
       competitorSearchesThisMonth: user?.settings?.competitorSearchesThisMonth ?? 0,
+      leadSearchesThisMonth,
       // Agent 24/7 status
       lastAgentRunAt: user?.settings?.lastAgentRunAt ?? null,
       agentEmailsProcessed: user?.settings?.agentEmailsProcessed ?? 0,
