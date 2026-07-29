@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     google: "8vBRb58Hy261nwNRfWy_qTdnez3reAy6dGjoMhfUGqU",
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.png?v=2",
+    apple: "/logo.png?v=2",
   },
   openGraph: {
     title: "meskiai",
