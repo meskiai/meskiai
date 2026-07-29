@@ -347,13 +347,16 @@ export default function Dashboard() {
         const data = await res.json();
         setThreads(data.threads || []);
         
-        // Scan for unreplied important threads overdue by more than 2 hours
+        // Scan for unreplied important threads overdue by more than 2 hours (checking if alert is currently snoozed)
+        const snoozedUntil = localStorage.getItem('overdueAlertSnoozedUntil');
+        const isSnoozed = snoozedUntil ? Date.now() < parseInt(snoozedUntil, 10) : false;
+
         const overdue = (data.threads || []).some((t: any) => 
           t.status === "REQUIRES_ATTENTION" &&
           !(t.emails || []).some((e: any) => e.isFromAgent) &&
           (Date.now() - new Date(t.updatedAt).getTime()) > 2 * 60 * 60 * 1000
         );
-        setShowOverdueImportantAlert(overdue);
+        setShowOverdueImportantAlert(overdue && !isSnoozed);
       }
     } catch (e) {
       console.error(e);
@@ -1321,6 +1324,16 @@ export default function Dashboard() {
                 }}
               >
                 Przejdź do Ważne
+              </button>
+              <button 
+                className="btn" 
+                style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(120, 120, 128, 0.15)', color: 'var(--foreground)', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }} 
+                onClick={() => {
+                  localStorage.setItem('overdueAlertSnoozedUntil', (Date.now() + 4 * 60 * 60 * 1000).toString());
+                  setShowOverdueImportantAlert(false);
+                }}
+              >
+                Przypomnij mi później
               </button>
               <button 
                 style={{ background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
