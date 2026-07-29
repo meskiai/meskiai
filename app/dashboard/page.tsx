@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [guideIndex, setGuideIndex] = useState(0);
 
   const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "STRATEGY" | "ACCOUNT">("INBOX");
+  const [showOverdueImportantAlert, setShowOverdueImportantAlert] = useState(false);
   const [businessContext, setBusinessContext] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [companyNip, setCompanyNip] = useState("");
@@ -345,6 +346,14 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setThreads(data.threads || []);
+        
+        // Scan for unreplied important threads overdue by more than 2 hours
+        const overdue = (data.threads || []).some((t: any) => 
+          t.status === "REQUIRES_ATTENTION" &&
+          !(t.emails || []).some((e: any) => e.isFromAgent) &&
+          (Date.now() - new Date(t.updatedAt).getTime()) > 2 * 60 * 60 * 1000
+        );
+        setShowOverdueImportantAlert(overdue);
       }
     } catch (e) {
       console.error(e);
@@ -1292,6 +1301,36 @@ export default function Dashboard() {
             </button>
           </div>
         </header>
+
+        {showOverdueImportantAlert && (
+          <div className="animate-fade-in" style={{ margin: '24px 32px 0 32px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '12px', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', backdropFilter: 'blur(20px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <AlertTriangle size={20} color="#ef4444" style={{ flexShrink: 0 }} />
+              <div>
+                <strong style={{ color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 600 }}>Masz nieodpisane wiadomości!</strong>
+                <p style={{ color: 'var(--subtext)', fontSize: '0.85rem', margin: '2px 0 0 0' }}>W zakładce "Ważne" znajdują się wiadomości wymagające Twojej uwagi, które czekają bez odpowiedzi od ponad 2 godzin.</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button 
+                className="btn" 
+                style={{ padding: '6px 14px', fontSize: '0.8rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }} 
+                onClick={() => {
+                  setCurrentTab("IMPORTANT");
+                  setSelectedThread(null);
+                }}
+              >
+                Przejdź do Ważne
+              </button>
+              <button 
+                style={{ background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+                onClick={() => setShowOverdueImportantAlert(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className={styles.workspace}>
           
