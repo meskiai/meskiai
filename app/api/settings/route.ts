@@ -91,6 +91,8 @@ export async function GET(req: Request) {
       subscriptionStatus: user?.subscriptionStatus || "inactive",
       stripePriceId: user?.stripePriceId || null,
       stripeCurrentPeriodEnd: user?.stripeCurrentPeriodEnd || null,
+      createdAt: user?.createdAt || null,
+      feedbackSubmitted: user?.feedbackSubmitted ?? false,
       // Usage counters for limits display
       emailsSentThisMonth: user?.settings?.emailsSentThisMonth ?? 0,
       competitorSearchesThisMonth: user?.settings?.competitorSearchesThisMonth ?? 0,

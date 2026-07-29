@@ -52,6 +52,8 @@ model User {
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
   subscriptionStatus     String?   @default("inactive")
+  createdAt              DateTime  @default(now())
+  feedbackSubmitted      Boolean   @default(false)
 }
 
 model VerificationToken {

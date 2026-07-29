@@ -8,7 +8,7 @@ import {
   Sparkles, User, LogOut, Inbox, Archive, AlertTriangle, Trash2, Bot, Home, HelpCircle, LayoutGrid,
   ArrowUpRight, ArrowDownLeft, ArrowDown, FileText, Building, Search, ArrowRight, ChevronRight, Users,
   Target, Zap, TrendingUp, ShieldAlert, Plus, BarChart2, Activity, Lightbulb, PieChart, ExternalLink, Settings,
-  X, DollarSign, CheckSquare, ArrowDownRight, Info
+  X, DollarSign, CheckSquare, ArrowDownRight, Info, Star
 } from "lucide-react";
 import { ThemeToggle } from "../components/ThemeToggle";
 import styles from "./page.module.css";
@@ -36,6 +36,10 @@ export default function Dashboard() {
 
   const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "STRATEGY" | "ACCOUNT">("INBOX");
   const [showOverdueImportantAlert, setShowOverdueImportantAlert] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackStars, setFeedbackStars] = useState(5);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [businessContext, setBusinessContext] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [companyNip, setCompanyNip] = useState("");
@@ -153,6 +157,17 @@ export default function Dashboard() {
           if (data.subscriptionData) {
             setSubscriptionStatus(data.subscriptionData.subscriptionStatus);
             setSubscriptionData(data.subscriptionData);
+            
+            // Check for feedback prompt eligibility: 3 days after sub purchase/account creation
+            const sub = data.subscriptionData;
+            const isActive = sub.subscriptionStatus === "active" || sub.subscriptionStatus === "trialing";
+            const hasNotSubmitted = !sub.feedbackSubmitted;
+            const regDate = sub.createdAt ? new Date(sub.createdAt).getTime() : Date.now();
+            const isThreeDaysOld = (Date.now() - regDate) > 3 * 24 * 60 * 60 * 1000;
+            
+            if (isActive && hasNotSubmitted && isThreeDaysOld) {
+              setShowFeedbackModal(true);
+            }
             
             // Show guide for first-time subscribed users
             if (data.subscriptionData.subscriptionStatus === 'active') {
@@ -396,6 +411,35 @@ export default function Dashboard() {
       showToast("Błąd połączenia z serwerem", "error");
     } finally {
       setGeneratingLeads(false);
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    setSubmittingFeedback(true);
+    try {
+      const res = await fetch("/api/settings/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stars: feedbackStars, comment: feedbackComment })
+      });
+      if (res.ok) {
+        showToast("Dziękujemy za opinię!", "success");
+        setShowFeedbackModal(false);
+        if (subscriptionData) {
+          setSubscriptionData({
+            ...subscriptionData,
+            feedbackSubmitted: true
+          });
+        }
+      } else {
+        const data = await res.json();
+        showToast(data.error || "Błąd wysyłania opinii", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Błąd połączenia z serwerem", "error");
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -1082,6 +1126,109 @@ export default function Dashboard() {
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
               >
                 Sprawdź Pakiety <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showFeedbackModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in" style={{ 
+            background: 'rgba(25, 25, 30, 0.75)', 
+            border: '1px solid rgba(255, 255, 255, 0.12)', 
+            padding: '48px 40px', 
+            borderRadius: '28px', 
+            maxWidth: '460px', 
+            width: '90%', 
+            textAlign: 'center', 
+            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)', 
+            backdropFilter: 'blur(50px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(50px) saturate(190%)',
+            position: 'relative' 
+          }}>
+            <button 
+              onClick={() => setShowFeedbackModal(false)} 
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+            >
+              <X size={18} />
+            </button>
+            <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #10b981, #3b82f6)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)' }}>
+              <Star size={30} style={{ fill: 'currentColor', filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
+            </div>
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff', letterSpacing: '-0.02em' }}>Podziel się opinią</h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '24px' }}>
+              Dziękujemy, że korzystasz z MESKIAI! Twoja opinia jest dla nas niezwykle ważna. Pomóż nam stawać się jeszcze lepszym.
+            </p>
+
+            {/* Stars Selector */}
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}>
+              {[1, 2, 3, 4, 5].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setFeedbackStars(num)}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', transition: 'transform 0.1s' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+                >
+                  <Star 
+                    size={36} 
+                    style={{ 
+                      color: num <= feedbackStars ? '#f59e0b' : 'rgba(255,255,255,0.2)', 
+                      fill: num <= feedbackStars ? '#f59e0b' : 'transparent',
+                      transition: 'color 0.2s, fill 0.2s'
+                    }} 
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Feedback Comment */}
+            <textarea
+              value={feedbackComment}
+              onChange={(e) => setFeedbackComment(e.target.value)}
+              placeholder="Napisz swoją opinię (co możemy poprawić, co działa najlepiej)..."
+              style={{
+                width: '100%',
+                height: '110px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                color: '#ffffff',
+                fontSize: '0.9rem',
+                lineHeight: 1.4,
+                resize: 'none',
+                marginBottom: '24px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+            />
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => setShowFeedbackModal(false)} 
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+              >
+                Pomiń
+              </button>
+              <button 
+                onClick={handleSubmitFeedback} 
+                disabled={submittingFeedback}
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 600, fontSize: '0.85rem', background: 'linear-gradient(135deg, #10b981, #3b82f6)', border: 'none', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)', transition: 'transform 0.2s, opacity 0.2s', opacity: submittingFeedback ? 0.6 : 1 }}
+                onMouseEnter={(e) => { if (!submittingFeedback) e.currentTarget.style.transform = 'scale(1.02)'; }}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+              >
+                {submittingFeedback ? "Wysyłanie..." : "Wyślij opinię"} <ArrowRight size={16} />
               </button>
             </div>
           </div>
