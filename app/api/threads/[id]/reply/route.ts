@@ -46,15 +46,22 @@ export async function POST(
     const userSettings = user?.settings;
 
     if (userSettings) {
-      const isBasic = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-      const isPro = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
       const emailsCount = userSettings.emailsSentThisMonth || 0;
 
-      if (isBasic && emailsCount >= 50) {
-        return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (50) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
-      }
-      if (isPro && emailsCount >= 1000) {
-        return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (1000) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+      // Use the same limit logic as lib/cron.ts getMonthlyLimit()
+      const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+      const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+      const priceId = user?.stripePriceId ?? null;
+      
+      const monthlyLimit =
+        priceId === PRICE_MAX ? Infinity :
+        priceId === PRICE_PRO ? 1000 :
+        50; // Basic or any active subscription without a known price ID
+
+      if (monthlyLimit !== Infinity && emailsCount >= monthlyLimit) {
+        return NextResponse.json({
+          error: `Wykorzystałeś miesięczny limit wysłanych e-maili (${monthlyLimit}). Zrób upgrade pakietu, aby kontynuować.`
+        }, { status: 403 });
       }
     }
 

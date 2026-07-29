@@ -373,8 +373,7 @@ async function processMessage({
       // KEY LOGIC: when a person replies to an agent auto-reply (AUTO_REPLIED)
       // or continues a REPLIED thread, this conversation is now human-driven
       // and MUST be shown in the "Ważne" (REQUIRES_ATTENTION) tab.
-      // Only already-REQUIRES_ATTENTION stays as-is (already escalated).
-      // IGNORED threads get re-activated to REQUIRES_ATTENTION (person returned).
+      // IGNORED threads also re-activate to REQUIRES_ATTENTION (person came back).
       let newStatus: string;
       if (existingThread?.status === 'REQUIRES_ATTENTION') {
         newStatus = 'REQUIRES_ATTENTION'; // already escalated — keep
@@ -385,6 +384,10 @@ async function processMessage({
         // Person replied back to our auto-reply — escalate to Important!
         newStatus = 'REQUIRES_ATTENTION';
         console.log(`[Agent AI] 🔔 Klient odpowiedział na maila agenta w wątku ${dbThreadId} → REQUIRES_ATTENTION`);
+      } else if (existingThread?.status === 'IGNORED') {
+        // Client came back after being ignored — re-activate to Important!
+        newStatus = 'REQUIRES_ATTENTION';
+        console.log(`[Agent AI] 🔔 Klient z IGNORED odpowiedział ponownie w wątku ${dbThreadId} → REQUIRES_ATTENTION`);
       } else {
         // PENDING_APPROVAL or anything else — keep in inbox for review
         newStatus = 'PENDING_APPROVAL';
@@ -416,7 +419,7 @@ async function processMessage({
 
   // ── Save email to DB (so its UID is permanently remembered) ─────────────────
   if (!existing) {
-    await prisma.email
+    const created = await prisma.email
       .create({
         data: {
           threadId:    dbThread.id,
@@ -433,17 +436,21 @@ async function processMessage({
       })
       .catch(async (err: any) => {
         if (err.code === 'P2002' || err.code === '23505') {
-          console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — aktualizuję pop3Uid.`);
+          // This email is already in DB — just patch the UID and STOP processing.
+          // CRITICAL: returning false here prevents infinite loop re-processing.
+          console.warn(`[Agent AI] Duplikat wiadomości ${messageId} — aktualizuję pop3Uid i przerywam.`);
           if (msg.pop3Uid) {
             await prisma.email.update({
               where: { messageId },
               data: { pop3Uid: msg.pop3Uid }
             }).catch(() => {});
           }
-          return null;
+          return 'DUPLICATE'; // sentinel value — stop processing below
         }
         throw err;
       });
+    // If duplicate detected, exit immediately — do NOT run AI or send email
+    if (created === 'DUPLICATE') return false;
   }
 
   // Old / bot / self emails — UID saved, no AI needed
@@ -517,6 +524,7 @@ async function processMessage({
       ackText = cleanString(ackText);
 
       const shouldSendAck = settings.autoReply && !isPreviouslyImportant && ackText && ackText.length > 10;
+      let ackSent = false;
       if (shouldSendAck) {
         const replyTo = extractEmail(msg.from);
         const referencesStr = [...(msg.references ?? []), messageId].join(' ');
@@ -545,14 +553,16 @@ async function processMessage({
               isFromAgent: true
             }
           }).catch(() => {});
+          ackSent = true;
           console.log(`[Agent AI] ✉️ Wysłano potwierdzenie do klienta → ${replyTo} (msgId: ${ackMsgId})`);
         } catch (smtpErr: any) {
           console.error(`[Agent AI] Błąd SMTP przy wysyłaniu potwierdzenia:`, smtpErr?.message);
+          // ackSent remains false — draft label will reflect this correctly
         }
       }
 
       const draftContent = analysisText 
-        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[${(settings.autoReply && !isPreviouslyImportant) ? 'WYSŁANE POTWIERDZENIE' : 'PROPONOWANE POTWIERDZENIE (NIEWYSŁANE - WYŁĄCZONE LUB WĄTEK WAŻNY)'}]:\n${ackText || '(brak)'}`
+        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[${ackSent ? 'WYSŁANE POTWIERDZENIE' : 'PROPONOWANE POTWIERDZENIE (NIEWYSŁANE)'}]:\n${ackText || '(brak)'}` 
         : ackText || null;
 
       await prisma.thread

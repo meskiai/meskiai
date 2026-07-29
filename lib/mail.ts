@@ -99,7 +99,7 @@ export async function fetchUnreadEmailsPOP3(
 
         const headersParsed: any = await simpleParser(headersRaw);
         const msgDate = headersParsed.date || new Date();
-        let messageId = headersParsed.messageId || `uid-${uid}-${Date.now()}`;
+        let messageId = headersParsed.messageId || `uid-${uid}`;
         let fromAddr = headersParsed.from?.value?.[0]?.address || headersParsed.from?.text || '';
 
         const messageAgeHours = (Date.now() - msgDate.getTime()) / (1000 * 60 * 60);
@@ -159,7 +159,7 @@ export async function fetchUnreadEmailsPOP3(
 
         const toObj = Array.isArray(parsed.to) ? parsed.to[0] : parsed.to;
         const toAddr = toObj?.value?.[0]?.address || toObj?.text || email;
-        messageId = parsed.messageId || `uid-${uid}-${Date.now()}`;
+        messageId = parsed.messageId || `uid-${uid}`;
 
         let inReplyTo = parsed.inReplyTo;
         if (Array.isArray(inReplyTo)) inReplyTo = inReplyTo[0];
