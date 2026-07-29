@@ -429,25 +429,26 @@ async function processMessage({
     return false;
   }
 
-  // Thread already requires human attention — don't overwrite
-  if (dbThread.status === 'REQUIRES_ATTENTION') return false;
+  const isPreviouslyImportant = dbThread.status === 'REQUIRES_ATTENTION';
 
-  // ── Anti-Loop Protection (Zabezpieczenie przed pętlą z autoresponderami) ──
-  // Check if we sent an automated reply to this exact thread in the last 15 minutes.
-  // If so, do not send another one to avoid infinite loops with ticketing systems.
-  const emailsInThread = await prisma.email.findMany({
+  // ── Fetch Thread History & Loop Protection ───────────────────────────────────
+  const threadEmails = await prisma.email.findMany({
     where: { threadId: dbThread.id },
-    orderBy: { receivedAt: 'desc' },
-    take: 5
-  });
-  
-  const recentAutoReplies = emailsInThread.filter(
+    orderBy: { receivedAt: 'asc' },
+  }).catch(() => []);
+
+  const last5Emails = [...threadEmails].reverse().slice(0, 5);
+  const recentAutoReplies = last5Emails.filter(
     (e) => e.isFromAgent && (Date.now() - e.receivedAt.getTime() < 15 * 60 * 1000)
   );
   if (recentAutoReplies.length > 0) {
     console.log(`[Agent AI] 🛑 Wykryto potencjalną pętlę w wątku ${dbThread.id}. Ignoruję auto-odpowiedź (cooldown).`);
     return false;
   }
+
+  const formattedHistory = threadEmails.map(e => 
+    `[${e.isFromAgent ? 'ODPOWIEDŹ TWÓJ ASYSTENT/WŁAŚCICIEL' : 'WIADOMOŚĆ KLIENT'}]:\n${(e.body || e.snippet || '').substring(0, 1000)}\n---`
+  ).join('\n\n');
 
   // ── Generate AI reply ────────────────────────────────────────────────────────
   console.log(`[Agent AI] 🤖 Generuję odpowiedź: "${msg.subject}" od ${msg.from}`);
@@ -456,13 +457,15 @@ async function processMessage({
     const { text } = await generateText({
       model:  googleAI('gemini-pro-latest'),
       system: buildSystemPrompt(settings, websiteContent),
-      prompt: `Od: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść wiadomości:\n${(msg.text || '').substring(0, 3000)}`,
+      prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${formattedHistory}\n\nNOWA WIADOMOŚĆ DO ODPOWIEDZI / PRZEANALIZOWANIA:\nOd: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść nowej wiadomości:\n${(msg.text || '').substring(0, 2500)}`,
     });
     const cleanedAiText = cleanString(text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
-    const upper  = cleanedAiText.toUpperCase().slice(0, 80);
+    const firstLines = cleanedAiText.split('\n').slice(0, 3).join('\n').toUpperCase();
+    const isSpam = firstLines.includes('SPAM') || firstLines.includes('BOT') || firstLines.includes('IGNORE');
+    const isAttention = firstLines.includes('REQUIRES_ATTENTION');
 
     // ── SPAM / BOT ───────────────────────────────────────────────────────────
-    if (upper.includes('SPAM') || upper.includes('BOT') || upper.includes('IGNORE')) {
+    if (isSpam) {
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
         .catch(() => {});
@@ -471,7 +474,7 @@ async function processMessage({
     }
 
     // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
-    if (upper.includes('REQUIRES_ATTENTION')) {
+    if (isAttention) {
       const parts = cleanedAiText.split(/\n[-*_]{3,}\n/s);
       let analysisText = '';
       let ackText = '';
@@ -486,7 +489,8 @@ async function processMessage({
       analysisText = cleanString(analysisText);
       ackText = cleanString(ackText);
 
-      if (settings.autoReply && ackText && ackText.length > 10) {
+      const shouldSendAck = settings.autoReply && !isPreviouslyImportant && ackText && ackText.length > 10;
+      if (shouldSendAck) {
         const replyTo = extractEmail(msg.from);
         const referencesStr = [...(msg.references ?? []), messageId].join(' ');
         try {
@@ -519,23 +523,26 @@ async function processMessage({
       }
 
       const draftContent = analysisText 
-        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[${settings.autoReply ? 'WYSŁANE POTWIERDZENIE' : 'PROPONOWANE POTWIERDZENIE (NIEWYSŁANE - WYŁĄCZONE AUTO-ODPOWIEDZI)'}]:\n${ackText || '(brak)'}`
+        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[${(settings.autoReply && !isPreviouslyImportant) ? 'WYSŁANE POTWIERDZENIE' : 'PROPONOWANE POTWIERDZENIE (NIEWYSŁANE - WYŁĄCZONE LUB WĄTEK WAŻNY)'}]:\n${ackText || '(brak)'}`
         : ackText || null;
 
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: draftContent } })
         .catch(() => {});
-      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${settings.autoReply && !!ackText})`);
+      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${settings.autoReply && !isPreviouslyImportant && !!ackText})`);
       return false;
     }
 
-    // ── Save Draft and exit if AutoReply is disabled ──────────────────────────
-    if (!settings.autoReply) {
+    // ── Save Draft and exit if AutoReply is disabled OR if thread is previously important ──────────────────────────
+    if (!settings.autoReply || isPreviouslyImportant) {
       await prisma.thread.update({
         where: { id: dbThread.id },
-        data: { status: 'PENDING_APPROVAL', draftReply: cleanedAiText }
+        data: { 
+          status: isPreviouslyImportant ? 'REQUIRES_ATTENTION' : 'PENDING_APPROVAL', 
+          draftReply: cleanedAiText 
+        }
       }).catch(() => {});
-      console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false) | "${msg.subject}"`);
+      console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false lub wątek ważny) | "${msg.subject}"`);
       return false;
     }
 
