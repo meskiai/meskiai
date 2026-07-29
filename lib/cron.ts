@@ -82,7 +82,6 @@ export async function runSync() {
           subscriptionStatus: { in: ['active', 'trialing'] },
           settings: {
             appPassword: { not: null },
-            autoReply: true,
           },
         },
         include: { settings: true },
@@ -487,7 +486,7 @@ async function processMessage({
       analysisText = cleanString(analysisText);
       ackText = cleanString(ackText);
 
-      if (ackText && ackText.length > 10) {
+      if (settings.autoReply && ackText && ackText.length > 10) {
         const replyTo = extractEmail(msg.from);
         const referencesStr = [...(msg.references ?? []), messageId].join(' ');
         try {
@@ -520,13 +519,23 @@ async function processMessage({
       }
 
       const draftContent = analysisText 
-        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[WYSŁANE POTWIERDZENIE]:\n${ackText || '(brak)'}`
+        ? `[ANALIZA AGENTA]:\n${analysisText}\n\n[${settings.autoReply ? 'WYSŁANE POTWIERDZENIE' : 'PROPONOWANE POTWIERDZENIE (NIEWYSŁANE - WYŁĄCZONE AUTO-ODPOWIEDZI)'}]:\n${ackText || '(brak)'}`
         : ackText || null;
 
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: draftContent } })
         .catch(() => {});
-      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${!!ackText})`);
+      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${settings.autoReply && !!ackText})`);
+      return false;
+    }
+
+    // ── Save Draft and exit if AutoReply is disabled ──────────────────────────
+    if (!settings.autoReply) {
+      await prisma.thread.update({
+        where: { id: dbThread.id },
+        data: { status: 'PENDING_APPROVAL', draftReply: cleanedAiText }
+      }).catch(() => {});
+      console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false) | "${msg.subject}"`);
       return false;
     }
 
