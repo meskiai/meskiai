@@ -85,8 +85,8 @@ export async function POST(
     const incomingEmails = thread.emails.filter(e => !e.isFromAgent);
     const references = incomingEmails.map(e => e.messageId).join(' ');
 
-    // Send via SMTP using Gmail App Password
-    await sendReplySMTP(
+    // Send via SMTP using Gmail App Password — capture real SMTP Message-ID
+    const smtpInfo = await sendReplySMTP(
       session.user.email!,
       userSettings.appPassword,
       toEmail,
@@ -95,12 +95,14 @@ export async function POST(
       originalEmail.messageId,
       references
     );
+    // Use the real SMTP Message-ID so client replies can be matched back to this thread
+    const sentMsgId = (smtpInfo as any)?.messageId || `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     // Save our reply in the DB
     await prisma.email.create({
       data: {
         threadId: thread.id,
-        messageId: `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        messageId: sentMsgId,
         to: toEmail,
         subject: replySubject,
         from: session.user.email || "Agent AI",
@@ -111,7 +113,9 @@ export async function POST(
       }
     });
 
-    // Update thread status
+    // Update thread status:
+    // REQUIRES_ATTENTION → stays REQUIRES_ATTENTION (human conversation ongoing)
+    // Anything else → REPLIED (client can write back and it will escalate to REQUIRES_ATTENTION)
     await prisma.thread.update({
       where: { id: thread.id },
       data: {

@@ -344,39 +344,25 @@ async function processMessage({
     }
 
     if (!dbThreadId && msg.references?.length) {
+      // Check ALL references, group by threadId, pick the one with most matches
+      // (most reliable signal that this is the continuation of that conversation)
       const refs = await prisma.email
         .findMany({
           where: { messageId: { in: msg.references } },
           select: { threadId: true },
-          take: 1,
         })
         .catch(() => []);
-      if (refs.length) dbThreadId = refs[0].threadId;
-    }
-
-    // Subject-based fallback: some email clients strip In-Reply-To/References headers.
-    // Try to match by normalised subject (strip Re:/Odp:/Fwd:) to catch these edge cases.
-    if (!dbThreadId) {
-      const normaliseSubject = (s: string) =>
-        s.replace(/^(re|odp|fwd|fw|aw|vs|sv):\s*/gi, '').trim().toLowerCase();
-      const normalised = normaliseSubject(msg.subject);
-      if (normalised.length > 4) {
-        // Fetch threads for this user that have emails with a matching subject
-        const candidates = await prisma.email.findMany({
-          where: {
-            thread: { userId },
-            subject: { contains: normalised, mode: 'insensitive' },
-          },
-          select: { threadId: true },
-          orderBy: { receivedAt: 'desc' },
-          take: 1,
-        }).catch(() => []);
-        if (candidates.length) {
-          dbThreadId = candidates[0].threadId;
-          console.log(`[Agent AI] 🔍 Dopasowano wątek po temacie: "${msg.subject}" → threadId=${dbThreadId}`);
-        }
+      if (refs.length) {
+        // Count occurrences per thread and pick the highest
+        const counts: Record<string, number> = {};
+        for (const r of refs) counts[r.threadId] = (counts[r.threadId] || 0) + 1;
+        dbThreadId = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
       }
     }
+
+    // NOTE: Subject-based matching was intentionally removed — it caused unrelated
+    // threads from different senders to be incorrectly merged together.
+    // In-Reply-To + References headers are the reliable way to match threads.
 
     if (dbThreadId) {
       // Existing thread — figure out the right status for the incoming reply
@@ -535,7 +521,7 @@ async function processMessage({
         const replyTo = extractEmail(msg.from);
         const referencesStr = [...(msg.references ?? []), messageId].join(' ');
         try {
-          await sendReplySMTP(
+          const ackInfo = await sendReplySMTP(
             user.email!,
             settings.appPassword!,
             replyTo,
@@ -544,10 +530,12 @@ async function processMessage({
             messageId,
             referencesStr
           );
+          // Store the REAL SMTP Message-ID so client replies can be matched back to this thread
+          const ackMsgId = ackInfo?.messageId || `ack-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
           await prisma.email.create({
             data: {
               threadId:    dbThread.id,
-              messageId:   `ack-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              messageId:   ackMsgId,
               from:        user.email ?? 'Agent AI',
               to:          replyTo,
               subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
@@ -557,7 +545,7 @@ async function processMessage({
               isFromAgent: true
             }
           }).catch(() => {});
-          console.log(`[Agent AI] ✉️ Wysłano potwierdzenie do klienta → ${replyTo}`);
+          console.log(`[Agent AI] ✉️ Wysłano potwierdzenie do klienta → ${replyTo} (msgId: ${ackMsgId})`);
         } catch (smtpErr: any) {
           console.error(`[Agent AI] Błąd SMTP przy wysyłaniu potwierdzenia:`, smtpErr?.message);
         }
@@ -591,7 +579,8 @@ async function processMessage({
     const replyTo      = extractEmail(msg.from);
     const referencesStr = [...(msg.references ?? []), messageId].join(' ');
 
-    await sendReplySMTP(
+    // Capture the real SMTP Message-ID so future client replies can be matched back here
+    const smtpInfo = await sendReplySMTP(
       user.email!,
       settings.appPassword!,
       replyTo,
@@ -600,6 +589,7 @@ async function processMessage({
       messageId,
       referencesStr
     );
+    const sentMsgId = smtpInfo?.messageId || `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     await Promise.all([
       prisma.thread.update({
@@ -613,7 +603,7 @@ async function processMessage({
       prisma.email.create({
         data: {
           threadId:    dbThread.id,
-          messageId:   `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          messageId:   sentMsgId,
           from:        user.email ?? 'Agent AI',
           to:          replyTo,
           subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
