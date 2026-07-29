@@ -54,6 +54,7 @@ export default function Dashboard() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showModuleSwitcher, setShowModuleSwitcher] = useState(false);
+  const [showManualReply, setShowManualReply] = useState(false);
   const [showUpgradeReminder, setShowUpgradeReminder] = useState(false);
 
   // Edit Modes State
@@ -2548,6 +2549,7 @@ export default function Dashboard() {
                         className={`animate-fade-in ${styles.threadItem} ${selectedThread?.id === thread.id ? styles.selected : ''}`}
                         onClick={() => {
                           setSelectedThread(thread);
+                          setShowManualReply(false);
                           if (thread.status === 'REQUIRES_ATTENTION') {
                             setEditedReply("");
                           } else {
@@ -2622,6 +2624,7 @@ export default function Dashboard() {
                     ))}
                   </div>
 
+                  {/* ── AI draft + send section (PENDING_APPROVAL / REQUIRES_ATTENTION when not yet replied) ── */}
                   {((selectedThread.status === 'PENDING_APPROVAL' || selectedThread.status === 'REQUIRES_ATTENTION') && !isRepliedImportant) && (
                     <div className={styles.approvalSection}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', justifyContent: 'space-between' }}>
@@ -2683,7 +2686,8 @@ export default function Dashboard() {
                       </div>
                     </div>
                   )}
-                  
+
+                  {/* ── Sent / replied / important-already-replied / ignored: show status + always-available manual reply ── */}
                   {((selectedThread.status !== 'PENDING_APPROVAL' && selectedThread.status !== 'REQUIRES_ATTENTION') || isRepliedImportant) && (
                     <div className={styles.approvalSection}>
                       <div className={styles.successMessage}>
@@ -2693,8 +2697,60 @@ export default function Dashboard() {
                           <><CheckCircle size={18} color="#10b981" /> Odpowiedź została wysłana</>
                         )}
                       </div>
+
+                      {/* Always-available manual reply toggle */}
+                      {selectedThread.status !== 'IGNORED' && (
+                        <div style={{ marginTop: '16px' }}>
+                          {!showManualReply ? (
+                            <button
+                              className="btn btn-secondary"
+                              style={{ width: '100%', justifyContent: 'center', gap: '8px', padding: '10px' }}
+                              onClick={() => { setShowManualReply(true); setEditedReply(''); }}
+                            >
+                              <Send size={15} />
+                              Napisz kolejną odpowiedź
+                            </button>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <Send size={15} color="var(--primary)" /> Odpowiedz ręcznie
+                                </span>
+                                <button
+                                  style={{ background: 'none', border: 'none', color: 'var(--subtext)', cursor: 'pointer', fontSize: '0.8rem', padding: '2px 8px' }}
+                                  onClick={() => { setShowManualReply(false); setEditedReply(''); }}
+                                >
+                                  Anuluj
+                                </button>
+                              </div>
+                              <textarea
+                                className={styles.textarea}
+                                value={editedReply}
+                                onChange={(e) => setEditedReply(e.target.value)}
+                                placeholder="Wpisz swoją odpowiedź..."
+                                rows={5}
+                                autoFocus
+                              />
+                              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <button
+                                  className="btn btn-primary"
+                                  onClick={async () => { await handleSendReply(); setShowManualReply(false); }}
+                                  disabled={sending || !editedReply.trim()}
+                                >
+                                  {sending ? <RefreshCw className={styles['animate-spin']} size={16} /> : <Send size={16} />}
+                                  Wyślij
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
+
+                  {/* ── REQUIRES_ATTENTION already handled by owner (isRepliedImportant) — always show extra reply option ── */}
+                  {(selectedThread.status === 'REQUIRES_ATTENTION' && !isRepliedImportant) && null /* handled above */}
+
                 </>
               )}
             </div>
