@@ -718,6 +718,8 @@ export default function Dashboard() {
     return timeB - timeA;
   });
 
+  const isRepliedImportant = selectedThread && selectedThread.status === 'REQUIRES_ATTENTION' && (selectedThread.emails || []).some((e: any) => e.isFromAgent);
+
   if (dashboardMode === null) {
     return (
       <div className={`${styles.selectionContainer}`} style={{ position: 'relative', minHeight: '100dvh', background: 'var(--background)', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'hidden' }}>
@@ -2326,8 +2328,8 @@ export default function Dashboard() {
                           </button>
                         </div>
                         <div className={styles.subject}>{latestEmail.subject}</div>
-                        <div className={styles.statusBadge} data-status={thread.status}>
-                          {isPending ? 'Do Akceptacji' : thread.status === 'AUTO_REPLIED' ? 'Auto-odpowiedź' : thread.status === 'IGNORED' ? 'Spam' : thread.status === 'REQUIRES_ATTENTION' ? 'Wymaga Uwagi' : 'Wysłano'}
+                        <div className={styles.statusBadge} data-status={thread.status === 'REQUIRES_ATTENTION' && (thread.emails || []).some((e: any) => e.isFromAgent) ? 'REPLIED' : thread.status}>
+                          {isPending ? 'Do Akceptacji' : thread.status === 'AUTO_REPLIED' ? 'Auto-odpowiedź' : thread.status === 'IGNORED' ? 'Spam' : thread.status === 'REQUIRES_ATTENTION' ? ((thread.emails || []).some((e: any) => e.isFromAgent) ? 'Obsłużone' : 'Wymaga Uwagi') : 'Wysłano'}
                         </div>
                       </div>
                     );
@@ -2369,7 +2371,7 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  {(selectedThread.status === 'PENDING_APPROVAL' || selectedThread.status === 'REQUIRES_ATTENTION') && (
+                  {((selectedThread.status === 'PENDING_APPROVAL' || selectedThread.status === 'REQUIRES_ATTENTION') && !isRepliedImportant) && (
                     <div className={styles.approvalSection}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2406,7 +2408,7 @@ export default function Dashboard() {
                           <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', marginBottom: '8px', fontWeight: 600 }}>
                             <AlertTriangle size={16} /> Analiza Agenta (Nie zostanie wysłana do klienta)
                           </h4>
-                          <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                          <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, maxHeight: '160px', overflowY: 'auto', paddingRight: '4px' }}>
                             {selectedThread.draftReply}
                           </div>
                         </div>
@@ -2431,7 +2433,7 @@ export default function Dashboard() {
                     </div>
                   )}
                   
-                  {(selectedThread.status !== 'PENDING_APPROVAL' && selectedThread.status !== 'REQUIRES_ATTENTION') && (
+                  {((selectedThread.status !== 'PENDING_APPROVAL' && selectedThread.status !== 'REQUIRES_ATTENTION') || isRepliedImportant) && (
                     <div className={styles.approvalSection}>
                       <div className={styles.successMessage}>
                         {selectedThread.status === 'IGNORED' ? (

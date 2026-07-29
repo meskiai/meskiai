@@ -115,7 +115,7 @@ export async function POST(
     await prisma.thread.update({
       where: { id: thread.id },
       data: {
-        status: "REPLIED",
+        status: thread.status === "REQUIRES_ATTENTION" ? "REQUIRES_ATTENTION" : "REPLIED",
         draftReply: null,
         updatedAt: new Date()
       }

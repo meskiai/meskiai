@@ -294,7 +294,8 @@ async function processMessage({
   const isTooOld = messageAgeHours > 48;
   const isSelf   = (msg as any)._isSelf === true; // sent by the agent itself
   const isBot    = isSelf ||
-    /noreply|no-reply|daemon|mailer-daemon|@bounce|@noreply/i.test(msg.from.toLowerCase());
+    /noreply|no-reply|daemon|mailer-daemon|bounce|notification|receipt|billing|invoice|alert/i.test(msg.from.toLowerCase()) ||
+    /potwierdzenie|faktura|rachunek|płatność|subskrypcja|transakcja|receipt|invoice|billing|payment|subscription|transaction/i.test(msg.subject.toLowerCase());
 
   // ── Duplicate check ──────────────────────────────────────────────────────────
   const existing = await prisma.email.findUnique({ where: { messageId } });
@@ -607,6 +608,9 @@ function buildSystemPrompt(settings: any, websiteContent = ''): string {
   return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 jak doświadczony pracownik biurowy.
 Kontekst firmy: "${ctx}"${websiteSection}
 Ton komunikacji: ${tone} — ${toneInstr}
+
+ZASADA BEZWZGLĘDNA: Odpowiadaj wyłącznie na e-maile napisane bezpośrednio przez żywego człowieka zadającego pytania lub piszącego w sprawach biznesowych.
+Jeśli e-mail jest automatycznym powiadomieniem systemowym (np. potwierdzenie płatności, faktura, subskrypcja, powiadomienie transakcyjne, newsletter, kod weryfikacyjny, alert bezpieczeństwa, automatyczny raport), ZAWSZE sklasyfikuj to jako SPAM.
 
 ANALIZUJ każdy e-mail i wybierz JEDNĄ z trzech ścieżek:
 
