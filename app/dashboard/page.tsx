@@ -1132,20 +1132,34 @@ export default function Dashboard() {
         </div>
       )}
       {showFeedbackModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-fade-in" style={{ 
-            background: 'rgba(25, 25, 30, 0.75)', 
+            background: 'rgba(25, 25, 30, 0.78)', 
             border: '1px solid rgba(255, 255, 255, 0.12)', 
             padding: '48px 40px', 
             borderRadius: '28px', 
             maxWidth: '460px', 
             width: '90%', 
             textAlign: 'center', 
-            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)', 
+            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.25)', 
             backdropFilter: 'blur(50px) saturate(190%)',
             WebkitBackdropFilter: 'blur(50px) saturate(190%)',
             position: 'relative' 
           }}>
+            {/* Soft Ambient Light behind modal */}
+            <div style={{
+              position: 'absolute',
+              top: '-10%',
+              left: '-10%',
+              width: '120%',
+              height: '120%',
+              background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 60%, transparent 100%)',
+              zIndex: -1,
+              filter: 'blur(40px)',
+              pointerEvents: 'none',
+              borderRadius: '40px'
+            }} />
+
             <button 
               onClick={() => setShowFeedbackModal(false)} 
               style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
@@ -1162,23 +1176,24 @@ export default function Dashboard() {
               Dziękujemy, że korzystasz z MESKIAI! Twoja opinia jest dla nas niezwykle ważna. Pomóż nam stawać się jeszcze lepszym.
             </p>
 
-            {/* Stars Selector */}
+            {/* Stars Selector with rich gold glow */}
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}>
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => setFeedbackStars(num)}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', transition: 'transform 0.1s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', transition: 'transform 0.15s ease-out' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.25)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
                 >
                   <Star 
                     size={36} 
                     style={{ 
-                      color: num <= feedbackStars ? '#f59e0b' : 'rgba(255,255,255,0.2)', 
-                      fill: num <= feedbackStars ? '#f59e0b' : 'transparent',
-                      transition: 'color 0.2s, fill 0.2s'
+                      color: num <= feedbackStars ? '#fbbf24' : 'rgba(255,255,255,0.15)', 
+                      fill: num <= feedbackStars ? '#fbbf24' : 'transparent',
+                      filter: num <= feedbackStars ? 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.6))' : 'none',
+                      transition: 'color 0.2s, fill 0.2s, filter 0.2s'
                     }} 
                   />
                 </button>
@@ -1193,21 +1208,22 @@ export default function Dashboard() {
               style={{
                 width: '100%',
                 height: '110px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
                 padding: '12px 16px',
                 color: '#ffffff',
                 fontSize: '0.9rem',
-                lineHeight: 1.4,
+                lineHeight: 1.45,
                 resize: 'none',
                 marginBottom: '24px',
                 outline: 'none',
                 boxSizing: 'border-box',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                transition: 'border-color 0.2s, background-color 0.2s'
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)'}
-              onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)'; }}
             />
 
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
