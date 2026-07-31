@@ -63,6 +63,7 @@ export default function Dashboard() {
 
   // Strategy Agent State
   const [strategyUrl, setStrategyUrl] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [isAnalyzingStrategy, setIsAnalyzingStrategy] = useState(false);
   const [strategyLoadingStep, setStrategyLoadingStep] = useState(0);
   const [strategyResults, setStrategyResults] = useState<any>(null);
@@ -135,6 +136,7 @@ export default function Dashboard() {
           setCompanyAddress(data.settings.companyAddress || "");
           setCompanyBankAccount(data.settings.companyBankAccount || "");
           setStrategyUrl(data.settings.companyWebsite || "");
+          setCompanyWebsite(data.settings.companyWebsite || "");
           setDefaultVatRate(data.settings.defaultVatRate || "23%");
           setReplyTone(data.settings.replyTone || "PROFESJONALNY");
           
@@ -335,7 +337,7 @@ export default function Dashboard() {
       const res = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessContext, companyName, companyNip, companyAddress, companyBankAccount, defaultVatRate, replyTone }),
+        body: JSON.stringify({ businessContext, companyName, companyNip, companyAddress, companyBankAccount, defaultVatRate, replyTone, companyWebsite }),
       });
       if (!res.ok) {
         let errMsg = "Błąd zapisu na serwerze";
@@ -546,11 +548,16 @@ export default function Dashboard() {
     }, 2500);
 
     try {
-      // Save website to account
+      // Save website to account and keep strategyUrl in sync
+      const websiteToSave = companyWebsite.trim() || strategyUrl.trim();
+      if (websiteToSave) {
+        setStrategyUrl(websiteToSave);
+        setCompanyWebsite(websiteToSave);
+      }
       await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyWebsite: strategyUrl })
+        body: JSON.stringify({ companyWebsite: websiteToSave })
       });
 
       const res = await fetch("/api/strategy/analyze", {
@@ -1549,6 +1556,15 @@ export default function Dashboard() {
 
                 {!isEditingKnowledge ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {companyWebsite && (
+                      <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '1.3rem' }}>🌐</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--subtext)', fontWeight: 600, marginBottom: '2px' }}>Strona firmy (źródło wiedzy agenta)</div>
+                          <a href={companyWebsite.startsWith('http') ? companyWebsite : `https://${companyWebsite}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 500, textDecoration: 'none', wordBreak: 'break-all' }}>{companyWebsite}</a>
+                        </div>
+                      </div>
+                    )}
                     <div style={{ background: 'var(--card-bg)', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', whiteSpace: 'pre-wrap', lineHeight: 1.6, color: 'var(--foreground)' }}>
                       {businessContext || <span style={{ color: 'var(--subtext)', fontStyle: 'italic' }}>Brak wprowadzonych danych.</span>}
                     </div>
@@ -1561,6 +1577,23 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>
+                        🌐 Adres strony firmowej <span style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700 }}>(Agent AI czyta tę stronę przed odpowiedzią)</span>
+                      </label>
+                      <input
+                        type="url"
+                        className={styles.input}
+                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--foreground)' }}
+                        value={companyWebsite}
+                        onChange={(e) => setCompanyWebsite(e.target.value)}
+                        placeholder="np. https://twojafirma.pl"
+                      />
+                      <p style={{ fontSize: '0.78rem', color: 'var(--subtext)', marginTop: '6px', lineHeight: 1.5 }}>
+                        Agent pobierze treść tej strony i użyje jej do odpowiadania na pytania o ofertę, ceny, godziny itp.
+                      </p>
+                    </div>
+
                     <div style={{ position: 'relative' }}>
                       <textarea
                         className={styles.textarea}
