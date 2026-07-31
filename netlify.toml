@@ -12,11 +12,3 @@
 [functions]
   node_bundler = "esbuild"
   directory = "netlify/functions"
-
-# Scheduled function — fires every 2 minutes, 24/7
-[functions."sync-cron"]
-  schedule = "*/2 * * * *"
-
-# Background function — 15-minute timeout (default is 10 seconds, too short for POP3 + AI)
-[functions."sync-background"]
-  timeout = 900
