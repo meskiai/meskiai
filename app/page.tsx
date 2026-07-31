@@ -213,24 +213,7 @@ export default function Home() {
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
         </div>
         
-        <div className="animate-fade-in-up animate-delay-1" style={{ 
-          maxWidth: '800px', 
-          margin: '0 auto 48px auto', 
-          padding: '24px 32px', 
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02))',
-          backdropFilter: 'blur(30px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(30px) saturate(200%)',
-          border: '1px solid var(--glass-border)',
-          boxShadow: 'var(--mac-shadow), inset 0 1px 1px rgba(255,255,255,0.2)',
-          borderRadius: '24px', 
-          display: 'flex', 
-          alignItems: 'flex-start', 
-          gap: '20px', 
-          color: 'var(--subtext)', 
-          textAlign: 'left',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
+        <div className={`animate-fade-in-up animate-delay-1 ${styles.warningBox}`}>
           {/* Subtle glow effect in the background */}
           <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
           <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
