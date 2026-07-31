@@ -42,21 +42,40 @@ export async function POST(
       where: { userId: session.user.id },
     });
 
+    // Get website content if available to enrich context
+    let websiteContent = "";
+    if (userSettings?.companyWebsite) {
+      try {
+        const website = await prisma.userWebsiteContent.findFirst({
+          where: { userId: session.user.id }
+        });
+        if (website?.content) {
+          websiteContent = website.content;
+        }
+      } catch (e) {}
+    }
+
     const { text } = await generateText({
       model: googleAI("gemini-flash-latest"),
-      system: `Jesteś profesjonalnym asystentem AI ds. komunikacji e-mail.
-Twoja firma zajmuje się i kieruje się następującymi zasadami:
-"${userSettings?.businessContext || "Firma dbająca o profesjonalną obsługę klienta."}"
+      system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.
+Twoja firma kieruje się następującymi zasadami i informacjami:
+"${userSettings?.businessContext || "Profesjonalna obsługa klienta."}"
 
-Zadanie: Napisz profesjonalną propozycję odpowiedzi na poniższego e-maila. Bądź uprzejmy i zwięzły. Podpisz się jako profesjonalny Asystent z firmy klienta (na podstawie podanej bazy wiedzy), a nie jako zewnętrzny asystent. Odpowiedź MUSI opierać się na zasadach i profilu Twojej firmy. NIE PISZ słów takich jak "CZŁOWIEK", "BOT", ani "MESKIAI". Podaj po prostu gotowy tekst wiadomości.
+${websiteContent ? `Dodatkowe informacje o ofercie, cenniku i usługach firmy pobrane z jej strony internetowej:\n"${websiteContent.substring(0, 4000)}"` : ""}
+
+Zadanie: Napisz kompletną, gotową do wysłania, profesjonalną i uprzejmą propozycję odpowiedzi na poniższego e-maila od klienta.
+Ton odpowiedzi: ${userSettings?.replyTone || "PROFESJONALNY"}.
 
 ZASADY:
-1. Jeśli wiadomość to absolutny spam, reklama, newsletter, bot, systemowa lub śmieciowa oferta → odpowiedz TYLKO: BOT
-2. Jeśli wiadomość jest ściśle ważna, pilna, biznesowo krytyczna lub wymaga podjęcia decyzji przez właściciela → odpowiedz TYLKO: REQUIRES_ATTENTION`,
+1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacjach o firmie.
+2. Podpisz się jako profesjonalny pracownik/asystent firmy użytkownika.
+3. NIE używaj słów kluczowych "BOT", "SPAM", "REQUIRES_ATTENTION", ani "MESKIAI".
+4. Podaj tylko i wyłącznie samą treść e-maila, która jest gotowa do skopiowania i wysłania (bez żadnych komentarzy w stylu "Oto moja propozycja:").`,
       prompt: `
-Oto e-mail od: ${latestEmail.from}
+Oto e-mail od klienta:
+Nadawca: ${latestEmail.from}
 Temat: ${latestEmail.subject}
-Treść:
+Treść wiadomości:
 ${latestEmail.body || latestEmail.snippet}`,
     });
 
