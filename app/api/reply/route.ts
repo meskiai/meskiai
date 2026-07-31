@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const replyTo = originalEmail.from.replace(/.*<(.+)>.*/, '$1').trim() || originalEmail.from;
     const references = thread.emails.filter(e => !e.isFromAgent).map(e => e.messageId).join(' ');
 
-    await sendReplySMTP(
+    const smtpInfo = await sendReplySMTP(
       session.user.email!,
       userSettings.appPassword,
       replyTo,
@@ -43,6 +43,8 @@ export async function POST(req: Request) {
       originalEmail.messageId,
       references
     );
+    // Use the real SMTP Message-ID for proper threading
+    const sentMsgId = (smtpInfo as any)?.messageId || `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     await prisma.thread.update({
       where: { id: thread.id },
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
     await prisma.email.create({
       data: {
         threadId: thread.id,
-        messageId: `sent-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        messageId: sentMsgId,
         from: session.user.email || 'Agent',
         to: replyTo,
         subject: `Re: ${originalEmail.subject}`,
@@ -62,6 +64,12 @@ export async function POST(req: Request) {
         isFromAgent: true
       }
     });
+
+    // Increment email sent counter
+    await prisma.userSettings.update({
+      where: { userId: session.user.id },
+      data: { emailsSentThisMonth: { increment: 1 } }
+    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

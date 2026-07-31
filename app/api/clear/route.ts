@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
 
+// This endpoint has been disabled for security reasons.
+// It was a development utility that deleted all accounts/sessions without authentication.
 export async function GET() {
-  try {
-    await prisma.account.deleteMany({});
-    await prisma.session.deleteMany({});
-    return NextResponse.json({ success: true, message: "Cleared all accounts and sessions." });
-  } catch (e: any) {
-    return NextResponse.json({ success: false, error: e.message });
-  }
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
