@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showModuleSwitcher, setShowModuleSwitcher] = useState(false);
   const [showManualReply, setShowManualReply] = useState(false);
+  const [isGeneratingManualReply, setIsGeneratingManualReply] = useState(false);
   const [showUpgradeReminder, setShowUpgradeReminder] = useState(false);
 
   // Edit Modes State
@@ -2749,26 +2750,58 @@ export default function Dashboard() {
                                 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <Send size={15} color="var(--primary)" /> Odpowiedz ręcznie
                                 </span>
-                                <button
-                                  style={{ background: 'none', border: 'none', color: 'var(--subtext)', cursor: 'pointer', fontSize: '0.8rem', padding: '2px 8px' }}
-                                  onClick={() => { setShowManualReply(false); setEditedReply(''); }}
-                                >
-                                  Anuluj
-                                </button>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <button
+                                    style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: 'var(--primary)', cursor: isGeneratingManualReply ? 'not-allowed' : 'pointer', fontSize: '0.78rem', padding: '4px 12px', borderRadius: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }}
+                                    disabled={isGeneratingManualReply}
+                                    onClick={async () => {
+                                      if (!selectedThread) return;
+                                      setIsGeneratingManualReply(true);
+                                      setEditedReply('Generowanie...');
+                                      try {
+                                        const res = await fetch(`/api/threads/${selectedThread.id}/generate`, { method: 'POST' });
+                                        if (res.ok) {
+                                          const data = await res.json();
+                                          setEditedReply(data.draftReply || '');
+                                          await fetchThreads();
+                                        } else {
+                                          showToast('Nie udało się wygenerować odpowiedzi.', 'error');
+                                          setEditedReply('');
+                                        }
+                                      } catch (e) {
+                                        showToast('Błąd połączenia.', 'error');
+                                        setEditedReply('');
+                                      } finally {
+                                        setIsGeneratingManualReply(false);
+                                      }
+                                    }}
+                                  >
+                                    {isGeneratingManualReply
+                                      ? <><RefreshCw size={11} className={styles['animate-spin']} /> Generowanie...</>
+                                      : <><Sparkles size={11} /> Generuj AI</>}
+                                  </button>
+                                  <button
+                                    style={{ background: 'none', border: 'none', color: 'var(--subtext)', cursor: 'pointer', fontSize: '0.8rem', padding: '2px 8px' }}
+                                    onClick={() => { setShowManualReply(false); setEditedReply(''); }}
+                                  >
+                                    Anuluj
+                                  </button>
+                                </div>
                               </div>
                               <textarea
                                 className={styles.textarea}
                                 value={editedReply}
                                 onChange={(e) => setEditedReply(e.target.value)}
-                                placeholder="Wpisz swoją odpowiedź..."
+                                placeholder="Wpisz swoją odpowiedź lub kliknij 'Generuj AI'..."
                                 rows={5}
                                 autoFocus
+                                disabled={isGeneratingManualReply}
                               />
                               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <button
                                   className="btn btn-primary"
                                   onClick={async () => { await handleSendReply(); setShowManualReply(false); }}
-                                  disabled={sending || !editedReply.trim()}
+                                  disabled={sending || !editedReply.trim() || isGeneratingManualReply}
                                 >
                                   {sending ? <RefreshCw className={styles['animate-spin']} size={16} /> : <Send size={16} />}
                                   Wyślij
