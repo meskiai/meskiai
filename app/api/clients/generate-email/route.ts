@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: googleAI("gemini-1.5-pro"),
+      model: googleAI("gemini-flash-latest"),
       system: `Jesteś ekspertem ds. sprzedaży B2B (B2B Sales Executive) reprezentującym firmę.
 Twoim celem jest napisanie skutecznego, "zimnego maila" (cold email) z propozycją współpracy do potencjalnego klienta.
 

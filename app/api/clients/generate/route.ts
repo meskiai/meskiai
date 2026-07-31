@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     // Generate 5 leads using Gemini
     const { object } = await generateObject({
-      model: googleAI("gemini-1.5-pro"),
+      model: googleAI("gemini-flash-latest"),
       system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
 Twoim zadaniem jest znalezienie 5 potencjalnych, wysoce trafnych klientów na podstawie profilu działalności użytkownika.
 Zwracaj KONKRETNE i PRAWDZIWE (lub wysoce prawdopodobne) firmy działające na rynku.
