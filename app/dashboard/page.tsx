@@ -23,7 +23,9 @@ export default function Dashboard() {
   const [silentSyncing, setSilentSyncing] = useState(false);
   const [selectedThread, setSelectedThread] = useState<any | null>(null);
   const [editedReply, setEditedReply] = useState("");
+  const [resolvingThread, setResolvingThread] = useState(false);
   const [sending, setSending] = useState(false);
+
   const [deleting, setDeleting] = useState(false);
   const [autoReply, setAutoReply] = useState(false);
   const [lastAgentRunAt, setLastAgentRunAt] = useState<string | null>(null);
@@ -383,6 +385,49 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
+
+  const detectThreadTopic = (emails: any[]) => {
+    if (!emails || emails.length === 0) return null;
+    const content = emails.map(e => `${e.subject} ${e.body || e.snippet}`).join(" ").toLowerCase();
+    
+    if (content.includes("spotkan") || content.includes("telefon") || content.includes("call") || content.includes("zadzwo") || content.includes("kalendarz") || content.includes("termin") || content.includes("slot")) {
+      return { label: "Spotkanie / Rozmowa", emoji: "📞", color: "#6366f1", bg: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.3)" };
+    }
+    if (content.includes("ofert") || content.includes("cen") || content.includes("koszt") || content.includes("wycen") || content.includes("ile za") || content.includes("ile kosztuje")) {
+      return { label: "Oferta / Wycena", emoji: "💰", color: "#10b981", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" };
+    }
+    if (content.includes("reklamac") || content.includes("zwrot") || content.includes("nie dział") || content.includes("błąd") || content.includes("zepsut") || content.includes("popsut") || content.includes("wadliw")) {
+      return { label: "Reklamacja / Zwrot", emoji: "⚠️", color: "#ef4444", bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)" };
+    }
+    if (content.includes("faktur") || content.includes("rachunek") || content.includes("fv") || content.includes("przelew") || content.includes("płatn") || content.includes("platn")) {
+      return { label: "Faktura / Płatność", emoji: "📄", color: "#f59e0b", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" };
+    }
+    return null;
+  };
+
+  const handleResolveThread = async (threadId: string) => {
+    setResolvingThread(true);
+    try {
+      const res = await fetch(`/api/threads/${threadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "REPLIED" })
+      });
+      if (res.ok) {
+        showToast("Sprawa została zakończona i przeniesiona do archiwum.", "success");
+        setSelectedThread(null);
+        await fetchThreads();
+      } else {
+        showToast("Nie udało się zakończyć sprawy.", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Błąd połączenia z serwerem.", "error");
+    } finally {
+      setResolvingThread(false);
+    }
+  };
+
 
   const fetchLeads = async () => {
     try {
@@ -2615,8 +2660,25 @@ export default function Dashboard() {
                           </button>
                         </div>
                         <div className={styles.subject}>{latestEmail.subject}</div>
-                        <div className={styles.statusBadge} data-status={thread.status === 'REQUIRES_ATTENTION' && (thread.emails || []).some((e: any) => e.isFromAgent) ? 'REPLIED' : thread.status}>
-                          {isPending ? 'Do Akceptacji' : thread.status === 'AUTO_REPLIED' ? 'Auto-odpowiedź' : thread.status === 'IGNORED' ? 'Spam' : thread.status === 'REQUIRES_ATTENTION' ? ((thread.emails || []).some((e: any) => e.isFromAgent) ? 'Obsłużone' : 'Wymaga Uwagi') : 'Wysłano'}
+                        
+                        {/* Topic indicator */}
+                        {(() => {
+                          const topic = detectThreadTopic(thread.emails);
+                          if (!topic) return null;
+                          return (
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 8px', borderRadius: '4px', background: topic.bg, border: `1px solid ${topic.border}`, color: topic.color, fontSize: '0.72rem', fontWeight: 600, marginTop: '4px', marginBottom: '8px', marginRight: '6px' }}>
+                              <span>{topic.emoji}</span>
+                              <span>{topic.label}</span>
+                            </div>
+                          );
+                        })()}
+
+                        <div 
+                          className={styles.statusBadge} 
+                          data-status={thread.status === 'REQUIRES_ATTENTION' && (thread.emails || []).some((e: any) => e.isFromAgent) ? 'PENDING_APPROVAL' : thread.status}
+                          style={thread.status === 'REQUIRES_ATTENTION' && (thread.emails || []).some((e: any) => e.isFromAgent) ? { background: 'rgba(245,158,11,0.12)', color: '#d97706', boxShadow: 'none' } : {}}
+                        >
+                          {isPending ? 'Do Akceptacji' : thread.status === 'AUTO_REPLIED' ? 'Auto-odpowiedź' : thread.status === 'IGNORED' ? 'Spam' : thread.status === 'REQUIRES_ATTENTION' ? ((thread.emails || []).some((e: any) => e.isFromAgent) ? 'W toku (Odpisano)' : 'Wymaga Uwagi') : 'Wysłano'}
                         </div>
                       </div>
                     );
@@ -2731,6 +2793,30 @@ export default function Dashboard() {
                           <><CheckCircle size={18} color="#10b981" /> Odpowiedź została wysłana</>
                         )}
                       </div>
+
+                      {/* Display unresolved warning for REQUIRES_ATTENTION threads that have a reply */}
+                      {selectedThread.status === 'REQUIRES_ATTENTION' && (
+                        <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                            <AlertCircle size={18} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
+                            <div>
+                              <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--foreground)' }}>Niedokończona sprawa (W toku)</div>
+                              <p style={{ fontSize: '0.78rem', color: 'var(--subtext)', marginTop: '4px', lineHeight: 1.4 }}>
+                                Agent AI (lub Ty) wysłał już wiadomość w tym wątku, ale sprawa nadal widnieje jako ważna w toku. Jeśli cała sprawa z klientem jest załatwiona, kliknij przycisk poniżej, aby ją zarchiwizować.
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            className="btn btn-primary"
+                            style={{ background: '#d97706', color: 'white', fontSize: '0.82rem', padding: '8px 16px', alignSelf: 'flex-start', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                            onClick={() => handleResolveThread(selectedThread.id)}
+                            disabled={resolvingThread}
+                          >
+                            {resolvingThread ? <RefreshCw size={14} className={styles['animate-spin']} /> : <CheckCircle size={14} />}
+                            Zakończ sprawę (Zarchiwizuj)
+                          </button>
+                        </div>
+                      )}
 
                       {/* Always-available manual reply toggle */}
                       {selectedThread.status !== 'IGNORED' && (
