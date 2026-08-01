@@ -166,16 +166,16 @@
 
 /* HERO SECTION (Centered, Massive) */
 .hero {
-  padding-top: clamp(80px, 10vh, 120px); /* Reduced from 160px */
+  padding-top: clamp(120px, 12vh, 160px);
   padding-left: 20px;
   padding-right: 20px;
-  padding-bottom: 24px;
+  padding-bottom: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 40vh;
-  max-width: 1000px; /* Reduced from 1200px */
+  min-height: 45vh;
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -310,8 +310,8 @@
 
 /* Premium Pricing Section (Apple Style) */
 .pricingSection {
-  padding: 40px 5% 120px 5%;
-  max-width: 1400px;
+  padding: 100px 5% 120px 5%;
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -505,8 +505,8 @@
 
 /* Why Us Statement (Apple Style) */
 .whyUsSection {
-  padding: 60px 5% 80px 5%; /* Shrunk padding */
-  max-width: 800px; /* Reduced from 1000px */
+  padding: 100px 5% 100px 5%;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -543,7 +543,7 @@
    ============================================= */
 
 .macosSection {
-  padding: 80px 5% 100px;
+  padding: 100px 5% 120px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
@@ -600,7 +600,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 480px;
+  height: 580px;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -782,7 +782,7 @@
 /* CSS Mail App Mockup */
 .mockMailApp {
   width: 100%;
-  height: 260px;
+  height: 330px;
   background: #111;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -896,7 +896,7 @@
 .mockTableRow {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr 1fr;
-  padding: 12px 14px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.03);
   align-items: center;
   color: #ccc;
@@ -920,12 +920,12 @@
 
 .swotBox {
   border: 1px solid;
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 20px;
   background: rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .swotBox:hover {
@@ -1080,7 +1080,7 @@
   }
   .pricingSection,
   .whyUsSection,
-  .featuresSection {
+  .macosSection {
     padding: 140px clamp(40px, 8vw, 120px);
   }
 }
