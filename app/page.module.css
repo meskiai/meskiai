@@ -1,6 +1,5 @@
 /* ==========================================================================
-   Ultra-Luxury Apple App Marketing Style (Supports Dark/Light Mode)
-   (Highly optimized, fluid typography, 120 FPS scrolling)
+   Premium Dark/Light Page — Apple-Inspired, Performance Optimized
    ========================================================================== */
 
 .main {
@@ -14,40 +13,25 @@
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color 0.35s, color 0.35s;
   transform: translate3d(0, 0, 0);
 }
 
-/* Subtle, static luxury background accent */
-.ambientBackground {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 500px;
-  background: radial-gradient(circle at top, rgba(0, 122, 255, 0.05) 0%, transparent 65%);
-  pointer-events: none;
-  z-index: 0;
-}
+/* ─── Nav ──────────────────────────────────────────────────────────────── */
 
-[data-theme="dark"] .ambientBackground {
-  background: radial-gradient(circle at top, rgba(10, 132, 255, 0.08) 0%, transparent 60%);
-}
-
-/* Ultra-Thin Frosted Glass Navigation */
 .nav {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 48px;
+  height: 52px;
   background: var(--nav-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 1000;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.3s, border-color 0.3s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navHidden {
@@ -56,8 +40,8 @@
 
 .navContent {
   width: 100%;
-  max-width: 1000px;
-  padding: 0 20px;
+  max-width: 1080px;
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,19 +52,20 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9rem;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.2px;
   color: var(--foreground);
   cursor: pointer;
+  text-decoration: none;
 }
 
 .logo img {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
   filter: var(--logo-filter);
-  transition: filter 0.3s ease;
+  transition: filter 0.3s;
 }
 
 .navLinks {
@@ -89,59 +74,35 @@
   gap: 28px;
 }
 
-@media (max-width: 767px) {
-  .navLinks {
-    display: none;
-  }
-}
+@media (max-width: 767px) { .navLinks { display: none; } }
 
 .navLink {
   color: var(--subtext);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.78rem;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.2s;
 }
-
-.navLink:hover {
-  color: var(--foreground);
-}
+.navLink:hover { color: var(--foreground); }
 
 .navActions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-.loginBtn {
-  background: transparent;
-  color: var(--subtext);
-  border: none;
-  font-size: 0.75rem;
-  font-weight: 400;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.loginBtn:hover {
-  color: var(--foreground);
-}
-
-.ctaBtnNav {
+.navPrimaryBtn {
   background: var(--foreground);
   color: var(--background);
   border: none;
   border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 0.72rem;
-  font-weight: 500;
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s;
+  white-space: nowrap;
 }
-
-.ctaBtnNav:hover {
-  opacity: 0.9;
-}
+.navPrimaryBtn:hover { opacity: 0.88; }
 
 .avatarBtn {
   background: transparent;
@@ -151,428 +112,379 @@
   border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
-
-.avatarBtn img {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-}
+.avatarBtn img { width: 24px; height: 24px; border-radius: 50%; }
 
 .avatarPlaceholder {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* ==========================================================================
-   Hero Section
-   ========================================================================== */
-
-.hero {
-  padding-top: clamp(120px, 18vh, 180px);
-  padding-bottom: 80px;
-  padding-left: 20px;
-  padding-right: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  z-index: 10;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.badge {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--subtext);
-  margin-bottom: 24px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.badgeHighlight {
-  color: var(--primary);
-}
-
-.heroTitle {
-  font-size: clamp(2.6rem, 7.5vw, 4.8rem);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 1.05;
-  margin-bottom: 24px;
   color: var(--foreground);
 }
 
-.heroSubtitle {
-  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  padding-top: clamp(110px, 15vh, 160px);
+  padding-bottom: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 740px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--subtext);
+  margin-bottom: 28px;
+}
+.heroBadgeIcon { color: var(--primary); }
+
+.heroTitle {
+  font-size: clamp(2.8rem, 7.5vw, 5.2rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.04;
+  margin: 0 0 22px;
+  color: var(--foreground);
+}
+
+.heroParagraph {
+  font-size: clamp(1rem, 2.3vw, 1.2rem);
   font-weight: 400;
   color: var(--subtext);
-  margin-bottom: 40px;
-  line-height: 1.45;
-  max-width: 580px;
+  line-height: 1.5;
+  max-width: 520px;
+  margin: 0 0 38px;
 }
 
-.ctaWrapper {
+.heroButtons {
   display: flex;
+  gap: 14px;
   justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 599px) {
-  .ctaWrapper {
-    flex-direction: column;
-    width: 100%;
-    max-width: 260px;
-  }
-}
-
-.ctaBtnPrimary {
+.heroBtnPrimary {
   background: var(--foreground);
   color: var(--background);
   border: none;
   border-radius: 999px;
-  padding: 12px 28px;
-  font-size: 0.92rem;
-  font-weight: 500;
+  padding: 13px 30px;
+  font-size: 0.94rem;
+  font-weight: 600;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
   transition: opacity 0.2s;
+  text-decoration: none;
 }
+.heroBtnPrimary:hover { opacity: 0.88; }
 
-.ctaBtnPrimary:hover {
-  opacity: 0.9;
-}
-
-.ctaBtnSecondary {
+.heroBtnSecondary {
   background: transparent;
   color: var(--primary);
   border: none;
-  padding: 12px 28px;
-  font-size: 0.92rem;
+  padding: 13px 30px;
+  font-size: 0.94rem;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
   transition: opacity 0.2s;
 }
+.heroBtnSecondary:hover { opacity: 0.7; }
 
-.ctaBtnSecondary:hover {
-  text-decoration: underline;
-  opacity: 0.8;
-}
+/* ─── Divider Numbers Strip ─────────────────────────────────────────────── */
 
-/* ==========================================================================
-   Exclusive Apple Card Carousel / Slider Showcase
-   ========================================================================== */
-
-.carouselSection {
-  padding: 40px 20px 80px 20px;
-  max-width: 1100px;
+.statsStrip {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  padding: 48px 24px;
+  max-width: 780px;
   margin: 0 auto;
-  z-index: 10;
   position: relative;
+  z-index: 10;
 }
 
-.carouselGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+.statItem {
+  text-align: center;
+}
+.statNumber {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--foreground);
+}
+.statLabel {
+  font-size: 0.78rem;
+  color: var(--subtext);
+  margin-top: 4px;
 }
 
-@media (max-width: 899px) {
-  .carouselGrid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
+/* ─── Features Section ─────────────────────────────────────────────────── */
 
-.carouselCard {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 40px;
+.featuresSection {
+  padding: 0 24px 80px;
+  max-width: 1080px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 280px;
-  box-shadow: var(--mac-shadow), var(--glass-reflection);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+  gap: 16px;
+  position: relative;
+  z-index: 10;
 }
 
-.carouselCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--glass-border);
+.featuresSectionTitle {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.featuresSectionTitle h2 {
+  font-size: clamp(1.6rem, 3.8vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--foreground);
+  margin: 0 0 8px;
+}
+.featuresSectionTitle p {
+  font-size: 1rem;
+  color: var(--subtext);
+  margin: 0;
 }
 
-.carouselIcon {
+.featuresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .featuresGrid { grid-template-columns: 1fr; }
+}
+
+.featureCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.25s;
+}
+.featureCard:hover { border-color: var(--glass-border); }
+
+.featureCardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(0, 122, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary);
-  margin-bottom: 28px;
+  margin-bottom: 4px;
 }
 
-.carouselCard h3 {
-  font-size: 1.3rem;
+.featureCard h3 {
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--foreground);
-  margin: 0 0 12px 0;
+  margin: 0;
   letter-spacing: -0.02em;
 }
 
-.carouselCard p {
-  font-size: 0.85rem;
+.featureCard p {
+  font-size: 0.87rem;
   color: var(--subtext);
   line-height: 1.5;
   margin: 0;
 }
 
-/* ==========================================================================
-   Spotlight Alternate Details (Clean Visual Narrative)
-   ========================================================================== */
-
-.spotlightSection {
-  padding: 80px 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-  z-index: 10;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 120px;
-}
-
-.spotlightRow {
+.featureCardLarge {
+  grid-column: span 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 32px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  transition: border-color 0.25s;
   align-items: center;
 }
+.featureCardLarge:hover { border-color: var(--glass-border); }
 
-.spotlightRowInverse {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-}
-
-@media (max-width: 899px) {
-  .spotlightRow, .spotlightRowInverse {
+@media (max-width: 767px) {
+  .featureCardLarge {
+    grid-column: span 1;
     grid-template-columns: 1fr;
-    gap: 40px;
   }
 }
 
-.spotlightText {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 899px) {
-  .spotlightText {
-    align-items: center;
-    text-align: center;
-  }
-}
-
-.spotlightTitle {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+.featureCardLargeText h3 {
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--foreground);
-  margin: 0 0 16px 0;
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  margin: 0 0 10px;
 }
-
-.spotlightDesc {
-  font-size: 0.95rem;
+.featureCardLargeText p {
+  font-size: 0.88rem;
   color: var(--subtext);
-  line-height: 1.55;
+  line-height: 1.5;
   margin: 0;
 }
 
-.spotlightVisual {
-  width: 100%;
-}
-
-@media (max-width: 899px) {
-  .spotlightRowInverse .spotlightVisual {
-    order: 2;
-  }
-}
-
-/* MacOS Frosted App Mockup window */
-.macosWindow {
+/* macOS mini-window inside feature card */
+.miniWindow {
   background: var(--secondary);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--mac-shadow);
+  border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
-.macosHeader {
-  height: 32px;
-  background: rgba(0, 0, 0, 0.03);
+.miniWindowHeader {
+  height: 28px;
+  background: rgba(0,0,0,0.03);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  gap: 6px;
+  padding: 0 10px;
+  gap: 5px;
 }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.redDot { background: #ff5f56; }
+.yellowDot { background: #ffbd2e; }
+.greenDot { background: #27c93f; }
 
-.macosBody {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.macosBubble {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--foreground);
-}
-
-.macosAgentBubble {
-  background: rgba(0, 122, 255, 0.04);
-  border-color: rgba(0, 122, 255, 0.15);
-  align-self: flex-end;
-  max-width: 90%;
-}
-
-/* Leads listing preview widget */
-.leadsPreviewWidget {
+.miniWindowBody {
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.leadsPreviewRow {
+.chatBubble {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--foreground);
+}
+.chatBubbleAgent {
+  background: rgba(0, 122, 255, 0.05);
+  border-color: rgba(0, 122, 255, 0.14);
+  align-self: flex-end;
+  max-width: 88%;
+}
+
+.leadRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--secondary);
+  background: var(--card-bg);
   border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.72rem;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
 }
-
-.leadAvatarCircle {
-  width: 16px;
-  height: 16px;
+.leadAvatar {
+  width: 18px; height: 18px;
   border-radius: 50%;
   background: var(--primary);
   color: white;
   font-size: 0.55rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
-
-.leadPercentLabel {
+.leadPct {
   background: rgba(48, 209, 88, 0.12);
   color: #30d158;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 5px;
+  border-radius: 3px;
   font-weight: 600;
 }
 
-/* ==========================================================================
-   Pricing Section
-   ========================================================================== */
+/* ─── Pricing ───────────────────────────────────────────────────────────── */
 
 .pricingSection {
-  padding: 80px 20px;
-  max-width: 1000px;
+  padding: 80px 24px;
+  max-width: 1080px;
   margin: 0 auto;
   text-align: center;
-  z-index: 10;
   position: relative;
+  z-index: 10;
 }
 
-.pricingHeader {
-  margin-bottom: 48px;
-}
-
-.pricingHeader h2 {
-  font-size: clamp(2rem, 5vw, 2.8rem);
+.pricingTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
 }
-
-.pricingHeader p {
-  font-size: 1.05rem;
+.pricingSubtitle {
+  font-size: 1rem;
   color: var(--subtext);
-  margin: 0;
+  margin: 0 0 40px;
 }
 
 .warningBox {
-  max-width: 700px;
-  margin: 0 auto 36px auto;
+  max-width: 660px;
+  margin: 0 auto 40px;
   padding: 14px 20px;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  color: var(--subtext);
+  align-items: flex-start;
+  gap: 14px;
   text-align: left;
 }
-
-@media (max-width: 599px) {
-  .warningBox {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 14px;
-    gap: 10px;
-  }
-}
-
 .warningBox h3 {
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: var(--foreground);
-  margin: 0 0 4px 0;
+  margin: 0 0 3px;
 }
-
 .warningBox p {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
+  color: var(--subtext);
   line-height: 1.45;
   margin: 0;
-  color: var(--subtext);
 }
 
 .pricingGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  align-items: stretch;
 }
 
 @media (max-width: 899px) {
@@ -586,148 +498,177 @@
 .pricingCard {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 18px;
+  padding: 30px;
   text-align: left;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.2s ease, border-color 0.2s;
+  transition: transform 0.22s, border-color 0.22s;
 }
+.pricingCard:hover { transform: translateY(-3px); border-color: var(--glass-border); }
 
-.pricingCard:hover {
-  transform: translateY(-2px);
-  border-color: var(--glass-border);
+.pricingCardPro {
+  border-color: rgba(0, 122, 255, 0.3);
 }
+.pricingCardPro:hover { border-color: var(--primary); }
 
-.pricingCard.pro {
-  border-color: rgba(0, 122, 255, 0.35);
-  background: rgba(0, 122, 255, 0.015);
-}
-
-.pricingCard.pro:hover {
-  border-color: var(--primary);
-}
-
-.proBadge {
-  align-self: flex-start;
+.pricingBadge {
+  display: inline-block;
   background: var(--primary);
-  color: #ffffff;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   padding: 3px 8px;
   border-radius: 4px;
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: 16px;
+  align-self: flex-start;
+}
+
+.pricingCurrentBadge {
+  display: inline-block;
+  background: rgba(48, 209, 88, 0.12);
+  color: #30d158;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  align-self: flex-start;
 }
 
 .pricingName {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--foreground);
   margin-bottom: 6px;
 }
 
 .pricingDesc {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--subtext);
   line-height: 1.4;
-  margin-bottom: 20px;
-  min-height: 40px;
+  margin-bottom: 18px;
+  min-height: 38px;
 }
 
 .pricingPrice {
-  font-size: 1.85rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   color: var(--foreground);
+  letter-spacing: -0.04em;
   margin-bottom: 20px;
 }
-
 .pricingPrice span {
-  font-size: 0.85rem;
-  color: var(--subtext);
+  font-size: 0.82rem;
   font-weight: 400;
+  color: var(--subtext);
 }
 
 .pricingFeatures {
   list-style: none;
   padding: 0;
-  margin: 0 0 28px 0;
+  margin: 0 0 26px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
-
 .pricingFeatures li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.82rem;
+  gap: 9px;
+  font-size: 0.8rem;
   color: var(--foreground);
-  opacity: 0.8;
+  opacity: 0.85;
 }
+.pricingFeatures li svg { color: var(--primary); flex-shrink: 0; }
 
-.pricingFeatures li svg {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.pricingBtn {
+/* Pricing buttons — active / current / disabled states */
+.pricingBtnActive {
   background: var(--foreground);
   color: var(--background);
   border: none;
   border-radius: 999px;
   padding: 10px 16px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   width: 100%;
   cursor: pointer;
   transition: opacity 0.2s;
-  text-align: center;
+}
+.pricingBtnActive:hover { opacity: 0.88; }
+
+.pricingBtnUpgrade {
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(0, 122, 255, 0.25);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.pricingBtnUpgrade:hover {
+  background: rgba(0, 122, 255, 0.13);
+  border-color: var(--primary);
 }
 
-.pricingBtn:hover {
-  opacity: 0.9;
+.pricingBtnCurrent {
+  background: rgba(48, 209, 88, 0.07);
+  color: #30d158;
+  border: 1px solid rgba(48, 209, 88, 0.25);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: not-allowed;
+  opacity: 0.85;
 }
 
-/* ==========================================================================
-   Footer
-   ========================================================================== */
+.pricingBtnDisabled {
+  background: var(--secondary);
+  color: var(--subtext);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  width: 100%;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ─── Footer ────────────────────────────────────────────────────────────── */
 
 .footer {
   text-align: center;
-  padding: 40px 20px;
+  padding: 36px 24px;
   color: var(--subtext);
   border-top: 1px solid var(--border);
-  margin-top: 40px;
-  z-index: 10;
-  position: relative;
   background: var(--background);
-  transition: background-color 0.3s, border-color 0.3s;
+  transition: background 0.3s, border-color 0.3s;
+  position: relative;
+  z-index: 10;
 }
-
 .footerLinks {
   display: flex;
   gap: 20px;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
-
 .footerLinks a {
   color: var(--subtext);
   font-size: 0.72rem;
   text-decoration: none;
   transition: color 0.2s;
 }
-
-.footerLinks a:hover {
-  color: var(--foreground);
-  text-decoration: underline;
-}
-
-.footer p {
-  font-size: 0.72rem;
-  margin: 0;
-}
+.footerLinks a:hover { color: var(--foreground); }
+.footer p { font-size: 0.72rem; margin: 0; }
