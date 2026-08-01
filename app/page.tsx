@@ -353,78 +353,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Clean 3-Column Features Section */}
-      <section className={styles.featuresSection}>
-        <div className={styles.featuresHeader}>
-          <div className={`${styles.badge} animate-fade-in-up`} style={{ marginBottom: '16px', display: 'inline-flex' }}>
-            <Sparkles size={14} className={styles.badgeHighlight} /> Co potrafi Twój Agent
-          </div>
-          <h2 className="animate-fade-in-up">Moc automatyzacji B2B.<br/>Zamknięta w szklanym panelu.</h2>
+      {/* Premium Apple-Style Product Showcases */}
+      <section className={styles.showcaseSection}>
+        <div className={styles.showcaseHeader}>
+          <span className={styles.showcaseSubtitle}>Możliwości klasy Pro</span>
+          <h2 className={styles.showcaseTitle}>Oto co potrafi Meski AI.</h2>
         </div>
-        
-        <div className={styles.featuresPremiumGrid}>
-          {/* Card 1 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} ${styles.bentoFlex} animate-fade-in-up`}>
-            <div className={styles.bentoText}>
-              <div className={styles.premiumIconWrapper}>
-                <Clock size={18} />
-              </div>
-              <h3>Autonomiczny Agent 24/7</h3>
-              <p>Działa nieprzerwanie w tle na Netlify. Pobiera pocztę przez POP3 i automatycznie wysyła dopasowane odpowiedzi przez SMTP (hasło aplikacji), gdy Twój komputer jest wyłączony.</p>
-            </div>
-            <div className={styles.bentoImageWrapper}>
-              <img src="/dashboard_preview.jpg" alt="Dashboard Preview" className={styles.bentoImage} />
-            </div>
+
+        {/* Showcase 1: Autonomiczny Agent */}
+        <div className={styles.showcaseRow}>
+          <div className={styles.showcaseText}>
+            <span className={styles.showcaseTag} style={{ color: '#6366f1' }}>Inteligentny Agent</span>
+            <h3>Poczta, która pracuje.<br/>Kiedy Ty odpoczywasz.</h3>
+            <p>
+              Meski AI działa jako w pełni autonomiczny asystent 24/7. Pobiera wiadomości POP3 i wysyła odpowiedzi SMTP bezpośrednio z Twojego konta. Nie musisz mieć włączonego komputera – system automatycznie synchronizuje się co 2 minuty i odpowiada w Twoim imieniu, zachowując naturalny ton i kontekst rozmowy.
+            </p>
+            <ul className={styles.showcaseList}>
+              <li><CheckCircle size={16} /> Pełna automatyzacja POP3 / SMTP</li>
+              <li><CheckCircle size={16} /> Bezpieczne logowanie bez OAuth konta Google</li>
+              <li><CheckCircle size={16} /> Inteligentna klasyfikacja spraw w toku</li>
+            </ul>
+          </div>
+          <div className={styles.showcaseImageContainer}>
+            <img src="/dashboard_preview.jpg" alt="Dashboard Zarządzania Poczty" className={styles.showcaseImage} />
+          </div>
+        </div>
+
+        {/* Showcase 2: Baza Klientów i Cold Mail */}
+        <div className={`${styles.showcaseRow} ${styles.showcaseRowReverse}`}>
+          <div className={styles.showcaseText}>
+            <span className={styles.showcaseTag} style={{ color: '#10b981' }}>Proaktywna Sprzedaż</span>
+            <h3>Baza Klientów i Cold Mail.<br/>Wszystko w jednym miejscu.</h3>
+            <p>
+              Zwiększaj zyski bez wysiłku. System wyszukuje firmy pasujące do Twojego profilu klienta, wyciąga kluczowe dane kontaktowe i generuje zoptymalizowane, zimne maile sprzedażowe, które natychmiast przyciągają uwagę i konwertują odbiorców na klientów.
+            </p>
+            <ul className={styles.showcaseList}>
+              <li><CheckCircle size={16} /> Precyzyjne filtry wyszukiwania firm B2B</li>
+              <li><CheckCircle size={16} /> Szablony Cold Email pisane przez Gemini Pro</li>
+              <li><CheckCircle size={16} /> Bezpośredni eksport i wysyłka do skrzynek</li>
+            </ul>
+          </div>
+          <div className={styles.showcaseImageContainer}>
+            <img src="/hero_ai_core.jpg" alt="Baza Klientów B2B" className={styles.showcaseImage} />
+          </div>
+        </div>
+
+        {/* Showcase 3: Szczegółowe Funkcje w stylu Apple Grid */}
+        <div className={styles.featuresAppleGrid}>
+          {/* Item 1: Strona WWW */}
+          <div className={styles.featuresAppleItem}>
+            <Globe size={24} style={{ color: '#3b82f6', marginBottom: '16px' }} />
+            <h4>Analiza Strony WWW</h4>
+            <p>Podepnij link do swojej witryny. Agent w sekundy nauczy się Twojej oferty, cennika i godzin otwarcia, by precyzyjnie odpowiadać klientom na bazie faktów.</p>
           </div>
 
-          {/* Card 2 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-1`}>
-            <div className={styles.premiumIconWrapper}>
-              <Globe size={18} />
-            </div>
-            <h3>Analiza Strony WWW</h3>
-            <p>Podepnij link do swojej witryny. Agent AI automatycznie pobierze jej treść, pozna ofertę, cennik i specyfikę firmy, by precyzyjnie odpowiadać.</p>
+          {/* Item 2: Klasyfikacja */}
+          <div className={styles.featuresAppleItem}>
+            <Inbox size={24} style={{ color: '#a855f7', marginBottom: '16px' }} />
+            <h4>Czysta skrzynka</h4>
+            <p>System automatycznie odrzuca spam, alerty bezpieczeństwa i newslettery systemowe, zostawiając na panelu tylko autentyczne wiadomości od ludzi.</p>
           </div>
 
-          {/* Card 3 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-2`}>
-            <div className={styles.premiumIconWrapper}>
-              <Inbox size={18} />
-            </div>
-            <h3>Klasyfikacja</h3>
-            <p>AI automatycznie odrzuca spam i oferty marketingowe, a ważne zapytania kieruje do panelu.</p>
-          </div>
-
-          {/* Card 4 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} ${styles.bentoFlex} animate-fade-in-up animate-delay-3`}>
-            <div className={styles.bentoText}>
-              <div className={styles.premiumIconWrapper}>
-                <BarChart2 size={18} />
-              </div>
-              <h3>Baza Klientów i Cold Mail</h3>
-              <p>Wyszukuj potencjalnych klientów B2B na bazie profilu firmy. Wykorzystaj wbudowany model AI do natychmiastowego generowania spersonalizowanych, skutecznych szablonów sprzedażowych o najwyższym współczynniku konwersji.</p>
-            </div>
-            <div className={styles.bentoImageWrapper}>
-              <img src="/hero_ai_core.jpg" alt="Lead Generation Preview" className={styles.bentoImage} />
-            </div>
-          </div>
-
-          {/* Card 5 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-4`}>
-            <div className={styles.premiumIconWrapper}>
-              <Sliders size={18} />
-            </div>
-            <h3>Wybór Tonu AI</h3>
-            <p>Generuj odpowiedzi jednym kliknięciem, decydując o tonie (Profesjonalny, Casualowy, Krótki).</p>
-          </div>
-
-          {/* Card 6 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up animate-delay-5`}>
-            <div className={styles.premiumIconWrapper}>
-              <Shield size={18} />
-            </div>
-            <h3>Bezpieczeństwo i Prywatność</h3>
-            <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są całkowicie chronione, odizolowane i nie służą do treningu modeli AI.</p>
+          {/* Item 3: Wybór Tonu */}
+          <div className={styles.featuresAppleItem}>
+            <Sliders size={24} style={{ color: '#fbbf24', marginBottom: '16px' }} />
+            <h4>Pełna Kontrola Tonu</h4>
+            <p>Wybieraj ton odpowiedzi jednym kliknięciem: od bardzo formalnego i biznesowego, po casualowy i krótki. Zawsze decydujesz przed wysłaniem.</p>
           </div>
         </div>
       </section>

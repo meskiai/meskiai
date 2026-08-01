@@ -538,159 +538,154 @@
   opacity: 0.85;
 }
 
-/* Clean 3-Column Features Section */
-.featuresSection {
-  padding: 120px 5%;
-  max-width: 1400px;
+/* Showcase Section (Apple Alternating Rows) */
+.showcaseSection {
+  padding: 80px 5% 100px 5%;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.featuresHeader {
+.showcaseHeader {
   text-align: center;
-  margin-bottom: 48px; /* Tighter spacing */
+  margin-bottom: 64px;
 }
 
-.featuresHeader h2 {
-  font-size: clamp(2rem, 3.5vw, 2.8rem); /* Shrunk from clamp(3rem, 5vw, 4.5rem) */
+.showcaseSubtitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.showcaseTitle {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--foreground) 0%, var(--subtext) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--foreground);
 }
 
-.featuresPremiumGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px; /* Tighter gap */
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* Apple Bento Grid spanning */
-.bentoLarge {
-  grid-column: span 2;
-}
-
-.bentoSmall {
-  grid-column: span 1;
-}
-
-.bentoFlex {
-  flex-direction: row !important;
+.showcaseRow {
+  display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 60px;
+  margin-bottom: 80px;
 }
 
-.bentoText {
-  flex: 1.1;
+.showcaseRowReverse {
+  flex-direction: row-reverse;
+}
+
+.showcaseText {
+  flex: 1;
+}
+
+.showcaseTag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.showcaseText h3 {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+  margin-bottom: 16px;
+  line-height: 1.25;
+}
+
+.showcaseText p {
+  font-size: 0.9rem;
+  color: var(--subtext);
+  line-height: 1.55;
+  margin-bottom: 24px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.showcaseList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
-.bentoImageWrapper {
-  flex: 0.9;
-  position: relative;
-  border-radius: 12px;
+.showcaseList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.showcaseList li svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.showcaseImageContainer {
+  flex: 1.2;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow: var(--mac-shadow), 0 20px 50px rgba(0, 0, 0, 0.15);
+  background: var(--card-bg);
   display: flex;
 }
 
-.bentoImage {
+.showcaseImage {
   width: 100%;
   height: auto;
   object-fit: cover;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.featurePremiumCard {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px; /* Smaller, cleaner radius */
-  padding: 30px 26px; /* Significantly reduced padding */
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+.showcaseRow:hover .showcaseImage {
+  transform: scale(1.03);
+}
+
+/* Minor Grid below showcases */
+.featuresAppleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 48px;
+  margin-top: 48px;
+}
+
+.featuresAppleItem {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--mac-shadow);
+  align-items: flex-start;
+  text-align: left;
 }
 
-.featurePremiumCard::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
-}
-
-.featurePremiumCard:hover {
-  transform: translateY(-3px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), var(--glass-reflection);
-}
-
-/* Subtle glow effect behind bento cards on hover */
-.featurePremiumCard::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: -1;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.03) 0%, transparent 85%);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-.featurePremiumCard:hover::after {
-  opacity: 1;
-}
-
-.premiumIconWrapper {
-  width: 38px; /* Tighter wrapper */
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px; /* Reduced gap */
-  color: var(--primary);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.featurePremiumCard:hover .premiumIconWrapper {
-  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
-  color: white;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
-  border-color: transparent;
-  transform: scale(1.05);
-}
-
-.featurePremiumCard h3 {
-  font-size: 1.05rem; /* Shrunk title size for sleeker look */
-  font-weight: 600; /* Medium-bold for premium feel */
+.featuresAppleItem h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
   color: var(--foreground);
-  margin: 0 0 6px 0; /* Reduced spacing */
+  margin-bottom: 8px;
   letter-spacing: -0.015em;
 }
 
-.featurePremiumCard p {
-  font-size: 0.82rem; /* Clean, smaller text */
+.featuresAppleItem p {
+  font-size: 0.82rem;
   color: var(--subtext);
-  line-height: 1.5; /* Tightened line-height */
-  margin: 0;
+  line-height: 1.5;
   font-weight: 500;
   opacity: 0.85;
-  max-width: 650px;
 }
 
 /* Footer */
@@ -811,10 +806,6 @@
   .pricingCard.pro:hover {
     transform: translateY(-8px);
   }
-  .featuresPremiumGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
 }
 
 /* Tablet portrait / small laptop 768–899px */
@@ -830,25 +821,26 @@
     font-size: clamp(1rem, 2.5vw, 1.35rem);
     margin-bottom: 36px;
   }
-  .featuresPremiumGrid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .bentoFlex {
+  .showcaseRow, .showcaseRowReverse {
     flex-direction: column !important;
-    gap: 20px;
+    gap: 40px;
+    margin-bottom: 60px;
   }
-  .bentoImageWrapper {
+  .showcaseImageContainer {
     width: 100%;
+  }
+  .featuresAppleGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
   .pricingSection,
   .whyUsSection,
-  .featuresSection {
+  .showcaseSection {
     padding: 80px 32px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .featuresHeader h2 {
+  .showcaseTitle {
     font-size: clamp(1.9rem, 6vw, 2.8rem);
   }
 }
@@ -884,12 +876,12 @@
   }
   .pricingSection,
   .whyUsSection,
-  .featuresSection {
+  .showcaseSection {
     padding: 64px 20px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .featuresHeader h2 {
+  .showcaseTitle {
     font-size: clamp(1.7rem, 7vw, 2.4rem);
   }
   .pricingCard {
@@ -937,12 +929,12 @@
   }
   .pricingSection,
   .whyUsSection,
-  .featuresSection {
+  .showcaseSection {
     padding: 52px 16px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .featuresHeader h2 {
+  .showcaseTitle {
     font-size: clamp(1.5rem, 8vw, 2rem);
   }
   .pricingCard {
