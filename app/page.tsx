@@ -158,163 +158,172 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Split-Screen Hero Section */}
-      <section className={styles.heroSection}>
-        <div className={styles.splitHeroGrid}>
-          {/* Hero Left - Text & Buttons */}
-          <div className={styles.heroLeft}>
-            <div className={styles.badge}>
-              <Sparkles size={12} className={styles.badgeHighlight} /> Poczta Biznesowa Nowej Generacji
-            </div>
-            
-            <h1 className={styles.heroTitle}>
-              Poczta, która pracuje. <br />Kiedy Ty odpoczywasz.
-            </h1>
-            
-            <p className={styles.heroSubtitle}>
-              Pierwszy w pełni autonomiczny asystent e-mail dla biznesu B2B. Działa w chmurze przez całą dobę. Odpowiada klientom, zbiera leady i chroni Twój wolny czas.
-            </p>
-            
-            <div className={styles.ctaWrapper}>
-              {status === "authenticated" ? (
-                <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
-                  Otwórz Panel roboczy <ArrowRight size={15} />
-                </Link>
-              ) : (
-                <>
-                  <button className={styles.ctaBtnPrimary} onClick={() => {
-                    document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
-                  }}>
-                    Rozpocznij korzystanie
-                  </button>
-                  <button className={styles.ctaBtnSecondary} onClick={() => {
-                    document.getElementById('funkcje')?.scrollIntoView({ behavior: 'smooth' });
-                  }}>
-                    Dowiedz się więcej <ChevronRight size={14} />
-                  </button>
-                </>
-              )}
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.badge}>
+          <Sparkles size={12} className={styles.badgeHighlight} /> Luksus Wolnego Czasu
+        </div>
+        
+        <h1 className={styles.heroTitle}>
+          Asystent poczty, <br />zdefiniowany na nowo.
+        </h1>
+        
+        <p className={styles.heroSubtitle}>
+          Ekskluzywny Agent AI dla firm B2B, które cenią perfekcję działania. Odpowiada klientom i rozwija Twój biznes w pełnej harmonii 24 godziny na dobę.
+        </p>
+        
+        <div className={styles.ctaWrapper}>
+          {status === "authenticated" ? (
+            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
+              Wejdź do panelu asystenta <ArrowRight size={15} />
+            </Link>
+          ) : (
+            <>
+              <button className={styles.ctaBtnPrimary} onClick={() => {
+                document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Rozpocznij inwestycję
+              </button>
+              <button className={styles.ctaBtnSecondary} onClick={() => {
+                document.getElementById('funkcje')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Poznaj szczegóły
+              </button>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Exclusive Apple Card Showcase Grid */}
+      <section className={styles.carouselSection} id="funkcje">
+        <div className={styles.carouselGrid}>
+          {/* Card 1 */}
+          <div className={styles.carouselCard}>
+            <Zap size={22} className={styles.carouselIcon} />
+            <div>
+              <h3>Pełna Autonomia</h3>
+              <p>
+                Pracuje cicho w chmurze bez potrzeby instalacji oprogramowania. Klient otrzymuje natychmiastową, rzetelną odpowiedź, kiedy Ty zajmujesz się ważniejszymi sprawami.
+              </p>
             </div>
           </div>
 
-          {/* Hero Right - Minimal Status Widget */}
-          <div className={styles.heroRight}>
-            <div className={styles.heroStatusWidget}>
-              <div className={styles.statusHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div className={styles.activeIndicator} />
-                  <span style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--foreground)' }}>Agent AI: Aktywny</span>
-                </div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>Live Monitor</span>
-              </div>
-              
-              <div className={styles.statusIndicators}>
-                <div>
-                  <div className={styles.statusLabel}>Wykorzystanie CPU</div>
-                  <div className={styles.statusValue}>1.4%</div>
-                </div>
-                <div>
-                  <div className={styles.statusLabel}>Uptime</div>
-                  <div className={styles.statusValue}>99.99%</div>
-                </div>
-                <div>
-                  <div className={styles.statusLabel}>Weryfikacja wiedzy</div>
-                  <div className={styles.statusValue}>Zabezpieczona</div>
-                </div>
-              </div>
+          {/* Card 2 */}
+          <div className={styles.carouselCard}>
+            <Shield size={22} className={styles.carouselIcon} />
+            <div>
+              <h3>Precyzja Informacji</h3>
+              <p>
+                Asystent nie zmyśla faktów ani ofert. Bazując na cennikach ze strony WWW, zawsze podaje bezbłędne dane. Wątpliwości kieruje bezpośrednio do Twojej weryfikacji.
+              </p>
+            </div>
+          </div>
 
-              <div className={styles.statusList}>
-                <div className={styles.statusRow}>
-                  <span>📥 Zapytanie ofertowe</span>
-                  <span className={`${styles.statusRowBadge} ${styles.badgeSuccess}`}>Auto-odpowiedź</span>
-                </div>
-                <div className={styles.statusRow}>
-                  <span>📞 Ustalenie terminu</span>
-                  <span className={`${styles.statusRowBadge} ${styles.badgeProgress}`}>W toku</span>
-                </div>
-              </div>
+          {/* Card 3 */}
+          <div className={styles.carouselCard}>
+            <Users size={22} className={styles.carouselIcon} />
+            <div>
+              <h3>Elitarne B2B</h3>
+              <p>
+                Samodzielnie identyfikuje obiecujące firmy handlowe, znajduje decydentów i przygotowuje spersonalizowane cold emaile – prosto do wysyłki.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Alternating Narrative Feature Rows */}
-      <section className={styles.featureRowsSection} id="funkcje">
+      {/* Feature Spotlights with macOS Window Mockups */}
+      <section className={styles.spotlightSection}>
         
-        {/* Row 1 - AI Autopilot */}
-        <div className={styles.featureRow}>
-          <div className={styles.rowText}>
-            <div className={styles.rowLabel}>Autopilot e-mail</div>
-            <h2 className={styles.rowTitle}>Odpisywanie na autopilocie. Zawsze w punkt.</h2>
-            <p className={styles.rowDesc}>
-              Twój asystent na bieżąco odbiera wiadomości i pisze profesjonalne odpowiedzi w ułamku sekundy. Doskonale odróżnia maile o spotkaniach, wycenach czy reklamacjach, automatycznie przypisując im odpowiednie statusy.
+        {/* Spotlight 1: Automatic Mail Reply */}
+        <div className={styles.spotlightRow}>
+          <div className={styles.spotlightText}>
+            <h2 className={styles.spotlightTitle}>Odpisywanie na poziomie eksperta.</h2>
+            <p className={styles.spotlightDesc}>
+              Zaawansowany moduł konwersacji analizuje intencje klienta i tworzy naturalne odpowiedzi. System automatycznie dopasuje status wiadomości, oszczędzając do 90% czasu potrzebnego na obsługę maili.
             </p>
           </div>
-          <div className={styles.rowVisual}>
-            <div className={styles.featureWidget}>
-              <div className={styles.mailSimContainer}>
-                <div className={styles.mailSimBubble}>
-                  <strong>Klient:</strong> Czy mają Państwo wolny czas na rozmowę w ten piątek o 14:00?
+          <div className={styles.spotlightVisual}>
+            <div className={styles.macosWindow}>
+              <div className={styles.macosHeader}>
+                <div className={`${styles.dot} ${styles.redDot}`} />
+                <div className={`${styles.dot} ${styles.yellowDot}`} />
+                <div className={`${styles.dot} ${styles.greenDot}`} />
+              </div>
+              <div className={styles.macosBody}>
+                <div className={styles.macosBubble}>
+                  <strong>Klient:</strong> Czy realizują Państwo zlecenia w Poznaniu i jak wygląda wycena?
                 </div>
-                <div className={`${styles.mailSimBubble} ${styles.mailSimAgent}`}>
-                  <strong>Agent AI:</strong> Dziękuję za kontakt. Piątek o godzinie 14:00 nam odpowiada. Proszę o potwierdzenie rezerwacji.
+                <div className={`${styles.macosBubble} ${styles.macosAgentBubble}`}>
+                  <strong>Agent AI:</strong> Dziękuję za kontakt. Tak, realizujemy zlecenia na terenie Poznania. Wycena jest ustalana indywidualnie – nasz cennik usług rozpoczyna się od 200 zł...
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Row 2 - B2B Lead generation */}
-        <div className={styles.featureRowInverse}>
-          <div className={styles.rowVisual}>
-            <div className={styles.featureWidget}>
-              <div className={styles.leadsSimContainer}>
-                <div className={styles.leadsSimRow}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className={styles.leadsSimAvatar}>PK</div>
-                    <span style={{ fontWeight: 600 }}>Piotr Kowalski</span>
+        {/* Spotlight 2: Leads Simulation */}
+        <div className={styles.spotlightRowInverse}>
+          <div className={styles.spotlightVisual}>
+            <div className={styles.macosWindow}>
+              <div className={styles.macosHeader}>
+                <div className={`${styles.dot} ${styles.redDot}`} />
+                <div className={`${styles.dot} ${styles.yellowDot}`} />
+                <div className={`${styles.dot} ${styles.greenDot}`} />
+              </div>
+              <div className={styles.macosBody}>
+                <div className={styles.leadsPreviewWidget}>
+                  <div className={styles.leadsPreviewRow}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className={styles.leadAvatarCircle}>PK</div>
+                      <span style={{ fontWeight: 600 }}>Przemysław Kaczmarek</span>
+                    </div>
+                    <span className={styles.leadPercentLabel}>94% dopasowania</span>
                   </div>
-                  <span className={styles.leadsSimPercent}>92% dopasowania</span>
-                </div>
-                <div className={styles.leadsSimRow}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className={styles.leadsSimAvatar} style={{ background: '#30d158' }}>AM</div>
-                    <span style={{ fontWeight: 600 }}>Anna Mazur</span>
+                  <div className={styles.leadsPreviewRow}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className={styles.leadAvatarCircle} style={{ background: '#30d158' }}>AM</div>
+                      <span style={{ fontWeight: 600 }}>Anna Michalak</span>
+                    </div>
+                    <span className={styles.leadPercentLabel}>89% dopasowania</span>
                   </div>
-                  <span className={styles.leadsSimPercent}>88% dopasowania</span>
                 </div>
               </div>
             </div>
           </div>
-          <div className={styles.rowText}>
-            <div className={styles.rowLabel}>Sprzedaż proaktywna</div>
-            <h2 className={styles.rowTitle}>Inteligentne targetowanie B2B. Leady w skrzynce.</h2>
-            <p className={styles.rowDesc}>
-              System nie tylko czeka na maile – sam szuka dla Ciebie potencjalnych kontrahentów na rynku. Analizuje profile firm i na tacy podsuwa Ci idealnie dopasowane kontakty handlowe wraz z wersją roboczą pierwszej wiadomości.
+          <div className={styles.spotlightText}>
+            <h2 className={styles.spotlightTitle}>Cold Emailing nowej generacji.</h2>
+            <p className={styles.spotlightDesc}>
+              Moduł generowania leadów samodzielnie bada rynek w poszukiwaniu nowych klientów. Dostarcza zweryfikowane adresy e-mail osób decyzyjnych oraz natychmiast generuje dedykowane, unikalne wiadomości.
             </p>
           </div>
         </div>
 
-        {/* Row 3 - Website integration context */}
-        <div className={styles.featureRow}>
-          <div className={styles.rowText}>
-            <div className={styles.rowLabel}>Baza Wiedzy</div>
-            <h2 className={styles.rowTitle}>Wiedza wstrzyknięta prosto z Twojej witryny WWW.</h2>
-            <p className={styles.rowDesc}>
-              Zapomnij o żmudnym wpisywaniu instrukcji. Wklej link do swojej strony internetowej, a Agent AI automatycznie pobierze z niej cenniki, usługi i regulaminy, tworząc z nich nieomylną bazę wiedzy.
+        {/* Spotlight 3: Website Scan */}
+        <div className={styles.spotlightRow}>
+          <div className={styles.spotlightText}>
+            <h2 className={styles.spotlightTitle}>Wiedza zebrana ze strony w minutę.</h2>
+            <p className={styles.spotlightDesc}>
+              Wystarczy podać link do swojej strony internetowej w ustawieniach asystenta. Agent AI w kilka sekund zbierze informacje o usługach, cennikach i godzinach pracy, wstrzykując je jako główne źródło prawdy do bazy wiedzy.
             </p>
           </div>
-          <div className={styles.rowVisual}>
-            <div className={styles.featureWidget}>
-              <div className={styles.urlSimContainer}>
-                <div className={styles.urlSimField}>
-                  <span>https://twoja-pracownia.pl</span>
-                  <Globe size={12} style={{ color: 'var(--primary)' }} />
-                </div>
-                <div className={styles.urlSimTags}>
-                  <span className={styles.urlSimTag}>✓ Cennik usług</span>
-                  <span className={styles.urlSimTag}>✓ Godziny pracy</span>
-                  <span className={styles.urlSimTag}>✓ Kontakt</span>
+          <div className={styles.spotlightVisual}>
+            <div className={styles.macosWindow}>
+              <div className={styles.macosHeader}>
+                <div className={`${styles.dot} ${styles.redDot}`} />
+                <div className={`${styles.dot} ${styles.yellowDot}`} />
+                <div className={`${styles.dot} ${styles.greenDot}`} />
+              </div>
+              <div className={styles.macosBody}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '8px 12px', borderRadius: '6px', fontSize: '0.72rem', color: 'var(--subtext)', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>https://twoja-pracownia.pl</span>
+                    <Globe size={12} style={{ color: 'var(--primary)' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <span style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.62rem', color: 'var(--foreground)' }}>✓ Cennik usług</span>
+                    <span style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.62rem', color: 'var(--foreground)' }}>✓ Lokalizacje</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -326,16 +335,16 @@ export default function Home() {
       {/* Pricing Matrix */}
       <section className={styles.pricingSection} id="cennik">
         <div className={styles.pricingHeader}>
-          <h2>Przejrzyste pakiety.</h2>
-          <p>Wybierz limit wiadomości dopasowany do skali Twojej firmy.</p>
+          <h2>Inwestycja w Twój spokój.</h2>
+          <p>Wybierz plan odpowiadający skali Twojego biznesu.</p>
         </div>
 
         <div className={styles.warningBox}>
           <AlertCircle size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
           <div>
-            <h3>Weryfikacja konta</h3>
+            <h3>Ważna uwaga techniczna</h3>
             <p>
-              Dokonaj rejestracji logując się **dokładnie na to firmowe konto Google (Gmail)**, które ma być obsługiwane automatycznie przez Agenta AI.
+              Wykup subskrypcję logując się **dokładnie na to firmowe konto Google (Gmail)**, które ma być automatyzowane przez Agenta AI.
             </p>
           </div>
         </div>

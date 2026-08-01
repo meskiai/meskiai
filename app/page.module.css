@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Apple Alternating Split-Row Premium Design System
-   (High-Performance, responsive, smooth theme transitions)
+   Ultra-Luxury Apple App Marketing Style (Supports Dark/Light Mode)
+   (Highly optimized, fluid typography, 120 FPS scrolling)
    ========================================================================== */
 
 .main {
@@ -12,39 +12,37 @@
   background-color: var(--background);
   color: var(--foreground);
   position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  
-  /* GPU acceleration for scroll performance */
+  transition: background-color 0.4s ease, color 0.4s ease;
   transform: translate3d(0, 0, 0);
 }
 
-/* Light static gradient header */
+/* Subtle, static luxury background accent */
 .ambientBackground {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 500px;
-  background: radial-gradient(ellipse at top, rgba(0, 122, 255, 0.07) 0%, transparent 65%);
+  background: radial-gradient(circle at top, rgba(0, 122, 255, 0.05) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
 
 [data-theme="dark"] .ambientBackground {
-  background: radial-gradient(ellipse at top, rgba(10, 132, 255, 0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at top, rgba(10, 132, 255, 0.08) 0%, transparent 60%);
 }
 
-/* Navigation */
+/* Ultra-Thin Frosted Glass Navigation */
 .nav {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 52px;
+  height: 48px;
   background: var(--nav-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -54,8 +52,8 @@
 
 .navContent {
   width: 100%;
-  max-width: 1100px;
-  padding: 0 24px;
+  max-width: 1000px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -65,17 +63,17 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 0.98rem;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
   letter-spacing: -0.3px;
   color: var(--foreground);
   cursor: pointer;
 }
 
 .logo img {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
   filter: var(--logo-filter);
   transition: filter 0.3s ease;
@@ -84,7 +82,7 @@
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
 }
 
 @media (max-width: 767px) {
@@ -95,7 +93,7 @@
 
 .navLink {
   color: var(--subtext);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 400;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -108,15 +106,15 @@
 .navActions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .loginBtn {
   background: transparent;
   color: var(--subtext);
   border: none;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 400;
   cursor: pointer;
   transition: color 0.2s ease;
 }
@@ -130,9 +128,9 @@
   color: var(--background);
   border: none;
   border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -153,14 +151,14 @@
 }
 
 .avatarBtn img {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
 }
 
 .avatarPlaceholder {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--secondary);
   display: flex;
@@ -169,59 +167,36 @@
 }
 
 /* ==========================================================================
-   Apple Split-Hero Layout
+   Hero Section
    ========================================================================== */
 
-.heroSection {
-  padding-top: clamp(100px, 14vh, 140px);
-  padding-bottom: 60px;
-  padding-left: 24px;
-  padding-right: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-  z-index: 10;
-  position: relative;
-}
-
-.splitHeroGrid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 48px;
-  align-items: center;
-}
-
-@media (max-width: 899px) {
-  .splitHeroGrid {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 32px;
-  }
-}
-
-.heroLeft {
+.hero {
+  padding-top: clamp(120px, 18vh, 180px);
+  padding-bottom: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-
-@media (max-width: 899px) {
-  .heroLeft {
-    align-items: center;
-  }
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .badge {
   background: var(--secondary);
   border: 1px solid var(--border);
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: var(--subtext);
   margin-bottom: 24px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .badgeHighlight {
@@ -229,31 +204,26 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
-  margin: 0 0 20px 0;
+  font-size: clamp(2.6rem, 7.5vw, 4.8rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+  margin-bottom: 24px;
   color: var(--foreground);
 }
 
 .heroSubtitle {
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
   font-weight: 400;
   color: var(--subtext);
-  margin: 0 0 36px 0;
-  line-height: 1.5;
-  text-align: left;
-}
-
-@media (max-width: 899px) {
-  .heroSubtitle {
-    text-align: center;
-  }
+  margin-bottom: 40px;
+  line-height: 1.45;
+  max-width: 580px;
 }
 
 .ctaWrapper {
   display: flex;
+  justify-content: center;
   gap: 16px;
 }
 
@@ -261,7 +231,7 @@
   .ctaWrapper {
     flex-direction: column;
     width: 100%;
-    max-width: 280px;
+    max-width: 260px;
   }
 }
 
@@ -271,13 +241,13 @@
   border: none;
   border-radius: 999px;
   padding: 12px 28px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   transition: opacity 0.2s;
 }
 
@@ -286,166 +256,138 @@
 }
 
 .ctaBtnSecondary {
-  background: var(--secondary);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: 999px;
+  background: transparent;
+  color: var(--primary);
+  border: none;
   padding: 12px 28px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: background-color 0.2s, border-color 0.2s;
+  gap: 6px;
+  transition: opacity 0.2s;
 }
 
 .ctaBtnSecondary:hover {
-  background: var(--sidebar-hover);
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   Exclusive Apple Card Carousel / Slider Showcase
+   ========================================================================== */
+
+.carouselSection {
+  padding: 40px 20px 80px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  z-index: 10;
+  position: relative;
+}
+
+.carouselGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 899px) {
+  .carouselGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.carouselCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  box-shadow: var(--mac-shadow), var(--glass-reflection);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+}
+
+.carouselCard:hover {
+  transform: translateY(-4px);
   border-color: var(--glass-border);
 }
 
-/* ==========================================================================
-   Hero Visual Widget (Status Controller)
-   ========================================================================== */
-
-.heroRight {
-  width: 100%;
+.carouselIcon {
+  color: var(--primary);
+  margin-bottom: 28px;
 }
 
-.heroStatusWidget {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: var(--mac-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.statusHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
-}
-
-.statusIndicators {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.statusLabel {
-  font-size: 0.72rem;
-  color: var(--subtext);
-}
-
-.statusValue {
+.carouselCard h3 {
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--foreground);
-  font-size: 0.75rem;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
 }
 
-.activeIndicator {
-  width: 6px;
-  height: 6px;
-  background-color: #30d158;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #30d158;
+.carouselCard p {
+  font-size: 0.85rem;
+  color: var(--subtext);
+  line-height: 1.5;
+  margin: 0;
 }
-
-.statusList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.statusRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  padding: 10px 14px;
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-}
-
-.statusRowBadge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badgeSuccess { background: rgba(48,209,88,0.12); color: #30d158; }
-.badgeProgress { background: rgba(245,158,11,0.08); color: var(--warning); }
 
 /* ==========================================================================
-   Apple Alternate Feature Rows
+   Spotlight Alternate Details (Clean Visual Narrative)
    ========================================================================== */
 
-.featureRowsSection {
-  padding: 60px 24px;
-  max-width: 1100px;
+.spotlightSection {
+  padding: 80px 20px;
+  max-width: 1000px;
   margin: 0 auto;
   z-index: 10;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 80px;
+  gap: 120px;
 }
 
-.featureRow {
+.spotlightRow {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
 }
 
-.featureRowInverse {
+.spotlightRowInverse {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
 }
 
 @media (max-width: 899px) {
-  .featureRow, .featureRowInverse {
+  .spotlightRow, .spotlightRowInverse {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 40px;
   }
 }
 
-.rowText {
+.spotlightText {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
 @media (max-width: 899px) {
-  .rowText {
+  .spotlightText {
     align-items: center;
     text-align: center;
   }
 }
 
-.rowLabel {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--primary);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
-
-.rowTitle {
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+.spotlightTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   font-weight: 700;
   color: var(--foreground);
   margin: 0 0 16px 0;
@@ -453,44 +395,53 @@
   line-height: 1.15;
 }
 
-.rowDesc {
+.spotlightDesc {
   font-size: 0.95rem;
   color: var(--subtext);
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0;
 }
 
-.rowVisual {
+.spotlightVisual {
   width: 100%;
 }
 
 @media (max-width: 899px) {
-  .featureRowInverse .rowVisual {
-    order: 2; /* Visual goes below text on mobile */
+  .spotlightRowInverse .spotlightVisual {
+    order: 2;
   }
 }
 
-/* Feature row visual widgets */
-.featureWidget {
-  background: var(--card-bg);
+/* MacOS Frosted App Mockup window */
+.macosWindow {
+  background: var(--secondary);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
   box-shadow: var(--mac-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.macosHeader {
+  height: 32px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+}
+
+.macosBody {
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Widget: Mail Auto-Reply Simulation */
-.mailSimContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.mailSimBubble {
-  background: var(--secondary);
+.macosBubble {
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 14px;
@@ -499,32 +450,32 @@
   color: var(--foreground);
 }
 
-.mailSimAgent {
-  background: rgba(0, 122, 255, 0.05);
+.macosAgentBubble {
+  background: rgba(0, 122, 255, 0.04);
   border-color: rgba(0, 122, 255, 0.15);
   align-self: flex-end;
   max-width: 90%;
 }
 
-/* Widget: Leads list */
-.leadsSimContainer {
+/* Leads listing preview widget */
+.leadsPreviewWidget {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.leadsSimRow {
+.leadsPreviewRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--secondary);
   border: 1px solid var(--border);
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
   font-size: 0.72rem;
 }
 
-.leadsSimAvatar {
+.leadAvatarCircle {
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -537,44 +488,12 @@
   justify-content: center;
 }
 
-.leadsSimPercent {
-  background: rgba(48,209,88,0.12);
+.leadPercentLabel {
+  background: rgba(48, 209, 88, 0.12);
   color: #30d158;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
-}
-
-/* Widget: URL parsed folder tags */
-.urlSimContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.urlSimField {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.7rem;
-  color: var(--subtext);
-  display: flex;
-  justify-content: space-between;
-}
-
-.urlSimTags {
-  display: flex;
-  gap: 6px;
-}
-
-.urlSimTag {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.62rem;
-  color: var(--foreground);
 }
 
 /* ==========================================================================
@@ -582,8 +501,8 @@
    ========================================================================== */
 
 .pricingSection {
-  padding: 60px 24px;
-  max-width: 1100px;
+  padding: 80px 20px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
   z-index: 10;
@@ -591,15 +510,15 @@
 }
 
 .pricingHeader {
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
 .pricingHeader h2 {
-  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-size: clamp(2rem, 5vw, 2.8rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
 }
 
 .pricingHeader p {
@@ -775,7 +694,7 @@
 
 .footer {
   text-align: center;
-  padding: 40px 24px;
+  padding: 40px 20px;
   color: var(--subtext);
   border-top: 1px solid var(--border);
   margin-top: 40px;
