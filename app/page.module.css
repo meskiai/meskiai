@@ -1131,7 +1131,7 @@
   .pricingSection,
   .whyUsSection,
   .macosSection {
-    padding: 80px 32px;
+    padding: 64px 32px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
@@ -1176,7 +1176,7 @@
   .pricingSection,
   .whyUsSection,
   .macosSection {
-    padding: 60px 20px;
+    padding: 44px 20px;
     max-width: 100%;
     overflow-x: hidden;
   }
@@ -1357,6 +1357,11 @@
   }
   .logo span {
     display: none; /* show only icon on tiny screens */
+  }
+  .pricingSection,
+  .whyUsSection,
+  .macosSection {
+    padding: 32px 16px !important;
   }
 }
 
