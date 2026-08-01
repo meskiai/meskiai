@@ -2921,9 +2921,39 @@ export default function Dashboard() {
             </h3>
             
             {isGeneratingEmail ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--subtext)' }}>
-                <RefreshCw size={32} className="animate-spin" style={{ margin: '0 auto 16px', color: 'var(--primary)' }} />
-                <p>Agent AI analizuje profil firmy i pisze spersonalizowanego maila...</p>
+              <div style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    <div className={styles.pulseDot} style={{ animationDelay: '0s' }} />
+                    <div className={styles.pulseDot} style={{ animationDelay: '0.25s' }} />
+                    <div className={styles.pulseDot} style={{ animationDelay: '0.5s' }} />
+                  </div>
+                  <span style={{ fontSize: '0.88rem', color: 'var(--foreground)', fontWeight: 500 }}>
+                    Asystent pisze spersonalizowany Cold Email...
+                  </span>
+                </div>
+                
+                <div className={styles.skeletonContainer}>
+                  {/* Recipient line skeleton */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border)', paddingBottom: '14px' }}>
+                    <div style={{ width: '45px', height: '10px', borderRadius: '4px', background: 'rgba(134,134,139,0.15)' }} />
+                    <div className={styles.skeletonBar} style={{ width: '180px' }} />
+                  </div>
+                  {/* Subject line skeleton */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border)', paddingBottom: '14px' }}>
+                    <div style={{ width: '45px', height: '10px', borderRadius: '4px', background: 'rgba(134,134,139,0.15)' }} />
+                    <div className={styles.skeletonBar} style={{ width: '240px' }} />
+                  </div>
+                  {/* Body lines skeleton */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
+                    <div className={styles.skeletonBar} style={{ width: '92%' }} />
+                    <div className={styles.skeletonBar} style={{ width: '85%' }} />
+                    <div className={styles.skeletonBar} style={{ width: '97%' }} />
+                    <div style={{ height: '4px' }} />
+                    <div className={styles.skeletonBar} style={{ width: '70%' }} />
+                    <div className={styles.skeletonBar} style={{ width: '40%' }} />
+                  </div>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
