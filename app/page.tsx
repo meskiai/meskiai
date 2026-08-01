@@ -353,92 +353,102 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Premium Apple-Style Product Showcases */}
-      <section className={styles.showcaseSection}>
-        <div className={styles.showcaseHeader}>
-          <span className={styles.showcaseSubtitle}>Możliwości klasy Pro</span>
-          <h2 className={styles.showcaseTitle}>Oto co potrafi Meski AI.</h2>
+      {/* Premium Bento Features Section */}
+      <section className={styles.bentoSection}>
+        <div className={styles.bentoHeader}>
+          <span className={styles.bentoEyebrow}>Możliwości klasy Pro</span>
+          <h2 className={styles.bentoTitle}>Oto co potrafi Meski AI.</h2>
+          <p className={styles.bentoSubtitle}>Jeden agent. Działa 24/7. Obsługuje całą Twoją komunikację.</p>
         </div>
 
-        {/* Showcase 1: Autonomiczny Agent */}
-        <div className={styles.showcaseRow}>
-          <div className={styles.showcaseText}>
-            <span className={styles.showcaseTag} style={{ color: '#6366f1' }}>Inteligentny Agent</span>
-            <h3>Poczta, która pracuje.<br/>Kiedy Ty odpoczywasz.</h3>
-            <p>
-              Meski AI działa jako w pełni autonomiczny asystent 24/7. Pobiera wiadomości POP3 i wysyła odpowiedzi SMTP bezpośrednio z Twojego konta. Nie musisz mieć włączonego komputera – system automatycznie synchronizuje się co 2 minuty i odpowiada w Twoim imieniu, zachowując naturalny ton i kontekst rozmowy.
-            </p>
-            <ul className={styles.showcaseList}>
-              <li><CheckCircle size={16} /> Pełna automatyzacja POP3 / SMTP</li>
-              <li><CheckCircle size={16} /> Bezpieczne logowanie bez OAuth konta Google</li>
-              <li><CheckCircle size={16} /> Podgląd wysłanych odpowiedzi i historii wątku</li>
-            </ul>
-          </div>
-          <div className={styles.showcaseImageContainer}>
-            <img src="/screen_30_173710.png" alt="Rzeczywisty panel wysłanych wiadomości Meski AI" className={styles.showcaseImage} />
-          </div>
-        </div>
+        <div className={styles.bentoGrid}>
 
-        {/* Showcase 2: Baza Klientów i Cold Mail */}
-        <div className={`${styles.showcaseRow} ${styles.showcaseRowReverse}`}>
-          <div className={styles.showcaseText}>
-            <span className={styles.showcaseTag} style={{ color: '#10b981' }}>Proaktywna Sprzedaż</span>
-            <h3>Baza Klientów i Cold Mail.<br/>Wszystko w jednym miejscu.</h3>
-            <p>
-              Zwiększaj zyski bez wysiłku. System wyszukuje firmy pasujące do Twojego profilu klienta, wyciąga kluczowe dane kontaktowe i generuje zoptymalizowane, zimne maile sprzedażowe, które natychmiast przyciągają uwagę i konwertują odbiorców na klientów.
-            </p>
-            <ul className={styles.showcaseList}>
-              <li><CheckCircle size={16} /> Precyzyjne filtry wyszukiwania firm B2B</li>
-              <li><CheckCircle size={16} /> Szablony Cold Email pisane przez Gemini Pro</li>
-              <li><CheckCircle size={16} /> Podgląd leadów i bezpośrednia wysyłka AI</li>
-            </ul>
-          </div>
-          <div className={styles.showcaseImageContainer}>
-            <img src="/screen_30_173823.png" alt="Rzeczywisty panel bazy leadów i klientów B2B" className={styles.showcaseImage} />
-          </div>
-        </div>
-
-        {/* Showcase 3: Analiza Strony i SWOT */}
-        <div className={styles.showcaseRow}>
-          <div className={styles.showcaseText}>
-            <span className={styles.showcaseTag} style={{ color: '#3b82f6' }}>Głęboka Analiza</span>
-            <h3>Raport Witryny i SWOT.<br/>Poznaj rynek i konkurencję.</h3>
-            <p>
-              Podepnij link do witryny swojej lub potencjalnego klienta. Agent w sekundy przeanalizuje jej ofertę, cennik i strukturę, po czym wygeneruje kompletny raport SEO, szacowany koszt kliknięcia (CPC), badanie trendów oraz kompletną analizę SWOT.
-            </p>
-            <ul className={styles.showcaseList}>
-              <li><CheckCircle size={16} /> Błyskawiczne pobieranie informacji z linków</li>
-              <li><CheckCircle size={16} /> Automatyczna analiza mocnych i słabych stron</li>
-              <li><CheckCircle size={16} /> Szacowanie kosztów reklamy Google Ads</li>
-            </ul>
-          </div>
-          <div className={styles.showcaseImageContainer}>
-            <img src="/screen_30_173836.png" alt="Rzeczywisty raport analizy witryny i SWOT" className={styles.showcaseImage} />
-          </div>
-        </div>
-
-        {/* Showcase 4: Szczegółowe Funkcje w stylu Apple Grid */}
-        <div className={styles.featuresAppleGrid}>
-          {/* Item 1: Bezpieczeństwo */}
-          <div className={styles.featuresAppleItem}>
-            <Shield size={24} style={{ color: '#3b82f6', marginBottom: '16px' }} />
-            <h4>Bezpieczeństwo i Prywatność</h4>
-            <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są całkowicie chronione, odizolowane i nie służą do treningu modeli AI.</p>
+          {/* HERO CARD — Agent 24/7 */}
+          <div className={`${styles.bentoCard} ${styles.bentoBig} ${styles.bentoHero}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.35) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon}>
+              <Bot size={28} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#818cf8' }}>Agent AI</span>
+            <h3 className={styles.bentoCardTitle}>Poczta, która działa.<br/>Kiedy Ty śpisz.</h3>
+            <p className={styles.bentoCardText}>Autonomiczny asystent POP3/SMTP odpowiada na maile w Twoim imieniu — naturalnie, kontekstowo i bez Twojej ingerencji.</p>
+            <div className={styles.bentoStatRow}>
+              <div className={styles.bentoStat}>
+                <span className={styles.bentoStatNum}>24/7</span>
+                <span className={styles.bentoStatLabel}>Dostępność</span>
+              </div>
+              <div className={styles.bentoStat}>
+                <span className={styles.bentoStatNum}>2 min</span>
+                <span className={styles.bentoStatLabel}>Czas reakcji</span>
+              </div>
+              <div className={styles.bentoStat}>
+                <span className={styles.bentoStatNum}>100%</span>
+                <span className={styles.bentoStatLabel}>Automatyzacja</span>
+              </div>
+            </div>
           </div>
 
-          {/* Item 2: Klasyfikacja */}
-          <div className={styles.featuresAppleItem}>
-            <Inbox size={24} style={{ color: '#a855f7', marginBottom: '16px' }} />
-            <h4>Czysta skrzynka</h4>
-            <p>System automatycznie odrzuca spam, alerty bezpieczeństwa i newslettery systemowe, zostawiając na panelu tylko autentyczne wiadomości od ludzi.</p>
+          {/* Cold Email */}
+          <div className={`${styles.bentoCard} ${styles.bentoCold}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.3) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}>
+              <Mail size={22} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#34d399' }}>Cold Email</span>
+            <h3 className={styles.bentoCardTitle}>Zimne maile.<br/>Gorące wyniki.</h3>
+            <p className={styles.bentoCardText}>AI generuje spersonalizowane maile sprzedażowe B2B, które konwertują.</p>
+            <div className={styles.bentoStatRow}>
+              <div className={styles.bentoStat}>
+                <span className={styles.bentoStatNum}>200+</span>
+                <span className={styles.bentoStatLabel}>Leadów / mies.</span>
+              </div>
+            </div>
           </div>
 
-          {/* Item 3: Wybór Tonu */}
-          <div className={styles.featuresAppleItem}>
-            <Sliders size={24} style={{ color: '#fbbf24', marginBottom: '16px' }} />
-            <h4>Pełna Kontrola Tonu</h4>
-            <p>Wybieraj ton odpowiedzi jednym kliknięciem: od bardzo formalnego i biznesowego, po casualowy i krótki. Zawsze decydujesz przed wysłaniem.</p>
+          {/* Analiza SWOT */}
+          <div className={`${styles.bentoCard} ${styles.bentoSwot}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.3) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}>
+              <BarChart2 size={22} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#60a5fa' }}>Analiza</span>
+            <h3 className={styles.bentoCardTitle}>Raport SWOT<br/>w sekundy.</h3>
+            <p className={styles.bentoCardText}>Wklej link. Agent analizuje ofertę, SEO, trendy i CPC. Bez analityków.</p>
           </div>
+
+          {/* Bezpieczeństwo */}
+          <div className={`${styles.bentoCard} ${styles.bentoSecurity}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(168,85,247,0.25) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
+              <Shield size={22} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#c084fc' }}>Bezpieczeństwo</span>
+            <h3 className={styles.bentoCardTitle}>Zero dostępu<br/>do Twojej skrzynki.</h3>
+            <p className={styles.bentoCardText}>Logowanie Google tylko do identyfikacji. Dane pocztowe nigdy nie trafiają do API Google ani nie trenują modeli AI.</p>
+          </div>
+
+          {/* Czysta Skrzynka */}
+          <div className={`${styles.bentoCard} ${styles.bentoInbox}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(251,191,36,0.25) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #b45309, #fbbf24)' }}>
+              <Inbox size={22} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#fcd34d' }}>Smart Filter</span>
+            <h3 className={styles.bentoCardTitle}>Tylko prawdziwi<br/>ludzie.</h3>
+            <p className={styles.bentoCardText}>Spam, boty i alerty systemowe są automatycznie odsiewane. Na panelu widzisz tylko to, co ważne.</p>
+          </div>
+
+          {/* Ton odpowiedzi */}
+          <div className={`${styles.bentoCard} ${styles.bentoTone}`}>
+            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 80% 80%, rgba(244,63,94,0.25) 0%, transparent 60%)' }} />
+            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #9f1239, #f43f5e)' }}>
+              <Sliders size={22} color="white" />
+            </div>
+            <span className={styles.bentoCardTag} style={{ color: '#fb7185' }}>Personalizacja</span>
+            <h3 className={styles.bentoCardTitle}>Twój głos.<br/>Twoje zasady.</h3>
+            <p className={styles.bentoCardText}>Wybierz ton: formalny, przyjazny, krótki. Agent zawsze pisze tak, jak Ty — nie jak robot.</p>
+          </div>
+
         </div>
       </section>
       

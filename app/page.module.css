@@ -539,154 +539,187 @@
 }
 
 /* Showcase Section (Apple Alternating Rows) */
-.showcaseSection {
-  padding: 80px 5% 100px 5%;
+/* =============================================
+   BENTO GRID — Apple-style features section
+   ============================================= */
+
+.bentoSection {
+  padding: 100px 5% 120px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.showcaseHeader {
+.bentoHeader {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
-.showcaseSubtitle {
-  font-size: 0.85rem;
-  font-weight: 600;
+.bentoEyebrow {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: var(--primary);
-  display: block;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
-.showcaseTitle {
-  font-size: clamp(2rem, 3.5vw, 2.8rem);
+.bentoTitle {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--foreground);
-}
-
-.showcaseRow {
-  display: flex;
-  align-items: center;
-  gap: 60px;
-  margin-bottom: 80px;
-}
-
-.showcaseRowReverse {
-  flex-direction: row-reverse;
-}
-
-.showcaseText {
-  flex: 1;
-}
-
-.showcaseTag {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.showcaseText h3 {
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.04em;
   color: var(--foreground);
   margin-bottom: 16px;
-  line-height: 1.25;
+  line-height: 1.1;
 }
 
-.showcaseText p {
-  font-size: 0.9rem;
+.bentoSubtitle {
+  font-size: 1rem;
   color: var(--subtext);
-  line-height: 1.55;
-  margin-bottom: 24px;
   font-weight: 500;
-  opacity: 0.85;
+  opacity: 0.8;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
-.showcaseList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* Grid layout — bento style */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
 }
 
-.showcaseList li {
+/* Base card */
+.bentoCard {
+  position: relative;
+  border-radius: 24px;
+  padding: 36px 32px;
+  border: 1px solid var(--glass-border);
+  background: var(--card-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+  cursor: default;
+}
+
+.bentoCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Glow overlay inside card */
+.bentoCardGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bentoCard:hover .bentoCardGlow {
+  opacity: 1.4;
+}
+
+/* HERO card spans 2 columns */
+.bentoBig {
+  grid-column: span 2;
+}
+
+/* Icon */
+.bentoCardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: var(--foreground);
-  font-weight: 500;
-}
-
-.showcaseList li svg {
-  color: var(--primary);
+  justify-content: center;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
 }
 
-.showcaseImageContainer {
-  flex: 1.2;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--mac-shadow), 0 20px 50px rgba(0, 0, 0, 0.15);
-  background: var(--card-bg);
-  display: flex;
+/* Tag (category label) */
+.bentoCardTag {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.showcaseImage {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.showcaseRow:hover .showcaseImage {
-  transform: scale(1.03);
-}
-
-/* Minor Grid below showcases */
-.featuresAppleGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  border-top: 1px solid var(--glass-border);
-  padding-top: 48px;
-  margin-top: 48px;
-}
-
-.featuresAppleItem {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.featuresAppleItem h4 {
-  font-size: 1.05rem;
-  font-weight: 600;
+/* Title */
+.bentoCardTitle {
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--foreground);
-  margin-bottom: 8px;
-  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
 }
 
-.featuresAppleItem p {
-  font-size: 0.82rem;
+/* Body text */
+.bentoCardText {
+  font-size: 0.88rem;
   color: var(--subtext);
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 500;
   opacity: 0.85;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
 }
+
+/* Stat row */
+.bentoStatRow {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--glass-border);
+  position: relative;
+  z-index: 1;
+}
+
+.bentoStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bentoStatNum {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--foreground);
+  line-height: 1;
+}
+
+.bentoStatLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--subtext);
+  opacity: 0.7;
+}
+
+
 
 /* Footer */
 .footer {
@@ -826,21 +859,20 @@
     gap: 40px;
     margin-bottom: 60px;
   }
-  .showcaseImageContainer {
-    width: 100%;
+  .bentoGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  .featuresAppleGrid {
-    grid-template-columns: 1fr;
-    gap: 32px;
+  .bentoBig {
+    grid-column: span 2;
   }
   .pricingSection,
   .whyUsSection,
-  .showcaseSection {
+  .bentoSection {
     padding: 80px 32px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .showcaseTitle {
+  .bentoTitle {
     font-size: clamp(1.9rem, 6vw, 2.8rem);
   }
 }
@@ -876,13 +908,22 @@
   }
   .pricingSection,
   .whyUsSection,
-  .showcaseSection {
+  .bentoSection {
     padding: 64px 20px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .showcaseTitle {
+  .bentoTitle {
     font-size: clamp(1.7rem, 7vw, 2.4rem);
+  }
+  .bentoGrid {
+    grid-template-columns: 1fr;
+  }
+  .bentoBig {
+    grid-column: span 1;
+  }
+  .bentoCard {
+    padding: 28px 24px;
   }
   .pricingCard {
     padding: 28px 20px;
@@ -934,7 +975,7 @@
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .showcaseTitle {
+  .bentoTitle {
     font-size: clamp(1.5rem, 8vw, 2rem);
   }
   .pricingCard {
