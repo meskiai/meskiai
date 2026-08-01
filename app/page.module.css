@@ -564,75 +564,103 @@
 .featuresPremiumGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
+/* Apple Bento Grid spanning */
+.bentoLarge {
+  grid-column: span 2;
+}
+
+.bentoSmall {
+  grid-column: span 1;
+}
+
 .featurePremiumCard {
-  background: var(--card-bg);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 32px 28px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 28px;
+  padding: 40px 36px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--mac-shadow);
 }
 
 .featurePremiumCard::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
 }
 
 .featurePremiumCard:hover {
-  transform: translateY(-5px) scale(1.02);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), inset 0 0 0 1px rgba(255,255,255,0.05);
+  transform: translateY(-4px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), var(--glass-reflection);
+}
+
+/* Subtle glow effect behind bento cards on hover */
+.featurePremiumCard::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.04) 0%, transparent 80%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.featurePremiumCard:hover::after {
+  opacity: 1;
 }
 
 .premiumIconWrapper {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   color: var(--primary);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .featurePremiumCard:hover .premiumIconWrapper {
-  background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
   color: white;
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
   border-color: transparent;
+  transform: scale(1.05);
 }
 
 .featurePremiumCard h3 {
-  font-size: 1.18rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--foreground);
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   letter-spacing: -0.02em;
 }
 
 .featurePremiumCard p {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--subtext);
-  line-height: 1.55;
+  line-height: 1.6;
   margin: 0;
   font-weight: 500;
+  max-width: 650px;
 }
 
 /* Footer */

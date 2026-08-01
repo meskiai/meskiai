@@ -364,7 +364,7 @@ export default function Home() {
         
         <div className={styles.featuresPremiumGrid}>
           {/* Card 1 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up`}>
             <div className={styles.premiumIconWrapper}>
               <Clock size={20} />
             </div>
@@ -373,48 +373,48 @@ export default function Home() {
           </div>
 
           {/* Card 2 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up animate-delay-1`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-1`}>
             <div className={styles.premiumIconWrapper}>
               <Globe size={20} />
             </div>
-            <h3>Analiza Twojej Strony WWW</h3>
-            <p>Podepnij link do swojej witryny. Agent AI automatycznie pobierze jej treść, pozna Twoją ofertę, cennik i specyfikę firmy, by precyzyjnie odpowiadać w Twoim imieniu.</p>
+            <h3>Analiza Strony WWW</h3>
+            <p>Podepnij link do swojej witryny. Agent AI automatycznie pobierze jej treść, pozna ofertę, cennik i specyfikę firmy, by precyzyjnie odpowiadać.</p>
           </div>
 
           {/* Card 3 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up animate-delay-2`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-2`}>
             <div className={styles.premiumIconWrapper}>
               <Inbox size={20} />
             </div>
-            <h3>Inteligentna Klasyfikacja</h3>
-            <p>AI automatycznie odrzuca spam i oferty marketingowe. Rozpoznaje ważne wiadomości (np. zapytania ofertowe, reklamacje) i kataloguje je w zakładce Ważne.</p>
+            <h3>Klasyfikacja</h3>
+            <p>AI automatycznie odrzuca spam i oferty marketingowe, a ważne zapytania kieruje do panelu.</p>
           </div>
 
           {/* Card 4 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up animate-delay-3`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up animate-delay-3`}>
             <div className={styles.premiumIconWrapper}>
               <BarChart2 size={20} />
             </div>
             <h3>Baza Klientów i Cold Mail</h3>
-            <p>Wyszukuj potencjalnych klientów B2B na bazie profilu firmy. Wykorzystaj model AI do generowania spersonalizowanych, skutecznych szablonów sprzedażowych.</p>
+            <p>Wyszukuj potencjalnych klientów B2B na bazie profilu firmy. Wykorzystaj wbudowany model AI do natychmiastowego generowania spersonalizowanych, skutecznych szablonów sprzedażowych o najwyższym współczynniku konwersji.</p>
           </div>
 
           {/* Card 5 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up animate-delay-4`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-4`}>
             <div className={styles.premiumIconWrapper}>
               <Sliders size={20} />
             </div>
-            <h3>Pełna Kontrola i Ton AI</h3>
-            <p>Możesz wygenerować odpowiedź jednym kliknięciem, dostosować ton wypowiedzi (Profesjonalny, Casualowy, Krótki) i dowolnie ją edytować przed ostateczną wysyłką.</p>
+            <h3>Wybór Tonu AI</h3>
+            <p>Generuj odpowiedzi jednym kliknięciem, decydując o tonie (Profesjonalny, Casualowy, Krótki).</p>
           </div>
 
           {/* Card 6 */}
-          <div className={`${styles.featurePremiumCard} animate-fade-in-up animate-delay-5`}>
+          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up animate-delay-5`}>
             <div className={styles.premiumIconWrapper}>
               <Shield size={20} />
             </div>
             <h3>Bezpieczeństwo i Prywatność</h3>
-            <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są chronione i nie służą do treningu modeli AI.</p>
+            <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są całkowicie chronione, odizolowane i nie służą do treningu modeli AI.</p>
           </div>
         </div>
       </section>
