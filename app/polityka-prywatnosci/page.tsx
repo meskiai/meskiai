@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
             </div>
             <h1 className="animate-fade-in-up animate-delay-1">Twoja Prywatność.<br/>Nasz Priorytet.</h1>
             <p className="animate-fade-in-up animate-delay-2">
-              Przejrzyste zasady przetwarzania danych osobowych i plików cookies w aplikacji Meski AI. Zbudowane na fundamencie absolutnego bezpieczeństwa.
+              Przejrzyste zasady przetwarzania danych osobowych i plików cookies w aplikacji MESKIAI. Zbudowane na fundamencie absolutnego bezpieczeństwa.
             </p>
           </div>
 

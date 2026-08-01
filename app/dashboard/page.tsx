@@ -2542,7 +2542,7 @@ export default function Dashboard() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>3</div>
                     <div style={{ flex: 1 }}>
                       <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Utwórz Hasło Aplikacji</h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Google poprosi Cię o podanie nazwy (np. "Meski AI"). <br/><em style={{ opacity: 0.8 }}>Wymaga włączonego logowania dwuetapowego (2FA) na koncie Google.</em></p>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Google poprosi Cię o podanie nazwy (np. "MESKIAI"). <br/><em style={{ opacity: 0.8 }}>Wymaga włączonego logowania dwuetapowego (2FA) na koncie Google.</em></p>
                     </div>
                     <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
                       Utwórz Hasło <ExternalLink size={14} style={{ marginLeft: '6px' }} />

@@ -225,7 +225,7 @@ export default function Home() {
           <span className={styles.macosEyebrow}>System Operacyjny Sprzedaży</span>
           <h2 className={styles.macosTitle}>Zaprojektowany, by działać w tle.</h2>
           <p className={styles.macosSubtitle}>
-            Kliknij na funkcje w panelu poniżej, aby zobaczyć jak Meski AI rewolucjonizuje codzienną obsługę poczty.
+            Kliknij na funkcje w panelu poniżej, aby zobaczyć jak MESKIAI rewolucjonizuje codzienną obsługę poczty.
           </p>
         </div>
 
@@ -438,7 +438,7 @@ export default function Home() {
             <span>Sprzedajemy Twój wolny czas.</span>
           </h2>
           <p className="animate-fade-in-up animate-delay-1">
-            Większość narzędzi wymaga Twojej uwagi. Meski AI działa całkowicie w tle. Ty zyskujesz klientów i opłacone faktury, a my zajmujemy się całą czarną robotą. 
+            Większość narzędzi wymaga Twojej uwagi. MESKIAI działa całkowicie w tle. Ty zyskujesz klientów i opłacone faktury, a my zajmujemy się całą czarną robotą. 
           </p>
         </div>
       </section>
@@ -473,7 +473,7 @@ export default function Home() {
         <div className={styles.pricingGrid}>
           {/* Pakiet 1 */}
           <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-2`}>
-            <div className={styles.pricingName}>Meski AI</div>
+            <div className={styles.pricingName}>MESKIAI</div>
             <div className={styles.pricingDesc}>Podstawowa moc automatyzacji dla freelancerów i małych firm.</div>
             <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
             
@@ -508,7 +508,7 @@ export default function Home() {
           <div className={`${styles.pricingCard} ${styles.pro} animate-fade-in-up animate-delay-3`}>
             <div>
               <div className={styles.proBadge}><Sparkles size={14}/> Rekomendowany</div>
-              <div className={styles.pricingName}>Meski AI PRO</div>
+              <div className={styles.pricingName}>MESKIAI PRO</div>
               <div className={styles.pricingDesc}>Zbudowany dla skalujących się biznesów. Prawdziwy pracownik w chmurze.</div>
               <div className={styles.pricingPrice}>699 <span>zł / mies.</span></div>
             </div>
@@ -543,7 +543,7 @@ export default function Home() {
 
           {/* Pakiet 3 (MAX) */}
           <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-4`}>
-            <div className={styles.pricingName}>Meski AI MAX</div>
+            <div className={styles.pricingName}>MESKIAI MAX</div>
             <div className={styles.pricingDesc}>Bez limitów. Dla przedsiębiorstw pragnących absolutnej dominacji operacyjnej.</div>
             <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
             
@@ -583,7 +583,7 @@ export default function Home() {
           <span className={styles.faqEyebrow}>Centrum Pomocy</span>
           <h2 className={styles.faqTitle}>Najczęściej zadawane pytania</h2>
           <p className={styles.faqSubtitle}>
-            Masz pytania dotyczące działania Meski AI? Sprawdź odpowiedzi na najczęstsze wątpliwości.
+            Masz pytania dotyczące działania MESKIAI? Sprawdź odpowiedzi na najczęstsze wątpliwości.
           </p>
         </div>
 
@@ -613,7 +613,7 @@ export default function Home() {
           <a href="/regulamin">Regulamin</a>
           <a href="/polityka-prywatnosci">Polityka Prywatności i Cookies</a>
         </div>
-        <p>&copy; {new Date().getFullYear()} Meski AI. Zaprojektowano w Polsce.</p>
+        <p>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</p>
       </footer>
     </main>
   );
@@ -621,7 +621,7 @@ export default function Home() {
 
 const faqItems = [
   {
-    q: "Jak działa logowanie przez Google? Czy Meski AI ma dostęp do moich maili?",
+    q: "Jak działa logowanie przez Google? Czy MESKIAI ma dostęp do moich maili?",
     a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej autoryzacji Twojego konta w naszym systemie. Aplikacja nie pobiera, nie czyta ani nie wysyła wiadomości za pomocą Google API. Do obsługi poczty wykorzystujemy wyłącznie bezpieczne połączenia SMTP/IMAP, a w przypadku Gmaila – hasła aplikacji generowane w ustawieniach Twojego konta Google."
   },
   {
@@ -630,7 +630,7 @@ const faqItems = [
   },
   {
     q: "Jak działa asystent w tle? Czy muszę mieć otwartą kartę w przeglądarce?",
-    a: "Nie. Nasz agent AI działa w 100% w tle na naszych serwerach. Synchronizacja poczty i analizowanie wiadomości odbywa się automatycznie co 10 minut za pomocą bezpiecznych zadań cron. Możesz zamknąć komputer, wyjechać na urlop, a Meski AI nadal będzie klasyfikować i przygotowywać maile."
+    a: "Nie. Nasz agent AI działa w 100% w tle na naszych serwerach. Synchronizacja poczty i analizowanie wiadomości odbywa się automatycznie co 10 minut za pomocą bezpiecznych zadań cron. Możesz zamknąć komputer, wyjechać na urlop, a MESKIAI nadal będzie klasyfikować i przygotowywać maile."
   },
   {
     q: "Co to jest 'Audyt Konkurencji' i jak działa baza leadów?",
