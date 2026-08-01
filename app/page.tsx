@@ -233,7 +233,7 @@ export default function Home() {
           <div className={styles.macosWindow}>
             {/* Window Header / Titlebar */}
             <div className={styles.macosTitlebar} style={{ justifyContent: 'center' }}>
-              <div className={styles.macosWindowTitle}>MeskiAI Panel</div>
+              <div className={styles.macosWindowTitle}>MESKIAI Panel</div>
             </div>
 
             {/* Window Content Layout */}
