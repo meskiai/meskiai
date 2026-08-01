@@ -1359,3 +1359,88 @@
     display: none; /* show only icon on tiny screens */
   }
 }
+
+/* ==========================================================================
+   MACOS SHOWCASE WINDOW LIGHT MODE OVERRIDES
+   ========================================================================== */
+
+:global([data-theme="light"]) .macosTitlebar {
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .macosSidebar {
+  background: rgba(0, 0, 0, 0.015);
+  border-right-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .macosSidebarItem:hover {
+  background: rgba(0, 0, 0, 0.025);
+  color: var(--foreground);
+}
+
+:global([data-theme="light"]) .macosSidebarItem.active {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--foreground);
+}
+
+:global([data-theme="light"]) .mockMailApp {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+:global([data-theme="light"]) .mockMailList {
+  border-right-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .mockMailItem {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+:global([data-theme="light"]) .mockMailActive {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .mockMailSender {
+  color: #1d1d1f;
+}
+
+:global([data-theme="light"]) .mockMailSubject {
+  color: #86868b;
+}
+
+:global([data-theme="light"]) .mockMailDetail {
+  background: #ffffff;
+}
+
+:global([data-theme="light"]) .mockLine {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="light"]) .mockTableApp {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+:global([data-theme="light"]) .mockTableHeader {
+  background: rgba(0, 0, 0, 0.025);
+  color: #86868b;
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .mockTableRow {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+  color: #1d1d1f;
+}
+
+:global([data-theme="light"]) .swotBox {
+  background: rgba(0, 0, 0, 0.015);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="light"]) .swotBox p {
+  color: #1d1d1f;
+}
+
