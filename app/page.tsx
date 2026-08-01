@@ -17,6 +17,17 @@ export default function Home() {
   const [activeFeature, setActiveFeature] = useState('agent');
 
   useEffect(() => {
+    const features = ['agent', 'cold', 'swot', 'security'];
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => {
+        const nextIndex = (features.indexOf(prev) + 1) % features.length;
+        return features[nextIndex];
+      });
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
@@ -207,153 +218,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section (Apple Style) */}
-      <section className={styles.pricingSection} id="cennik">
-        <div className={styles.pricingHeader}>
-          <h2 className="animate-fade-in-up">Moc obliczeniowa.<br/>Zamiast listy płac.</h2>
-          <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
-        </div>
-        
-        <div className={`animate-fade-in-up animate-delay-1 ${styles.warningBox}`}>
-          {/* Subtle glow effect in the background */}
-          <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
-          <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
-
-          <div style={{ 
-            width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, var(--primary), #3b82f6)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(0,122,255,0.25)' 
-          }}>
-            <Mail size={24} color="white" />
-          </div>
-          
-          <div style={{ fontSize: '1rem', lineHeight: '1.6', zIndex: 1 }}>
-            <h3 style={{ margin: '0 0 8px 0', color: 'var(--foreground)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.3px' }}>Ważna informacja przed zakupem</h3>
-            <p style={{ margin: 0, opacity: 0.9 }}>
-              Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na konto Gmail firmowe</strong>, na którym ma działać Agent AI. Twój asystent zostanie trwale przypisany do konta, z którego wykupiono subskrypcję, aby móc płynnie zarządzać Twoją komunikacją biznesową.
-            </p>
-          </div>
-        </div>
-        
-        <div className={styles.pricingGrid}>
-          {/* Pakiet 1 */}
-          <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-2`}>
-            <div className={styles.pricingName}>Meski AI</div>
-            <div className={styles.pricingDesc}>Podstawowa moc automatyzacji dla freelancerów i małych firm.</div>
-            <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
-            
-            <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
-              <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
-              <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
-              <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 10 B2B)</li>
-              <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
-            </ul>
-            
-            <button 
-              className={styles.pricingBtn} 
-              disabled={userTier >= 1}
-              style={{ opacity: userTier >= 1 ? 0.5 : 1, cursor: userTier >= 1 ? 'not-allowed' : 'pointer' }}
-              onClick={() => {
-                if (userTier >= 1) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
-              }}
-            >
-              {userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet"}
-            </button>
-          </div>
-
-          {/* Pakiet 2 (PRO) - Rekomendowany */}
-          <div className={`${styles.pricingCard} ${styles.pro} animate-fade-in-up animate-delay-3`}>
-            <div>
-              <div className={styles.proBadge}><Sparkles size={14}/> Rekomendowany</div>
-              <div className={styles.pricingName}>Meski AI PRO</div>
-              <div className={styles.pricingDesc}>Zbudowany dla skalujących się biznesów. Prawdziwy pracownik w chmurze.</div>
-              <div className={styles.pricingPrice}>699 <span>zł / mies.</span></div>
-            </div>
-            
-            <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
-              <li><CheckCircle size={18} /> Do 1000 automatycznych e-maili miesięcznie</li>
-              <li><CheckCircle size={18} /> Do 100 wyszukań konkurencji miesięcznie</li>
-              <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 200 B2B)</li>
-              <li><CheckCircle size={18} /> Cold Email (Generowanie AI)</li>
-              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
-            </ul>
-            
-            <button 
-              className={styles.pricingBtn} 
-              disabled={userTier >= 2}
-              style={{ opacity: userTier >= 2 ? 0.5 : 1, cursor: userTier >= 2 ? 'not-allowed' : 'pointer' }}
-              onClick={() => {
-                if (userTier >= 2) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
-              }}
-            >
-              {userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO"}
-            </button>
-          </div>
-
-          {/* Pakiet 3 (MAX) */}
-          <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-4`}>
-            <div className={styles.pricingName}>Meski AI MAX</div>
-            <div className={styles.pricingDesc}>Bez limitów. Dla przedsiębiorstw pragnących absolutnej dominacji operacyjnej.</div>
-            <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
-            
-            <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Pełny dostęp do Agenta AI</li>
-              <li><CheckCircle size={18} /> Nielimitowane e-maile</li>
-              <li><CheckCircle size={18} /> Nielimitowane wyszukiwania konkurencji</li>
-              <li><CheckCircle size={18} /> Nielimitowane propozycje klientów</li>
-              <li><CheckCircle size={18} /> Nielimitowany Cold Email</li>
-              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
-              <li><CheckCircle size={18} /> Dedykowany Account Manager</li>
-            </ul>
-            
-            <button 
-              className={styles.pricingBtn} 
-              disabled={userTier >= 3}
-              style={{ opacity: userTier >= 3 ? 0.5 : 1, cursor: userTier >= 3 ? 'not-allowed' : 'pointer' }}
-              onClick={() => {
-                if (userTier >= 3) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
-              }}
-            >
-              {userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max"}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Us Statement (Apple Style) */}
-      <section className={styles.whyUsSection}>
-        <div className={styles.whyUsContent}>
-          <h2 className="animate-fade-in-up">
-            Nie sprzedajemy oprogramowania.<br/>
-            <span>Sprzedajemy Twój wolny czas.</span>
-          </h2>
-          <p className="animate-fade-in-up animate-delay-1">
-            Większość narzędzi wymaga Twojej uwagi. Meski AI działa całkowicie w tle. Ty zyskujesz klientów i opłacone faktury, a my zajmujemy się całą czarną robotą. 
-          </p>
-        </div>
-      </section>
-
       {/* Premium macOS-Style Interactive Features Section */}
       <section className={styles.macosSection}>
         <div className={styles.macosHeader}>
@@ -422,8 +286,8 @@ export default function Home() {
                         Agent AI działa bez przerwy, sprawdzając skrzynkę co 120 sekund. Samodzielnie analizuje kontekst, oddziela zapytania ofertowe od spamu i przygotowuje merytoryczne odpowiedzi.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Czas reakcji:</span> poniżej 2 minut</li>
                         <li><span>Tryb pracy:</span> 24h na dobę</li>
+                        <li><span>Czas reakcji:</span> poniżej 2 minut</li>
                         <li><span>Ton:</span> dostosowany do klienta</li>
                       </ul>
                     </div>
@@ -567,6 +431,153 @@ export default function Home() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Us Statement (Apple Style) */}
+      <section className={styles.whyUsSection}>
+        <div className={styles.whyUsContent}>
+          <h2 className="animate-fade-in-up">
+            Nie sprzedajemy oprogramowania.<br/>
+            <span>Sprzedajemy Twój wolny czas.</span>
+          </h2>
+          <p className="animate-fade-in-up animate-delay-1">
+            Większość narzędzi wymaga Twojej uwagi. Meski AI działa całkowicie w tle. Ty zyskujesz klientów i opłacone faktury, a my zajmujemy się całą czarną robotą. 
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing Section (Apple Style) */}
+      <section className={styles.pricingSection} id="cennik">
+        <div className={styles.pricingHeader}>
+          <h2 className="animate-fade-in-up">Moc obliczeniowa.<br/>Zamiast listy płac.</h2>
+          <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
+        </div>
+        
+        <div className={`animate-fade-in-up animate-delay-1 ${styles.warningBox}`}>
+          {/* Subtle glow effect in the background */}
+          <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
+          <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
+
+          <div style={{ 
+            width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, var(--primary), #3b82f6)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(0,122,255,0.25)' 
+          }}>
+            <Mail size={24} color="white" />
+          </div>
+          
+          <div style={{ fontSize: '1rem', lineHeight: '1.6', zIndex: 1 }}>
+            <h3 style={{ margin: '0 0 8px 0', color: 'var(--foreground)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.3px' }}>Ważna informacja przed zakupem</h3>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na konto Gmail firmowe</strong>, na którym ma działać Agent AI. Twój asystent zostanie trwale przypisany do konta, z którego wykupiono subskrypcję, aby móc płynnie zarządzać Twoją komunikacją biznesową.
+            </p>
+          </div>
+        </div>
+        
+        <div className={styles.pricingGrid}>
+          {/* Pakiet 1 */}
+          <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-2`}>
+            <div className={styles.pricingName}>Meski AI</div>
+            <div className={styles.pricingDesc}>Podstawowa moc automatyzacji dla freelancerów i małych firm.</div>
+            <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
+            
+            <ul className={styles.pricingFeatures}>
+              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
+              <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
+              <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
+              <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
+              <li><CheckCircle size={18} /> Propozycje klientów (limit 10 B2B)</li>
+              <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
+            </ul>
+            
+            <button 
+              className={styles.pricingBtn} 
+              disabled={userTier >= 1}
+              style={{ opacity: userTier >= 1 ? 0.5 : 1, cursor: userTier >= 1 ? 'not-allowed' : 'pointer' }}
+              onClick={() => {
+                if (userTier >= 1) return;
+                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic', time: Date.now() }));
+                if (status === "authenticated") {
+                  router.push("/dashboard");
+                } else {
+                  signIn("google", { callbackUrl: "/dashboard" });
+                }
+              }}
+            >
+              {userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet"}
+            </button>
+          </div>
+
+          {/* Pakiet 2 (PRO) - Rekomendowany */}
+          <div className={`${styles.pricingCard} ${styles.pro} animate-fade-in-up animate-delay-3`}>
+            <div>
+              <div className={styles.proBadge}><Sparkles size={14}/> Rekomendowany</div>
+              <div className={styles.pricingName}>Meski AI PRO</div>
+              <div className={styles.pricingDesc}>Zbudowany dla skalujących się biznesów. Prawdziwy pracownik w chmurze.</div>
+              <div className={styles.pricingPrice}>699 <span>zł / mies.</span></div>
+            </div>
+            
+            <ul className={styles.pricingFeatures}>
+              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
+              <li><CheckCircle size={18} /> Do 1000 automatycznych e-maili miesięcznie</li>
+              <li><CheckCircle size={18} /> Do 100 wyszukań konkurencji miesięcznie</li>
+              <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
+              <li><CheckCircle size={18} /> Propozycje klientów (limit 200 B2B)</li>
+              <li><CheckCircle size={18} /> Cold Email (Generowanie AI)</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
+            </ul>
+            
+            <button 
+              className={styles.pricingBtn} 
+              disabled={userTier >= 2}
+              style={{ opacity: userTier >= 2 ? 0.5 : 1, cursor: userTier >= 2 ? 'not-allowed' : 'pointer' }}
+              onClick={() => {
+                if (userTier >= 2) return;
+                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro', time: Date.now() }));
+                if (status === "authenticated") {
+                  router.push("/dashboard");
+                } else {
+                  signIn("google", { callbackUrl: "/dashboard" });
+                }
+              }}
+            >
+              {userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO"}
+            </button>
+          </div>
+
+          {/* Pakiet 3 (MAX) */}
+          <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-4`}>
+            <div className={styles.pricingName}>Meski AI MAX</div>
+            <div className={styles.pricingDesc}>Bez limitów. Dla przedsiębiorstw pragnących absolutnej dominacji operacyjnej.</div>
+            <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
+            
+            <ul className={styles.pricingFeatures}>
+              <li><CheckCircle size={18} /> Pełny dostęp do Agenta AI</li>
+              <li><CheckCircle size={18} /> Nielimitowane e-maile</li>
+              <li><CheckCircle size={18} /> Nielimitowane wyszukiwania konkurencji</li>
+              <li><CheckCircle size={18} /> Nielimitowane propozycje klientów</li>
+              <li><CheckCircle size={18} /> Nielimitowany Cold Email</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
+              <li><CheckCircle size={18} /> Dedykowany Account Manager</li>
+            </ul>
+            
+            <button 
+              className={styles.pricingBtn} 
+              disabled={userTier >= 3}
+              style={{ opacity: userTier >= 3 ? 0.5 : 1, cursor: userTier >= 3 ? 'not-allowed' : 'pointer' }}
+              onClick={() => {
+                if (userTier >= 3) return;
+                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max', time: Date.now() }));
+                if (status === "authenticated") {
+                  router.push("/dashboard");
+                } else {
+                  signIn("google", { callbackUrl: "/dashboard" });
+                }
+              }}
+            >
+              {userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max"}
+            </button>
           </div>
         </div>
       </section>
