@@ -231,14 +231,8 @@ export default function Home() {
         <div className={styles.macosWindowWrapper}>
           <div className={styles.macosWindow}>
             {/* Window Header / Titlebar */}
-            <div className={styles.macosTitlebar}>
-              <div className={styles.macosDots}>
-                <span className={styles.dotClose}></span>
-                <span className={styles.dotMinimize}></span>
-                <span className={styles.dotMaximize}></span>
-              </div>
+            <div className={styles.macosTitlebar} style={{ justifyContent: 'center' }}>
               <div className={styles.macosWindowTitle}>MeskiAI Panel</div>
-              <div style={{ width: '52px' }}></div> {/* Spacer to center title */}
             </div>
 
             {/* Window Content Layout */}
