@@ -62,14 +62,10 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      {/* Dynamic Theme Glow Blobs */}
-      <div className={styles.ambientBackground}>
-        <div className={styles.ambientBlob1} />
-        <div className={styles.ambientBlob2} />
-        <div className={styles.ambientBlob3} />
-      </div>
+      {/* Light dynamic background gradient */}
+      <div className={styles.ambientBackground} />
       
-      {/* Frosted glass top nav */}
+      {/* Frosted Glass Nav */}
       <nav className={styles.nav}>
         <div className={styles.navContent}>
           <div className={styles.logo} onClick={() => router.push("/")}>
@@ -162,210 +158,184 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles.badge}>
-          <Sparkles size={12} className={styles.badgeHighlight} /> Nowy Standard Poczty Biznesowej
-        </div>
-        
-        <h1 className={styles.heroTitle}>
-          Zatrudnij AI. <br />Uwolnij swój czas.
-        </h1>
-        
-        <p className={styles.heroSubtitle}>
-          MESKIAI to w pełni autonomiczny asystent poczty e-mail pracujący bezpośrednio w chmurze. Odpowiada klientom, generuje bazy leadów i analizuje ofertę 24/7.
-        </p>
-        
-        <div className={styles.ctaWrapper}>
-          {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
-              Wejdź do Panelu <ArrowRight size={15} />
-            </Link>
-          ) : (
-            <>
-              <button className={styles.ctaBtnPrimary} onClick={() => {
-                document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                Wybierz pakiet
-              </button>
-              <button className={styles.ctaBtnSecondary} onClick={() => {
-                document.getElementById('funkcje')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                Dowiedz się więcej <ChevronRight size={14} />
-              </button>
-            </>
-          )}
+      {/* Split-Screen Hero Section */}
+      <section className={styles.heroSection}>
+        <div className={styles.splitHeroGrid}>
+          {/* Hero Left - Text & Buttons */}
+          <div className={styles.heroLeft}>
+            <div className={styles.badge}>
+              <Sparkles size={12} className={styles.badgeHighlight} /> Poczta Biznesowa Nowej Generacji
+            </div>
+            
+            <h1 className={styles.heroTitle}>
+              Poczta, która pracuje. <br />Kiedy Ty odpoczywasz.
+            </h1>
+            
+            <p className={styles.heroSubtitle}>
+              Pierwszy w pełni autonomiczny asystent e-mail dla biznesu B2B. Działa w chmurze przez całą dobę. Odpowiada klientom, zbiera leady i chroni Twój wolny czas.
+            </p>
+            
+            <div className={styles.ctaWrapper}>
+              {status === "authenticated" ? (
+                <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
+                  Otwórz Panel roboczy <ArrowRight size={15} />
+                </Link>
+              ) : (
+                <>
+                  <button className={styles.ctaBtnPrimary} onClick={() => {
+                    document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>
+                    Rozpocznij korzystanie
+                  </button>
+                  <button className={styles.ctaBtnSecondary} onClick={() => {
+                    document.getElementById('funkcje')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>
+                    Dowiedz się więcej <ChevronRight size={14} />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Hero Right - Minimal Status Widget */}
+          <div className={styles.heroRight}>
+            <div className={styles.heroStatusWidget}>
+              <div className={styles.statusHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className={styles.activeIndicator} />
+                  <span style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--foreground)' }}>Agent AI: Aktywny</span>
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>Live Monitor</span>
+              </div>
+              
+              <div className={styles.statusIndicators}>
+                <div>
+                  <div className={styles.statusLabel}>Wykorzystanie CPU</div>
+                  <div className={styles.statusValue}>1.4%</div>
+                </div>
+                <div>
+                  <div className={styles.statusLabel}>Uptime</div>
+                  <div className={styles.statusValue}>99.99%</div>
+                </div>
+                <div>
+                  <div className={styles.statusLabel}>Weryfikacja wiedzy</div>
+                  <div className={styles.statusValue}>Zabezpieczona</div>
+                </div>
+              </div>
+
+              <div className={styles.statusList}>
+                <div className={styles.statusRow}>
+                  <span>📥 Zapytanie ofertowe</span>
+                  <span className={`${styles.statusRowBadge} ${styles.badgeSuccess}`}>Auto-odpowiedź</span>
+                </div>
+                <div className={styles.statusRow}>
+                  <span>📞 Ustalenie terminu</span>
+                  <span className={`${styles.statusRowBadge} ${styles.badgeProgress}`}>W toku</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Cyberpunk/Frosted Laptop Showcase */}
-      <section className={styles.mockupContainer}>
-        <div className={styles.laptopMockup}>
-          <div className={styles.mockupHeader}>
-            <div className={`${styles.dot} ${styles.redDot}`} />
-            <div className={`${styles.dot} ${styles.yellowDot}`} />
-            <div className={`${styles.dot} ${styles.greenDot}`} />
-            <div style={{ margin: '0 auto', fontSize: '0.7rem', color: 'var(--subtext)', opacity: 0.8, fontWeight: 500, letterSpacing: '0.5px' }}>MESKIAI Dashboard Preview</div>
-          </div>
-          <div className={styles.mockupBody}>
-            <div className={styles.mockupSidebar}>
-              <div className={`${styles.sidebarItem} ${styles.sidebarItemActive}`}>
-                <div className={`${styles.sidebarIcon} ${styles.sidebarIconActive}`} />
-                <div className={styles.sidebarText} />
-              </div>
-              <div className={styles.sidebarItem}>
-                <div className={styles.sidebarIcon} />
-                <div className={styles.sidebarText} style={{ width: '40%' }} />
-              </div>
-              <div className={styles.sidebarItem}>
-                <div className={styles.sidebarIcon} />
-                <div className={styles.sidebarText} style={{ width: '60%' }} />
-              </div>
-            </div>
-            <div className={styles.mockupContent}>
-              <div className={styles.previewThread}>
-                <div className={styles.previewMailRow}>
-                  <strong style={{ fontSize: '0.8rem', color: 'var(--foreground)' }}>Klient: Piotr Kamiński</strong>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <span className={`${styles.previewBadge} ${styles.badgeCall}`}>📞 Spotkanie</span>
-                    <span className={`${styles.previewBadge} ${styles.badgeStatus}`}>W toku (Odpisano)</span>
-                  </div>
-                </div>
-                <div className={styles.previewBubble}>
-                  Dzień dobry, chciałbym umówić się na spotkanie w Poznaniu w celu omówienia oferty i wyceny wdrożenia. Czy mają Państwo wolny termin w piątek po 14:00?
-                </div>
-                <div className={`${styles.previewBubble} ${styles.previewAgentBubble}`}>
-                  Dzień dobry, dziękuję za kontakt. Oczywiście, nasza pracownia w Poznaniu jest otwarta i chętnie się spotkamy. Proponuję spotkanie w piątek o godzinie 14:30. Proszę o potwierdzenie, czy ten termin Panu odpowiada.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bento Grid with Live CSS Previews */}
-      <section className={styles.featuresSection} id="funkcje">
-        <div className={styles.featuresHeader}>
-          <h2>Architektura pełnej automatyzacji.</h2>
-        </div>
+      {/* Alternating Narrative Feature Rows */}
+      <section className={styles.featureRowsSection} id="funkcje">
         
-        <div className={styles.bentoGrid}>
-          {/* Card 1 - Large: Thread status manager */}
-          <div className={`${styles.bentoCard} ${styles.span2}`}>
-            <div className={styles.bentoWidget}>
-              <div className={styles.threadListWidget}>
-                <div className={styles.widgetThreadItem}>
-                  <span style={{ color: 'var(--primary)', fontWeight: 600 }}>📧 Zapytanie o wycenę</span>
-                  <span style={{ color: '#30d158', background: 'rgba(48,209,88,0.12)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>AUTO_REPLIED</span>
+        {/* Row 1 - AI Autopilot */}
+        <div className={styles.featureRow}>
+          <div className={styles.rowText}>
+            <div className={styles.rowLabel}>Autopilot e-mail</div>
+            <h2 className={styles.rowTitle}>Odpisywanie na autopilocie. Zawsze w punkt.</h2>
+            <p className={styles.rowDesc}>
+              Twój asystent na bieżąco odbiera wiadomości i pisze profesjonalne odpowiedzi w ułamku sekundy. Doskonale odróżnia maile o spotkaniach, wycenach czy reklamacjach, automatycznie przypisując im odpowiednie statusy.
+            </p>
+          </div>
+          <div className={styles.rowVisual}>
+            <div className={styles.featureWidget}>
+              <div className={styles.mailSimContainer}>
+                <div className={styles.mailSimBubble}>
+                  <strong>Klient:</strong> Czy mają Państwo wolny czas na rozmowę w ten piątek o 14:00?
                 </div>
-                <div className={styles.widgetThreadItem} style={{ opacity: 0.85 }}>
-                  <span style={{ color: 'var(--foreground)', fontWeight: 600 }}>📞 Termin spotkania</span>
-                  <span style={{ color: 'var(--warning)', background: 'rgba(245,158,11,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>W TOKU (ODPISANO)</span>
+                <div className={`${styles.mailSimBubble} ${styles.mailSimAgent}`}>
+                  <strong>Agent AI:</strong> Dziękuję za kontakt. Piątek o godzinie 14:00 nam odpowiada. Proszę o potwierdzenie rezerwacji.
                 </div>
               </div>
             </div>
-            <div>
-              <h3>Zarządzanie wątkami 24/7</h3>
-              <p>
-                W pełni autonomiczne pobieranie poczty przez POP3. AI automatycznie klasyfikuje wiadomości i natychmiast odpisuje przez serwer SMTP.
-              </p>
-            </div>
           </div>
+        </div>
 
-          {/* Card 2 - Leads generator table */}
-          <div className={styles.bentoCard}>
-            <div className={styles.bentoWidget}>
-              <div className={styles.leadsBoardWidget}>
-                <div className={styles.widgetLeadRow}>
-                  <div className={styles.widgetLeadLeft}>
-                    <div className={styles.leadAvatar}>PK</div>
-                    <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Pol-Bud Sp. z o.o.</span>
+        {/* Row 2 - B2B Lead generation */}
+        <div className={styles.featureRowInverse}>
+          <div className={styles.rowVisual}>
+            <div className={styles.featureWidget}>
+              <div className={styles.leadsSimContainer}>
+                <div className={styles.leadsSimRow}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className={styles.leadsSimAvatar}>PK</div>
+                    <span style={{ fontWeight: 600 }}>Piotr Kowalski</span>
                   </div>
-                  <span className={styles.leadPercent}>94%</span>
+                  <span className={styles.leadsSimPercent}>92% dopasowania</span>
                 </div>
-                <div className={styles.widgetLeadRow}>
-                  <div className={styles.widgetLeadLeft}>
-                    <div className={styles.leadAvatar} style={{ background: 'var(--primary)' }}>JS</div>
-                    <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Jan Stal</span>
+                <div className={styles.leadsSimRow}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className={styles.leadsSimAvatar} style={{ background: '#30d158' }}>AM</div>
+                    <span style={{ fontWeight: 600 }}>Anna Mazur</span>
                   </div>
-                  <span className={styles.leadPercent}>87%</span>
+                  <span className={styles.leadsSimPercent}>88% dopasowania</span>
                 </div>
               </div>
             </div>
-            <div>
-              <h3>Wyszukiwarka leadów</h3>
-              <p>
-                Analizuje rynek w poszukiwaniu nowych klientów. Filtruje firmy, dopasowuje profile i automatyzuje wysyłkę cold maili.
-              </p>
-            </div>
           </div>
-
-          {/* Card 3 - Safety Shield */}
-          <div className={styles.bentoCard}>
-            <div className={styles.bentoWidget}>
-              <div className={styles.shieldWidget}>
-                <Shield size={26} />
-              </div>
-            </div>
-            <div>
-              <h3>Brak zmyślania faktów</h3>
-              <p>
-                Bezpieczeństwo przede wszystkim. W przypadku braku wiedzy w bazie, Agent nie zmyśla nieprawdziwych danych, lecz przekazuje sprawę do Twojej weryfikacji.
-              </p>
-            </div>
+          <div className={styles.rowText}>
+            <div className={styles.rowLabel}>Sprzedaż proaktywna</div>
+            <h2 className={styles.rowTitle}>Inteligentne targetowanie B2B. Leady w skrzynce.</h2>
+            <p className={styles.rowDesc}>
+              System nie tylko czeka na maile – sam szuka dla Ciebie potencjalnych kontrahentów na rynku. Analizuje profile firm i na tacy podsuwa Ci idealnie dopasowane kontakty handlowe wraz z wersją roboczą pierwszej wiadomości.
+            </p>
           </div>
+        </div>
 
-          {/* Card 4 - Large: Scanner URL */}
-          <div className={`${styles.bentoCard} ${styles.span2}`}>
-            <div className={styles.bentoWidget}>
-              <div className={styles.websiteWidget}>
-                <div className={styles.widgetUrlInput}>
+        {/* Row 3 - Website integration context */}
+        <div className={styles.featureRow}>
+          <div className={styles.rowText}>
+            <div className={styles.rowLabel}>Baza Wiedzy</div>
+            <h2 className={styles.rowTitle}>Wiedza wstrzyknięta prosto z Twojej witryny WWW.</h2>
+            <p className={styles.rowDesc}>
+              Zapomnij o żmudnym wpisywaniu instrukcji. Wklej link do swojej strony internetowej, a Agent AI automatycznie pobierze z niej cenniki, usługi i regulaminy, tworząc z nich nieomylną bazę wiedzy.
+            </p>
+          </div>
+          <div className={styles.rowVisual}>
+            <div className={styles.featureWidget}>
+              <div className={styles.urlSimContainer}>
+                <div className={styles.urlSimField}>
                   <span>https://twoja-pracownia.pl</span>
                   <Globe size={12} style={{ color: 'var(--primary)' }} />
                 </div>
-                <div className={styles.widgetTagRow}>
-                  <span className={styles.widgetTag}>✓ Cenniki</span>
-                  <span className={styles.widgetTag}>✓ Godziny pracy</span>
-                  <span className={styles.widgetTag}>✓ Zakres usług</span>
+                <div className={styles.urlSimTags}>
+                  <span className={styles.urlSimTag}>✓ Cennik usług</span>
+                  <span className={styles.urlSimTag}>✓ Godziny pracy</span>
+                  <span className={styles.urlSimTag}>✓ Kontakt</span>
                 </div>
               </div>
             </div>
-            <div>
-              <h3>Kontekst z Twojej witryny WWW</h3>
-              <p>
-                Wklej link do swojej strony internetowej w ustawieniach. Agent AI zbierze dane o Twojej działalności i wykorzysta je jako główne źródło wiedzy o firmie.
-              </p>
-            </div>
           </div>
         </div>
+
       </section>
 
-      {/* Why Us Philosophy */}
-      <section className={styles.whyUsSection}>
-        <div className={styles.whyUsContent}>
-          <h2>
-            Prawdziwy asystent nie wymaga nadzoru.
-            <span>Kupujesz swój wolny czas.</span>
-          </h2>
-          <p>
-            Systemy typu CRM wymagają setek kliknięć. Nasz Agent AI działa autonomicznie bezpośrednio z poziomu Twojej skrzynki pocztowej. Zyskujesz profesjonalnego pracownika, który nigdy nie bierze urlopu.
-          </p>
-        </div>
-      </section>
-
-      {/* Pricing cards */}
+      {/* Pricing Matrix */}
       <section className={styles.pricingSection} id="cennik">
         <div className={styles.pricingHeader}>
-          <h2>Minimalizm w cenniku.</h2>
-          <p>Wybierz moc asystenta dopasowaną do Twojej skrzynki mailowej.</p>
+          <h2>Przejrzyste pakiety.</h2>
+          <p>Wybierz limit wiadomości dopasowany do skali Twojej firmy.</p>
         </div>
 
         <div className={styles.warningBox}>
           <AlertCircle size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
           <div>
-            <h3>Ważne przed rejestracją</h3>
+            <h3>Weryfikacja konta</h3>
             <p>
-              Prosimy o wykupienie wybranej subskrypcji logując się **dokładnie tym kontem Google (Gmail)**, które ma być automatyzowane przez Agenta AI.
+              Dokonaj rejestracji logując się **dokładnie na to firmowe konto Google (Gmail)**, które ma być obsługiwane automatycznie przez Agenta AI.
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Ultra-Optimized, High-Performance Apple Premium Design System
-   (Zero lag, 120 FPS scrolling, supports dark/light mode dynamically)
+   Apple Alternating Split-Row Premium Design System
+   (High-Performance, responsive, smooth theme transitions)
    ========================================================================== */
 
 .main {
@@ -16,32 +16,27 @@
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
   
-  /* GPU acceleration for smoother rendering */
+  /* GPU acceleration for scroll performance */
   transform: translate3d(0, 0, 0);
 }
 
-/* 
-   REMOVED HEAVY BLUR FILTER BLOBS (Caused massive paint/render lag on scroll).
-   Replaced with a single lightweight static gradient on the background, 
-   which is hardware accelerated and does not require expensive filter repaints.
-*/
+/* Light static gradient header */
 .ambientBackground {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 600px;
-  background: radial-gradient(ellipse at top, rgba(0, 122, 255, 0.08) 0%, transparent 70%);
+  height: 500px;
+  background: radial-gradient(ellipse at top, rgba(0, 122, 255, 0.07) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
-  transition: background 0.3s ease;
 }
 
 [data-theme="dark"] .ambientBackground {
-  background: radial-gradient(ellipse at top, rgba(10, 132, 255, 0.12) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top, rgba(10, 132, 255, 0.1) 0%, transparent 60%);
 }
 
-/* Light Frosted Glass Navbar (Optimized blur depth) */
+/* Navigation */
 .nav {
   position: fixed;
   top: 0;
@@ -174,28 +169,51 @@
 }
 
 /* ==========================================================================
-   Hero Section
+   Apple Split-Hero Layout
    ========================================================================== */
 
-.hero {
+.heroSection {
   padding-top: clamp(100px, 14vh, 140px);
-  padding-bottom: 40px;
+  padding-bottom: 60px;
   padding-left: 24px;
   padding-right: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  z-index: 10;
+  position: relative;
+}
+
+.splitHeroGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 899px) {
+  .splitHeroGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 32px;
+  }
+}
+
+.heroLeft {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  z-index: 10;
-  max-width: 900px;
-  margin: 0 auto;
+  align-items: flex-start;
+}
+
+@media (max-width: 899px) {
+  .heroLeft {
+    align-items: center;
+  }
 }
 
 .badge {
   background: var(--secondary);
   border: 1px solid var(--border);
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 500;
@@ -211,26 +229,31 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.4rem, 6.5vw, 4.2rem);
-  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 20px;
+  line-height: 1.08;
+  margin: 0 0 20px 0;
   color: var(--foreground);
 }
 
 .heroSubtitle {
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   font-weight: 400;
   color: var(--subtext);
-  margin-bottom: 36px;
+  margin: 0 0 36px 0;
   line-height: 1.5;
-  max-width: 600px;
+  text-align: left;
+}
+
+@media (max-width: 899px) {
+  .heroSubtitle {
+    text-align: center;
+  }
 }
 
 .ctaWrapper {
   display: flex;
-  justify-content: center;
   gap: 16px;
 }
 
@@ -255,12 +278,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: transform 0.2s ease, opacity 0.2s;
+  transition: opacity 0.2s;
 }
 
 .ctaBtnPrimary:hover {
   opacity: 0.9;
-  transform: translateY(-1px);
 }
 
 .ctaBtnSecondary {
@@ -285,133 +307,75 @@
 }
 
 /* ==========================================================================
-   CSS Laptop Mockup (High Performance - Reduced Blurs & Shaders)
+   Hero Visual Widget (Status Controller)
    ========================================================================== */
 
-.mockupContainer {
+.heroRight {
   width: 100%;
-  max-width: 900px;
-  margin: 30px auto 50px auto;
-  padding: 0 24px;
-  box-sizing: border-box;
-  z-index: 10;
-  position: relative;
 }
 
-.laptopMockup {
-  background: var(--secondary);
+.heroStatusWidget {
+  background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  overflow: hidden;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--mac-shadow);
   display: flex;
   flex-direction: column;
-  aspect-ratio: 16/10;
-  width: 100%;
+  gap: 16px;
 }
 
-[data-theme="dark"] .laptopMockup {
-  background: #111112;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-}
-
-.mockupHeader {
-  height: 34px;
-  background: rgba(0, 0, 0, 0.05);
+.statusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.statusIndicators {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 8px;
+  gap: 16px;
 }
 
-.dot {
+.statusLabel {
+  font-size: 0.72rem;
+  color: var(--subtext);
+}
+
+.statusValue {
+  font-weight: 600;
+  color: var(--foreground);
+  font-size: 0.75rem;
+}
+
+.activeIndicator {
   width: 6px;
   height: 6px;
+  background-color: #30d158;
   border-radius: 50%;
+  box-shadow: 0 0 8px #30d158;
 }
 
-.redDot { background: #ff5f56; }
-.yellowDot { background: #ffbd2e; }
-.greenDot { background: #27c93f; }
-
-.mockupBody {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-}
-
-.mockupSidebar {
-  width: 22%;
-  background: rgba(0, 0, 0, 0.02);
-  border-right: 1px solid var(--border);
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sidebarItem {
-  height: 24px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.04);
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  gap: 8px;
-}
-
-.sidebarItemActive {
-  background: var(--sidebar-active);
-}
-
-.sidebarIcon {
-  width: 8px;
-  height: 8px;
-  border-radius: 1.5px;
-  background: var(--subtext);
-  opacity: 0.3;
-}
-
-.sidebarIconActive {
-  background: var(--primary);
-  opacity: 1;
-}
-
-.sidebarText {
-  height: 5px;
-  width: 55%;
-  border-radius: 2px;
-  background: var(--subtext);
-  opacity: 0.2;
-}
-
-.mockupContent {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow-y: hidden;
-}
-
-.previewThread {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
+.statusList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.previewMailRow {
+.statusRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.75rem;
+  padding: 10px 14px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 
-.previewBadge {
+.statusRowBadge {
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.62rem;
@@ -419,268 +383,202 @@
   text-transform: uppercase;
 }
 
-.badgeCall { 
-  background: rgba(0, 122, 255, 0.08); 
-  color: var(--primary); 
-}
-.badgeStatus { 
-  background: rgba(245, 158, 11, 0.08); 
-  color: var(--warning); 
-}
-
-.previewBubble {
-  background: var(--secondary);
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--foreground);
-  opacity: 0.9;
-  border: 1px solid var(--border);
-}
-
-.previewAgentBubble {
-  background: rgba(0, 122, 255, 0.04);
-  border: 1px solid rgba(0, 122, 255, 0.12);
-  align-self: flex-end;
-  color: var(--foreground);
-}
+.badgeSuccess { background: rgba(48,209,88,0.12); color: #30d158; }
+.badgeProgress { background: rgba(245,158,11,0.08); color: var(--warning); }
 
 /* ==========================================================================
-   Bento Grid Section (Solid High-Performance Design)
+   Apple Alternate Feature Rows
    ========================================================================== */
 
-.featuresSection {
+.featureRowsSection {
   padding: 60px 24px;
   max-width: 1100px;
   margin: 0 auto;
   z-index: 10;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
 }
 
-.featuresHeader {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.featuresHeader h2 {
-  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.bentoGrid {
+.featureRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.bentoCard {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: border-color 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  min-height: 330px;
-}
-
-.bentoCard:hover {
-  border-color: var(--glass-border);
-}
-
-.bentoCard h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--foreground);
-  margin: 0 0 8px 0;
-  letter-spacing: -0.01em;
-}
-
-.bentoCard p {
-  font-size: 0.88rem;
-  color: var(--subtext);
-  line-height: 1.45;
-  margin: 0;
-}
-
-/* Simplified static widgets - Zero GPU render cost */
-.bentoWidget {
-  flex: 1;
-  width: 100%;
-  display: flex;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 60px;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  position: relative;
 }
 
-.threadListWidget {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.widgetThreadItem {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  padding: 8px 12px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
+.featureRowInverse {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 60px;
   align-items: center;
-  font-size: 0.72rem;
-}
-
-.leadsBoardWidget {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.widgetLeadRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-}
-
-.widgetLeadLeft {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.leadAvatar {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--primary);
-  font-size: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-}
-
-.leadPercent {
-  background: rgba(48, 209, 88, 0.1);
-  color: #30d158;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-.websiteWidget {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.widgetUrlInput {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 8px 10px;
-  font-size: 0.68rem;
-  color: var(--subtext);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.widgetTagRow {
-  display: flex;
-  gap: 6px;
-}
-
-.widgetTag {
-  background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 2px 6px;
-  font-size: 0.62rem;
-  color: var(--foreground);
-  opacity: 0.8;
-}
-
-/* Static, non-animated shield */
-.shieldWidget {
-  width: 52px;
-  height: 52px;
-  background: rgba(0, 122, 255, 0.05);
-  border: 1px solid rgba(0, 122, 255, 0.15);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-}
-
-.span2 {
-  grid-column: span 2;
 }
 
 @media (max-width: 899px) {
-  .bentoGrid {
+  .featureRow, .featureRowInverse {
     grid-template-columns: 1fr;
-  }
-  .span2 {
-    grid-column: span 1;
+    gap: 32px;
   }
 }
 
-/* ==========================================================================
-   Why Us Section
-   ========================================================================== */
-
-.whyUsSection {
-  padding: 60px 24px;
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-  z-index: 10;
-  position: relative;
+.rowText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.whyUsContent h2 {
-  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+@media (max-width: 899px) {
+  .rowText {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.rowLabel {
+  font-size: 0.72rem;
   font-weight: 700;
-  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.rowTitle {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 700;
   color: var(--foreground);
-  margin-bottom: 20px;
+  margin: 0 0 16px 0;
   letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
-.whyUsContent span {
+.rowDesc {
+  font-size: 0.95rem;
   color: var(--subtext);
-  display: block;
-  margin-top: 8px;
-}
-
-.whyUsContent p {
-  font-size: 1.02rem;
-  color: var(--subtext);
-  line-height: 1.55;
+  line-height: 1.5;
   margin: 0;
 }
 
+.rowVisual {
+  width: 100%;
+}
+
+@media (max-width: 899px) {
+  .featureRowInverse .rowVisual {
+    order: 2; /* Visual goes below text on mobile */
+  }
+}
+
+/* Feature row visual widgets */
+.featureWidget {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--mac-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Widget: Mail Auto-Reply Simulation */
+.mailSimContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mailSimBubble {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--foreground);
+}
+
+.mailSimAgent {
+  background: rgba(0, 122, 255, 0.05);
+  border-color: rgba(0, 122, 255, 0.15);
+  align-self: flex-end;
+  max-width: 90%;
+}
+
+/* Widget: Leads list */
+.leadsSimContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leadsSimRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+
+.leadsSimAvatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leadsSimPercent {
+  background: rgba(48,209,88,0.12);
+  color: #30d158;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Widget: URL parsed folder tags */
+.urlSimContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.urlSimField {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.7rem;
+  color: var(--subtext);
+  display: flex;
+  justify-content: space-between;
+}
+
+.urlSimTags {
+  display: flex;
+  gap: 6px;
+}
+
+.urlSimTag {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.62rem;
+  color: var(--foreground);
+}
+
 /* ==========================================================================
-   Pricing Section (Metallic Apple subscription cards)
+   Pricing Section
    ========================================================================== */
 
 .pricingSection {
@@ -779,7 +677,6 @@
   border-color: var(--glass-border);
 }
 
-/* PRO glowing accent */
 .pricingCard.pro {
   border-color: rgba(0, 122, 255, 0.35);
   background: rgba(0, 122, 255, 0.015);
