@@ -1177,6 +1177,8 @@
   .whyUsSection,
   .macosSection {
     padding: 60px 20px;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   .pricingHeader {
     text-align: center;
