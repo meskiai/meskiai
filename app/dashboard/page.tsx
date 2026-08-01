@@ -94,6 +94,7 @@ export default function Dashboard() {
   const [contactBody, setContactBody] = useState("");
   const [isGeneratingEmail, setIsGeneratingEmail] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [generationStep, setGenerationStep] = useState(0);
 
   // Toast Notification State
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
@@ -211,15 +212,13 @@ export default function Dashboard() {
                 
                 // Only trigger if clicked within the last 10 minutes
                 if (Date.now() - time < 10 * 60 * 1000) {
-                  const hasActiveSub = data.subscriptionData && 
-                    ['active', 'trialing'].includes(data.subscriptionData.subscriptionStatus);
-                  
-                  if (hasActiveSub) {
-                    showToast("Posiadasz już aktywną subskrypcję. Możesz nią zarządzać w Ustawieniach za pomocą Portalu Stripe.", "info");
-                  } else if (data.subscriptionData.stripePriceId !== selectedPlan) {
+                  // Always go through Stripe Checkout for payment confirmation
+                  // (checkout route handles both new subscriptions and upgrades)
+                  if (data.subscriptionData.stripePriceId !== selectedPlan) {
                     handleCheckout(selectedPlan);
                     isCheckingOut = true;
                   }
+                  // If same plan selected, do nothing (no redirect needed)
                 }
               } catch (e) {
                 console.error("Invalid selectedPlan format");
@@ -515,6 +514,11 @@ export default function Dashboard() {
     setContactSubject("");
     setContactBody("");
     setIsGeneratingEmail(true);
+    setGenerationStep(0);
+
+    const interval = setInterval(() => {
+      setGenerationStep((prev) => (prev < 3 ? prev + 1 : prev));
+    }, 1500);
 
     try {
       const res = await fetch("/api/clients/generate-email", {
@@ -535,6 +539,7 @@ export default function Dashboard() {
       console.error(e);
       showToast("Błąd połączenia z serwerem. Możesz wpisać treść ręcznie.", "error");
     } finally {
+      clearInterval(interval);
       setIsGeneratingEmail(false);
     }
   };
@@ -2923,38 +2928,104 @@ export default function Dashboard() {
             </h3>
             
             {isGeneratingEmail ? (
-              <div style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', marginBottom: '4px' }}>
-                  <div style={{ display: 'flex', gap: '5px' }}>
-                    <div className={styles.pulseDot} style={{ animationDelay: '0s' }} />
-                    <div className={styles.pulseDot} style={{ animationDelay: '0.25s' }} />
-                    <div className={styles.pulseDot} style={{ animationDelay: '0.5s' }} />
-                  </div>
-                  <span style={{ fontSize: '0.88rem', color: 'var(--foreground)', fontWeight: 500 }}>
-                    Asystent pisze spersonalizowany Cold Email...
-                  </span>
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                padding: '24px 0', 
+                color: 'var(--subtext)',
+                gap: '24px'
+              }}>
+                {/* AI Pulse Scanner Graphic */}
+                <div style={{ 
+                  position: 'relative', 
+                  width: '72px', 
+                  height: '72px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(139,92,246,0.08)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  border: '1px solid rgba(139,92,246,0.15)'
+                }}>
+                  <div className="animate-spin" style={{
+                    position: 'absolute',
+                    inset: '-4px',
+                    borderRadius: '50%',
+                    border: '1.5px dashed rgba(139,92,246,0.4)',
+                    animationDuration: '10s'
+                  }}></div>
+                  <Sparkles size={28} style={{ color: 'var(--primary)', animation: 'pulse 2s infinite ease-in-out' }} />
                 </div>
-                
-                <div className={styles.skeletonContainer}>
-                  {/* Recipient line skeleton */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border)', paddingBottom: '14px' }}>
-                    <div style={{ width: '45px', height: '10px', borderRadius: '4px', background: 'rgba(134,134,139,0.15)' }} />
-                    <div className={styles.skeletonBar} style={{ width: '180px' }} />
-                  </div>
-                  {/* Subject line skeleton */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border)', paddingBottom: '14px' }}>
-                    <div style={{ width: '45px', height: '10px', borderRadius: '4px', background: 'rgba(134,134,139,0.15)' }} />
-                    <div className={styles.skeletonBar} style={{ width: '240px' }} />
-                  </div>
-                  {/* Body lines skeleton */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
-                    <div className={styles.skeletonBar} style={{ width: '92%' }} />
-                    <div className={styles.skeletonBar} style={{ width: '85%' }} />
-                    <div className={styles.skeletonBar} style={{ width: '97%' }} />
-                    <div style={{ height: '4px' }} />
-                    <div className={styles.skeletonBar} style={{ width: '70%' }} />
-                    <div className={styles.skeletonBar} style={{ width: '40%' }} />
-                  </div>
+
+                <div style={{ textAlign: 'center', width: '100%' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', fontWeight: 600, color: 'var(--foreground)', letterSpacing: '-0.2px' }}>
+                    Agent AI projektuje wiadomość
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--subtext)', opacity: 0.8 }}>
+                    Trwa dopasowywanie treści i tonu komunikacji do profilu firmy.
+                  </p>
+                </div>
+
+                {/* Steps container */}
+                <div style={{ 
+                  width: '100%', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '12px', 
+                  padding: '16px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px'
+                }}>
+                  {[
+                    "Skanowanie profilu i danych kontaktowych",
+                    "Analizowanie oferty i branży odbiorcy",
+                    "Ustalanie optymalnej strategii dotarcia",
+                    "Generowanie treści wiadomości przez Gemini"
+                  ].map((stepText, idx) => {
+                    const isDone = generationStep > idx;
+                    const isActive = generationStep === idx;
+                    return (
+                      <div key={idx} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px',
+                        opacity: isDone || isActive ? 1 : 0.35,
+                        transition: 'opacity 0.3s ease'
+                      }}>
+                        {isDone ? (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(52,199,89,0.15)', color: '#34c759' }}>
+                            <CheckCircle size={11} />
+                          </div>
+                        ) : isActive ? (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px' }}>
+                            <RefreshCw size={11} className="animate-spin" style={{ color: 'var(--primary)' }} />
+                          </div>
+                        ) : (
+                          <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '1.5px solid var(--border)', opacity: 0.5 }}></div>
+                        )}
+                        <span style={{ 
+                          fontSize: '0.8rem', 
+                          fontWeight: isActive ? 600 : 500, 
+                          color: isActive ? 'var(--foreground)' : 'var(--subtext)' 
+                        }}>
+                          {stepText}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Progress bar */}
+                <div style={{ width: '100%', height: '3px', background: 'var(--border)', borderRadius: '1.5px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    height: '100%', 
+                    width: `${(generationStep + 1) * 25}%`, 
+                    background: 'linear-gradient(90deg, var(--primary), #a855f7)', 
+                    borderRadius: '1.5px',
+                    transition: 'width 0.4s ease-in-out' 
+                  }}></div>
                 </div>
               </div>
             ) : (
