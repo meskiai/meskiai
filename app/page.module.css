@@ -538,186 +538,448 @@
   opacity: 0.85;
 }
 
-/* Showcase Section (Apple Alternating Rows) */
 /* =============================================
-   BENTO GRID — Apple-style features section
+   MACOS INTERACTIVE WINDOW — Apple-style Showcase
    ============================================= */
 
-.bentoSection {
-  padding: 100px 5% 120px;
+.macosSection {
+  padding: 80px 5% 100px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.bentoHeader {
+.macosHeader {
   text-align: center;
-  margin-bottom: 72px;
+  margin-bottom: 56px;
 }
 
-.bentoEyebrow {
+.macosEyebrow {
   display: block;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
   color: var(--primary);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
-.bentoTitle {
-  font-size: clamp(2.2rem, 4vw, 3.2rem);
+.macosTitle {
+  font-size: clamp(2.2rem, 3.8vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  margin-bottom: 16px;
-  line-height: 1.1;
+  margin-bottom: 14px;
+  line-height: 1.15;
 }
 
-.bentoSubtitle {
-  font-size: 1rem;
+.macosSubtitle {
+  font-size: 0.95rem;
   color: var(--subtext);
   font-weight: 500;
   opacity: 0.8;
-  max-width: 480px;
+  max-width: 580px;
   margin: 0 auto;
   line-height: 1.6;
 }
 
-/* Grid layout — bento style */
-.bentoGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
-  gap: 16px;
+/* macOS Window wrapper with subtle perspective and shadow */
+.macosWindowWrapper {
+  perspective: 1000px;
+  width: 100%;
 }
 
-/* Base card */
-.bentoCard {
-  position: relative;
-  border-radius: 24px;
-  padding: 36px 32px;
+.macosWindow {
+  border-radius: 20px;
   border: 1px solid var(--glass-border);
   background: var(--card-bg);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   overflow: hidden;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.35s ease;
-  cursor: default;
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.bentoCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255,255,255,0.06) inset;
-  border-color: rgba(255, 255, 255, 0.12);
+.macosWindow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 50px 120px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
 }
 
-/* Glow overlay inside card */
-.bentoCardGlow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 0.4s ease;
-}
-
-.bentoCard:hover .bentoCardGlow {
-  opacity: 1.4;
-}
-
-/* HERO card spans 2 columns */
-.bentoBig {
-  grid-column: span 2;
-}
-
-/* Icon */
-.bentoCardIcon {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+/* macOS Titlebar */
+.macosTitlebar {
+  height: 48px;
+  background: rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 22px;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
+  justify-content: space-between;
+  padding: 0 20px;
+  user-select: none;
 }
 
-/* Tag (category label) */
-.bentoCardTag {
-  display: block;
+.macosDots {
+  display: flex;
+  gap: 8px;
+}
+
+.macosDots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotClose { background: #ff5f56; }
+.dotMinimize { background: #ffbd2e; }
+.dotMaximize { background: #27c93f; }
+
+.macosWindowTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--subtext);
+  letter-spacing: -0.1px;
+  opacity: 0.8;
+}
+
+/* Window Content Layout */
+.macosBody {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.macosSidebar {
+  width: 240px;
+  border-right: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.06);
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.macosSidebarItem {
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.macosSidebarItem svg {
+  color: var(--subtext);
+  transition: color 0.2s ease;
+}
+
+.macosSidebarItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.macosSidebarItem.active {
+  background: var(--primary);
+  color: white;
+}
+
+.macosSidebarItem.active svg {
+  color: white;
+}
+
+/* Content Area */
+.macosContent {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+/* Inner Layout of Features */
+.featureView {
+  display: flex;
+  gap: 40px;
+  height: 100%;
+  align-items: center;
+}
+
+.featureInfo {
+  flex: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.featureBadge {
   font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 10px;
-  position: relative;
-  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 16px;
 }
 
-/* Title */
-.bentoCardTitle {
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+.featureInfo h3 {
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--foreground);
-  line-height: 1.2;
+  line-height: 1.25;
   margin-bottom: 14px;
-  position: relative;
-  z-index: 1;
 }
 
-/* Body text */
-.bentoCardText {
+.featureInfo p {
   font-size: 0.88rem;
   color: var(--subtext);
   line-height: 1.6;
   font-weight: 500;
   opacity: 0.85;
-  position: relative;
-  z-index: 1;
-  margin-bottom: 0;
+  margin-bottom: 24px;
 }
 
-/* Stat row */
-.bentoStatRow {
+.featureSpecs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  gap: 32px;
-  margin-top: 32px;
-  padding-top: 28px;
-  border-top: 1px solid var(--glass-border);
-  position: relative;
-  z-index: 1;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
-.bentoStat {
+.featureSpecs li {
+  font-size: 0.8rem;
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.featureSpecs li span {
+  color: var(--subtext);
+  font-weight: 500;
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+.featureVisual {
+  flex: 1.2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CSS Mail App Mockup */
+.mockMailApp {
+  width: 100%;
+  height: 260px;
+  background: #111;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.mockMailList {
+  width: 130px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mockMailItem {
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+}
+
+.mockMailActive {
+  background: rgba(255,255,255,0.08);
+}
+
+.mockMailHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  margin-bottom: 2px;
+}
+
+.mockMailSender {
+  font-weight: 700;
+  color: #fff;
+}
+
+.mockMailTime {
+  color: #666;
+}
+
+.mockMailSubject {
+  font-size: 0.68rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mockMailDetail {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mockDetailHeader {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #818cf8;
+}
+
+.mockDetailBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.mockLine {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.mockDraftBadge {
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+/* CSS Table Mockup */
+.mockTableApp {
+  width: 100%;
+  background: #111;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  font-size: 0.72rem;
+}
+
+.mockTableHeader {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-weight: 700;
+  color: #888;
+}
+
+.mockTableRow {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  align-items: center;
+  color: #ccc;
+}
+
+.statusPill {
+  justify-self: start;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* CSS SWOT Grid Mockup */
+.mockSwotGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.swotBox {
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 14px;
+  background: rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.bentoStatNum {
-  font-size: 1.8rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--foreground);
-  line-height: 1;
+.swotBox:hover {
+  transform: none;
+  box-shadow: none;
 }
 
-.bentoStatLabel {
-  font-size: 0.72rem;
-  font-weight: 600;
+.swotLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--subtext);
-  opacity: 0.7;
+  letter-spacing: 0.5px;
 }
+
+.swotBox p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* CSS Security mock */
+.mockSecureShield {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.shieldPulse {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseShield 2s infinite ease-in-out;
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+}
+
+.secureStatus {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #c084fc;
+}
+
+@keyframes pulseShield {
+  0% { transform: scale(1); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(168, 85, 247, 0.4); }
+  100% { transform: scale(1); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
+}
+
 
 
 
@@ -859,20 +1121,21 @@
     gap: 40px;
     margin-bottom: 60px;
   }
-  .bentoGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .macosWindow {
+    height: auto;
+    min-height: 480px;
   }
-  .bentoBig {
-    grid-column: span 2;
+  .macosContent {
+    padding: 30px;
   }
   .pricingSection,
   .whyUsSection,
-  .bentoSection {
+  .macosSection {
     padding: 80px 32px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .bentoTitle {
+  .macosTitle {
     font-size: clamp(1.9rem, 6vw, 2.8rem);
   }
 }
@@ -908,22 +1171,45 @@
   }
   .pricingSection,
   .whyUsSection,
-  .bentoSection {
+  .macosSection {
     padding: 64px 20px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .bentoTitle {
+  .macosTitle {
     font-size: clamp(1.7rem, 7vw, 2.4rem);
   }
-  .bentoGrid {
-    grid-template-columns: 1fr;
+  .macosBody {
+    flex-direction: column;
   }
-  .bentoBig {
-    grid-column: span 1;
+  .macosSidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 10px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
   }
-  .bentoCard {
-    padding: 28px 24px;
+  .macosSidebarItem {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .macosContent {
+    padding: 24px 16px;
+  }
+  .featureView {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .featureInfo {
+    width: 100%;
+  }
+  .featureVisual {
+    width: 100%;
+    margin-top: 10px;
   }
   .pricingCard {
     padding: 28px 20px;
@@ -970,12 +1256,12 @@
   }
   .pricingSection,
   .whyUsSection,
-  .showcaseSection {
+  .macosSection {
     padding: 52px 16px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
-  .bentoTitle {
+  .macosTitle {
     font-size: clamp(1.5rem, 8vw, 2rem);
   }
   .pricingCard {

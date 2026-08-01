@@ -14,6 +14,7 @@ export default function Home() {
   const [currentPriceId, setCurrentPriceId] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [activeFeature, setActiveFeature] = useState('agent');
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -353,102 +354,220 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Premium Bento Features Section */}
-      <section className={styles.bentoSection}>
-        <div className={styles.bentoHeader}>
-          <span className={styles.bentoEyebrow}>Możliwości klasy Pro</span>
-          <h2 className={styles.bentoTitle}>Oto co potrafi Meski AI.</h2>
-          <p className={styles.bentoSubtitle}>Jeden agent. Działa 24/7. Obsługuje całą Twoją komunikację.</p>
+      {/* Premium macOS-Style Interactive Features Section */}
+      <section className={styles.macosSection}>
+        <div className={styles.macosHeader}>
+          <span className={styles.macosEyebrow}>System Operacyjny Sprzedaży</span>
+          <h2 className={styles.macosTitle}>Zaprojektowany, by działać w tle.</h2>
+          <p className={styles.macosSubtitle}>
+            Kliknij na funkcje w panelu poniżej, aby zobaczyć jak Meski AI rewolucjonizuje codzienną obsługę poczty.
+          </p>
         </div>
 
-        <div className={styles.bentoGrid}>
-
-          {/* HERO CARD — Agent 24/7 */}
-          <div className={`${styles.bentoCard} ${styles.bentoBig} ${styles.bentoHero}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.35) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon}>
-              <Bot size={28} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#818cf8' }}>Agent AI</span>
-            <h3 className={styles.bentoCardTitle}>Poczta, która działa.<br/>Kiedy Ty śpisz.</h3>
-            <p className={styles.bentoCardText}>Autonomiczny asystent POP3/SMTP odpowiada na maile w Twoim imieniu — naturalnie, kontekstowo i bez Twojej ingerencji.</p>
-            <div className={styles.bentoStatRow}>
-              <div className={styles.bentoStat}>
-                <span className={styles.bentoStatNum}>24/7</span>
-                <span className={styles.bentoStatLabel}>Dostępność</span>
+        <div className={styles.macosWindowWrapper}>
+          <div className={styles.macosWindow}>
+            {/* Window Header / Titlebar */}
+            <div className={styles.macosTitlebar}>
+              <div className={styles.macosDots}>
+                <span className={styles.dotClose}></span>
+                <span className={styles.dotMinimize}></span>
+                <span className={styles.dotMaximize}></span>
               </div>
-              <div className={styles.bentoStat}>
-                <span className={styles.bentoStatNum}>2 min</span>
-                <span className={styles.bentoStatLabel}>Czas reakcji</span>
+              <div className={styles.macosWindowTitle}>MeskiAI Panel</div>
+              <div style={{ width: '52px' }}></div> {/* Spacer to center title */}
+            </div>
+
+            {/* Window Content Layout */}
+            <div className={styles.macosBody}>
+              {/* Sidebar */}
+              <div className={styles.macosSidebar}>
+                <button
+                  className={`${styles.macosSidebarItem} ${activeFeature === 'agent' ? styles.active : ''}`}
+                  onClick={() => setActiveFeature('agent')}
+                >
+                  <Bot size={16} />
+                  <span>Poczta AI</span>
+                </button>
+                <button
+                  className={`${styles.macosSidebarItem} ${activeFeature === 'cold' ? styles.active : ''}`}
+                  onClick={() => setActiveFeature('cold')}
+                >
+                  <Mail size={16} />
+                  <span>Generowanie Leadów</span>
+                </button>
+                <button
+                  className={`${styles.macosSidebarItem} ${activeFeature === 'swot' ? styles.active : ''}`}
+                  onClick={() => setActiveFeature('swot')}
+                >
+                  <BarChart2 size={16} />
+                  <span>Analiza SWOT</span>
+                </button>
+                <button
+                  className={`${styles.macosSidebarItem} ${activeFeature === 'security' ? styles.active : ''}`}
+                  onClick={() => setActiveFeature('security')}
+                >
+                  <Shield size={16} />
+                  <span>Bezpieczeństwo</span>
+                </button>
               </div>
-              <div className={styles.bentoStat}>
-                <span className={styles.bentoStatNum}>100%</span>
-                <span className={styles.bentoStatLabel}>Automatyzacja</span>
+
+              {/* Main view area */}
+              <div className={styles.macosContent}>
+                {activeFeature === 'agent' && (
+                  <div className={`${styles.featureView} animate-fade-in`}>
+                    <div className={styles.featureInfo}>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>POP3 & SMTP</span>
+                      <h3>Poczta, która sama odpowiada.</h3>
+                      <p>
+                        Agent AI działa bez przerwy, sprawdzając skrzynkę co 120 sekund. Samodzielnie analizuje kontekst, oddziela zapytania ofertowe od spamu i przygotowuje merytoryczne odpowiedzi.
+                      </p>
+                      <ul className={styles.featureSpecs}>
+                        <li><span>Czas reakcji:</span> poniżej 2 minut</li>
+                        <li><span>Tryb pracy:</span> 24h na dobę</li>
+                        <li><span>Ton:</span> dostosowany do klienta</li>
+                      </ul>
+                    </div>
+                    <div className={styles.featureVisual}>
+                      {/* CSS Mockup of Mail app */}
+                      <div className={styles.mockMailApp}>
+                        <div className={styles.mockMailList}>
+                          <div className={`${styles.mockMailItem} ${styles.mockMailActive}`}>
+                            <div className={styles.mockMailHeader}>
+                              <span className={styles.mockMailSender}>Jan Kowalski</span>
+                              <span className={styles.mockMailTime}>Teraz</span>
+                            </div>
+                            <div className={styles.mockMailSubject}>Wycena wdrożenia...</div>
+                          </div>
+                          <div className={styles.mockMailItem}>
+                            <div className={styles.mockMailHeader}>
+                              <span className={styles.mockMailSender}>Anna Nowak</span>
+                              <span className={styles.mockMailTime}>10 min</span>
+                            </div>
+                            <div className={styles.mockMailSubject}>Spotkanie w środę</div>
+                          </div>
+                        </div>
+                        <div className={styles.mockMailDetail}>
+                          <div className={styles.mockDetailHeader}>Pisanie odpowiedzi AI...</div>
+                          <div className={styles.mockDetailBody}>
+                            <div className={styles.mockLine} style={{ width: '80%' }}></div>
+                            <div className={styles.mockLine} style={{ width: '90%' }}></div>
+                            <div className={styles.mockLine} style={{ width: '60%' }}></div>
+                            <div className={styles.mockDraftBadge}>Szkic gotowy do wysłania</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeFeature === 'cold' && (
+                  <div className={`${styles.featureView} animate-fade-in`}>
+                    <div className={styles.featureInfo}>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(16,185,129,0.1)', color: '#34d399' }}>B2B Prospects</span>
+                      <h3>Automatyczne pozyskiwanie klientów.</h3>
+                      <p>
+                        Zamiast ręcznie szukać kontaktów, pozwól Agentowi sprofilować Twój rynek. System automatycznie wyszukuje decydentów z firm i komponuje dedykowane, unikalne maile.
+                      </p>
+                      <ul className={styles.featureSpecs}>
+                        <li><span>Wyszukiwanie:</span> zautomatyzowane leady</li>
+                        <li><span>Personalizacja:</span> na bazie profilu firmy</li>
+                        <li><span>Konwersja:</span> zoptymalizowana przez AI</li>
+                      </ul>
+                    </div>
+                    <div className={styles.featureVisual}>
+                      {/* CSS Mockup of Lead Table */}
+                      <div className={styles.mockTableApp}>
+                        <div className={styles.mockTableHeader}>
+                          <span>Nazwa firmy</span>
+                          <span>Kontakt</span>
+                          <span>Status</span>
+                        </div>
+                        <div className={styles.mockTableRow}>
+                          <span>Omnipack Sp. z o.o.</span>
+                          <span>CEO</span>
+                          <span className={styles.statusPill} style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>Wysłano</span>
+                        </div>
+                        <div className={styles.mockTableRow}>
+                          <span>Your KAYA</span>
+                          <span>Founder</span>
+                          <span className={styles.statusPill} style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>Zainteresowany</span>
+                        </div>
+                        <div className={styles.mockTableRow}>
+                          <span>Sklep XYZ</span>
+                          <span>Marketing</span>
+                          <span className={styles.statusPill} style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>W kolejce</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeFeature === 'swot' && (
+                  <div className={`${styles.featureView} animate-fade-in`}>
+                    <div className={styles.featureInfo}>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>SWOT Analysis</span>
+                      <h3>Błyskawiczny audyt konkurencji.</h3>
+                      <p>
+                        Chcesz poznać klienta przed rozmową? Wpisz jego adres www. System przeanalizuje usługi, ceny i potencjał, a Ty otrzymasz pełny raport SWOT w kilka sekund.
+                      </p>
+                      <ul className={styles.featureSpecs}>
+                        <li><span>Generowanie:</span> około 15 sekund</li>
+                        <li><span>Źródło:</span> skanowanie kodu strony</li>
+                        <li><span>Analiza:</span> mocne strony i nisze rynkowe</li>
+                      </ul>
+                    </div>
+                    <div className={styles.featureVisual}>
+                      {/* CSS Mockup of SWOT Grid */}
+                      <div className={styles.mockSwotGrid}>
+                        <div className={styles.swotBox} style={{ borderColor: 'rgba(16,185,129,0.3)' }}>
+                          <span className={styles.swotLabel} style={{ color: '#34d399' }}>Mocne strony</span>
+                          <p>Szybka dostawa</p>
+                        </div>
+                        <div className={styles.swotBox} style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+                          <span className={styles.swotLabel} style={{ color: '#f87171' }}>Słabe strony</span>
+                          <p>Drogi cennik</p>
+                        </div>
+                        <div className={styles.swotBox} style={{ borderColor: 'rgba(59,130,246,0.3)' }}>
+                          <span className={styles.swotLabel} style={{ color: '#60a5fa' }}>Szanse</span>
+                          <p>Nisza na rynku DE</p>
+                        </div>
+                        <div className={styles.swotBox} style={{ borderColor: 'rgba(251,191,36,0.3)' }}>
+                          <span className={styles.swotLabel} style={{ color: '#fbbf24' }}>Zagrożenia</span>
+                          <p>Nowa konkurencja</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeFeature === 'security' && (
+                  <div className={`${styles.featureView} animate-fade-in`}>
+                    <div className={styles.featureInfo}>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}>Privacy Shield</span>
+                      <h3>Bezpieczne szyfrowanie AES-256.</h3>
+                      <p>
+                        Nie wymagamy dostępu przez API Google do Twojej skrzynki. Twoje hasło do aplikacji pocztowej jest szyfrowane i zapisane bezpiecznie w bazie.
+                      </p>
+                      <ul className={styles.featureSpecs}>
+                        <li><span>Google API Access:</span> Brak</li>
+                        <li><span>Szyfrowanie:</span> Klucz AES-256</li>
+                        <li><span>Prywatność:</span> Zgodna z RODO</li>
+                      </ul>
+                    </div>
+                    <div className={styles.featureVisual}>
+                      {/* CSS Mockup of Secure Lock screen */}
+                      <div className={styles.mockSecureShield}>
+                        <div className={styles.shieldPulse}>
+                          <Shield size={36} color="#c084fc" />
+                        </div>
+                        <span className={styles.secureStatus}>Szyfrowanie Aktywne</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Cold Email */}
-          <div className={`${styles.bentoCard} ${styles.bentoCold}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.3) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}>
-              <Mail size={22} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#34d399' }}>Cold Email</span>
-            <h3 className={styles.bentoCardTitle}>Zimne maile.<br/>Gorące wyniki.</h3>
-            <p className={styles.bentoCardText}>AI generuje spersonalizowane maile sprzedażowe B2B, które konwertują.</p>
-            <div className={styles.bentoStatRow}>
-              <div className={styles.bentoStat}>
-                <span className={styles.bentoStatNum}>200+</span>
-                <span className={styles.bentoStatLabel}>Leadów / mies.</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Analiza SWOT */}
-          <div className={`${styles.bentoCard} ${styles.bentoSwot}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.3) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}>
-              <BarChart2 size={22} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#60a5fa' }}>Analiza</span>
-            <h3 className={styles.bentoCardTitle}>Raport SWOT<br/>w sekundy.</h3>
-            <p className={styles.bentoCardText}>Wklej link. Agent analizuje ofertę, SEO, trendy i CPC. Bez analityków.</p>
-          </div>
-
-          {/* Bezpieczeństwo */}
-          <div className={`${styles.bentoCard} ${styles.bentoSecurity}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(168,85,247,0.25) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
-              <Shield size={22} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#c084fc' }}>Bezpieczeństwo</span>
-            <h3 className={styles.bentoCardTitle}>Zero dostępu<br/>do Twojej skrzynki.</h3>
-            <p className={styles.bentoCardText}>Logowanie Google tylko do identyfikacji. Dane pocztowe nigdy nie trafiają do API Google ani nie trenują modeli AI.</p>
-          </div>
-
-          {/* Czysta Skrzynka */}
-          <div className={`${styles.bentoCard} ${styles.bentoInbox}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(251,191,36,0.25) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #b45309, #fbbf24)' }}>
-              <Inbox size={22} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#fcd34d' }}>Smart Filter</span>
-            <h3 className={styles.bentoCardTitle}>Tylko prawdziwi<br/>ludzie.</h3>
-            <p className={styles.bentoCardText}>Spam, boty i alerty systemowe są automatycznie odsiewane. Na panelu widzisz tylko to, co ważne.</p>
-          </div>
-
-          {/* Ton odpowiedzi */}
-          <div className={`${styles.bentoCard} ${styles.bentoTone}`}>
-            <div className={styles.bentoCardGlow} style={{ background: 'radial-gradient(ellipse at 80% 80%, rgba(244,63,94,0.25) 0%, transparent 60%)' }} />
-            <div className={styles.bentoCardIcon} style={{ background: 'linear-gradient(135deg, #9f1239, #f43f5e)' }}>
-              <Sliders size={22} color="white" />
-            </div>
-            <span className={styles.bentoCardTag} style={{ color: '#fb7185' }}>Personalizacja</span>
-            <h3 className={styles.bentoCardTitle}>Twój głos.<br/>Twoje zasady.</h3>
-            <p className={styles.bentoCardText}>Wybierz ton: formalny, przyjazny, krótki. Agent zawsze pisze tak, jak Ty — nie jak robot.</p>
-          </div>
-
         </div>
       </section>
       
