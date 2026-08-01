@@ -1449,3 +1449,166 @@
   color: #1d1d1f;
 }
 
+/* ==========================================================================
+   FAQ SECTION (Apple Style Accordion)
+   ========================================================================== */
+.faqSection {
+  padding: 100px 5% 120px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.faqHeader {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.faqEyebrow {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.faqTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--foreground);
+  margin-bottom: 16px;
+}
+
+.faqSubtitle {
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  color: var(--subtext);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.faqGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.faqCard {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.faqCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme="light"]) .faqCard:hover {
+  background: rgba(0, 0, 0, 0.015);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.faqQuestionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.faqQuestionRow h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.faqIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+}
+
+:global([data-theme="light"]) .faqIconWrapper {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.faqIcon {
+  color: var(--foreground);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faqCard.active .faqIconWrapper {
+  transform: rotate(180deg);
+  background: var(--primary);
+}
+
+.faqCard.active .faqIcon {
+  color: #fff;
+}
+
+.faqAnswerWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding-top 0.3s ease;
+  overflow: hidden;
+}
+
+.faqCard.active .faqAnswerWrapper {
+  grid-template-rows: 1fr;
+  padding-top: 16px;
+}
+
+.faqAnswer {
+  min-height: 0;
+  color: var(--subtext);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Responsive FAQ overrides */
+@media (max-width: 767px) {
+  .faqSection {
+    padding: 44px 20px;
+  }
+  .faqHeader {
+    margin-bottom: 32px;
+  }
+  .faqCard {
+    padding: 18px 20px;
+    border-radius: 14px;
+  }
+  .faqQuestionRow h3 {
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+  .faqAnswer {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 389px) {
+  .faqSection {
+    padding: 32px 16px !important;
+  }
+}

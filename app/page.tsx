@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2 } from "lucide-react";
+import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { ThemeToggle } from "./components/ThemeToggle";
 import styles from "./page.module.css";
@@ -15,6 +15,7 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeFeature, setActiveFeature] = useState('agent');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const features = ['agent', 'cold', 'swot', 'security'];
@@ -575,6 +576,37 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <section className={styles.faqSection} id="faq">
+        <div className={styles.faqHeader}>
+          <span className={styles.faqEyebrow}>Centrum Pomocy</span>
+          <h2 className={styles.faqTitle}>Najczęściej zadawane pytania</h2>
+          <p className={styles.faqSubtitle}>
+            Masz pytania dotyczące działania Meski AI? Sprawdź odpowiedzi na najczęstsze wątpliwości.
+          </p>
+        </div>
+
+        <div className={styles.faqGrid}>
+          {faqItems.map((item, idx) => (
+            <div 
+              key={idx} 
+              className={`${styles.faqCard} ${openFaq === idx ? styles.active : ''}`}
+              onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+            >
+              <div className={styles.faqQuestionRow}>
+                <h3>{item.q}</h3>
+                <div className={styles.faqIconWrapper}>
+                  <ChevronDown size={18} className={styles.faqIcon} />
+                </div>
+              </div>
+              <div className={styles.faqAnswerWrapper}>
+                <p className={styles.faqAnswer}>{item.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       
       <footer className={styles.footer}>
         <div className={styles.footerLinks} style={{ display: 'flex', gap: '24px', justifyContent: 'center' }}>
@@ -586,3 +618,26 @@ export default function Home() {
     </main>
   );
 }
+
+const faqItems = [
+  {
+    q: "Jak działa logowanie przez Google? Czy Meski AI ma dostęp do moich maili?",
+    a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej autoryzacji Twojego konta w naszym systemie. Aplikacja nie pobiera, nie czyta ani nie wysyła wiadomości za pomocą Google API. Do obsługi poczty wykorzystujemy wyłącznie bezpieczne połączenia SMTP/IMAP, a w przypadku Gmaila – hasła aplikacji generowane w ustawieniach Twojego konta Google."
+  },
+  {
+    q: "Czy konfiguracja poczty jest bezpieczna?",
+    a: "W pełni. Twoje dane połączenia są szyfrowane na poziomie bazy danych. Zamiast głównego hasła do konta, zalecamy użycie dedykowanego 'Hasła Aplikacji', które możesz w każdej chwili wycofać jednym kliknięciem w panelu bezpieczeństwa swojego dostawcy poczty (Google, Onet, WP, Outlook)."
+  },
+  {
+    q: "Jak działa asystent w tle? Czy muszę mieć otwartą kartę w przeglądarce?",
+    a: "Nie. Nasz agent AI działa w 100% w tle na naszych serwerach. Synchronizacja poczty i analizowanie wiadomości odbywa się automatycznie co 10 minut za pomocą bezpiecznych zadań cron. Możesz zamknąć komputer, wyjechać na urlop, a Meski AI nadal będzie klasyfikować i przygotowywać maile."
+  },
+  {
+    q: "Co to jest 'Audyt Konkurencji' i jak działa baza leadów?",
+    a: "Z poziomu panelu możesz podać adres URL konkurenta, a system automatycznie przeprowadzi analizę SWOT oraz wygeneruje sugerowane mocne/słabe strony. Baza leadów pozwala na automatyczne wyszukiwanie i dopasowywanie potencjalnych klientów w Twojej branży wraz z generowaniem spersonalizowanych kampanii Cold Email."
+  },
+  {
+    q: "Jak mogę anulować subskrypcję?",
+    a: "W każdej chwili. Z poziomu ustawień w panelu masz dostęp do portalu rozliczeniowego Stripe, gdzie jednym kliknięciem możesz anulować subskrypcję lub zmienić pakiet na inny. Brak długoterminowych zobowiązań."
+  }
+];
