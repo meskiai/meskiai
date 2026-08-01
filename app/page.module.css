@@ -549,13 +549,13 @@
 
 .featuresHeader {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 48px; /* Tighter spacing */
 }
 
 .featuresHeader h2 {
-  font-size: clamp(3rem, 5vw, 4.5rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-size: clamp(2rem, 3.5vw, 2.8rem); /* Shrunk from clamp(3rem, 5vw, 4.5rem) */
+  font-weight: 700;
+  letter-spacing: -0.03em;
   background: linear-gradient(135deg, var(--foreground) 0%, var(--subtext) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -564,7 +564,7 @@
 .featuresPremiumGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px; /* Tighter gap */
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -583,8 +583,8 @@
   backdrop-filter: blur(40px) saturate(200%);
   -webkit-backdrop-filter: blur(40px) saturate(200%);
   border: 1px solid var(--glass-border);
-  border-radius: 28px;
-  padding: 40px 36px;
+  border-radius: 20px; /* Smaller, cleaner radius */
+  padding: 30px 26px; /* Significantly reduced padding */
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
@@ -598,14 +598,14 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
 }
 
 .featurePremiumCard:hover {
-  transform: translateY(-4px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), var(--glass-reflection);
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), var(--glass-reflection);
 }
 
 /* Subtle glow effect behind bento cards on hover */
@@ -614,7 +614,7 @@
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: -1;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.04) 0%, transparent 80%);
+  background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.03) 0%, transparent 85%);
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -625,15 +625,15 @@
 }
 
 .premiumIconWrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  width: 38px; /* Tighter wrapper */
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px; /* Reduced gap */
   color: var(--primary);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -641,25 +641,26 @@
 .featurePremiumCard:hover .premiumIconWrapper {
   background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
   color: white;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
   border-color: transparent;
   transform: scale(1.05);
 }
 
 .featurePremiumCard h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1.05rem; /* Shrunk title size for sleeker look */
+  font-weight: 600; /* Medium-bold for premium feel */
   color: var(--foreground);
-  margin: 0 0 10px 0;
-  letter-spacing: -0.02em;
+  margin: 0 0 6px 0; /* Reduced spacing */
+  letter-spacing: -0.015em;
 }
 
 .featurePremiumCard p {
-  font-size: 0.9rem;
+  font-size: 0.82rem; /* Clean, smaller text */
   color: var(--subtext);
-  line-height: 1.6;
+  line-height: 1.5; /* Tightened line-height */
   margin: 0;
   font-weight: 500;
+  opacity: 0.85;
   max-width: 650px;
 }
 
