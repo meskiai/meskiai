@@ -1184,8 +1184,14 @@
     font-size: clamp(1.6rem, 6vw, 2.2rem);
     letter-spacing: -0.03em;
   }
+  .macosWindow {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
   .macosBody {
     flex-direction: column;
+    overflow: visible;
   }
   .macosSidebar {
     width: 100%;
@@ -1205,6 +1211,7 @@
   }
   .macosContent {
     padding: 20px 14px;
+    overflow: visible;
   }
   .featureView {
     flex-direction: column;

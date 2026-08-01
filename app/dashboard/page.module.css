@@ -1067,7 +1067,7 @@ input:checked + .slider:before { transform: translateX(16px); }
   width: 100%;
   /* fluid padding: 28px on phones → 60px on desktops */
   padding: clamp(24px, 5vw, 60px) clamp(20px, 5vw, 60px);
-  background: var(--card-bg);
+  background: var(--modal-bg);
   backdrop-filter: saturate(200%) blur(80px);
   -webkit-backdrop-filter: saturate(200%) blur(80px);
   border-radius: clamp(24px, 3vw, 40px);
@@ -1503,44 +1503,3 @@ input:checked + .slider:before { transform: translateX(16px); }
 .pulseRing {
   animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
-
-/* Premium Skeleton Email Loader & Shimmer Effect */
-.skeletonContainer {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.skeletonBar {
-  height: 10px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, rgba(134, 134, 139, 0.1) 25%, rgba(134, 134, 139, 0.25) 50%, rgba(134, 134, 139, 0.1) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.6s infinite linear;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.pulseDot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  animation: pulseBlink 1.4s infinite ease-in-out;
-}
-
-@keyframes pulseBlink {
-  0%, 100% { transform: scale(0.6); opacity: 0.4; }
-  50% { transform: scale(1.1); opacity: 1; }
-}
-

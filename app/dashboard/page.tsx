@@ -1040,7 +1040,7 @@ export default function Dashboard() {
             {/* Progress Bar */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '40px' }}>
               {[0, 1, 2, 3].map(idx => (
-                <div key={idx} style={{ height: '4px', width: '40px', borderRadius: '2px', background: idx === guideIndex ? 'var(--primary)' : 'rgba(255,255,255,0.1)', transition: 'background 0.3s' }}></div>
+                <div key={idx} style={{ height: '4px', width: '40px', borderRadius: '2px', background: idx === guideIndex ? 'var(--primary)' : 'var(--border)', transition: 'background 0.3s' }}></div>
               ))}
             </div>
 
@@ -1142,40 +1142,38 @@ export default function Dashboard() {
       {showUpgradeReminder && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-fade-in" style={{ 
-            background: 'rgba(25, 25, 30, 0.75)', 
-            border: '1px solid rgba(255, 255, 255, 0.12)', 
+            background: 'var(--modal-bg)', 
+            border: '1px solid var(--border)', 
             padding: '48px 40px', 
             borderRadius: '28px', 
             maxWidth: '460px', 
             width: '90%', 
             textAlign: 'center', 
-            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)', 
-            backdropFilter: 'blur(50px) saturate(190%)',
-            WebkitBackdropFilter: 'blur(50px) saturate(190%)',
+            boxShadow: 'var(--mac-shadow), var(--glass-reflection)', 
+            backdropFilter: 'saturate(190%) blur(50px)',
+            WebkitBackdropFilter: 'saturate(190%) blur(50px)',
             position: 'relative' 
           }}>
             <button 
               onClick={() => setShowUpgradeReminder(false)} 
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--sidebar-hover)'; e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--subtext)'; }}
             >
               <X size={18} />
             </button>
             <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #a855f7, #6366f1)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(168, 85, 247, 0.3)' }}>
               <Zap size={30} style={{ filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
             </div>
-            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
-            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
+            <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '32px' }}>
               Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać **większe limity wysyłki e-maili, dodatkowe analizy klientów (leadów) B2B oraz zaawansowane analizy strategiczne**.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setShowUpgradeReminder(false)} 
-                className="btn" 
-                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                className="btn btn-secondary" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', borderRadius: '12px' }}
               >
                 Później
               </button>
@@ -1192,19 +1190,20 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
       {showFeedbackModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-fade-in" style={{ 
-            background: 'rgba(25, 25, 30, 0.78)', 
-            border: '1px solid rgba(255, 255, 255, 0.12)', 
+            background: 'var(--modal-bg)', 
+            border: '1px solid var(--border)', 
             padding: '48px 40px', 
             borderRadius: '28px', 
             maxWidth: '460px', 
             width: '90%', 
             textAlign: 'center', 
-            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.25)', 
-            backdropFilter: 'blur(50px) saturate(190%)',
-            WebkitBackdropFilter: 'blur(50px) saturate(190%)',
+            boxShadow: 'var(--mac-shadow), var(--glass-reflection)', 
+            backdropFilter: 'saturate(190%) blur(50px)',
+            WebkitBackdropFilter: 'saturate(190%) blur(50px)',
             position: 'relative' 
           }}>
             {/* Soft Ambient Light behind modal */}
@@ -1223,17 +1222,17 @@ export default function Dashboard() {
 
             <button 
               onClick={() => setShowFeedbackModal(false)} 
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--sidebar-hover)'; e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--subtext)'; }}
             >
               <X size={18} />
             </button>
             <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #10b981, #3b82f6)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)' }}>
               <Star size={30} style={{ fill: 'currentColor', filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
             </div>
-            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff', letterSpacing: '-0.02em' }}>Podziel się opinią</h2>
-            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Podziel się opinią</h2>
+            <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '24px' }}>
               Dziękujemy, że korzystasz z MESKIAI! Twoja opinia jest dla nas niezwykle ważna. Pomóż nam stawać się jeszcze lepszym.
             </p>
 
@@ -1251,7 +1250,7 @@ export default function Dashboard() {
                   <Star 
                     size={36} 
                     style={{ 
-                      color: num <= feedbackStars ? '#fbbf24' : 'rgba(255,255,255,0.15)', 
+                      color: num <= feedbackStars ? '#fbbf24' : 'var(--subtext)', 
                       fill: num <= feedbackStars ? '#fbbf24' : 'transparent',
                       filter: num <= feedbackStars ? 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.6))' : 'none',
                       transition: 'color 0.2s, fill 0.2s, filter 0.2s'
@@ -1273,7 +1272,7 @@ export default function Dashboard() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
                 padding: '12px 16px',
-                color: '#ffffff',
+                color: 'var(--foreground)',
                 fontSize: '0.9rem',
                 lineHeight: 1.45,
                 resize: 'none',
@@ -1290,10 +1289,8 @@ export default function Dashboard() {
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setShowFeedbackModal(false)} 
-                className="btn" 
-                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                className="btn btn-secondary" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', borderRadius: '12px' }}
               >
                 Pomiń
               </button>
@@ -2921,7 +2918,7 @@ export default function Dashboard() {
       {/* Contact Lead Modal (moved to root for proper fixed positioning) */}
       {contactingLead && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="animate-fade-in-up" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '92%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="animate-fade-in-up" style={{ background: 'var(--modal-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '92%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles size={20} style={{ color: 'var(--primary)' }} />
               Napisz (Cold Email) do: {contactingLead.name}
