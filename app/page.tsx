@@ -51,8 +51,8 @@ export default function Home() {
 
   if (status === "loading") {
     return (
-      <div style={{ display: 'flex', width: '100vw', height: '100vh', background: '#030303', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: '24px', height: '24px', border: '2px solid rgba(255,255,255,0.1)', borderTopColor: '#ffffff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <div style={{ display: 'flex', width: '100vw', height: '100vh', background: 'var(--background)', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '24px', height: '24px', border: '2px solid var(--border)', borderTopColor: 'var(--foreground)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
         <style jsx global>{`
           @keyframes spin { to { transform: rotate(360deg); } }
         `}</style>
@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      {/* Vercel/Linear Glow Blobs */}
+      {/* Dynamic Theme Glow Blobs */}
       <div className={styles.ambientBackground}>
         <div className={styles.ambientBlob1} />
         <div className={styles.ambientBlob2} />
@@ -76,7 +76,7 @@ export default function Home() {
             <img
               src="/logo.png"
               alt="MESKIAI logo"
-              style={{ filter: 'invert(1)' }}
+              style={{ filter: 'var(--logo-filter)' }}
             />
             <span>MESKIAI</span>
           </div>
@@ -110,19 +110,19 @@ export default function Home() {
                   <div
                     style={{
                       position: 'absolute', top: 'calc(100% + 10px)', right: 0,
-                      background: 'rgba(10, 10, 12, 0.95)', backdropFilter: 'saturate(140%) blur(35px)',
+                      background: 'var(--card-bg)', backdropFilter: 'saturate(140%) blur(35px)',
                       WebkitBackdropFilter: 'saturate(140%) blur(35px)',
-                      border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px',
+                      border: '1px solid var(--border)', borderRadius: '12px',
                       padding: '6px', width: '200px',
-                      boxShadow: '0 20px 40px rgba(0,0,0,0.7)',
+                      boxShadow: 'var(--mac-shadow)',
                       zIndex: 100
                     }}
                   >
-                    <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '4px' }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {session?.user?.name || session?.user?.email?.split('@')[0]}
                       </div>
-                      <div style={{ fontSize: '0.7rem', color: '#86868b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--subtext)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {session?.user?.email}
                       </div>
                     </div>
@@ -130,14 +130,14 @@ export default function Home() {
                     <Link
                       href="/dashboard"
                       onClick={() => setShowUserMenu(false)}
-                      style={{ width: '100%', padding: '8px 12px', background: 'transparent', border: 'none', borderRadius: '8px', color: '#ffffff', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', transition: 'background 0.15s', textDecoration: 'none' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                      style={{ width: '100%', padding: '8px 12px', background: 'transparent', border: 'none', borderRadius: '8px', color: 'var(--foreground)', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', transition: 'background 0.15s', textDecoration: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--sidebar-hover)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <HomeIcon size={13} style={{ color: '#86868b' }} /> Panel roboczy
+                      <HomeIcon size={13} style={{ color: 'var(--subtext)' }} /> Panel roboczy
                     </Link>
 
-                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
+                    <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
 
                     <button
                       onClick={() => signOut({ callbackUrl: '/' })}
@@ -198,14 +198,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Cyberpunk frosted laptop showcase */}
+      {/* Cyberpunk/Frosted Laptop Showcase */}
       <section className={styles.mockupContainer}>
         <div className={styles.laptopMockup}>
           <div className={styles.mockupHeader}>
             <div className={`${styles.dot} ${styles.redDot}`} />
             <div className={`${styles.dot} ${styles.yellowDot}`} />
             <div className={`${styles.dot} ${styles.greenDot}`} />
-            <div style={{ margin: '0 auto', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', fontWeight: 500, letterSpacing: '0.5px' }}>MESKIAI Dashboard Preview</div>
+            <div style={{ margin: '0 auto', fontSize: '0.7rem', color: 'var(--subtext)', opacity: 0.8, fontWeight: 500, letterSpacing: '0.5px' }}>MESKIAI Dashboard Preview</div>
           </div>
           <div className={styles.mockupBody}>
             <div className={styles.mockupSidebar}>
@@ -225,7 +225,7 @@ export default function Home() {
             <div className={styles.mockupContent}>
               <div className={styles.previewThread}>
                 <div className={styles.previewMailRow}>
-                  <strong style={{ fontSize: '0.8rem', color: '#ffffff' }}>Klient: Piotr Kamiński</strong>
+                  <strong style={{ fontSize: '0.8rem', color: 'var(--foreground)' }}>Klient: Piotr Kamiński</strong>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <span className={`${styles.previewBadge} ${styles.badgeCall}`}>📞 Spotkanie</span>
                     <span className={`${styles.previewBadge} ${styles.badgeStatus}`}>W toku (Odpisano)</span>
@@ -255,12 +255,12 @@ export default function Home() {
             <div className={styles.bentoWidget}>
               <div className={styles.threadListWidget}>
                 <div className={styles.widgetThreadItem}>
-                  <span style={{ color: '#a5b4fc', fontWeight: 600 }}>📧 Zapytanie o wycenę</span>
-                  <span style={{ color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>AUTO_REPLIED</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 600 }}>📧 Zapytanie o wycenę</span>
+                  <span style={{ color: '#30d158', background: 'rgba(48,209,88,0.12)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>AUTO_REPLIED</span>
                 </div>
-                <div className={styles.widgetThreadItem} style={{ opacity: 0.7 }}>
-                  <span style={{ color: '#fbcfe8', fontWeight: 600 }}>📞 Termin spotkania</span>
-                  <span style={{ color: '#fbbf24', background: 'rgba(251,191,36,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>W TOKU (ODPISANO)</span>
+                <div className={styles.widgetThreadItem} style={{ opacity: 0.85 }}>
+                  <span style={{ color: 'var(--foreground)', fontWeight: 600 }}>📞 Termin spotkania</span>
+                  <span style={{ color: 'var(--warning)', background: 'rgba(245,158,11,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.62rem' }}>W TOKU (ODPISANO)</span>
                 </div>
               </div>
             </div>
@@ -279,14 +279,14 @@ export default function Home() {
                 <div className={styles.widgetLeadRow}>
                   <div className={styles.widgetLeadLeft}>
                     <div className={styles.leadAvatar}>PK</div>
-                    <span style={{ color: '#fff', fontWeight: 500 }}>Pol-Bud Sp. z o.o.</span>
+                    <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Pol-Bud Sp. z o.o.</span>
                   </div>
                   <span className={styles.leadPercent}>94%</span>
                 </div>
                 <div className={styles.widgetLeadRow}>
                   <div className={styles.widgetLeadLeft}>
-                    <div className={styles.leadAvatar} style={{ background: '#3b82f6' }}>JS</div>
-                    <span style={{ color: '#fff', fontWeight: 500 }}>Jan Stal</span>
+                    <div className={styles.leadAvatar} style={{ background: 'var(--primary)' }}>JS</div>
+                    <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>Jan Stal</span>
                   </div>
                   <span className={styles.leadPercent}>87%</span>
                 </div>
@@ -310,7 +310,7 @@ export default function Home() {
             <div>
               <h3>Brak zmyślania faktów</h3>
               <p>
-                Bezpieczeństwo przede wszystkim. W przypadku braku wiedzy w systemie, Agent nie tworzy nieprawdziwych danych, lecz grzecznie pyta o pomoc.
+                Bezpieczeństwo przede wszystkim. W przypadku braku wiedzy w bazie, Agent nie zmyśla nieprawdziwych danych, lecz przekazuje sprawę do Twojej weryfikacji.
               </p>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function Home() {
               <div className={styles.websiteWidget}>
                 <div className={styles.widgetUrlInput}>
                   <span>https://twoja-pracownia.pl</span>
-                  <Globe size={12} style={{ color: '#818cf8' }} />
+                  <Globe size={12} style={{ color: 'var(--primary)' }} />
                 </div>
                 <div className={styles.widgetTagRow}>
                   <span className={styles.widgetTag}>✓ Cenniki</span>
@@ -353,7 +353,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* pricing cards */}
+      {/* Pricing cards */}
       <section className={styles.pricingSection} id="cennik">
         <div className={styles.pricingHeader}>
           <h2>Minimalizm w cenniku.</h2>
@@ -361,7 +361,7 @@ export default function Home() {
         </div>
 
         <div className={styles.warningBox}>
-          <AlertCircle size={22} style={{ color: '#818cf8', flexShrink: 0 }} />
+          <AlertCircle size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
           <div>
             <h3>Ważne przed rejestracją</h3>
             <p>
@@ -371,8 +371,8 @@ export default function Home() {
         </div>
         
         <div className={styles.pricingGrid}>
-          {/* Silver card */}
-          <div className={`${styles.pricingCard} ${styles.metallicBasic}`}>
+          {/* Plan Basic */}
+          <div className={styles.pricingCard}>
             <div className={styles.pricingName}>Meski AI Basic</div>
             <div className={styles.pricingDesc}>Idealny wybór dla mikroprzedsiębiorstw i freelancerów.</div>
             <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
@@ -388,7 +388,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn}
               disabled={userTier >= 1}
-              style={userTier >= 1 ? { background: '#1c1c1e', color: 'rgba(255,255,255,0.3)', cursor: 'not-allowed' } : {}}
+              style={userTier >= 1 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               onClick={() => {
                 if (userTier >= 1) return;
                 localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic', time: Date.now() }));
@@ -399,13 +399,13 @@ export default function Home() {
                 }
               }}
             >
-              {userTier >= 1 ? (userTier === 1 ? "Obecny plan" : "Aktywny wyższy plan") : "Wybierz Basic"}
+              {userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet"}
             </button>
           </div>
 
-          {/* Indigo card - PRO */}
-          <div className={`${styles.pricingCard} ${styles.metallicPro}`}>
-            <div className={styles.proBadge}>Space Indigo</div>
+          {/* Plan PRO */}
+          <div className={`${styles.pricingCard} ${styles.pro}`}>
+            <div className={styles.proBadge}>Rekomendowany</div>
             <div className={styles.pricingName}>Meski AI PRO</div>
             <div className={styles.pricingDesc}>Zaprojektowany dla rosnących firm handlowo-usługowych.</div>
             <div className={styles.pricingPrice}>699 <span>zł / mies.</span></div>
@@ -422,7 +422,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn}
               disabled={userTier >= 2}
-              style={userTier >= 2 ? { background: '#1c1c1e', color: 'rgba(255,255,255,0.3)', cursor: 'not-allowed' } : {}}
+              style={userTier >= 2 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               onClick={() => {
                 if (userTier >= 2) return;
                 localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro', time: Date.now() }));
@@ -433,13 +433,12 @@ export default function Home() {
                 }
               }}
             >
-              {userTier >= 2 ? (userTier === 2 ? "Obecny plan" : "Aktywny wyższy plan") : "Wybierz PRO"}
+              {userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO"}
             </button>
           </div>
 
-          {/* Gold Titanium card */}
-          <div className={`${styles.pricingCard} ${styles.metallicMax}`}>
-            <div className={styles.goldBadge}>Gold Titanium</div>
+          {/* Plan MAX */}
+          <div className={styles.pricingCard}>
             <div className={styles.pricingName}>Meski AI MAX</div>
             <div className={styles.pricingDesc}>Nielimitowana moc obliczeniowa bez żadnych ograniczeń.</div>
             <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
@@ -455,7 +454,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn}
               disabled={userTier >= 3}
-              style={userTier >= 3 ? { background: '#1c1c1e', color: 'rgba(255,255,255,0.3)', cursor: 'not-allowed' } : {}}
+              style={userTier >= 3 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               onClick={() => {
                 if (userTier >= 3) return;
                 localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max', time: Date.now() }));
@@ -466,7 +465,7 @@ export default function Home() {
                 }
               }}
             >
-              {userTier >= 3 ? "Obecny plan" : "Wybierz MAX"}
+              {userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max"}
             </button>
           </div>
         </div>
