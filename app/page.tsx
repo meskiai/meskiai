@@ -371,11 +371,11 @@ export default function Home() {
             <ul className={styles.showcaseList}>
               <li><CheckCircle size={16} /> Pełna automatyzacja POP3 / SMTP</li>
               <li><CheckCircle size={16} /> Bezpieczne logowanie bez OAuth konta Google</li>
-              <li><CheckCircle size={16} /> Inteligentna klasyfikacja spraw w toku</li>
+              <li><CheckCircle size={16} /> Podgląd wysłanych odpowiedzi i historii wątku</li>
             </ul>
           </div>
           <div className={styles.showcaseImageContainer}>
-            <img src="/dashboard_preview.jpg" alt="Dashboard Zarządzania Poczty" className={styles.showcaseImage} />
+            <img src="/screen_30_173710.png" alt="Rzeczywisty panel wysłanych wiadomości Meski AI" className={styles.showcaseImage} />
           </div>
         </div>
 
@@ -390,21 +390,40 @@ export default function Home() {
             <ul className={styles.showcaseList}>
               <li><CheckCircle size={16} /> Precyzyjne filtry wyszukiwania firm B2B</li>
               <li><CheckCircle size={16} /> Szablony Cold Email pisane przez Gemini Pro</li>
-              <li><CheckCircle size={16} /> Bezpośredni eksport i wysyłka do skrzynek</li>
+              <li><CheckCircle size={16} /> Podgląd leadów i bezpośrednia wysyłka AI</li>
             </ul>
           </div>
           <div className={styles.showcaseImageContainer}>
-            <img src="/hero_ai_core.jpg" alt="Baza Klientów B2B" className={styles.showcaseImage} />
+            <img src="/screen_30_173823.png" alt="Rzeczywisty panel bazy leadów i klientów B2B" className={styles.showcaseImage} />
           </div>
         </div>
 
-        {/* Showcase 3: Szczegółowe Funkcje w stylu Apple Grid */}
+        {/* Showcase 3: Analiza Strony i SWOT */}
+        <div className={styles.showcaseRow}>
+          <div className={styles.showcaseText}>
+            <span className={styles.showcaseTag} style={{ color: '#3b82f6' }}>Głęboka Analiza</span>
+            <h3>Raport Witryny i SWOT.<br/>Poznaj rynek i konkurencję.</h3>
+            <p>
+              Podepnij link do witryny swojej lub potencjalnego klienta. Agent w sekundy przeanalizuje jej ofertę, cennik i strukturę, po czym wygeneruje kompletny raport SEO, szacowany koszt kliknięcia (CPC), badanie trendów oraz kompletną analizę SWOT.
+            </p>
+            <ul className={styles.showcaseList}>
+              <li><CheckCircle size={16} /> Błyskawiczne pobieranie informacji z linków</li>
+              <li><CheckCircle size={16} /> Automatyczna analiza mocnych i słabych stron</li>
+              <li><CheckCircle size={16} /> Szacowanie kosztów reklamy Google Ads</li>
+            </ul>
+          </div>
+          <div className={styles.showcaseImageContainer}>
+            <img src="/screen_30_173836.png" alt="Rzeczywisty raport analizy witryny i SWOT" className={styles.showcaseImage} />
+          </div>
+        </div>
+
+        {/* Showcase 4: Szczegółowe Funkcje w stylu Apple Grid */}
         <div className={styles.featuresAppleGrid}>
-          {/* Item 1: Strona WWW */}
+          {/* Item 1: Bezpieczeństwo */}
           <div className={styles.featuresAppleItem}>
-            <Globe size={24} style={{ color: '#3b82f6', marginBottom: '16px' }} />
-            <h4>Analiza Strony WWW</h4>
-            <p>Podepnij link do swojej witryny. Agent w sekundy nauczy się Twojej oferty, cennika i godzin otwarcia, by precyzyjnie odpowiadać klientom na bazie faktów.</p>
+            <Shield size={24} style={{ color: '#3b82f6', marginBottom: '16px' }} />
+            <h4>Bezpieczeństwo i Prywatność</h4>
+            <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są całkowicie chronione, odizolowane i nie służą do treningu modeli AI.</p>
           </div>
 
           {/* Item 2: Klasyfikacja */}
