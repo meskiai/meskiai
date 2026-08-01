@@ -80,7 +80,7 @@
   position: fixed;
   top: 0;
   width: 100%;
-  height: 64px;
+  height: 56px; /* Shrunk from 64px */
   background: var(--nav-bg);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -93,7 +93,7 @@
 .navContent {
   width: 100%;
   max-width: 1200px;
-  padding: 0 32px;
+  padding: 0 24px; /* Shrunk padding */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -103,10 +103,10 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-weight: 700;
-  font-size: 1.3rem;
-  letter-spacing: -0.5px;
+  font-size: 1.15rem; /* Shrunk from 1.3rem */
+  letter-spacing: -0.4px;
   color: var(--foreground);
 }
 
@@ -166,38 +166,35 @@
 
 /* HERO SECTION (Centered, Massive) */
 .hero {
-  padding-top: clamp(90px, 13vh, 160px);
-  padding-left: clamp(16px, 4vw, 40px);
-  padding-right: clamp(16px, 4vw, 40px);
-  padding-bottom: clamp(24px, 4vh, 60px);
+  padding-top: clamp(80px, 10vh, 120px); /* Reduced from 160px */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 50vh;
-  max-width: 1200px;
+  min-height: 40vh;
+  max-width: 1000px; /* Reduced from 1200px */
   margin: 0 auto;
   text-align: center;
   position: relative;
   z-index: 10;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-bottom: 40px;
 }
 
 .badge {
-  background: rgba(134, 134, 139, 0.15);
-  border: 1px solid rgba(134, 134, 139, 0.3);
-  padding: 6px 16px;
+  background: rgba(134, 134, 139, 0.12);
+  border: 1px solid rgba(134, 134, 139, 0.25);
+  padding: 5px 14px; /* Shrunk padding */
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-size: 0.78rem; /* Shrunk from 0.85rem */
   font-weight: 600;
   color: var(--foreground);
-  margin-bottom: 32px;
+  margin-bottom: 20px; /* Reduced from 32px */
   backdrop-filter: blur(10px);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .badgeHighlight {
@@ -205,37 +202,37 @@
 }
 
 .heroTitle {
-  font-size: clamp(2rem, 7vw, 7.5rem);
+  font-size: clamp(2rem, 5.5vw, 4.5rem); /* Shrunk from clamp(2rem, 7vw, 7.5rem) */
   font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 1.05;
-  margin-bottom: clamp(12px, 2vh, 24px);
-  background: linear-gradient(180deg, var(--foreground) 0%, rgba(134, 134, 139, 0.5) 100%);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+  background: linear-gradient(180deg, var(--foreground) 0%, rgba(134, 134, 139, 0.6) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  max-width: 1000px;
+  max-width: 900px;
 }
 
 [data-theme="dark"] .heroTitle {
-  background: linear-gradient(180deg, #fff 0%, #86868b 100%);
+  background: linear-gradient(180deg, #fff 0%, #a1a1a6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .heroSubtitle {
-  font-size: clamp(0.9rem, 2.2vw, 1.6rem);
+  font-size: clamp(0.85rem, 1.4vw, 1.15rem); /* Shrunk from clamp(0.9rem, 2.2vw, 1.6rem) */
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--subtext);
-  margin-bottom: clamp(28px, 5vh, 48px);
+  margin-bottom: clamp(20px, 3.5vh, 32px); /* Reduced from 48px */
   line-height: 1.5;
-  max-width: 700px;
+  max-width: 600px;
 }
 
 .ctaWrapper {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .ctaBtnPrimary {
@@ -243,17 +240,17 @@
   color: var(--background);
   border: none;
   border-radius: 9999px;
-  padding: clamp(12px, 2vh, 18px) clamp(24px, 4vw, 40px);
-  font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+  padding: 12px 28px; /* Compact padding */
+  font-size: 0.92rem; /* Clean, smaller font */
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 
 .ctaBtnPrimary::before {
@@ -266,8 +263,8 @@
 }
 
 .ctaBtnPrimary:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.16);
 }
 
 .ctaBtnPrimary:hover::before {
@@ -275,20 +272,20 @@
 }
 
 .ctaBtnSecondary {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--foreground);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px);
   border-radius: 9999px;
-  padding: clamp(12px, 2vh, 18px) clamp(24px, 4vw, 40px);
-  font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+  padding: 12px 28px; /* Compact padding */
+  font-size: 0.92rem; /* Clean, smaller font */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .ctaBtnSecondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
 }
 
@@ -410,28 +407,28 @@
 }
 
 .pricingName {
-  font-size: 1.8rem;
+  font-size: 1.3rem; /* Shrunk from 1.8rem */
   font-weight: 700;
   color: var(--foreground);
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  letter-spacing: -0.015em;
 }
 
 .pricingPrice {
-  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-size: clamp(2.2rem, 4vw, 3.2rem); /* Shrunk from clamp(3rem, 5vw, 4.5rem) */
   font-weight: 800;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.04em;
   color: var(--foreground);
-  margin-bottom: 16px;
+  margin-bottom: 12px; /* Reduced from 16px */
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   line-height: 1.1;
   flex-wrap: wrap;
 }
 
 .pricingPrice span {
-  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-size: 0.85rem; /* Shrunk from clamp(1rem, 2vw, 1.2rem) */
   font-weight: 500;
   color: var(--subtext);
   margin-top: 0;
@@ -439,28 +436,29 @@
 }
 
 .pricingDesc {
-  font-size: 1.1rem;
+  font-size: 0.92rem; /* Shrunk from 1.1rem */
   color: var(--subtext);
-  margin-bottom: 40px;
-  line-height: 1.6;
+  margin-bottom: 28px; /* Reduced from 40px */
+  line-height: 1.5;
   font-weight: 500;
+  opacity: 0.85;
 }
 
 .pricingFeatures {
   list-style: none;
   padding: 0;
-  margin: 0 0 40px 0;
+  margin: 0 0 28px 0; /* Reduced from 40px */
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px; /* Reduced from 20px */
 }
 
 .pricingFeatures li {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  font-size: 1.05rem;
+  gap: 12px;
+  font-size: 0.88rem; /* Shrunk from 1.05rem */
   font-weight: 500;
   color: var(--foreground);
   line-height: 1.4;
@@ -469,16 +467,17 @@
 .pricingFeatures li svg {
   color: var(--primary);
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .pricingBtn {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--foreground);
   border: 1px solid var(--glass-border);
   border-radius: 999px;
-  padding: 18px;
-  font-size: 1.1rem;
+  padding: 12px; /* Shrunk from 18px */
+  font-size: 0.92rem; /* Shrunk from 1.1rem */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -495,19 +494,19 @@
   background: var(--primary);
   color: white;
   border: none;
-  box-shadow: 0 8px 25px rgba(10, 116, 218, 0.5);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
 }
 
 .pricingCard.pro .pricingBtn:hover {
   background: var(--primary-hover);
-  box-shadow: 0 12px 35px rgba(10, 116, 218, 0.6);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.45);
+  transform: translateY(-1px);
 }
 
 /* Why Us Statement (Apple Style) */
 .whyUsSection {
-  padding: 80px 5% 120px 5%;
-  max-width: 1000px;
+  padding: 60px 5% 80px 5%; /* Shrunk padding */
+  max-width: 800px; /* Reduced from 1000px */
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -515,27 +514,28 @@
 }
 
 .whyUsContent h2 {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem); /* Shrunk from clamp(2.5rem, 5vw, 4.5rem) */
   font-weight: 800;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
   color: var(--foreground);
-  line-height: 1.1;
-  margin-bottom: 32px;
+  line-height: 1.15;
+  margin-bottom: 24px;
 }
 
 .whyUsContent h2 span {
-  background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .whyUsContent p {
-  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem); /* Shrunk from clamp(1.2rem, 2vw, 1.5rem) */
   color: var(--subtext);
-  line-height: 1.6;
+  line-height: 1.55;
   font-weight: 500;
-  max-width: 800px;
+  max-width: 700px;
   margin: 0 auto;
+  opacity: 0.85;
 }
 
 /* Clean 3-Column Features Section */
