@@ -211,13 +211,15 @@ export default function Dashboard() {
                 
                 // Only trigger if clicked within the last 10 minutes
                 if (Date.now() - time < 10 * 60 * 1000) {
-                  // Always go through Stripe Checkout for payment confirmation
-                  // (checkout route handles both new subscriptions and upgrades)
-                  if (data.subscriptionData.stripePriceId !== selectedPlan) {
+                  const hasActiveSub = data.subscriptionData && 
+                    ['active', 'trialing'].includes(data.subscriptionData.subscriptionStatus);
+                  
+                  if (hasActiveSub) {
+                    showToast("Posiadasz już aktywną subskrypcję. Możesz nią zarządzać w Ustawieniach za pomocą Portalu Stripe.", "info");
+                  } else if (data.subscriptionData.stripePriceId !== selectedPlan) {
                     handleCheckout(selectedPlan);
                     isCheckingOut = true;
                   }
-                  // If same plan selected, do nothing (no redirect needed)
                 }
               } catch (e) {
                 console.error("Invalid selectedPlan format");

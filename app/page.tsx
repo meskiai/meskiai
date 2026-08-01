@@ -39,6 +39,25 @@ export default function Home() {
     }
   }, [status]);
 
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY <= 50) {
+        setShowHeader(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        setShowHeader(false);
+      } else {
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const getTier = (priceId: string | null) => {
     if (!priceId) return 0;
     if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
@@ -66,7 +85,7 @@ export default function Home() {
       <div className={styles.ambientBackground} />
       
       {/* Frosted Glass Nav */}
-      <nav className={styles.nav}>
+      <nav className={`${styles.nav} ${!showHeader ? styles.navHidden : ""}`}>
         <div className={styles.navContent}>
           <div className={styles.logo} onClick={() => router.push("/")}>
             <img
@@ -165,7 +184,7 @@ export default function Home() {
         </div>
         
         <h1 className={styles.heroTitle}>
-          Asystent poczty, <br />zdefiniowany na nowo.
+          Zatrudnij AI. <br />Uwolnij swój czas.
         </h1>
         
         <p className={styles.heroSubtitle}>

@@ -47,7 +47,11 @@
   display: flex;
   justify-content: center;
   border-bottom: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navHidden {
+  transform: translateY(-100%);
 }
 
 .navContent {
