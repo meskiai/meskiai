@@ -1178,6 +1178,10 @@
   .macosSection {
     padding: 60px 20px;
   }
+  .pricingHeader {
+    text-align: center;
+    margin-bottom: 40px;
+  }
   .pricingHeader h2,
   .whyUsContent h2,
   .macosTitle {
@@ -1310,6 +1314,18 @@
     line-height: 1.45;
   }
   .badge {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+  }
+  .pricingHeader {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .pricingHeader h2,
+  .whyUsContent h2,
+  .macosTitle {
+    font-size: clamp(1.35rem, 6vw, 1.7rem) !important;
+  }
   .pricingCard {
     padding: 24px 16px;
     border-radius: 24px;
@@ -1322,7 +1338,12 @@
 /* Very small phones < 390px */
 @media (max-width: 389px) {
   .heroTitle {
-    font-size: clamp(1.8rem, 12vw, 2.2rem);
+    font-size: clamp(1.6rem, 12vw, 2rem);
+  }
+  .pricingHeader h2,
+  .whyUsContent h2,
+  .macosTitle {
+    font-size: 1.25rem !important;
   }
   .ctaBtnPrimary,
   .ctaBtnSecondary {
