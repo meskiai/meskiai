@@ -364,18 +364,23 @@ export default function Home() {
         
         <div className={styles.featuresPremiumGrid}>
           {/* Card 1 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up`}>
-            <div className={styles.premiumIconWrapper}>
-              <Clock size={20} />
+          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} ${styles.bentoFlex} animate-fade-in-up`}>
+            <div className={styles.bentoText}>
+              <div className={styles.premiumIconWrapper}>
+                <Clock size={18} />
+              </div>
+              <h3>Autonomiczny Agent 24/7</h3>
+              <p>Działa nieprzerwanie w tle na Netlify. Pobiera pocztę przez POP3 i automatycznie wysyła dopasowane odpowiedzi przez SMTP (hasło aplikacji), gdy Twój komputer jest wyłączony.</p>
             </div>
-            <h3>Autonomiczny Agent 24/7</h3>
-            <p>Działa nieprzerwanie w tle na Netlify. Pobiera pocztę przez POP3 i automatycznie wysyła dopasowane odpowiedzi przez SMTP (hasło aplikacji), gdy Twój komputer jest wyłączony.</p>
+            <div className={styles.bentoImageWrapper}>
+              <img src="/dashboard_preview.jpg" alt="Dashboard Preview" className={styles.bentoImage} />
+            </div>
           </div>
 
           {/* Card 2 */}
           <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-1`}>
             <div className={styles.premiumIconWrapper}>
-              <Globe size={20} />
+              <Globe size={18} />
             </div>
             <h3>Analiza Strony WWW</h3>
             <p>Podepnij link do swojej witryny. Agent AI automatycznie pobierze jej treść, pozna ofertę, cennik i specyfikę firmy, by precyzyjnie odpowiadać.</p>
@@ -384,25 +389,30 @@ export default function Home() {
           {/* Card 3 */}
           <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-2`}>
             <div className={styles.premiumIconWrapper}>
-              <Inbox size={20} />
+              <Inbox size={18} />
             </div>
             <h3>Klasyfikacja</h3>
             <p>AI automatycznie odrzuca spam i oferty marketingowe, a ważne zapytania kieruje do panelu.</p>
           </div>
 
           {/* Card 4 */}
-          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up animate-delay-3`}>
-            <div className={styles.premiumIconWrapper}>
-              <BarChart2 size={20} />
+          <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} ${styles.bentoFlex} animate-fade-in-up animate-delay-3`}>
+            <div className={styles.bentoText}>
+              <div className={styles.premiumIconWrapper}>
+                <BarChart2 size={18} />
+              </div>
+              <h3>Baza Klientów i Cold Mail</h3>
+              <p>Wyszukuj potencjalnych klientów B2B na bazie profilu firmy. Wykorzystaj wbudowany model AI do natychmiastowego generowania spersonalizowanych, skutecznych szablonów sprzedażowych o najwyższym współczynniku konwersji.</p>
             </div>
-            <h3>Baza Klientów i Cold Mail</h3>
-            <p>Wyszukuj potencjalnych klientów B2B na bazie profilu firmy. Wykorzystaj wbudowany model AI do natychmiastowego generowania spersonalizowanych, skutecznych szablonów sprzedażowych o najwyższym współczynniku konwersji.</p>
+            <div className={styles.bentoImageWrapper}>
+              <img src="/hero_ai_core.jpg" alt="Lead Generation Preview" className={styles.bentoImage} />
+            </div>
           </div>
 
           {/* Card 5 */}
           <div className={`${styles.featurePremiumCard} ${styles.bentoSmall} animate-fade-in-up animate-delay-4`}>
             <div className={styles.premiumIconWrapper}>
-              <Sliders size={20} />
+              <Sliders size={18} />
             </div>
             <h3>Wybór Tonu AI</h3>
             <p>Generuj odpowiedzi jednym kliknięciem, decydując o tonie (Profesjonalny, Casualowy, Krótki).</p>
@@ -411,7 +421,7 @@ export default function Home() {
           {/* Card 6 */}
           <div className={`${styles.featurePremiumCard} ${styles.bentoLarge} animate-fade-in-up animate-delay-5`}>
             <div className={styles.premiumIconWrapper}>
-              <Shield size={20} />
+              <Shield size={18} />
             </div>
             <h3>Bezpieczeństwo i Prywatność</h3>
             <p>Platforma nie wymaga dostępu do pełnego API konta Google. Logujesz się tylko do identyfikacji, a Twoje dane pocztowe są całkowicie chronione, odizolowane i nie służą do treningu modeli AI.</p>
