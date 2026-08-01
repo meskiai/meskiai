@@ -1106,15 +1106,15 @@
 /* Tablet portrait / small laptop 768–899px */
 @media (max-width: 899px) {
   .hero {
-    padding-top: 120px;
+    padding-top: 110px;
     padding-bottom: 24px;
   }
   .heroTitle {
-    font-size: clamp(3rem, 9vw, 5rem);
+    font-size: clamp(2.4rem, 8vw, 3.8rem);
   }
   .heroSubtitle {
-    font-size: clamp(1rem, 2.5vw, 1.35rem);
-    margin-bottom: 36px;
+    font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+    margin-bottom: 32px;
   }
   .showcaseRow, .showcaseRowReverse {
     flex-direction: column !important;
@@ -1143,18 +1143,22 @@
 /* Mobile landscape / large phone 600–767px */
 @media (max-width: 767px) {
   .hero {
-    padding-top: 96px;
+    padding-top: 90px;
     padding-bottom: 16px;
     padding-left: 20px;
     padding-right: 20px;
   }
   .heroTitle {
-    font-size: clamp(2.4rem, 10vw, 3.2rem);
+    font-size: clamp(2rem, 8vw, 2.8rem);
     letter-spacing: -0.04em;
   }
   .heroSubtitle {
-    font-size: clamp(0.95rem, 3vw, 1.15rem);
-    margin-bottom: 28px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-weight: 400;
+    max-width: 100%;
+    margin-bottom: 24px;
+    opacity: 0.8;
   }
   .ctaWrapper {
     flex-direction: column;
@@ -1166,18 +1170,19 @@
   .ctaBtnSecondary {
     width: 100%;
     justify-content: center;
-    padding: 15px 28px;
-    font-size: 1rem;
+    padding: 14px 28px;
+    font-size: 0.95rem;
   }
   .pricingSection,
   .whyUsSection,
   .macosSection {
-    padding: 64px 20px;
+    padding: 60px 20px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
   .macosTitle {
-    font-size: clamp(1.7rem, 7vw, 2.4rem);
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    letter-spacing: -0.03em;
   }
   .macosBody {
     flex-direction: column;
@@ -1188,37 +1193,75 @@
     overflow-x: auto;
     border-right: none;
     border-bottom: 1px solid var(--glass-border);
-    padding: 10px;
-    gap: 8px;
+    padding: 8px;
+    gap: 6px;
     -webkit-overflow-scrolling: touch;
   }
   .macosSidebarItem {
-    padding: 8px 12px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    font-size: 0.78rem;
     white-space: nowrap;
+    border-radius: 8px;
   }
   .macosContent {
-    padding: 24px 16px;
+    padding: 20px 14px;
   }
   .featureView {
     flex-direction: column;
-    gap: 32px;
+    gap: 28px;
   }
   .featureInfo {
     width: 100%;
   }
+  .featureInfo h3 {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  .featureInfo p {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
   .featureVisual {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 5px;
+  }
+  /* Hide mail list inside mockup on mobile to save space */
+  .mockMailList {
+    display: none;
+  }
+  .mockMailApp {
+    height: 180px;
+  }
+  .mockMailDetail {
+    padding: 12px;
+  }
+  .mockDetailBody {
+    margin: 12px 0;
+  }
+  .mockTableApp {
+    font-size: 0.65rem;
+  }
+  .mockTableHeader, .mockTableRow {
+    padding: 8px 10px;
+  }
+  .mockSwotGrid {
+    gap: 6px;
+  }
+  .swotBox {
+    padding: 10px;
+  }
+  .swotBox p {
+    font-size: 0.72rem;
   }
   .pricingCard {
-    padding: 28px 20px;
+    padding: 24px 20px;
   }
   .pricingPrice {
-    font-size: 2.4rem;
+    font-size: 2.2rem;
   }
   .pricingFeatures li {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
   .navContent {
     padding: 0 16px;
@@ -1238,32 +1281,28 @@
   }
   .warningBox {
     flex-direction: column;
-    padding: 20px;
-    gap: 16px;
+    padding: 16px;
+    gap: 12px;
+  }
+  .warningBox h3 {
+    font-size: 1.05rem;
+    margin-bottom: 4px !important;
+  }
+  .warningBox p {
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
   .hero {
-    padding-top: 88px;
+    padding-top: 80px;
   }
   .heroTitle {
-    font-size: clamp(2rem, 11vw, 2.6rem);
+    font-size: clamp(1.8rem, 8vw, 2.2rem);
   }
   .heroSubtitle {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
   .badge {
-    font-size: 0.78rem;
-    padding: 5px 12px;
-  }
-  .pricingSection,
-  .whyUsSection,
-  .macosSection {
-    padding: 52px 16px;
-  }
-  .pricingHeader h2,
-  .whyUsContent h2,
-  .macosTitle {
-    font-size: clamp(1.5rem, 8vw, 2rem);
-  }
   .pricingCard {
     padding: 24px 16px;
     border-radius: 24px;
