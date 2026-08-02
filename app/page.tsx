@@ -622,19 +622,15 @@ export default function Home() {
 const faqItems = [
   {
     q: "Jak działa logowanie przez Google? Czy MESKIAI ma dostęp do moich maili?",
-    a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej autoryzacji Twojego konta w naszym systemie. Aplikacja nie pobiera, nie czyta ani nie wysyła wiadomości za pomocą Google API. Do obsługi poczty wykorzystujemy wyłącznie bezpieczne połączenia SMTP/IMAP, a w przypadku Gmaila – hasła aplikacji generowane w ustawieniach Twojego konta Google."
+    a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej identyfikacji i autoryzacji Twojego profilu w panelu MESKIAI. Aplikacja nie żąda uprawnień do czytania Twojej poczty przez Google API. Połączenie z Twoją skrzynką odbywa się za pomocą dedykowanego, wyizolowanego klucza dostępu, co gwarantuje pełne bezpieczeństwo i kontrolę."
   },
   {
     q: "Czy konfiguracja poczty jest bezpieczna?",
-    a: "W pełni. Twoje dane połączenia są szyfrowane na poziomie bazy danych. Zamiast głównego hasła do konta, zalecamy użycie dedykowanego 'Hasła Aplikacji', które możesz w każdej chwili wycofać jednym kliknięciem w panelu bezpieczeństwa swojego dostawcy poczty (Google, Onet, WP, Outlook)."
-  },
-  {
-    q: "Jak działa asystent w tle? Czy muszę mieć otwartą kartę w przeglądarce?",
-    a: "Nie. Nasz agent AI działa w 100% w tle na naszych serwerach. Synchronizacja poczty i analizowanie wiadomości odbywa się automatycznie co 10 minut za pomocą bezpiecznych zadań cron. Możesz zamknąć komputer, wyjechać na urlop, a MESKIAI nadal będzie klasyfikować i przygotowywać maile."
+    a: "Tak, bezpieczeństwo to nasz priorytet. Wszystkie dane dostępowe są szyfrowane kryptograficznie i przechowywane w zabezpieczonej infrastrukturze. Wykorzystanie jednorazowego klucza dostępu sprawia, że nie podajesz nam swojego głównego hasła logowania do Google, a sam dostęp możesz natychmiastowo zablokować w panelu swojego dostawcy poczty."
   },
   {
     q: "Co to jest 'Audyt Konkurencji' i jak działa baza leadów?",
-    a: "Z poziomu panelu możesz podać adres URL konkurenta, a system automatycznie przeprowadzi analizę SWOT oraz wygeneruje sugerowane mocne/słabe strony. Baza leadów pozwala na automatyczne wyszukiwanie i dopasowywanie potencjalnych klientów w Twojej branży wraz z generowaniem spersonalizowanych kampanii Cold Email."
+    a: "Audyt Konkurencji to moduł, który na podstawie analizy struktury oferty innej firmy wskazuje jej mocne i słabe strony oraz rynkowe szanse i zagrożenia. Z kolei baza leadów automatyzuje docieranie do nowych odbiorców: znajduje idealne dopasowania biznesowe i projektuje zindywidualizowane kampanie kontaktowe."
   },
   {
     q: "Jak mogę anulować subskrypcję?",
