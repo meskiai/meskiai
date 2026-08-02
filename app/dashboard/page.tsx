@@ -1924,22 +1924,44 @@ export default function Dashboard() {
                       <ShieldAlert size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
                       <span>Integracja E-mail</span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px" }}>
-                      <div>
-                        <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "4px" }}>Hasło Aplikacji Google</div>
-                        <div style={{ fontSize: "0.9rem", color: "var(--subtext)" }}>Zmień hasło w przypadku błędu połączenia</div>
+                    <div style={{ display: "flex", flexDirection: "column", padding: "20px 24px", gap: "16px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+                        <div>
+                          <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px" }}>
+                            Status Połączenia Gmail
+                            {hasAppPassword ? (
+                              <span style={{ fontSize: "0.75rem", background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", padding: "3px 8px", borderRadius: "20px", fontWeight: 600 }}>Połączono</span>
+                            ) : (
+                              <span style={{ fontSize: "0.75rem", background: "rgba(239, 68, 68, 0.15)", color: "#ef4444", padding: "3px 8px", borderRadius: "20px", fontWeight: 600 }}>Wymagane Hasło</span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: "0.9rem", color: "var(--subtext)" }}>
+                            {hasAppPassword 
+                              ? `Aktywne konto Gmail: ${session?.user?.email}` 
+                              : `Należy podpiąć hasło aplikacji dla konta: ${session?.user?.email}`
+                            }
+                          </div>
+                        </div>
+                        <button 
+                          className={hasAppPassword ? styles.accountBtnSecondary : styles.accountBtnPrimary}
+                          style={{ flex: "none", width: "auto", padding: "10px 18px", fontSize: "0.88rem", display: "flex", alignItems: "center", gap: "6px" }}
+                          onClick={async () => {
+                            setHasAppPassword(false);
+                            setCurrentTab("INBOX");
+                          }}
+                        >
+                          {hasAppPassword ? "Zmień hasło" : "Podepnij pocztę Gmail"}
+                        </button>
                       </div>
-                      <button 
-                        className={styles.accountBtnSecondary}
-                        style={{ flex: "none", width: "auto" }}
-                        onClick={async () => {
-                          // Reset it locally and let the user enter a new one in the INBOX tab
-                          setHasAppPassword(false);
-                          setCurrentTab("INBOX");
-                        }}
-                      >
-                        Zmień hasło
-                      </button>
+
+                      {/* Helper notice explaining what to do */}
+                      <div style={{ padding: "14px 16px", borderRadius: "12px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)", fontSize: "0.85rem", color: "var(--subtext)", lineHeight: 1.5 }}>
+                        <div style={{ fontWeight: 600, color: "var(--foreground)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Info size={14} style={{ color: "var(--primary)" }} />
+                          Gdzie wpisać Hasło Aplikacji?
+                        </div>
+                        Po kliknięciu przycisku powyżej zostaniesz przeniesiony do widoku Skrzynki. Zobaczysz tam 4-krokowy kreator, w którym wygenerujesz i wkleisz 16-literowe hasło aplikacji wygenerowane w ustawieniach bezpieczeństwa Google.
+                      </div>
                     </div>
                   </div>
 
@@ -2565,7 +2587,7 @@ export default function Dashboard() {
                           onChange={e => { setAppPasswordInput(e.target.value); setAppPasswordError(""); }}
                           placeholder="xxxx xxxx xxxx xxxx"
                           className={styles.input}
-                          style={{ flex: '1 1 200px', padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1.1rem", letterSpacing: '1px', minWidth: '0' }}
+                          style={{ flex: '1 1 270px', padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1.1rem", letterSpacing: '1px', minWidth: '0' }}
                         />
                         <button 
                           className="btn btn-primary"
@@ -2601,6 +2623,18 @@ export default function Dashboard() {
                           Połącz z AI
                         </button>
                       </div>
+                      
+                      {/* App Password warning banner */}
+                      <div style={{ 
+                        display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px 16px', borderRadius: '12px', 
+                        background: 'rgba(255, 149, 0, 0.08)', border: '1px solid rgba(255, 149, 0, 0.2)', fontSize: '0.85rem', color: 'var(--warning)', lineHeight: 1.45 
+                      }}>
+                        <Info size={16} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--warning)' }} />
+                        <div>
+                          <strong>Ważne bezpieczeństwo:</strong> Wklej tutaj 16-literowe hasło aplikacji wygenerowane w ustawieniach Google. Zwykłe główne hasło, którego używasz do logowania na pocztę Gmail, <strong>nie zadziała</strong> ze względów bezpieczeństwa Google.
+                        </div>
+                      </div>
+
                       {appPasswordError && (
                         <div style={{ color: "var(--danger)", fontSize: "0.85rem", background: "rgba(255,59,48,0.1)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,59,48,0.2)" }}>
                           {appPasswordError}
