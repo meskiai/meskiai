@@ -3013,7 +3013,7 @@ export default function Dashboard() {
                     "Skanowanie profilu i danych kontaktowych",
                     "Analizowanie oferty i branży odbiorcy",
                     "Ustalanie optymalnej strategii dotarcia",
-                    "Generowanie treści wiadomości przez Gemini"
+                    "Generowanie treści wiadomości przez MESKIAI"
                   ].map((stepText, idx) => {
                     const isDone = generationStep > idx;
                     const isActive = generationStep === idx;

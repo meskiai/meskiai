@@ -322,15 +322,15 @@ export default function Home() {
                 {activeFeature === 'cold' && (
                   <div className={`${styles.featureView} animate-fade-in`}>
                     <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(16,185,129,0.1)', color: '#34d399' }}>B2B Prospects</span>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(16,185,129,0.1)', color: '#34d399' }}>Silnik Prospekcji</span>
                       <h3>Automatyczne pozyskiwanie klientów.</h3>
                       <p>
-                        Zamiast ręcznie szukać kontaktów, pozwól Agentowi sprofilować Twój rynek. System automatycznie wyszukuje decydentów z firm i komponuje dedykowane, unikalne maile.
+                        Pozwól algorytmom zidentyfikować i sprofilować Twoją grupę docelową. System precyzyjnie dociera do kluczowych decydentów i automatycznie projektuje spersonalizowaną ścieżkę kontaktu.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Wyszukiwanie:</span> zautomatyzowane leady</li>
-                        <li><span>Personalizacja:</span> na bazie profilu firmy</li>
-                        <li><span>Konwersja:</span> zoptymalizowana przez AI</li>
+                        <li><span>Dopasowanie:</span> Precyzyjne (ICP)</li>
+                        <li><span>Komunikacja:</span> Zorientowana na wartość</li>
+                        <li><span>Efektywność:</span> Zoptymalizowana konwersja</li>
                       </ul>
                     </div>
                     <div className={styles.featureVisual}>
@@ -364,15 +364,15 @@ export default function Home() {
                 {activeFeature === 'swot' && (
                   <div className={`${styles.featureView} animate-fade-in`}>
                     <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>SWOT Analysis</span>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>Skaner Rynkowy</span>
                       <h3>Błyskawiczny audyt konkurencji.</h3>
                       <p>
-                        Chcesz poznać klienta przed rozmową? Wpisz jego adres www. System przeanalizuje usługi, ceny i potencjał, a Ty otrzymasz pełny raport SWOT w kilka sekund.
+                        Chcesz błyskawicznie poznać potencjał partnera lub konkurenta? Podaj adres URL, a zaawansowany skaner przetworzy strukturę oferty i przygotuje pełną analizę mocnych i słabych stron w kilka sekund.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Generowanie:</span> około 15 sekund</li>
-                        <li><span>Źródło:</span> skanowanie kodu strony</li>
-                        <li><span>Analiza:</span> mocne strony i nisze rynkowe</li>
+                        <li><span>Szybkość:</span> Natychmiastowa</li>
+                        <li><span>Analiza:</span> Głębia strategiczna</li>
+                        <li><span>Zakres:</span> Nisze rynkowe i przewagi</li>
                       </ul>
                     </div>
                     <div className={styles.featureVisual}>
@@ -402,15 +402,15 @@ export default function Home() {
                 {activeFeature === 'security' && (
                   <div className={`${styles.featureView} animate-fade-in`}>
                     <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}>Privacy Shield</span>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}>Tarcza Bezpieczeństwa</span>
                       <h3>Bezpieczne szyfrowanie AES-256.</h3>
                       <p>
-                        Nie wymagamy dostępu przez API Google do Twojej skrzynki. Twoje hasło do aplikacji pocztowej jest szyfrowane i zapisane bezpiecznie w bazie.
+                        Dbamy o Twoją prywatność. Połączenie opiera się na wydzielonych, dedykowanych kluczach dostępu. Wszystkie wrażliwe dane są szyfrowane kryptograficznie na poziomie infrastruktury.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Google API Access:</span> Brak</li>
-                        <li><span>Szyfrowanie:</span> Klucz AES-256</li>
-                        <li><span>Prywatność:</span> Zgodna z RODO</li>
+                        <li><span>Integracja:</span> Szyfrowana chmura</li>
+                        <li><span>Standard:</span> Klasa wojskowa (AES-256)</li>
+                        <li><span>Zgodność:</span> Standardy RODO / GDPR</li>
                       </ul>
                     </div>
                     <div className={styles.featureVisual}>
