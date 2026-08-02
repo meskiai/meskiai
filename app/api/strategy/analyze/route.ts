@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const res = await fetch(targetUrl, { signal: controller.signal });
       clearTimeout(timeoutId);
       
@@ -116,9 +118,16 @@ Wymagane sekcje:
       prompt,
     });
 
-    await prisma.userSettings.update({
+    await prisma.userSettings.upsert({
       where: { userId: user.id },
-      data: { competitorSearchesThisMonth: { increment: 1 } }
+      update: { competitorSearchesThisMonth: { increment: 1 } },
+      create: { 
+        userId: user.id, 
+        competitorSearchesThisMonth: 1,
+        autoReply: true,
+        onboardingDone: false,
+        businessContext: ""
+      }
     });
 
     return NextResponse.json(object);
