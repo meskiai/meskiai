@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
     const searchResponse = await generateText({
-      model: googleAI("gemini-1.5-flash"),
+      model: googleAI("gemini-flash-latest"),
       system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
 Twoim zadaniem jest znalezienie 5 potencjalnych, wysoce trafnych i przede wszystkim REALNYCH klientów na polskim rynku (lub globalnym, jeśli profil wskazuje na eksport) na podstawie bazy wiedzy firmy użytkownika.
 Użyj narzędzia Google Search, aby znaleźć prawdziwe, istniejące firmy i sprawdzić ich autentyczne dane kontaktowe.
@@ -72,7 +72,7 @@ Baza wiedzy firmy, dla której szukasz klientów:
 
     // Krok 2: Przetworzenie tekstu na ustrukturyzowany format JSON
     const { object } = await generateObject({
-      model: googleAI("gemini-1.5-flash"),
+      model: googleAI("gemini-flash-latest"),
       system: "Jesteś parserem danych. Przekształć tekst z raportu o leadach na ustrukturyzowany format JSON.",
       prompt: `Przetwórz poniższy tekst na JSON. W opisie (description) każdego leada zawrzyj precyzyjnie:
 - Imię i nazwisko osoby decyzyjnej
