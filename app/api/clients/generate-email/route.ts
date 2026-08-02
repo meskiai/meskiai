@@ -66,7 +66,7 @@ Wymagania dotyczące maila:
 Dodatkowo, przeanalizuj uważnie profil klienta i wyodrębnij z niego jego adres e-mail, jeśli został podany w opisie. Jeśli nie ma adresu, zostaw pole puste.`,
       prompt: `Wygeneruj maila do klienta:\n\nNazwa: ${lead.name}\nOpis: ${lead.description}`,
       schema: z.object({
-        emailAddress: z.string().describe("Wyodrębniony adres e-mail klienta z opisu. Pusty string, jeśli nie znaleziono."),
+        emailAddress: z.string().describe("Wyodrębniony rzeczywisty adres e-mail klienta z opisu (np. kontakt@firma.pl). Usuń wszelkie zbędne znaki. Jeśli w opisie podano tylko URL formularza kontaktowego lub nie ma żadnego e-maila, zwróć pusty string."),
         subject: z.string().describe("Temat maila"),
         body: z.string().describe("Treść maila sprzedażowego")
       })

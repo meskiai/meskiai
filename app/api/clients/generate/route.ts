@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
 import { z } from "zod";
 
@@ -47,24 +47,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu PRO (200). Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
     }
 
-    // Generate 5 leads using Gemini
-    const { object } = await generateObject({
-      model: googleAI("gemini-flash-latest"),
+    // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
+    const searchResponse = await generateText({
+      model: googleAI("gemini-1.5-flash"),
       system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
-Twoim zadaniem jest znalezienie 5 potencjalnych, wysoce trafnych klientów na podstawie profilu działalności użytkownika.
-Zwracaj KONKRETNE i PRAWDZIWE (lub wysoce prawdopodobne) firmy działające na rynku.
-Dla każdego leada musisz podać DOKŁADNE DANE: kto jest osobą decyzyjną (np. imię i nazwisko CEO/Dyrektora), jak się z nimi skontaktować (konkretny e-mail, telefon, link do LinkedIn lub strony www).
-Opisz szczegółowo dlaczego jest to idealny klient. Przypisz też procentowe prawdopodobieństwo konwersji (od 50 do 99).
-Zwróć uwagę na polski rynek, chyba że profil firmy wskazuje na globalny.
+Twoim zadaniem jest znalezienie 5 potencjalnych, wysoce trafnych i przede wszystkim REALNYCH klientów na polskim rynku (lub globalnym, jeśli profil wskazuje na eksport) na podstawie bazy wiedzy firmy użytkownika.
+Użyj narzędzia Google Search, aby znaleźć prawdziwe, istniejące firmy i sprawdzić ich autentyczne dane kontaktowe.
+
+ZASADY POZYSKIWANIA DANYCH KONTAKTOWYCH (KRYTYCZNE):
+1. Podaj wyłącznie PRAWDZIWY, publicznie opublikowany na stronie firmy lub w rejestrach adres e-mail.
+2. Jeśli bezpośredni e-mail do decydenta nie jest podany publicznie, podaj OFICJALNY OGÓLNY E-MAIL KONTAKTOWY firmy (np. biuro@firma.pl, kontakt@firma.pl, office@firma.pl, info@firma.pl).
+3. POD ŻADNYM POZOREM NIE ZMYŚLAJ, NIE ZGADUJ ani NIE GENERUJ fikcyjnych adresów e-mail (np. nie twórz adresów typu dyrektor@firma.pl, prezes@firma.pl lub imie.nazwisko@firma.pl na podstawie domniemanych danych, jeśli nie masz 100% potwierdzenia z wyszukiwarki, że taki adres istnieje).
+4. Jeżeli firma posiada jedynie formularz kontaktowy na stronie i brak jest jakiegokolwiek adresu e-mail, podaj adres URL do formularza kontaktowego jako alternatywę (np. https://firma.pl/kontakt).
 
 Baza wiedzy firmy, dla której szukasz klientów:
 "${businessContext}"`,
-      prompt: "Wygeneruj 5 bardzo konkretnych leadów sprzedażowych z dokładnymi danymi kontaktowymi (maile, telefony, osoby, firmy).",
+      prompt: "Wygeneruj listę 5 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie).",
+      tools: {
+        google_search: googleAI.tools.googleSearch({}),
+      },
+    });
+
+    const searchResultText = searchResponse.text;
+
+    // Krok 2: Przetworzenie tekstu na ustrukturyzowany format JSON
+    const { object } = await generateObject({
+      model: googleAI("gemini-1.5-flash"),
+      system: "Jesteś parserem danych. Przekształć tekst z raportu o leadach na ustrukturyzowany format JSON.",
+      prompt: `Przetwórz poniższy tekst na JSON. W opisie (description) każdego leada zawrzyj precyzyjnie:
+- Imię i nazwisko osoby decyzyjnej
+- Uzasadnienie dopasowania
+- RZECZYWISTY ADRES E-MAIL (zawsze z prefiksem "E-mail: ") lub URL formularza kontaktowego.
+- Telefon i profil LinkedIn (jeśli są dostępne).
+
+Tekst do przetworzenia:
+${searchResultText}`,
       schema: z.object({
         leads: z.array(z.object({
-          name: z.string().describe("Dokładna nazwa firmy lub imię i nazwisko konkretnej osoby docelowej"),
-          description: z.string().describe("Opis dlaczego potrzebują usług ORAZ dokładne dane kontaktowe: E-mail, Telefon, Profil LinkedIn, Osoba Decyzyjna."),
-          source: z.string().describe("Źródło pozyskania (np. Instagram, LinkedIn, Google Maps, Grupy na FB)"),
+          name: z.string().describe("Prawdziwa nazwa firmy"),
+          description: z.string().describe("Uzasadnienie potrzeby usług oraz prawdziwe dane kontaktowe: E-mail (wyraźnie oznaczony), telefon, LinkedIn, osoba decyzyjna."),
+          source: z.string().describe("Źródło pozyskania (np. Google Search)"),
           probability: z.number().min(50).max(99).describe("Prawdopodobieństwo zainteresowania w %")
         }))
       })
