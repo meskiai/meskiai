@@ -587,7 +587,8 @@ export default function Dashboard() {
       showToast("Wykorzystałeś swój miesięczny limit analiz strategii. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.", "error");
       return;
     }
-    if (!strategyUrl) {
+    const targetUrl = strategyUrl.trim();
+    if (!targetUrl) {
       showToast("Proszę podać adres URL strony.", "error");
       return;
     }
@@ -601,22 +602,10 @@ export default function Dashboard() {
     }, 2500);
 
     try {
-      // Save website to account and keep strategyUrl in sync
-      const websiteToSave = companyWebsite.trim() || strategyUrl.trim();
-      if (websiteToSave) {
-        setStrategyUrl(websiteToSave);
-        setCompanyWebsite(websiteToSave);
-      }
-      await fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyWebsite: websiteToSave })
-      });
-
       const res = await fetch("/api/strategy/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: strategyUrl })
+        body: JSON.stringify({ url: targetUrl })
       });
       const data = await res.json();
       
@@ -625,7 +614,7 @@ export default function Dashboard() {
       
       if (res.ok) {
         setStrategyResults(data);
-        localStorage.setItem("meskiStrategyUrl", strategyUrl);
+        localStorage.setItem("meskiStrategyUrl", targetUrl);
         localStorage.setItem("meskiStrategyResults", JSON.stringify(data));
       } else {
         showToast(data.error || "Wystąpił błąd podczas analizy strony.", "error");
@@ -2007,7 +1996,7 @@ export default function Dashboard() {
                         <div style={{ flex: 1, background: 'rgba(120,120,128,0.12)', borderRadius: '10px', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
                           <Search size={16} style={{ color: 'var(--subtext)' }} />
                           <input 
-                            type="url"
+                            type="text"
                             value={strategyUrl}
                             onChange={(e) => setStrategyUrl(e.target.value)}
                             placeholder="np. twojastrona.pl"
