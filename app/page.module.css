@@ -682,6 +682,7 @@
 .macosSidebarItem svg {
   color: var(--subtext);
   transition: color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .macosSidebarItem:hover {
@@ -1214,6 +1215,7 @@
     font-size: 0.78rem;
     white-space: nowrap;
     border-radius: 8px;
+    gap: 6px;
   }
   .macosContent {
     padding: 20px 14px;
