@@ -1123,11 +1123,11 @@
     margin-bottom: 60px;
   }
   .macosWindow {
-    height: auto;
-    min-height: 480px;
+    height: 580px;
   }
   .macosContent {
     padding: 30px;
+    overflow-y: auto;
   }
   .pricingSection,
   .whyUsSection,
@@ -1192,13 +1192,13 @@
     letter-spacing: -0.03em;
   }
   .macosWindow {
-    height: auto;
+    height: 540px;
     min-height: auto;
-    overflow: visible;
+    overflow: hidden;
   }
   .macosBody {
     flex-direction: column;
-    overflow: visible;
+    height: calc(100% - 48px); /* Height minus titlebar */
   }
   .macosSidebar {
     width: 100%;
@@ -1209,6 +1209,7 @@
     padding: 8px;
     gap: 6px;
     -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
   }
   .macosSidebarItem {
     padding: 6px 10px;
@@ -1219,7 +1220,8 @@
   }
   .macosContent {
     padding: 20px 14px;
-    overflow: visible;
+    overflow-y: auto;
+    flex: 1;
   }
   .featureView {
     flex-direction: column;
