@@ -59,17 +59,17 @@ export async function POST(req: Request) {
       body
     );
 
-    // Oznacz leada jako skontaktowanego i inkrementuj licznik e-maili
-    await prisma.$transaction([
-      prisma.lead.update({
-        where: { id: leadId },
-        data: { status: "CONTACTED" }
-      }),
-      prisma.userSettings.update({
-        where: { userId: session.user.id },
-        data: { emailsSentThisMonth: { increment: 1 } }
-      })
-    ]);
+    // Oznacz leada jako skontaktowanego
+    await prisma.lead.update({
+      where: { id: leadId },
+      data: { status: "CONTACTED" }
+    });
+
+    // Inkrementuj licznik e-maili
+    await prisma.userSettings.update({
+      where: { userId: session.user.id },
+      data: { emailsSentThisMonth: { increment: 1 } }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
