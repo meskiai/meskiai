@@ -94,20 +94,20 @@ ${searchResultText}`,
 
     const generatedLeads = object.leads;
 
-    const savedLeads = await Promise.all(
-      generatedLeads.map(lead => 
-        prisma.lead.create({
-          data: {
-            userId: session.user.id,
-            name: lead.name,
-            description: lead.description,
-            source: lead.source,
-            probability: lead.probability <= 1 ? Math.floor(lead.probability * 100) : Math.floor(lead.probability),
-            status: "NEW"
-          }
-        })
-      )
-    );
+    const savedLeads = [];
+    for (const lead of generatedLeads) {
+      const saved = await prisma.lead.create({
+        data: {
+          userId: session.user.id,
+          name: lead.name,
+          description: lead.description,
+          source: lead.source,
+          probability: lead.probability <= 1 ? Math.floor(lead.probability * 100) : Math.floor(lead.probability),
+          status: "NEW"
+        }
+      });
+      savedLeads.push(saved);
+    }
 
     return NextResponse.json({ leads: savedLeads });
   } catch (error: any) {
