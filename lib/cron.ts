@@ -509,7 +509,7 @@ async function processMessage({
 
     // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
     if (isAttention) {
-      const parts = cleanedAiText.split(/\n[-*_]{3,}\n/s);
+      const parts = cleanedAiText.split(/\n[-*_]{3,}\n/);
       let analysisText = '';
       let ackText = '';
       
@@ -697,4 +697,16 @@ ZASADY BEZPIECZEŃSTWA:
 function cleanString(str: string | null | undefined): string {
   if (!str) return '';
   return str.replace(/\0/g, ''); // Strip out PostgreSQL-incompatible null bytes (\u0000)
+}
+
+export function startCron() {
+  console.log('🤖 [Agent AI Cron] Inicjalizacja pętli synchronizacji (co 120s)...');
+  
+  // Uruchom natychmiast na starcie
+  runSync().catch(err => console.error('[Agent AI Cron] Błąd pierwszego uruchomienia:', err));
+
+  // Powtarzaj co 2 minuty
+  setInterval(() => {
+    runSync().catch(err => console.error('[Agent AI Cron] Błąd cyklu synchronizacji:', err));
+  }, 120 * 1000);
 }

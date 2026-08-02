@@ -64,7 +64,7 @@ Baza wiedzy firmy, dla której szukasz klientów:
 "${businessContext}"`,
       prompt: "Wygeneruj listę 5 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie).",
       tools: {
-        google_search: googleAI.tools.googleSearch({}),
+        google_search: googleAI.tools.googleSearch({}) as any,
       },
     });
 

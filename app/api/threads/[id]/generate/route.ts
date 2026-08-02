@@ -46,13 +46,29 @@ export async function POST(
     let websiteContent = "";
     if (userSettings?.companyWebsite) {
       try {
-        const website = await prisma.userWebsiteContent.findFirst({
-          where: { userId: session.user.id }
+        const url = userSettings.companyWebsite;
+        const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch(fullUrl, {
+          signal: controller.signal,
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MailAgent/1.0)' }
         });
-        if (website?.content) {
-          websiteContent = website.content;
+        clearTimeout(timeout);
+        if (res.ok) {
+          const html = await res.text();
+          websiteContent = html
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
+            .substring(0, 4000);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Failed to fetch company website in generate-reply endpoint:", e);
+      }
     }
 
     const { text } = await generateText({
