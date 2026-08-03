@@ -63,6 +63,7 @@ async function shopifyLookupOrder(settings: StoreSettings, orderNumber: string):
       headers: {
         "X-Shopify-Access-Token": settings.storeApiKey,
         "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
       signal: AbortSignal.timeout(6000),
     });
@@ -113,6 +114,7 @@ async function shopifyLookupProducts(settings: StoreSettings, query: string): Pr
       headers: {
         "X-Shopify-Access-Token": settings.storeApiKey,
         "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
       signal: AbortSignal.timeout(6000),
     });
@@ -167,10 +169,12 @@ async function woocommerceLookupOrder(settings: StoreSettings, orderNumber: stri
     const baseUrl = normalizeUrl(settings.storeUrl);
     const auth = Buffer.from(`${settings.storeApiKey}:${settings.storeApiSecret || ""}`).toString("base64");
 
-    // First try by order ID
-    const url = `${baseUrl}/wp-json/wc/v3/orders/${orderNumber}`;
     let res = await fetch(url, {
-      headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/json" },
+      headers: { 
+        Authorization: `Basic ${auth}`, 
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
       signal: AbortSignal.timeout(6000),
     });
 
@@ -178,7 +182,11 @@ async function woocommerceLookupOrder(settings: StoreSettings, orderNumber: stri
     if (!res.ok) {
       const searchUrl = `${baseUrl}/wp-json/wc/v3/orders?search=${encodeURIComponent(orderNumber)}&per_page=5`;
       res = await fetch(searchUrl, {
-        headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/json" },
+        headers: { 
+          Authorization: `Basic ${auth}`, 
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        },
         signal: AbortSignal.timeout(6000),
       });
 
@@ -225,7 +233,11 @@ async function woocommerceLookupProducts(settings: StoreSettings, query: string)
     const url = `${baseUrl}/wp-json/wc/v3/products?search=${encodeURIComponent(query)}&per_page=5`;
 
     const res = await fetch(url, {
-      headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/json" },
+      headers: { 
+        Authorization: `Basic ${auth}`, 
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
       signal: AbortSignal.timeout(6000),
     });
 
@@ -276,6 +288,7 @@ async function customLookupOrder(settings: StoreSettings, orderNumber: string, c
       headers: {
         ...(settings.storeApiKey ? { Authorization: `Bearer ${settings.storeApiKey}` } : {}),
         "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
       signal: AbortSignal.timeout(6000),
     });
@@ -397,7 +410,10 @@ Użyj tych danych do udzielenia PRECYZYJNEJ odpowiedzi. Jeśli klient pyta o zwr
         const auth = Buffer.from(`${settings.storeApiKey}:${settings.storeApiSecret || ""}`).toString("base64");
         const url = `${baseUrl}/wp-json/wc/v3/orders?billing_email=${encodeURIComponent(customerEmail)}&per_page=1&orderby=date&order=desc`;
         const res = await fetch(url, {
-          headers: { Authorization: `Basic ${auth}` },
+          headers: { 
+            Authorization: `Basic ${auth}`,
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          },
           signal: AbortSignal.timeout(4000),
         });
         if (res.ok) {

@@ -30,7 +30,10 @@ export async function POST(req: Request) {
     if (storeType === "shopify") {
       const baseUrl = storeUrl.startsWith("http") ? storeUrl.replace(/\/$/, "") : `https://${storeUrl}`;
       const res = await fetch(`${baseUrl}/admin/api/2024-01/shop.json`, {
-        headers: { "X-Shopify-Access-Token": storeApiKey },
+        headers: { 
+          "X-Shopify-Access-Token": storeApiKey,
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
         signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
@@ -45,7 +48,10 @@ export async function POST(req: Request) {
       const baseUrl = storeUrl.startsWith("http") ? storeUrl.replace(/\/$/, "") : `https://${storeUrl}`;
       const auth = Buffer.from(`${storeApiKey}:${storeApiSecret || ""}`).toString("base64");
       const res = await fetch(`${baseUrl}/wp-json/wc/v3/system_status`, {
-        headers: { Authorization: `Basic ${auth}` },
+        headers: { 
+          Authorization: `Basic ${auth}`,
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
         signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
@@ -62,7 +68,10 @@ export async function POST(req: Request) {
       const baseUrl = storeUrl.startsWith("http") ? storeUrl : `https://${storeUrl}`;
       const res = await fetch(baseUrl, {
         method: "HEAD",
-        headers: storeApiKey ? { Authorization: `Bearer ${storeApiKey}` } : {},
+        headers: {
+          ...(storeApiKey ? { Authorization: `Bearer ${storeApiKey}` } : {}),
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
         signal: AbortSignal.timeout(6000),
       });
       if (res.ok || res.status === 405) {

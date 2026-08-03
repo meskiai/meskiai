@@ -2879,7 +2879,16 @@ export default function Dashboard() {
                       <input
                         type="text"
                         value={storeUrl}
-                        onChange={(e) => { setStoreUrl(e.target.value); setStoreTestResult(null); }}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setStoreUrl(val);
+                          setStoreTestResult(null);
+                          if (val.toLowerCase().includes("myshopify.com")) {
+                            setStoreType("shopify");
+                          } else if ((val.toLowerCase().startsWith("http") || val.toLowerCase().includes(".")) && !storeType) {
+                            setStoreType("woocommerce");
+                          }
+                        }}
                         placeholder={storeType === 'shopify' ? 'moj-sklep.myshopify.com' : storeType === 'woocommerce' ? 'https://moj-sklep.pl' : 'https://api.moj-sklep.pl/orders'}
                         style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
                       />
