@@ -275,15 +275,15 @@ export default function Home() {
                 {activeFeature === 'agent' && (
                   <div className={`${styles.featureView} animate-fade-in`}>
                     <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>POP3 & SMTP</span>
-                      <h3>Poczta, która sama odpowiada.</h3>
+                      <span className={styles.featureBadge} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>POP3 & SMTP & Webhooks</span>
+                      <h3>Poczta, ktora sama obsluguje sklep.</h3>
                       <p>
-                        Agent AI działa bez przerwy, sprawdzając skrzynkę co 120 sekund. Samodzielnie analizuje kontekst, oddziela zapytania ofertowe od spamu i przygotowuje merytoryczne odpowiedzi.
+                        Agent AI dziala bez przerwy, automatycznie odpowiadajac na wiadomosci klientow. Dzieki integracji ze sklepami Shopify oraz WooCommerce przez proste polaczenie Webhook, Agent w czasie rzeczywistym weryfikuje statusy przesylek, obsluguje reklamacje i zwroty.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Tryb pracy:</span> 24h na dobę</li>
-                        <li><span>Czas reakcji:</span> poniżej 2 minut</li>
-                        <li><span>Ton:</span> dostosowany do klienta</li>
+                        <li><span>Obsluga sklepow:</span> Shopify, WooCommerce</li>
+                        <li><span>Zakres:</span> Statusy, zwroty, reklamacje</li>
+                        <li><span>Czas reakcji:</span> ponizej 2 minut</li>
                       </ul>
                     </div>
                     <div className={styles.featureVisual}>
@@ -624,6 +624,10 @@ const faqItems = [
   {
     q: "Jak działa logowanie przez Google? Czy MESKIAI ma dostęp do moich maili?",
     a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej identyfikacji i autoryzacji Twojego profilu w panelu MESKIAI. Aplikacja nie żąda uprawnień do czytania Twojej poczty przez Google API. Połączenie z Twoją skrzynką odbywa się za pomocą dedykowanego, wyizolowanego klucza dostępu, co gwarantuje pełne bezpieczeństwo i kontrolę."
+  },
+  {
+    q: "Jak działa integracja ze sklepem (Shopify / WooCommerce)?",
+    a: "Integracja opiera się na prostym i bezpiecznym połączeniu Webhook. Wystarczy wkleić wygenerowany link w panelu swojego sklepu. Agent automatycznie pobiera informacje o zamówieniach w tle, dzięki czemu w czasie rzeczywistym odpowiada na pytania o status przesyłki, pomaga w procedurze zwrotu towaru oraz obsługuje zgłoszenia reklamacyjne."
   },
   {
     q: "Czy konfiguracja poczty jest bezpieczna?",
