@@ -2733,6 +2733,36 @@ export default function Dashboard() {
                   </button>
                 </div>
 
+                {/* 1.5. Information Banner */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '16px', 
+                  padding: '20px 24px', 
+                  borderRadius: '16px', 
+                  background: 'rgba(59, 130, 246, 0.04)', 
+                  border: '1px solid rgba(59, 130, 246, 0.15)',
+                  fontSize: '0.9rem',
+                  color: 'var(--foreground)',
+                  lineHeight: 1.5,
+                  alignItems: 'flex-start'
+                }}>
+                  <Info size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '4px', fontSize: '0.95rem' }}>Jak Agent AI pozyskuje wiedzę i zapobiega zmyślaniu (halucynacjom)?</strong>
+                    <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--subtext)' }}>
+                      <li>
+                        <strong>Baza zamówień:</strong> Przy pytaniu o zamówienie Agent wyciągnie numer (np. #1024) lub e-mail nadawcy i pobierze dane z tabeli poniżej.
+                      </li>
+                      <li>
+                        <strong>Kategoryczny zakaz zmyślania:</strong> Jeśli zamówienia nie ma w bazie, Agent <u>nigdy</u> nie zmyśli statusu ani linku. Poprosi klienta o poprawne dane lub oznaczy maila jako <strong>Wymaga uwagi (REQUIRES_ATTENTION)</strong>, abyś mógł odpowiedzieć ręcznie.
+                      </li>
+                      <li>
+                        <strong>Ogólne zasady sklepu:</strong> Informacje o regulaminie, polityce zwrotów i asortymencie Agent pobiera z Twojej <strong>Bazy Wiedzy (AI)</strong> oraz automatycznie skanuje z Twojej witryny firmowej.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
                 {/* 2. Orders Table / Empty State */}
                 {loadingOrders ? (
                   <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
