@@ -46,3 +46,10 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Additional build artifacts and temp files
+".next 2"/
+.next*/
+scratch/
+public/media__*
+public/screen_*
