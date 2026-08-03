@@ -1877,8 +1877,8 @@ export default function Dashboard() {
           
           {/* SETTINGS (KNOWLEDGE BASE) VIEW */}
           {currentTab === "SETTINGS" && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "32px", overflowY: "auto", display: "flex", justifyContent: "center" }}>
-              <div style={{ maxWidth: "600px", width: "100%" }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto" }}>
+              <div style={{ maxWidth: "600px", width: "100%", margin: "0 auto" }}>
                 {/* BAZA WIEDZY */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h2 style={{ fontSize: "1.5rem", color: "var(--foreground)", margin: 0 }}>Baza Wiedzy Agenta AI</h2>
@@ -2263,8 +2263,8 @@ export default function Dashboard() {
 
           {/* STRATEGY VIEW */}
           {currentTab === "STRATEGY" && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "40px", overflowY: "auto", display: "flex", justifyContent: "center", background: 'var(--background)' }}>
-              <div style={{ maxWidth: "1000px", width: "100%", display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto", background: 'var(--background)' }}>
+              <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 
                 {/* Header & Search Bar (Minimalist iOS Settings style) */}
                 <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '8px' }}>
@@ -2565,8 +2565,8 @@ export default function Dashboard() {
 
           {/* CLIENTS VIEW */}
           {currentTab === "CLIENTS" as any && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "40px", overflowY: "auto", display: "flex", justifyContent: "center" }}>
-              <div style={{ maxWidth: "1200px", width: "100%", display: 'flex', flexDirection: 'column', gap: '40px' }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto" }}>
+              <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 
                 {/* 1. Header & Stats Panel */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
@@ -2808,8 +2808,8 @@ export default function Dashboard() {
 
           {/* ORDERS VIEW */}
           {currentTab === "ORDERS" as any && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "40px", overflowY: "auto", display: "flex", justifyContent: "center" }}>
-              <div style={{ maxWidth: "1200px", width: "100%", display: 'flex', flexDirection: 'column', gap: '40px' }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto" }}>
+              <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 
                 {/* 1. Header & Stats Panel */}
                 <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
