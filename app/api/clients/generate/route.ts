@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const searchResponse = await generateText({
       model: googleAI("gemini-flash-latest"),
       system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
-Twoim zadaniem jest znalezienie 5 potencjalnych, wysoce trafnych i przede wszystkim REALNYCH klientów na polskim rynku (lub globalnym, jeśli profil wskazuje na eksport) na podstawie bazy wiedzy firmy użytkownika.
+Twoim zadaniem jest znalezienie 3 potencjalnych, wysoce trafnych i przede wszystkim REALNYCH klientów na polskim rynku (lub globalnym, jeśli profil wskazuje na eksport) na podstawie bazy wiedzy firmy użytkownika.
 Użyj narzędzia Google Search, aby znaleźć prawdziwe, istniejące firmy i sprawdzić ich autentyczne dane kontaktowe.
 
 ZASADY POZYSKIWANIA DANYCH KONTAKTOWYCH (KRYTYCZNE):
@@ -62,7 +62,7 @@ ZASADY POZYSKIWANIA DANYCH KONTAKTOWYCH (KRYTYCZNE):
 
 Baza wiedzy firmy, dla której szukasz klientów:
 "${businessContext}"`,
-      prompt: "Wygeneruj listę 5 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie).",
+      prompt: "Wygeneruj listę 3 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie). Pisz niezwykle zwięźle, w punktach, bez wstępów.",
       tools: {
         google_search: googleAI.tools.googleSearch({}) as any,
       },
