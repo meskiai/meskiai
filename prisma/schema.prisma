@@ -54,6 +54,7 @@ model User {
   subscriptionStatus     String?   @default("inactive")
   createdAt              DateTime  @default(now())
   feedbackSubmitted      Boolean   @default(false)
+  orders                 Order[]
 }
 
 model VerificationToken {
@@ -179,4 +180,21 @@ enum LeadStatus {
   CONTACTED
   CONVERTED
   REJECTED
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  userId        String
+  orderNumber   String
+  customerEmail String
+  status        String   // e.g. "W realizacji", "Wysłane", "Opłacone", "Dostarczone", "Anulowane"
+  items         String   @db.Text // e.g. "Kurs AI, Ebook o automatyzacjach"
+  totalPrice    String   // e.g. "199.00 PLN"
+  trackingUrl   String?  // e.g. Link to InPost
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, orderNumber])
 }

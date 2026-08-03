@@ -71,6 +71,14 @@ export async function POST(
       }
     }
 
+    // Wyszukaj powiązane zamówienie klienta w bazie danych
+    const { getOrderContextForEmail } = await import("../../../../../lib/orders");
+    const orderContext = await getOrderContextForEmail(
+      session.user.id,
+      latestEmail.body || latestEmail.snippet || "",
+      latestEmail.from || ""
+    );
+
     const { text } = await generateText({
       model: googleAI("gemini-flash-latest"),
       system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.
@@ -78,6 +86,8 @@ Twoja firma kieruje się następującymi zasadami i informacjami:
 "${userSettings?.businessContext || "Profesjonalna obsługa klienta."}"
 
 ${websiteContent ? `Dodatkowe informacje o ofercie, cenniku i usługach firmy pobrane z jej strony internetowej:\n"${websiteContent.substring(0, 4000)}"` : ""}
+
+${orderContext}
 
 Zadanie: Napisz kompletną, gotową do wysłania, profesjonalną i uprzejmą propozycję odpowiedzi na poniższego e-maila od klienta.
 Ton odpowiedzi: ${userSettings?.replyTone || "PROFESJONALNY"}.

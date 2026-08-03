@@ -488,9 +488,16 @@ async function processMessage({
   console.log(`[Agent AI] 🤖 Generuję odpowiedź: "${msg.subject}" od ${msg.from}`);
 
   try {
+    const { getOrderContextForEmail } = await import("./orders");
+    const orderContext = await getOrderContextForEmail(
+      user.id,
+      msg.text || msg.html || '',
+      msg.from || ''
+    );
+
     const { text } = await generateText({
       model:  googleAI('gemini-flash-latest'),
-      system: buildSystemPrompt(settings, websiteContent),
+      system: buildSystemPrompt(settings, websiteContent, orderContext),
       prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${formattedHistory}\n\nNOWA WIADOMOŚĆ DO ODPOWIEDZI / PRZEANALIZOWANIA:\nOd: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść nowej wiadomości:\n${(msg.text || '').substring(0, 2500)}`,
     });
     const cleanedAiText = cleanString(text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
@@ -647,7 +654,7 @@ function extractEmail(raw: string): string {
   return match ? match[1].trim() : raw.trim();
 }
 
-function buildSystemPrompt(settings: any, websiteContent = ''): string {
+function buildSystemPrompt(settings: any, websiteContent = '', orderContext = ''): string {
   const tone = settings?.replyTone ?? 'PROFESJONALNY';
   const ctx  = settings?.businessContext ?? 'Firma dbająca o profesjonalną obsługę klienta.';
 
@@ -662,14 +669,18 @@ function buildSystemPrompt(settings: any, websiteContent = ''): string {
     ? `\n\n─── TREŚĆ STRONY FIRMOWEJ (źródło prawdy o ofercie, cenach, godzinach itp.) ───\n${websiteContent}\n────────────────────────────────────────────────────────────────────────────────`
     : '';
 
+  const orderSection = orderContext
+    ? `\n\n─── DANE ZAMÓWIENIA KLIENTA (Pobrane z Twojej bazy e-commerce) ───\n${orderContext}\n────────────────────────────────────────────────────────────────────────────────`
+    : '';
+
   return `Jesteś zaawansowanym asystentem AI ds. e-maili pracującym 24/7 jak doświadczony pracownik biurowy.
-Kontekst firmy: "${ctx}"${websiteSection}
+Kontekst firmy: "${ctx}"${websiteSection}${orderSection}
 Ton komunikacji: ${tone} — ${toneInstr}
 
 PROCES MYŚLOWY I ANALIZA KROK PO KROKU (Zastosuj przed podjęciem decyzji):
 Krok 1. Sprawdź, czy nadawca to nie bot/system automatyczny (faktury, newslettery, zaproszenia, automatyczne powiadomienia, kody OTP, maile transakcyjne, reklamy). Jeśli tak -> Wybierz ŚCIEŻKĘ 1 (SPAM).
 Krok 2. Przeanalizuj treść e-maila. Czy zawiera załącznik PDF, prośbę o zwrot pieniędzy, reklamację, skargę, ofertę współpracy, kwestie prawne, faktury, dokumenty finansowe lub nietypowe wymagania? Jeśli tak -> Wybierz ŚCIEŻKĘ 2 (REQUIRES_ATTENTION).
-Krok 3. Jeśli to zapytanie od prawdziwego klienta: Sprawdź, czy dokładne informacje potrzebne do udzielenia odpowiedzi znajdują się w „TREŚCI STRONY FIRMOWEJ” lub „Kontekście firmy” powyżej.
+Krok 3. Jeśli to zapytanie od prawdziwego klienta: Sprawdź, czy dokładne informacje potrzebne do udzielenia odpowiedzi znajdują się w „TREŚCI STRONY FIRMOWEJ”, „Kontekście firmy” lub „DANYCH ZAMÓWIENIA KLIENTA” powyżej.
   - Jeśli informacje są w 100% dostępne -> Wybierz ŚCIEŻKĘ 3 (SAMODZIELNA ODPOWIEDŹ).
   - Jeśli informacji brakuje (np. brak cen konkretnej usługi, brak godzin otwarcia w dane święto, brak potwierdzenia czy dana usługa jest dostępna) -> KATEGORYCZNIE wybierz ŚCIEŻKĘ 2 (REQUIRES_ATTENTION). Nigdy nie zmyślaj faktów!
 

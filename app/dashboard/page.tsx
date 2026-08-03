@@ -75,6 +75,17 @@ export default function Dashboard() {
   const [leads, setLeads] = useState<any[]>([]);
   const [generatingLeads, setGeneratingLeads] = useState(false);
   const [showClientsGuide, setShowClientsGuide] = useState(false);
+
+  // Orders State
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [showAddOrderModal, setShowAddOrderModal] = useState(false);
+  const [newOrderNum, setNewOrderNum] = useState("");
+  const [newOrderEmail, setNewOrderEmail] = useState("");
+  const [newOrderStatus, setNewOrderStatus] = useState("W realizacji");
+  const [newOrderItems, setNewOrderItems] = useState("");
+  const [newOrderPrice, setNewOrderPrice] = useState("");
+  const [newOrderTracking, setNewOrderTracking] = useState("");
   
   // Welcome Animation
   const [welcomeState, setWelcomeState] = useState<"VISIBLE" | "FADING_OUT" | "HIDDEN">("VISIBLE");
@@ -430,6 +441,78 @@ export default function Dashboard() {
   };
 
 
+  const fetchOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const res = await fetch("/api/orders");
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Błąd podczas wczytywania zamówień", "error");
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const handleAddOrder = async () => {
+    if (!newOrderNum.trim() || !newOrderEmail.trim() || !newOrderItems.trim() || !newOrderPrice.trim()) {
+      showToast("Uzupełnij wszystkie wymagane pola", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderNumber: newOrderNum,
+          customerEmail: newOrderEmail,
+          status: newOrderStatus,
+          items: newOrderItems,
+          totalPrice: newOrderPrice,
+          trackingUrl: newOrderTracking
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast("Zamówienie zostało dodane do bazy", "success");
+        setShowAddOrderModal(false);
+        setNewOrderNum("");
+        setNewOrderEmail("");
+        setNewOrderItems("");
+        setNewOrderPrice("");
+        setNewOrderTracking("");
+        await fetchOrders();
+      } else {
+        showToast(data.error || "Błąd podczas dodawania zamówienia", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Błąd połączenia z serwerem", "error");
+    }
+  };
+
+  const handleDeleteOrder = async (id: string) => {
+    if (!confirm("Czy na pewno chcesz usunąć to zamówienie?")) return;
+
+    try {
+      const res = await fetch(`/api/orders?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Zamówienie zostało usunięte", "success");
+        await fetchOrders();
+      } else {
+        const data = await res.json();
+        showToast(data.error || "Błąd podczas usuwania zamówienia", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Błąd połączenia z serwerem", "error");
+    }
+  };
+
   const fetchLeads = async () => {
     try {
       const res = await fetch("/api/clients");
@@ -638,6 +721,7 @@ export default function Dashboard() {
         fetchSettings();
         fetchThreads();
         fetchLeads();
+        fetchOrders();
       };
 
       if (isCheckout) {
@@ -1297,6 +1381,118 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {showAddOrderModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in" style={{ 
+            background: 'var(--modal-bg)', 
+            border: '1px solid var(--border)', 
+            padding: '36px 32px', 
+            borderRadius: '24px', 
+            maxWidth: '500px', 
+            width: '90%', 
+            boxShadow: 'var(--mac-shadow), var(--glass-reflection)', 
+            backdropFilter: 'saturate(190%) blur(50px)',
+            WebkitBackdropFilter: 'saturate(190%) blur(50px)',
+            position: 'relative'
+          }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--foreground)', margin: '0 0 8px 0' }}>Dodaj testowe zamówienie</h3>
+            <p style={{ color: 'var(--subtext)', fontSize: '0.85rem', margin: '0 0 24px 0', lineHeight: 1.4 }}>
+              Dodaj parametry do bazy. Pytając o nie w e-mailu, Agent automatycznie pobierze ich szczegóły.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>Numer zamówienia *</label>
+                <input 
+                  type="text" 
+                  value={newOrderNum} 
+                  onChange={(e) => setNewOrderNum(e.target.value)} 
+                  placeholder="np. 998822 lub ZO-1042" 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>E-mail klienta *</label>
+                <input 
+                  type="email" 
+                  value={newOrderEmail} 
+                  onChange={(e) => setNewOrderEmail(e.target.value)} 
+                  placeholder="np. jan.kowalski@wp.pl" 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>Zakupione produkty *</label>
+                <input 
+                  type="text" 
+                  value={newOrderItems} 
+                  onChange={(e) => setNewOrderItems(e.target.value)} 
+                  placeholder="np. Ebook o AI, Kurs automatyzacji" 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>Cena łączna *</label>
+                  <input 
+                    type="text" 
+                    value={newOrderPrice} 
+                    onChange={(e) => setNewOrderPrice(e.target.value)} 
+                    placeholder="np. 149.00 PLN" 
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>Status zamówienia *</label>
+                  <select 
+                    value={newOrderStatus} 
+                    onChange={(e) => setNewOrderStatus(e.target.value)} 
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--modal-bg)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                  >
+                    <option value="W realizacji">W realizacji</option>
+                    <option value="Wysłane">Wysłane</option>
+                    <option value="Dostarczone">Dostarczone</option>
+                    <option value="Opłacone">Opłacone</option>
+                    <option value="Anulowane">Anulowane</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--subtext)', textTransform: 'uppercase', marginBottom: '6px' }}>Link do śledzenia paczki</label>
+                <input 
+                  type="text" 
+                  value={newOrderTracking} 
+                  onChange={(e) => setNewOrderTracking(e.target.value)} 
+                  placeholder="np. https://inpost.pl/..." 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--foreground)', fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowAddOrderModal(false)}
+                style={{ padding: '10px 20px' }}
+              >
+                Anuluj
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleAddOrder}
+                style={{ padding: '10px 20px' }}
+              >
+                Zapisz zamówienie
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     <div className={styles.dashboardLayout}>
       <div className={styles.ambientBackground}>
         <div className={styles.ambientBlob}></div>
@@ -1428,12 +1624,20 @@ export default function Dashboard() {
           </div>
           
           {dashboardMode === "MAIL" && (
-            <button 
-              className={`${styles.navItem} ${currentTab === "SETTINGS" ? styles.active : ""}`}
-              onClick={() => { setCurrentTab("SETTINGS"); setSelectedThread(null); }}
-            >
-              <Bot size={18} /> Baza Wiedzy (AI)
-            </button>
+            <>
+              <button 
+                className={`${styles.navItem} ${currentTab === "SETTINGS" ? styles.active : ""}`}
+                onClick={() => { setCurrentTab("SETTINGS"); setSelectedThread(null); }}
+              >
+                <Bot size={18} /> Baza Wiedzy (AI)
+              </button>
+              <button 
+                className={`${styles.navItem} ${currentTab === "ORDERS" as any ? styles.active : ""}`}
+                onClick={() => { setCurrentTab("ORDERS" as any); setSelectedThread(null); }}
+              >
+                <CheckSquare size={18} /> Zamówienia (E-commerce)
+              </button>
+            </>
           )}
           
         </div>
@@ -1520,6 +1724,7 @@ export default function Dashboard() {
             {currentTab === "SPAM" && "Pominięte i Zablokowane"}
             {currentTab === "SETTINGS" && "Ustawienia Agenta AI"}
             {currentTab === "ACCOUNT" && "Ustawienia Konta"}
+            {currentTab === "ORDERS" as any && "Baza Zamówień (E-commerce)"}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 
@@ -2506,7 +2711,113 @@ export default function Dashboard() {
             </div>
           )}
 
+          {/* ORDERS VIEW */}
+          {currentTab === "ORDERS" as any && (
+            <div className="animate-fade-in" style={{ flex: 1, padding: "40px", overflowY: "auto", display: "flex", justifyContent: "center" }}>
+              <div style={{ maxWidth: "1200px", width: "100%", display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                
+                {/* 1. Header & Stats Panel */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
+                  <div>
+                    <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Baza Zamówień (E-commerce)</h2>
+                    <p style={{ color: "var(--subtext)", fontSize: "0.95rem", marginTop: '8px', maxWidth: '600px', lineHeight: 1.5 }}>
+                      Dodaj testowe zamówienia do bazy danych, aby Agent AI mógł automatycznie weryfikować statusy przesyłek, kupione produkty i kwoty w mailach od klientów.
+                    </p>
+                  </div>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setShowAddOrderModal(true)}
+                    style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <Plus size={18} /> Dodaj zamówienie
+                  </button>
+                </div>
 
+                {/* 2. Orders Table / Empty State */}
+                {loadingOrders ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+                    <RefreshCw className={styles['animate-spin']} size={24} style={{ color: 'var(--subtext)' }} />
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '48px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', boxShadow: 'var(--mac-shadow)' }}>
+                    <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                      <CheckSquare size={28} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', margin: '0 0 8px 0' }}>Baza zamówień jest pusta</h4>
+                      <p style={{ color: 'var(--subtext)', margin: 0, maxWidth: '400px', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                        Dodaj testowe zamówienie, np. nr #998822, a następnie wyślij maila z pytaniem o to zamówienie, aby przetestować asystenta.
+                      </p>
+                    </div>
+                    <button className="btn btn-secondary" onClick={() => setShowAddOrderModal(true)}>
+                      Utwórz pierwsze zamówienie
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--mac-shadow)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--subtext)', fontWeight: 600 }}>
+                          <th style={{ padding: '16px 20px' }}>Numer zamówienia</th>
+                          <th style={{ padding: '16px 20px' }}>E-mail klienta</th>
+                          <th style={{ padding: '16px 20px' }}>Zakupione produkty</th>
+                          <th style={{ padding: '16px 20px' }}>Kwota</th>
+                          <th style={{ padding: '16px 20px' }}>Status</th>
+                          <th style={{ padding: '16px 20px' }}>Link śledzenia</th>
+                          <th style={{ padding: '16px 20px', textAlign: 'right' }}>Akcje</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((ord) => (
+                          <tr key={ord.id} style={{ borderBottom: '1px solid var(--border)', color: 'var(--foreground)' }}>
+                            <td style={{ padding: '16px 20px', fontWeight: 600 }}>#{ord.orderNumber}</td>
+                            <td style={{ padding: '16px 20px', color: 'var(--subtext)' }}>{ord.customerEmail}</td>
+                            <td style={{ padding: '16px 20px', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ord.items}</td>
+                            <td style={{ padding: '16px 20px', fontWeight: 500 }}>{ord.totalPrice}</td>
+                            <td style={{ padding: '16px 20px' }}>
+                              <span style={{ 
+                                padding: '4px 10px', 
+                                borderRadius: '20px', 
+                                fontSize: '0.78rem', 
+                                fontWeight: 600,
+                                background: ord.status === 'Wysłane' ? 'rgba(52,199,89,0.1)' : 
+                                            ord.status === 'Dostarczone' ? 'rgba(59,130,246,0.1)' :
+                                            ord.status === 'Opłacone' ? 'rgba(16,185,129,0.1)' :
+                                            ord.status === 'Anulowane' ? 'rgba(239,68,68,0.1)' : 'rgba(255,149,0,0.1)',
+                                color: ord.status === 'Wysłane' ? '#34c759' : 
+                                       ord.status === 'Dostarczone' ? '#3b82f6' :
+                                       ord.status === 'Opłacone' ? '#10b981' :
+                                       ord.status === 'Anulowane' ? '#ef4444' : '#ff9500'
+                              }}>
+                                {ord.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px 20px', fontSize: '0.85rem' }}>
+                              {ord.trackingUrl ? (
+                                <a href={ord.trackingUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
+                                  Śledź paczkę <ExternalLink size={12} />
+                                </a>
+                              ) : (
+                                <span style={{ color: 'var(--border)' }}>—</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                              <button 
+                                onClick={() => handleDeleteOrder(ord.id)}
+                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '6px', borderRadius: '6px' }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* APP PASSWORD PROMPT */}
           {!hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
