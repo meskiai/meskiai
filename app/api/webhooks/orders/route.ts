@@ -56,7 +56,37 @@ export async function POST(req: Request) {
 
     console.log(`[Webhook Order] Otrzymano zdarzenie dla uzytkownika ${userId}`);
 
-    // ─── 1. DETECT PLATFORM & PARSE PAYLOAD ───
+    // Log raw payload to scratch/last-webhook-payload.json for debugging
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const logDir = '/Users/miloszmeski/Desktop/strona meski ai/email-ai-agent/scratch';
+      const logFile = path.join(logDir, 'last-webhook-payload.json');
+      fs.writeFileSync(logFile, JSON.stringify({
+        url: req.url,
+        headers: Object.fromEntries(req.headers.entries()),
+        body
+      }, null, 2));
+      console.log(`[Webhook Debug] Saved payload to ${logFile}`);
+    } catch (logErr) {
+      console.error("[Webhook Debug] Failed to save payload:", logErr);
+    }
+
+    // ─── 1. VALIDATE TOPIC ───
+    const shopifyTopic = req.headers.get("x-shopify-topic");
+    const wcTopic = req.headers.get("x-wc-webhook-topic");
+
+    if (shopifyTopic && !shopifyTopic.startsWith("orders/")) {
+      console.log(`[Webhook Order] Ignoruje nielubiany temat Shopify: ${shopifyTopic}`);
+      return NextResponse.json({ success: true, message: "Ignored non-order event" });
+    }
+
+    if (wcTopic && !wcTopic.includes("order")) {
+      console.log(`[Webhook Order] Ignoruje nielubiany temat WooCommerce: ${wcTopic}`);
+      return NextResponse.json({ success: true, message: "Ignored non-order event" });
+    }
+
+    // ─── 2. EXTRACT PLATFORM & PARSE PAYLOAD ───
     let orderNumber = "";
     let customerEmail = "";
     let status = "W realizacji";
@@ -65,19 +95,29 @@ export async function POST(req: Request) {
     let trackingUrl: string | null = null;
 
     // Detect Shopify vs WooCommerce
-    const isShopify = req.headers.get("x-shopify-topic") || body.financial_status !== undefined;
+    const isShopify = !!shopifyTopic || body.financial_status !== undefined || body.order_number !== undefined;
 
     if (isShopify) {
       console.log("[Webhook Order] Wykryto format Shopify");
-      // Sanitize order number (strip '#' and whitespace)
-      const rawName = body.name || body.order_number || body.id;
+      
+      // We prefer order_number or name (e.g. 1024 or #1024) because that is what the customer sees and types.
+      // If those are missing, we fall back to id.
+      const rawName = body.order_number || body.name || body.id;
       orderNumber = rawName ? rawName.toString().replace(/#/g, "").trim() : "";
       
       // Fallback email checks
-      customerEmail = body.email || body.customer?.email || body.billing_address?.email || "";
+      customerEmail = body.email || 
+                      body.customer?.email || 
+                      body.billing_address?.email || 
+                      body.shipping_address?.email || 
+                      "";
       
       // Parse items
-      items = body.line_items?.map((i: any) => `${i.title} x${i.quantity}`).join(", ") || "";
+      const rawItems = body.line_items || [];
+      items = Array.isArray(rawItems) 
+        ? rawItems.map((i: any) => `${i.title || i.name} x${i.quantity || 1}`).join(", ") 
+        : "";
+        
       totalPrice = `${body.total_price || "0.00"} ${body.currency || "PLN"}`;
       
       // Fulfillments check for tracking info
@@ -97,12 +137,24 @@ export async function POST(req: Request) {
       }
     } else {
       console.log("[Webhook Order] Wykryto format WooCommerce/Standard");
+      
+      // We prefer number or id
       const rawName = body.number || body.id;
       orderNumber = rawName ? rawName.toString().replace(/#/g, "").trim() : "";
-      customerEmail = body.billing?.email || body.email || "";
+      
+      // Fallback email checks
+      customerEmail = body.billing?.email || 
+                      body.email || 
+                      body.customer?.email || 
+                      body.shipping?.email || 
+                      "";
       
       // Parse items
-      items = body.line_items?.map((i: any) => `${i.name} x${i.quantity}`).join(", ") || "";
+      const rawItems = body.line_items || [];
+      items = Array.isArray(rawItems)
+        ? rawItems.map((i: any) => `${i.name || i.title} x${i.quantity || 1}`).join(", ")
+        : "";
+        
       totalPrice = `${body.total || "0.00"} ${body.currency || "PLN"}`;
       
       // WooCommerce tracking url check
@@ -135,10 +187,14 @@ export async function POST(req: Request) {
     }
 
     if (!orderNumber) {
+      console.warn("[Webhook Order] Ignoruje zamowienie z powodu braku numeru zamowienia");
       return NextResponse.json({ error: "Brak numeru zamowienia w body" }, { status: 400 });
     }
 
-    // ─── 2. UPSERT ORDER IN DATABASE WITH RETRY ───
+    // Clean customer email (trim and ensure it is present)
+    customerEmail = customerEmail.trim();
+
+    // ─── 3. UPSERT ORDER IN DATABASE WITH RETRY ───
     const order = await withRetry(() =>
       prisma.order.upsert({
         where: {
@@ -148,7 +204,7 @@ export async function POST(req: Request) {
           },
         },
         update: {
-          customerEmail: customerEmail.trim(),
+          customerEmail,
           status,
           items,
           totalPrice,
@@ -158,7 +214,7 @@ export async function POST(req: Request) {
         create: {
           userId,
           orderNumber: orderNumber.trim(),
-          customerEmail: customerEmail.trim(),
+          customerEmail,
           status,
           items,
           totalPrice,
@@ -167,7 +223,7 @@ export async function POST(req: Request) {
       })
     );
 
-    console.log(`[Webhook Order] Pomyslnie zsynchronizowano zamowienie #${orderNumber} dla userId=${userId}`);
+    console.log(`[Webhook Order] Pomyslnie zsynchronizowano zamowienie #${orderNumber} dla userId=${userId} (email: ${customerEmail}, kwota: ${totalPrice})`);
     return NextResponse.json({ success: true, orderId: order.id });
   } catch (e: any) {
     console.error("[Webhook Order Error]:", e);
