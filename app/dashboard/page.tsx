@@ -2817,15 +2817,13 @@ export default function Dashboard() {
                   <div style={{ flex: '1 1 500px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
                       <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Integracja Sklepu E-commerce</h2>
-                      {storeConnected && (
-                        <span style={{ background: 'rgba(52,199,89,0.12)', color: '#34c759', border: '1px solid rgba(52,199,89,0.3)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#34c759', display: 'inline-block' }}></span>
-                          POŁĄCZONO NA ŻYWO
-                        </span>
-                      )}
+                      <span style={{ background: 'rgba(52,199,89,0.12)', color: '#34c759', border: '1px solid rgba(52,199,89,0.3)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#34c759', display: 'inline-block' }}></span>
+                        WEBHOOK AKTYWNY
+                      </span>
                     </div>
                     <p style={{ color: "var(--subtext)", fontSize: "0.95rem", marginTop: '4px', maxWidth: '620px', lineHeight: 1.5 }}>
-                      Połącz swój sklep (Shopify, WooCommerce lub własne API) — Agent będzie sprawdzał statusy zamówień i dostępność produktów w czasie rzeczywistym, bezpośrednio z Twojego sklepu.
+                      Polacz swoj sklep przez Webhook - zamowienia beda przesylane bezposrednio do Agenta, dzieki czemu sprawdzi on statusy wysylek i dostepnosc produktow w czasie rzeczywistym.
                     </p>
                   </div>
                   <button 
@@ -2833,237 +2831,77 @@ export default function Dashboard() {
                     onClick={() => setShowAddOrderModal(true)}
                     style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}
                   >
-                    <Plus size={18} /> Ręczne zamówienie
+                    <Plus size={18} /> Reczne zamowienie
                   </button>
                 </div>
 
-                {/* 1.5 Live Store Integration Configuration Panel */}
-                <div style={{ background: 'var(--card-bg)', border: storeConnected ? '1px solid rgba(52,199,89,0.3)' : '1px solid var(--glass-border)', borderRadius: '20px', padding: '24px 24px', boxShadow: 'var(--mac-shadow)', position: 'relative', overflow: 'hidden' }}>
+                {/* 1.5 Webhook Integration Configuration Panel */}
+                <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '20px', padding: '24px 24px', boxShadow: 'var(--mac-shadow)', position: 'relative', overflow: 'hidden' }}>
                   {/* Background accent */}
-                  <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: storeConnected ? 'radial-gradient(circle at 100% 0%, rgba(52,199,89,0.06) 0%, transparent 70%)' : 'radial-gradient(circle at 100% 0%, rgba(59,130,246,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: 'radial-gradient(circle at 100% 0%, rgba(59,130,246,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: storeConnected ? 'rgba(52,199,89,0.1)' : 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={storeConnected ? '#34c759' : 'var(--primary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
                       </svg>
                     </div>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Połączenie ze sklepem</h3>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Polaczenie ze sklepem</h3>
                       <p style={{ margin: 0, color: 'var(--subtext)', fontSize: '0.85rem' }}>
-                        {storeConnected ? `Aktywna integracja: ${storeType?.toUpperCase()} — zapytania do sklepu w czasie rzeczywistym` : 'Skonfiguruj integrację, aby Agent łączył się ze Twoim sklepem'}
+                        Skonfiguruj integracje przez Webhook, aby Agent mial staly dostep do danych o zamowieniach.
                       </p>
                     </div>
                   </div>
 
-                  {/* Selector metody integracji (Tabs control) */}
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '12px', border: '1px solid var(--glass-border)', width: 'fit-content' }}>
-                    <button
-                      onClick={() => setIntegrationMethod('API')}
-                      style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: integrationMethod === 'API' ? 'var(--primary)' : 'transparent', color: integrationMethod === 'API' ? 'white' : 'var(--subtext)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
-                    >
-                      🔌 Połączenie API (Zalecane)
-                    </button>
-                    <button
-                      onClick={() => setIntegrationMethod('WEBHOOK')}
-                      style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: integrationMethod === 'WEBHOOK' ? 'var(--primary)' : 'transparent', color: integrationMethod === 'WEBHOOK' ? 'white' : 'var(--subtext)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
-                    >
-                      ⚡ Super Proste Połączenie (Webhook)
-                    </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <p style={{ color: 'var(--foreground)', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
+                      Nie potrzebujesz kluczy API, hasel ani kont deweloperskich. Po prostu skopiuj ponizszy adres URL i wklej go w panelu swojego sklepu:
+                    </p>
+                    
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: 'var(--input-bg)', padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)', flexWrap: 'wrap' }}>
+                      <input
+                        type="text"
+                        readOnly
+                        value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/orders?userId=${session?.user?.id || ''}`}
+                        style={{ flex: '1 1 300px', background: 'transparent', border: 'none', color: 'var(--foreground)', fontSize: '0.9rem', outline: 'none' }}
+                        id="webhook-url-input"
+                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                      />
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('webhook-url-input') as HTMLInputElement;
+                          if (input) {
+                            input.select();
+                            navigator.clipboard.writeText(input.value);
+                            showToast("Skopiowano link do schowka!", "success");
+                          }
+                        }}
+                        className="btn btn-secondary"
+                        style={{ padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
+                      >
+                        Kopiuj link
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '8px' }}>
+                      <div style={{ padding: '14px 18px', borderRadius: '12px', background: 'rgba(255,149,0,0.06)', border: '1px solid rgba(255,149,0,0.2)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
+                        <strong style={{ color: 'var(--foreground)' }}>Jak dodac w Shopify (1 min):</strong><br/>
+                        1. Wejdz w Shopify Admin &rarr; Settings &rarr; Notifications.<br/>
+                        2. Przewin na sam dol do sekcji Webhooks i kliknij Create webhook.<br/>
+                        3. Wybierz Event: Order creation, Format: JSON i wklej skopiowany URL.<br/>
+                        4. Kliknij Zapisz. (Zalecamy dodac drugi webhook dla Order update).
+                      </div>
+                      <div style={{ padding: '14px 18px', borderRadius: '12px', background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
+                        <strong style={{ color: 'var(--foreground)' }}>Jak dodac w WooCommerce (1 min):</strong><br/>
+                        1. Wejdz w WordPress &rarr; WooCommerce &rarr; Settings &rarr; Advanced &rarr; Webhooks.<br/>
+                        2. Kliknij Add webhook.<br/>
+                        3. Nazwij go (np. "MESKIAI"), ustaw status na Active.<br/>
+                        4. Wybierz Topic: Order created i wklej skopiowany URL w pole Delivery URL.<br/>
+                        5. Kliknij Zapisz. (Dodaj drugi dla Order updated).
+                      </div>
+                    </div>
                   </div>
-
-                  {integrationMethod === 'API' ? (
-                    <>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-                        {/* Platform selector */}
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Platforma sklepu</label>
-                          <select
-                            value={storeType}
-                            onChange={(e) => { setStoreType(e.target.value as any); setStoreTestResult(null); }}
-                            style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
-                          >
-                            <option value="">Wybierz platformę...</option>
-                            <option value="shopify">🛍️ Shopify</option>
-                            <option value="woocommerce">🔵 WooCommerce (WordPress)</option>
-                            <option value="custom">⚙️ Własne API (Custom)</option>
-                          </select>
-                        </div>
-
-                        {/* Store URL */}
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                            {storeType === 'shopify' ? 'Adres sklepu Shopify' : storeType === 'woocommerce' ? 'URL sklepu WordPress' : 'URL endpointu API'}
-                          </label>
-                          <input
-                            type="text"
-                            value={storeUrl}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setStoreUrl(val);
-                              setStoreTestResult(null);
-                              if (val.toLowerCase().includes("myshopify.com")) {
-                                setStoreType("shopify");
-                              } else if ((val.toLowerCase().startsWith("http") || val.toLowerCase().includes(".")) && !storeType) {
-                                setStoreType("woocommerce");
-                              }
-                            }}
-                            placeholder={storeType === 'shopify' ? 'moj-sklep.myshopify.com' : storeType === 'woocommerce' ? 'https://moj-sklep.pl' : 'https://api.moj-sklep.pl/orders'}
-                            style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
-                          />
-                        </div>
-
-                        {/* API Key */}
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                            {storeType === 'shopify' ? 'Admin API Access Token' : storeType === 'woocommerce' ? 'Consumer Key' : 'Bearer Token / API Key'}
-                          </label>
-                          <input
-                            type="password"
-                            value={storeApiKey === '__HIDDEN__' ? '' : storeApiKey}
-                            onChange={(e) => { setStoreApiKey(e.target.value); setStoreTestResult(null); }}
-                            placeholder={storeConnected && storeApiKey === '__HIDDEN__' ? '••••••••••••• (zapisany)' : storeType === 'shopify' ? 'shpat_xxxxxxxxxxxx' : storeType === 'woocommerce' ? 'ck_xxxxxxxxxxxx' : 'Bearer token lub klucz API'}
-                            style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
-                          />
-                          {storeType === 'shopify' && (
-                            <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)', lineHeight: '1.4' }}>
-                              Znajdziesz w: Shopify Admin → Settings → Apps → Develop apps → Admin API access token
-                            </p>
-                          )}
-                        </div>
-
-                        {/* API Secret (WooCommerce only) */}
-                        {(storeType === 'woocommerce' || storeType === 'custom') && (
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                              {storeType === 'woocommerce' ? 'Consumer Secret' : 'Secret (opcjonalnie)'}
-                            </label>
-                            <input
-                              type="password"
-                              value={storeApiSecret === '__HIDDEN__' ? '' : storeApiSecret}
-                              onChange={(e) => { setStoreApiSecret(e.target.value); setStoreTestResult(null); }}
-                              placeholder={storeConnected && storeApiSecret === '__HIDDEN__' ? '••••••••••••• (zapisany)' : storeType === 'woocommerce' ? 'cs_xxxxxxxxxxxx' : 'Opcjonalny secret'}
-                              style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
-                            />
-                            {storeType === 'woocommerce' && (
-                              <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)', lineHeight: '1.4' }}>
-                                Znajdziesz w: WooCommerce → Settings → Advanced → REST API → Add key
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Test result feedback */}
-                      {storeTestResult && (
-                        <div style={{ padding: '14px 18px', borderRadius: '10px', marginBottom: '16px', background: storeTestResult.success ? 'rgba(52,199,89,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${storeTestResult.success ? 'rgba(52,199,89,0.25)' : 'rgba(239,68,68,0.25)'}`, color: storeTestResult.success ? '#34c759' : '#ef4444', fontSize: '0.88rem', fontWeight: 500 }}>
-                          <div>{storeTestResult.message}</div>
-                          {storeTestResult.details && <div style={{ marginTop: '4px', color: 'var(--subtext)', fontWeight: 400, fontSize: '0.82rem' }}>{storeTestResult.details}</div>}
-                        </div>
-                      )}
-
-                      {/* Action buttons */}
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
-                        <button
-                          onClick={testStoreConnection}
-                          disabled={testingStoreConnection || !storeType || !storeUrl.trim() || !storeApiKey.trim()}
-                          style={{ padding: '11px 22px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--card-bg)', color: 'var(--foreground)', fontSize: '0.88rem', fontWeight: 600, cursor: (testingStoreConnection || !storeType || !storeUrl || !storeApiKey) ? 'not-allowed' : 'pointer', opacity: (testingStoreConnection || !storeType || !storeUrl || !storeApiKey) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
-                        >
-                          {testingStoreConnection ? (
-                            <><RefreshCw size={15} className={styles['animate-spin']} /> Testowanie...</>
-                          ) : (
-                            <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Testuj połączenie</>
-                          )}
-                        </button>
-                        <button
-                          onClick={saveStoreSettings}
-                          disabled={savingStoreSettings || !storeType || !storeUrl.trim() || !storeApiKey.trim()}
-                          className="btn btn-primary"
-                          style={{ padding: '11px 22px', opacity: (savingStoreSettings || !storeType || !storeUrl || !storeApiKey) ? 0.6 : 1 }}
-                        >
-                          {savingStoreSettings ? 'Zapisywanie...' : '💾 Zapisz integrację'}
-                        </button>
-                        {storeConnected && (
-                          <button
-                            onClick={disconnectStore}
-                            disabled={savingStoreSettings}
-                            style={{ padding: '11px 22px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#ef4444', fontSize: '0.88rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-                          >
-                            Rozłącz sklep
-                          </button>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      <p style={{ color: 'var(--foreground)', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
-                        Nie potrzebujesz kluczy API, haseł ani kont deweloperskich. Po prostu skopiuj poniższy adres URL i wklej go w panelu swojego sklepu:
-                      </p>
-                      
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: 'var(--input-bg)', padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)', flexWrap: 'wrap' }}>
-                        <input
-                          type="text"
-                          readOnly
-                          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/orders?userId=${session?.user?.id || ''}`}
-                          style={{ flex: '1 1 300px', background: 'transparent', border: 'none', color: 'var(--foreground)', fontSize: '0.9rem', outline: 'none' }}
-                          id="webhook-url-input"
-                          onClick={(e) => (e.target as HTMLInputElement).select()}
-                        />
-                        <button
-                          onClick={() => {
-                            const input = document.getElementById('webhook-url-input') as HTMLInputElement;
-                            if (input) {
-                              input.select();
-                              navigator.clipboard.writeText(input.value);
-                              showToast("Skopiowano link do schowka!", "success");
-                            }
-                          }}
-                          className="btn btn-secondary"
-                          style={{ padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
-                        >
-                          📋 Kopiuj link
-                        </button>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '8px' }}>
-                        <div style={{ padding: '14px 18px', borderRadius: '12px', background: 'rgba(255,149,0,0.06)', border: '1px solid rgba(255,149,0,0.2)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
-                          <strong style={{ color: 'var(--foreground)' }}>🛍️ Jak dodać w Shopify (1 min):</strong><br/>
-                          1. Wejdź w Shopify Admin → <strong>Settings → Notifications</strong>.<br/>
-                          2. Przewiń na sam dół do sekcji <strong>Webhooks</strong> i kliknij <strong>Create webhook</strong>.<br/>
-                          3. Wybierz Event: <strong>Order creation</strong>, Format: <strong>JSON</strong> i wklej skopiowany URL.<br/>
-                          4. Kliknij Zapisz. (Zalecamy dodać drugi webhook dla <strong>Order update</strong>).
-                        </div>
-                        <div style={{ padding: '14px 18px', borderRadius: '12px', background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
-                          <strong style={{ color: 'var(--foreground)' }}>🔵 Jak dodać w WooCommerce (1 min):</strong><br/>
-                          1. Wejdź w WordPress → <strong>WooCommerce → Settings → Advanced → Webhooks</strong>.<br/>
-                          2. Kliknij <strong>Add webhook</strong>.<br/>
-                          3. Nazwij go (np. "MESKIAI"), ustaw status na <strong>Active</strong>.<br/>
-                          4. Wybierz Topic: <strong>Order created</strong> i wklej skopiowany URL w pole <strong>Delivery URL</strong>.<br/>
-                          5. Kliknij Zapisz. (Dodaj drugi dla <strong>Order updated</strong>).
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Info about what Agent will do */}
-                  {storeType === 'shopify' && !storeConnected && (
-                    <div style={{ marginTop: '20px', padding: '14px 18px', borderRadius: '10px', background: 'rgba(255,149,0,0.06)', border: '1px solid rgba(255,149,0,0.2)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
-                      <strong style={{ color: 'var(--foreground)' }}>📋 Jak uzyskać Admin API Token w Shopify:</strong><br/>
-                      1. Zaloguj się do panelu Shopify → Settings → Apps and sales channels<br/>
-                      2. Kliknij "Develop apps" → "Create an app"<br/>
-                      3. W zakładce "Configuration" → "Admin API access scopes" dodaj: <code>read_orders</code>, <code>read_products</code><br/>
-                      4. Kliknij "Install app" → skopiuj "Admin API access token" (pokazuje się tylko raz!)
-                    </div>
-                  )}
-                  {storeType === 'woocommerce' && !storeConnected && (
-                    <div style={{ marginTop: '20px', padding: '14px 18px', borderRadius: '10px', background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
-                      <strong style={{ color: 'var(--foreground)' }}>📋 Jak uzyskać klucze API WooCommerce:</strong><br/>
-                      1. W panelu WordPress → WooCommerce → Settings → Advanced → REST API<br/>
-                      2. Kliknij "Add key" → nadaj nazwę (np. "MESKIAI Agent")<br/>
-                      3. Ustaw uprawnienia: <strong>Read</strong> (wystarczy do sprawdzania zamówień)<br/>
-                      4. Kliknij "Generate API key" → skopiuj Consumer Key i Consumer Secret
-                    </div>
-                  )}
                 </div>
 
 
