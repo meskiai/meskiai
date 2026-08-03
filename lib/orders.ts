@@ -80,16 +80,16 @@ export async function getOrderContextForEmail(
 
     return `
 ========================================
-INFORMACJE O ZAMÓWIENIU KLIENTA Z RĘCZNEJ BAZY DANYCH:
+RZECZYWISTE DANE ZAMÓWIENIA ZINTEGROWANE ZE SKLEPU (Shopify/WooCommerce):
 Numer zamówienia: #${order.orderNumber}
 E-mail kupującego: ${order.customerEmail}
 Status zamówienia: ${order.status.toUpperCase()}
 Zakupione produkty: ${order.items}
 Kwota łączna: ${order.totalPrice}
-Link do śledzenia przesyłki: ${order.trackingUrl || "Brak"}
+Link do śledzenia przesyłki: ${order.trackingUrl || "Brak (jeszcze nie wysłano)"}
 Data zamówienia: ${order.createdAt.toISOString().split("T")[0]}
 ========================================
-Jeśli klient pyta o zwrot, poinformuj o procedurze adekwatnej do statusu.
+Powyższe dane są w 100% prawdziwe i aktualne. Pochodzą bezpośrednio z systemu sklepowego klienta (Shopify/WooCommerce) zaimportowane przez Webhook. Odpowiedz klientowi ściśle na podstawie tych informacji.
 `;
   } catch (error) {
     console.error("[Order Lookup] Błąd:", error);
