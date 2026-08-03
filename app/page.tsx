@@ -24,7 +24,7 @@ export default function Home() {
         const nextIndex = (features.indexOf(prev) + 1) % features.length;
         return features[nextIndex];
       });
-    }, 6000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
