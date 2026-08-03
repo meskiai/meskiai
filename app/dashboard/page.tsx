@@ -2786,9 +2786,9 @@ export default function Dashboard() {
               <div style={{ maxWidth: "1200px", width: "100%", display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 
                 {/* 1. Header & Stats Panel */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
+                  <div style={{ flex: '1 1 500px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
                       <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Integracja Sklepu E-commerce</h2>
                       {storeConnected && (
                         <span style={{ background: 'rgba(52,199,89,0.12)', color: '#34c759', border: '1px solid rgba(52,199,89,0.3)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2811,12 +2811,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* 1.5 Live Store Integration Configuration Panel */}
-                <div style={{ background: 'var(--card-bg)', border: storeConnected ? '1px solid rgba(52,199,89,0.3)' : '1px solid var(--glass-border)', borderRadius: '20px', padding: '28px 32px', boxShadow: 'var(--mac-shadow)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ background: 'var(--card-bg)', border: storeConnected ? '1px solid rgba(52,199,89,0.3)' : '1px solid var(--glass-border)', borderRadius: '20px', padding: '24px 24px', boxShadow: 'var(--mac-shadow)', position: 'relative', overflow: 'hidden' }}>
                   {/* Background accent */}
                   <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: storeConnected ? 'radial-gradient(circle at 100% 0%, rgba(52,199,89,0.06) 0%, transparent 70%)' : 'radial-gradient(circle at 100% 0%, rgba(59,130,246,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
                   
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: storeConnected ? 'rgba(52,199,89,0.1)' : 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: storeConnected ? 'rgba(52,199,89,0.1)' : 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={storeConnected ? '#34c759' : 'var(--primary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
                       </svg>
@@ -2829,14 +2829,14 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                     {/* Platform selector */}
                     <div>
                       <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Platforma sklepu</label>
                       <select
                         value={storeType}
                         onChange={(e) => { setStoreType(e.target.value as any); setStoreTestResult(null); }}
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', cursor: 'pointer' }}
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                       >
                         <option value="">Wybierz platformę...</option>
                         <option value="shopify">🛍️ Shopify</option>
@@ -2872,7 +2872,7 @@ export default function Dashboard() {
                         style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
                       />
                       {storeType === 'shopify' && (
-                        <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)' }}>
+                        <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)', lineHeight: '1.4' }}>
                           Znajdziesz w: Shopify Admin → Settings → Apps → Develop apps → Admin API access token
                         </p>
                       )}
@@ -2892,7 +2892,7 @@ export default function Dashboard() {
                           style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
                         />
                         {storeType === 'woocommerce' && (
-                          <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)' }}>
+                          <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)', lineHeight: '1.4' }}>
                             Znajdziesz w: WooCommerce → Settings → Advanced → REST API → Add key
                           </p>
                         )}
@@ -2909,7 +2909,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Action buttons */}
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
                     <button
                       onClick={testStoreConnection}
                       disabled={testingStoreConnection || !storeType || !storeUrl.trim() || !storeApiKey.trim()}
