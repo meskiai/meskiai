@@ -12,6 +12,32 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "../components/ThemeToggle";
 import styles from "./page.module.css";
+const getCleanDraftReply = (draft: string | null): string => {
+  if (!draft) return "";
+  if (draft.includes("[ANALIZA AGENTA]:")) {
+    if (draft.includes("[PROPONOWANE POTWIERDZENIE (NIEWYSŁANE)]:")) {
+      const match = draft.match(/\[PROPONOWANE POTWIERDZENIE \(NIEWYSŁANE\)\]:\n([\s\S]*)/i);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+    if (draft.includes("[WYSŁANE POTWIERDZENIE]:")) {
+      return "";
+    }
+  }
+  return draft;
+};
+
+const getAgentAnalysis = (draft: string | null): string => {
+  if (!draft) return "";
+  if (draft.includes("[ANALIZA AGENTA]:")) {
+    const match = draft.match(/\[ANALIZA AGENTA\]:\n([\s\S]*?)(?:\n\n\[(?:WYSŁANE POTWIERDZENIE|PROPONOWANE POTWIERDZENIE))/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return draft;
+};
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -3227,7 +3253,7 @@ export default function Dashboard() {
                           setSelectedThread(thread);
                           setShowManualReply(false);
                           if (thread.status === 'REQUIRES_ATTENTION') {
-                            setEditedReply("");
+                            setEditedReply(getCleanDraftReply(thread.draftReply));
                           } else {
                             setEditedReply(thread.draftReply || "");
                           }
@@ -3356,7 +3382,7 @@ export default function Dashboard() {
                             <AlertTriangle size={16} /> Analiza Agenta (Nie zostanie wysłana do klienta)
                           </h4>
                           <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, maxHeight: '160px', overflowY: 'auto', paddingRight: '4px' }}>
-                            {selectedThread.draftReply}
+                            {getAgentAnalysis(selectedThread.draftReply)}
                           </div>
                         </div>
                       )}
