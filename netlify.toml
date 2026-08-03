@@ -12,3 +12,4 @@
 [functions]
   node_bundler = "esbuild"
   directory = "netlify/functions"
+  included_files = ["node_modules/.prisma/client/*.node", "prisma/schema.prisma"]
