@@ -276,14 +276,14 @@ export default function Home() {
                   <div className={`${styles.featureView} animate-fade-in`}>
                     <div className={styles.featureInfo}>
                       <span className={styles.featureBadge} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>POP3 & SMTP & Webhooks</span>
-                      <h3>Poczta, ktora sama obsluguje sklep.</h3>
+                      <h3>Agent AI, ktory przejmuje rozmowy z klientami.</h3>
                       <p>
-                        Agent AI dziala bez przerwy, automatycznie odpowiadajac na wiadomosci klientow. Dzieki integracji ze sklepami Shopify oraz WooCommerce przez proste polaczenie Webhook, Agent w czasie rzeczywistym weryfikuje statusy przesylek, obsluguje reklamacje i zwroty.
+                        Podlacz skrzynke pocztowa i pozwol sztucznej inteligencji prowadzic dialog. Agent automatycznie odpisuje na maile, a dzieki integracji z Shopify i WooCommerce samodzielnie weryfikuje status i stopien realizacji zamowienia, a takze pomaga klientom w sprawach zwrotow oraz reklamacji.
                       </p>
                       <ul className={styles.featureSpecs}>
-                        <li><span>Obsluga sklepow:</span> Shopify, WooCommerce</li>
-                        <li><span>Zakres:</span> Statusy, zwroty, reklamacje</li>
-                        <li><span>Czas reakcji:</span> ponizej 2 minut</li>
+                        <li><span>Praca w tle:</span> 24h na dobe</li>
+                        <li><span>Integracje:</span> Shopify & WooCommerce</li>
+                        <li><span>Zadania:</span> Statusy, zwroty, reklamacje</li>
                       </ul>
                     </div>
                     <div className={styles.featureVisual}>
