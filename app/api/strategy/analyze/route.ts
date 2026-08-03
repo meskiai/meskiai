@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import { getServerSession } from "next-auth/next";
@@ -60,62 +60,63 @@ export async function POST(req: Request) {
       pageText = "Nie udało się pobrać treści strony. Wywnioskuj branżę, usługi i porady wyłącznie na podstawie samej nazwy domeny: " + url;
     }
 
-    const prompt = `
-Jesteś elitarnym Agentem Strategicznym AI, Głównym Analitykiem Danych w firmie doradczej wielkiej czwórki (Big 4).
-Otrzymałeś zlecenie przeprowadzenia głębokiego audytu biznesowego i strategicznego dla poniższej domeny/strony.
+    // Krok 1: Głębokie badanie rynku i konkurencji za pomocą Google Search
+    const researchResponse = await generateText({
+      model: google("gemini-flash-latest"),
+      system: `Jesteś elitarnym doradcą biznesowym, Głównym Strategiem i Analitykiem Rynku w firmie doradczej Wielkiej Czwórki (Big 4).
+Twoim zadaniem jest przeprowadzenie kompleksowego badania i audytu biznesowego dla podanej domeny/firmy.
+Użyj narzędzia Google Search, aby znaleźć rzeczywiste i szczegółowe informacje o tej firmie, jej usługach, pozycji rynkowej, konkurentach oraz stawkach reklamowych w jej branży.
 
-Strona docelowa: ${targetUrl}
-Zeskrapowana treść strony (może być ucięta):
-${pageText}
+Zrób głęboki wywiad gospodarczy pod kątem:
+1. Prawdziwych konkurentów na rynku polskim (lub globalnym, zależy od skali działania).
+2. Szacunków ruchu (trafficEstimate), głównych przewag konkurencji (mainAdvantage) i luk w ich ofercie (strategyGap).
+3. Klasycznej analizy SWOT (Słabe strony, Mocne strony, Szanse, Zagrożenia).
+4. Stawek CPC i trudności pozycjonowania (SEO Difficulty) dla powiązanych słów kluczowych.
+5. Konkretnych, precyzyjnych i natychmiastowo wykonalnych kroków strategicznych (Action Plan) dla tej firmy.`,
+      prompt: `Przeprowadź dokładny wywiad rynkowy i analizę strategiczną dla firmy: ${targetUrl}
+Treść zeskrapowana ze strony głównej (jako punkt wyjścia):
+${pageText}`,
+      tools: {
+        google_search: google.tools.googleSearch({}) as any,
+      },
+    });
 
-Twoim zadaniem jest wygenerować ULTRA-PROFESJONALNY raport analityczny w formacie JSON.
-Nie zgaduj "na oko" w sposób amatorski - przeprowadź rzetelną dedukcję, wyliczając realistyczne metryki na podstawie natury branży, dostępnych danych oraz rynkowych benchmarków. Zwróć dane po polsku.
+    const researchReportText = researchResponse.text;
 
-Wymagane sekcje:
-1. "marketOverview": Zwięzłe podsumowanie rynku docelowego dla tej firmy, główny trend oraz szacowany roczny wzrost (np. "+12.5% YoY").
-2. "swotAnalysis": Klasyczna analiza SWOT (Strengths, Weaknesses, Opportunities, Threats), po 3-4 punkty na każdą kategorię.
-3. "keyMetrics": Kluczowe twarde metryki rynkowe:
-   - "seoDifficulty": Trudność pozycjonowania w tej branży (od 1 do 100).
-   - "averageCpc": Średni koszt kliknięcia w Google Ads dla tej branży (np. "3.50 PLN").
-   - "marginPotential": Potencjał marżowości ("Niski", "Średni", "Wysoki", "Bardzo Wysoki").
-4. "competitors": Lista 4 konkretnych, faktycznie istniejących głównych konkurentów na rynku (polskim lub globalnym zależy od profilu), wraz z ich:
-   - "name": Nazwa firmy
-   - "url": Prawdziwy adres URL
-   - "trafficEstimate": Szacowany miesięczny ruch (np. "150k - 200k")
-   - "mainAdvantage": Ich główna przewaga konkurencyjna
-   - "strategyGap": Luka w ich strategii, którą klient może wykorzystać
-5. "actionPlan": 3 konkretne, zaawansowane kroki strategiczne (To-Do) do wdrożenia w celu przejęcia leadów od konkurencji.
-`;
-
+    // Krok 2: Ustrukturyzowanie raportu do formatu JSON dopasowanego do interfejsu
     const { object } = await generateObject({
       model: google("gemini-flash-latest"),
+      system: "Jesteś analitykiem technicznym. Twoim zadaniem jest przełożenie szczegółowego raportu rynkowego na ustrukturyzowany format JSON.",
+      prompt: `Przetwórz poniższy raport z badania rynku na format JSON zgodnie ze schematem. Zwróć wszystkie dane w języku polskim.
+
+Raport do przetworzenia:
+${researchReportText}`,
       schema: z.object({
         marketOverview: z.object({
-          summary: z.string(),
-          mainTrend: z.string(),
-          estimatedGrowth: z.string()
+          summary: z.string().describe("Syntetyczne podsumowanie rynku docelowego i pozycji badanej firmy"),
+          mainTrend: z.string().describe("Główny trend technologiczny lub rynkowy dominujący w tej branży"),
+          estimatedGrowth: z.string().describe("Szacowany roczny wzrost rynku, np. '+15% YoY'")
         }),
         swotAnalysis: z.object({
-          strengths: z.array(z.string()),
-          weaknesses: z.array(z.string()),
-          opportunities: z.array(z.string()),
-          threats: z.array(z.string())
+          strengths: z.array(z.string()).describe("3-4 konkretne mocne strony badanej firmy"),
+          weaknesses: z.array(z.string()).describe("3-4 rzeczywiste słabe strony lub braki operacyjne"),
+          opportunities: z.array(z.string()).describe("3-4 szanse rynkowe i technologiczne stojące przed firmą"),
+          threats: z.array(z.string()).describe("3-4 realne zagrożenia zewnętrzne, działania konkurencji")
         }),
         keyMetrics: z.object({
-          seoDifficulty: z.number(),
-          averageCpc: z.string(),
-          marginPotential: z.string()
+          seoDifficulty: z.number().min(1).max(100).describe("Trudność pozycjonowania w wyszukiwarce (1-100)"),
+          averageCpc: z.string().describe("Średni koszt kliknięcia w Google Ads dla branży (np. '4.20 PLN')"),
+          marginPotential: z.string().describe("Potencjał marżowości (np. 'Wysoki', 'Średni')")
         }),
         competitors: z.array(z.object({
-          name: z.string(),
-          url: z.string(),
-          trafficEstimate: z.string(),
-          mainAdvantage: z.string(),
-          strategyGap: z.string()
-        })),
-        actionPlan: z.array(z.string())
+          name: z.string().describe("Nazwa prawdziwego konkurenta"),
+          url: z.string().describe("Poprawny adres URL konkurenta"),
+          trafficEstimate: z.string().describe("Szacowany ruch miesięczny, np. '50k - 100k wizyt'"),
+          mainAdvantage: z.string().describe("Główna przewaga rynkowa tego konkurenta"),
+          strategyGap: z.string().describe("Luka w ofercie lub marketingu tego konkurenta, którą badana firma może wykorzystać")
+        })).describe("Lista 3-4 prawdziwych, bezpośrednich konkurentów"),
+        actionPlan: z.array(z.string()).describe("3-4 konkretne, zaawansowane porady/kroki strategiczne (To-Do) do natychmiastowego wdrożenia")
       }),
-      prompt,
     });
 
     await prisma.userSettings.upsert({
