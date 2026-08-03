@@ -19,10 +19,7 @@ export const metadata: Metadata = {
   verification: {
     google: "8vBRb58Hy261nwNRfWy_qTdnez3reAy6dGjoMhfUGqU",
   },
-  icons: {
-    icon: "/logo.png?v=3",
-    apple: "/logo.png?v=3",
-  },
+
   openGraph: {
     title: "meskiai",
     description: "Inteligentny asystent e-mail dla Twojej firmy.",
