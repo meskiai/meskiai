@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
     const isProOrMax = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
 
-    const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, companyWebsite, defaultVatRate, replyTone } = await req.json();
+    const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, companyWebsite, defaultVatRate, replyTone, storeType, storeUrl, storeApiKey, storeApiSecret } = await req.json();
 
     const dataToUpdate: any = {};
     if (autoReply !== undefined) dataToUpdate.autoReply = autoReply;
@@ -28,6 +28,11 @@ export async function POST(req: Request) {
     if (companyBankAccount !== undefined) dataToUpdate.companyBankAccount = companyBankAccount;
     if (companyWebsite !== undefined) dataToUpdate.companyWebsite = companyWebsite;
     if (defaultVatRate !== undefined) dataToUpdate.defaultVatRate = defaultVatRate;
+    // Store integration
+    if (storeType !== undefined) dataToUpdate.storeType = storeType || null;
+    if (storeUrl !== undefined) dataToUpdate.storeUrl = storeUrl || null;
+    if (storeApiKey !== undefined) dataToUpdate.storeApiKey = storeApiKey || null;
+    if (storeApiSecret !== undefined) dataToUpdate.storeApiSecret = storeApiSecret || null;
     
     // Tylko PRO i MAX mogą zmieniać ton
     if (replyTone !== undefined && isProOrMax) {
@@ -85,7 +90,9 @@ export async function GET(req: Request) {
 
     const settings = {
       ...(user?.settings || { autoReply: false }),
-      hasAppPassword: !!user?.settings?.appPassword
+      hasAppPassword: !!user?.settings?.appPassword,
+      // Mask API secret — return boolean only for security
+      storeApiSecret: user?.settings?.storeApiSecret ? "__SET__" : null,
     };
     const subscriptionData = {
       subscriptionStatus: user?.subscriptionStatus || "inactive",

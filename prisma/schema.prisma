@@ -90,6 +90,12 @@ model UserSettings {
   agentEmailsProcessed Int      @default(0)
   lastMonthlyReset     DateTime?
 
+  // E-commerce Store Integration (live API)
+  storeType      String?  // "shopify" | "woocommerce" | "custom"
+  storeUrl       String?  // e.g. "my-store.myshopify.com" or "https://mystore.pl"
+  storeApiKey    String?  // Shopify Admin API key / WooCommerce Consumer Key
+  storeApiSecret String?  // WooCommerce Consumer Secret (not needed for Shopify)
+
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

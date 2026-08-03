@@ -87,6 +87,16 @@ export default function Dashboard() {
   const [newOrderPrice, setNewOrderPrice] = useState("");
   const [newOrderTracking, setNewOrderTracking] = useState("");
   
+  // Store Integration State
+  const [storeType, setStoreType] = useState<"shopify" | "woocommerce" | "custom" | "">(""); 
+  const [storeUrl, setStoreUrl] = useState("");
+  const [storeApiKey, setStoreApiKey] = useState("");
+  const [storeApiSecret, setStoreApiSecret] = useState("");
+  const [savingStoreSettings, setSavingStoreSettings] = useState(false);
+  const [testingStoreConnection, setTestingStoreConnection] = useState(false);
+  const [storeTestResult, setStoreTestResult] = useState<{success: boolean; message: string; details?: string} | null>(null);
+  const [storeConnected, setStoreConnected] = useState(false);
+
   // Welcome Animation
   const [welcomeState, setWelcomeState] = useState<"VISIBLE" | "FADING_OUT" | "HIDDEN">("VISIBLE");
 
@@ -154,7 +164,14 @@ export default function Dashboard() {
           setCompanyWebsite(data.settings.companyWebsite || "");
           setDefaultVatRate(data.settings.defaultVatRate || "23%");
           setReplyTone(data.settings.replyTone || "PROFESJONALNY");
-          
+          // Store integration
+          if (data.settings.storeType) setStoreType(data.settings.storeType);
+          if (data.settings.storeUrl) setStoreUrl(data.settings.storeUrl);
+          if (data.settings.storeApiKey) setStoreApiKey(data.settings.storeApiKey);
+          // storeApiSecret comes back as "__SET__" if configured — show a placeholder
+          if (data.settings.storeApiSecret === "__SET__") setStoreApiSecret("__HIDDEN__");
+          const hasStore = !!(data.settings.storeType && data.settings.storeUrl && data.settings.storeApiKey);
+          setStoreConnected(hasStore);
           if (!data.settings.companyWebsite) {
             setStrategyResults(null);
             localStorage.removeItem("meskiStrategyResults");
@@ -370,6 +387,58 @@ export default function Dashboard() {
       showToast(`Wystąpił błąd podczas zapisywania: ${e.message}`, "error");
     } finally {
       setSavingSettings(false);
+    }
+  };
+
+  const saveStoreSettings = async () => {
+    if (!storeType) { showToast("Wybierz typ sklepu", "error"); return; }
+    if (!storeUrl.trim()) { showToast("Podaj adres URL sklepu", "error"); return; }
+    if (!storeApiKey.trim()) { showToast("Podaj klucz API", "error"); return; }
+    setSavingStoreSettings(true);
+    try {
+      const body: any = { storeType, storeUrl: storeUrl.trim(), storeApiKey: storeApiKey.trim() };
+      if (storeApiSecret && storeApiSecret !== "__HIDDEN__") body.storeApiSecret = storeApiSecret.trim();
+      const res = await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error("Błąd zapisu");
+      showToast("✓ Ustawienia sklepu zapisano!", "success");
+      setStoreConnected(true);
+      setStoreTestResult(null);
+    } catch (e: any) {
+      showToast(`Błąd: ${e.message}`, "error");
+    } finally {
+      setSavingStoreSettings(false);
+    }
+  };
+
+  const testStoreConnection = async () => {
+    if (!storeType || !storeUrl.trim() || !storeApiKey.trim()) { showToast("Uzupełnij typ sklepu, URL i klucz API przed testem", "error"); return; }
+    setTestingStoreConnection(true);
+    setStoreTestResult(null);
+    try {
+      const body: any = { storeType, storeUrl: storeUrl.trim(), storeApiKey: storeApiKey.trim() };
+      if (storeApiSecret && storeApiSecret !== "__HIDDEN__") body.storeApiSecret = storeApiSecret.trim();
+      const res = await fetch("/api/store/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      setStoreTestResult(data);
+      if (data.success) setStoreConnected(true);
+    } catch (e: any) {
+      setStoreTestResult({ success: false, message: `Błąd: ${e.message}` });
+    } finally {
+      setTestingStoreConnection(false);
+    }
+  };
+
+  const disconnectStore = async () => {
+    setSavingStoreSettings(true);
+    try {
+      await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeType: null, storeUrl: null, storeApiKey: null, storeApiSecret: null }) });
+      setStoreType(""); setStoreUrl(""); setStoreApiKey(""); setStoreApiSecret("");
+      setStoreConnected(false); setStoreTestResult(null);
+      showToast("Rozłączono sklep", "success");
+    } catch (e: any) {
+      showToast("Błąd: " + e.message, "error");
+    } finally {
+      setSavingStoreSettings(false);
     }
   };
 
@@ -2719,19 +2788,179 @@ export default function Dashboard() {
                 {/* 1. Header & Stats Panel */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
                   <div>
-                    <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Baza Zamówień (E-commerce)</h2>
-                    <p style={{ color: "var(--subtext)", fontSize: "0.95rem", marginTop: '8px', maxWidth: '600px', lineHeight: 1.5 }}>
-                      Dodaj testowe zamówienia do bazy danych, aby Agent AI mógł automatycznie weryfikować statusy przesyłek, kupione produkty i kwoty w mailach od klientów.
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                      <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Integracja Sklepu E-commerce</h2>
+                      {storeConnected && (
+                        <span style={{ background: 'rgba(52,199,89,0.12)', color: '#34c759', border: '1px solid rgba(52,199,89,0.3)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#34c759', display: 'inline-block' }}></span>
+                          POŁĄCZONO NA ŻYWO
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ color: "var(--subtext)", fontSize: "0.95rem", marginTop: '4px', maxWidth: '620px', lineHeight: 1.5 }}>
+                      Połącz swój sklep (Shopify, WooCommerce lub własne API) — Agent będzie sprawdzał statusy zamówień i dostępność produktów w czasie rzeczywistym, bezpośrednio z Twojego sklepu.
                     </p>
                   </div>
                   <button 
-                    className="btn btn-primary"
+                    className="btn btn-secondary"
                     onClick={() => setShowAddOrderModal(true)}
-                    style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}
                   >
-                    <Plus size={18} /> Dodaj zamówienie
+                    <Plus size={18} /> Ręczne zamówienie
                   </button>
                 </div>
+
+                {/* 1.5 Live Store Integration Configuration Panel */}
+                <div style={{ background: 'var(--card-bg)', border: storeConnected ? '1px solid rgba(52,199,89,0.3)' : '1px solid var(--glass-border)', borderRadius: '20px', padding: '28px 32px', boxShadow: 'var(--mac-shadow)', position: 'relative', overflow: 'hidden' }}>
+                  {/* Background accent */}
+                  <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: storeConnected ? 'radial-gradient(circle at 100% 0%, rgba(52,199,89,0.06) 0%, transparent 70%)' : 'radial-gradient(circle at 100% 0%, rgba(59,130,246,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: storeConnected ? 'rgba(52,199,89,0.1)' : 'rgba(59,130,246,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={storeConnected ? '#34c759' : 'var(--primary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Połączenie ze sklepem</h3>
+                      <p style={{ margin: 0, color: 'var(--subtext)', fontSize: '0.85rem' }}>
+                        {storeConnected ? `Aktywna integracja: ${storeType?.toUpperCase()} — zapytania do sklepu w czasie rzeczywistym` : 'Skonfiguruj integrację, aby Agent łączył się ze Twoim sklepem'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    {/* Platform selector */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Platforma sklepu</label>
+                      <select
+                        value={storeType}
+                        onChange={(e) => { setStoreType(e.target.value as any); setStoreTestResult(null); }}
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', cursor: 'pointer' }}
+                      >
+                        <option value="">Wybierz platformę...</option>
+                        <option value="shopify">🛍️ Shopify</option>
+                        <option value="woocommerce">🔵 WooCommerce (WordPress)</option>
+                        <option value="custom">⚙️ Własne API (Custom)</option>
+                      </select>
+                    </div>
+
+                    {/* Store URL */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        {storeType === 'shopify' ? 'Adres sklepu Shopify' : storeType === 'woocommerce' ? 'URL sklepu WordPress' : 'URL endpointu API'}
+                      </label>
+                      <input
+                        type="text"
+                        value={storeUrl}
+                        onChange={(e) => { setStoreUrl(e.target.value); setStoreTestResult(null); }}
+                        placeholder={storeType === 'shopify' ? 'moj-sklep.myshopify.com' : storeType === 'woocommerce' ? 'https://moj-sklep.pl' : 'https://api.moj-sklep.pl/orders'}
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* API Key */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        {storeType === 'shopify' ? 'Admin API Access Token' : storeType === 'woocommerce' ? 'Consumer Key' : 'Bearer Token / API Key'}
+                      </label>
+                      <input
+                        type="password"
+                        value={storeApiKey === '__HIDDEN__' ? '' : storeApiKey}
+                        onChange={(e) => { setStoreApiKey(e.target.value); setStoreTestResult(null); }}
+                        placeholder={storeConnected && storeApiKey === '__HIDDEN__' ? '••••••••••••• (zapisany)' : storeType === 'shopify' ? 'shpat_xxxxxxxxxxxx' : storeType === 'woocommerce' ? 'ck_xxxxxxxxxxxx' : 'Bearer token lub klucz API'}
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                      {storeType === 'shopify' && (
+                        <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)' }}>
+                          Znajdziesz w: Shopify Admin → Settings → Apps → Develop apps → Admin API access token
+                        </p>
+                      )}
+                    </div>
+
+                    {/* API Secret (WooCommerce only) */}
+                    {(storeType === 'woocommerce' || storeType === 'custom') && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                          {storeType === 'woocommerce' ? 'Consumer Secret' : 'Secret (opcjonalnie)'}
+                        </label>
+                        <input
+                          type="password"
+                          value={storeApiSecret === '__HIDDEN__' ? '' : storeApiSecret}
+                          onChange={(e) => { setStoreApiSecret(e.target.value); setStoreTestResult(null); }}
+                          placeholder={storeConnected && storeApiSecret === '__HIDDEN__' ? '••••••••••••• (zapisany)' : storeType === 'woocommerce' ? 'cs_xxxxxxxxxxxx' : 'Opcjonalny secret'}
+                          style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--foreground)', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                        {storeType === 'woocommerce' && (
+                          <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--subtext)' }}>
+                            Znajdziesz w: WooCommerce → Settings → Advanced → REST API → Add key
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Test result feedback */}
+                  {storeTestResult && (
+                    <div style={{ padding: '14px 18px', borderRadius: '10px', marginBottom: '16px', background: storeTestResult.success ? 'rgba(52,199,89,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${storeTestResult.success ? 'rgba(52,199,89,0.25)' : 'rgba(239,68,68,0.25)'}`, color: storeTestResult.success ? '#34c759' : '#ef4444', fontSize: '0.88rem', fontWeight: 500 }}>
+                      <div>{storeTestResult.message}</div>
+                      {storeTestResult.details && <div style={{ marginTop: '4px', color: 'var(--subtext)', fontWeight: 400, fontSize: '0.82rem' }}>{storeTestResult.details}</div>}
+                    </div>
+                  )}
+
+                  {/* Action buttons */}
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={testStoreConnection}
+                      disabled={testingStoreConnection || !storeType || !storeUrl.trim() || !storeApiKey.trim()}
+                      style={{ padding: '11px 22px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--card-bg)', color: 'var(--foreground)', fontSize: '0.88rem', fontWeight: 600, cursor: (testingStoreConnection || !storeType || !storeUrl || !storeApiKey) ? 'not-allowed' : 'pointer', opacity: (testingStoreConnection || !storeType || !storeUrl || !storeApiKey) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
+                    >
+                      {testingStoreConnection ? (
+                        <><RefreshCw size={15} className={styles['animate-spin']} /> Testowanie...</>
+                      ) : (
+                        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Testuj połączenie</>
+                      )}
+                    </button>
+                    <button
+                      onClick={saveStoreSettings}
+                      disabled={savingStoreSettings || !storeType || !storeUrl.trim() || !storeApiKey.trim()}
+                      className="btn btn-primary"
+                      style={{ padding: '11px 22px', opacity: (savingStoreSettings || !storeType || !storeUrl || !storeApiKey) ? 0.6 : 1 }}
+                    >
+                      {savingStoreSettings ? 'Zapisywanie...' : '💾 Zapisz integrację'}
+                    </button>
+                    {storeConnected && (
+                      <button
+                        onClick={disconnectStore}
+                        disabled={savingStoreSettings}
+                        style={{ padding: '11px 22px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#ef4444', fontSize: '0.88rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                      >
+                        Rozłącz sklep
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Info about what Agent will do */}
+                  {storeType === 'shopify' && !storeConnected && (
+                    <div style={{ marginTop: '20px', padding: '14px 18px', borderRadius: '10px', background: 'rgba(255,149,0,0.06)', border: '1px solid rgba(255,149,0,0.2)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
+                      <strong style={{ color: 'var(--foreground)' }}>📋 Jak uzyskać Admin API Token w Shopify:</strong><br/>
+                      1. Zaloguj się do panelu Shopify → Settings → Apps and sales channels<br/>
+                      2. Kliknij "Develop apps" → "Create an app"<br/>
+                      3. W zakładce "Configuration" → "Admin API access scopes" dodaj: <code>read_orders</code>, <code>read_products</code><br/>
+                      4. Kliknij "Install app" → skopiuj "Admin API access token" (pokazuje się tylko raz!)
+                    </div>
+                  )}
+                  {storeType === 'woocommerce' && !storeConnected && (
+                    <div style={{ marginTop: '20px', padding: '14px 18px', borderRadius: '10px', background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', fontSize: '0.82rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
+                      <strong style={{ color: 'var(--foreground)' }}>📋 Jak uzyskać klucze API WooCommerce:</strong><br/>
+                      1. W panelu WordPress → WooCommerce → Settings → Advanced → REST API<br/>
+                      2. Kliknij "Add key" → nadaj nazwę (np. "MESKIAI Agent")<br/>
+                      3. Ustaw uprawnienia: <strong>Read</strong> (wystarczy do sprawdzania zamówień)<br/>
+                      4. Kliknij "Generate API key" → skopiuj Consumer Key i Consumer Secret
+                    </div>
+                  )}
+                </div>
+
 
                 {/* 1.5. Information Banner */}
                 <div style={{ 

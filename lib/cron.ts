@@ -491,7 +491,7 @@ async function processMessage({
     const { getOrderContextForEmail } = await import("./orders");
     const orderContext = await getOrderContextForEmail(
       user.id,
-      msg.text || msg.html || '',
+      msg.text || (msg as any).html || '',
       msg.from || ''
     );
 

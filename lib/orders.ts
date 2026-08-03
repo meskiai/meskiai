@@ -1,21 +1,22 @@
 import { prisma } from "./prisma";
+import { getLiveStoreContextForEmail } from "./storeApi";
 
 /**
- * Szuka i wyciąga numer zamówienia z treści wiadomości e-mail.
- * Wspiera formaty typu #1234, "zamówienie 12345", czy same ciągi cyfr 4-8 znaków.
+ * Wyciąga numery zamówień z treści wiadomości e-mail.
+ * Wspiera formaty: #1234, "zamówienie nr 12345", ciągi cyfr 4-8 znaków.
  */
 export function extractOrderNumbers(text: string): string[] {
   const numbers: string[] = [];
-  
-  // Pattern 1: Szukaj #1234 lub #12345
+
+  // Pattern 1: #1234
   const hashPattern = /#([0-9A-Za-z-]{3,10})/g;
   let match;
   while ((match = hashPattern.exec(text)) !== null) {
     if (match[1]) numbers.push(match[1].trim());
   }
 
-  // Pattern 2: Szukaj "zamówien* 12345" lub "nr 12345"
-  const textPattern = /(?:zamówienie|zamówienia|zamowienie|zamowienia|nr|numer|id)\s*#?\s*([0-9A-Za-z-]{3,10})/gi;
+  // Pattern 2: "zamówienie / nr / numer / id 12345"
+  const textPattern = /(?:zamówienie|zamówienia|zamowienie|zamowienia|nr|numer|id|order)\s*#?\s*([0-9A-Za-z-]{3,10})/gi;
   while ((match = textPattern.exec(text)) !== null) {
     if (match[1] && !numbers.includes(match[1].trim())) {
       numbers.push(match[1].trim());
@@ -26,7 +27,8 @@ export function extractOrderNumbers(text: string): string[] {
 }
 
 /**
- * Szuka informacji o zamówieniu w bazie danych i zwraca sformatowany tekst dla AI.
+ * Główna funkcja — buduje kontekst dla AI na podstawie danych o zamówieniu.
+ * Priorytet: żywe API sklepu → ręczna baza danych zamówień → info o braku danych.
  */
 export async function getOrderContextForEmail(
   userId: string,
@@ -34,66 +36,63 @@ export async function getOrderContextForEmail(
   customerEmail: string
 ): Promise<string> {
   try {
+    // 1. Pobierz ustawienia użytkownika (w tym konfigurację sklepu)
+    const userSettings = await prisma.userSettings.findUnique({
+      where: { userId },
+      select: { storeType: true, storeUrl: true, storeApiKey: true, storeApiSecret: true },
+    });
+
+    // 2. Jeśli skonfigurowano żywe API sklepu — użyj go PRIORYTETOWO
+    if (userSettings?.storeType && userSettings?.storeUrl && userSettings?.storeApiKey) {
+      console.log(`[Order Lookup] Użytkownik ${userId} ma skonfigurowany sklep (${userSettings.storeType}) — odpytuję live API`);
+      const liveContext = await getLiveStoreContextForEmail(
+        userSettings,
+        emailBody,
+        customerEmail,
+        extractOrderNumbers
+      );
+      if (liveContext) return liveContext;
+    }
+
+    // 3. Fallback: ręczna baza zamówień (tabela Order)
     const extractedNumbers = extractOrderNumbers(emailBody);
-    console.log(`[Order Lookup] Wyodrębnione numery z maila:`, extractedNumbers);
+    console.log(`[Order Lookup] Fallback do ręcznej bazy. Wyodrębnione numery:`, extractedNumbers);
 
     let order = null;
 
-    // 1. Spróbuj dopasować po wyciągniętym numerze zamówienia
     for (const num of extractedNumbers) {
       order = await prisma.order.findFirst({
-        where: {
-          userId,
-          orderNumber: {
-            equals: num,
-            mode: "insensitive"
-          }
-        }
+        where: { userId, orderNumber: { equals: num, mode: "insensitive" } },
       });
-      if (order) {
-        console.log(`[Order Lookup] Znaleziono zamówienie po numerze: ${num}`);
-        break;
-      }
+      if (order) break;
     }
 
-    // 2. Jeśli nie znaleziono po numerze, spróbuj dopasować po e-mailu klienta
     if (!order && customerEmail) {
       order = await prisma.order.findFirst({
-        where: {
-          userId,
-          customerEmail: {
-            equals: customerEmail.trim(),
-            mode: "insensitive"
-          }
-        },
-        orderBy: {
-          createdAt: "desc"
-        }
+        where: { userId, customerEmail: { equals: customerEmail.trim(), mode: "insensitive" } },
+        orderBy: { createdAt: "desc" },
       });
-      if (order) {
-        console.log(`[Order Lookup] Znaleziono zamówienie po e-mailu nadawcy: ${customerEmail}`);
-      }
     }
 
     if (!order) {
-      return "\n[INFO O ZAMÓWIENIU: Nie znaleziono żadnego zamówienia powiązanego z tym e-mailem ani podanym numerem w bazie danych. Jeśli klient pyta o zamówienie, poproś go uprzejmie o podanie numeru zamówienia lub poprawnego adresu e-mail, na który zostało złożone.]\n";
+      return "\n[INFO O ZAMÓWIENIU: Nie znaleziono zamówienia w bazie ani w sklepie. Poproś klienta uprzejmie o podanie numeru zamówienia lub adresu e-mail użytego przy zakupie.]\n";
     }
 
     return `
 ========================================
-INFORMACJE O ZAMÓWIENIU KLIENTA Z BAZY DANYCH:
+INFORMACJE O ZAMÓWIENIU KLIENTA Z RĘCZNEJ BAZY DANYCH:
 Numer zamówienia: #${order.orderNumber}
 E-mail kupującego: ${order.customerEmail}
 Status zamówienia: ${order.status.toUpperCase()}
 Zakupione produkty: ${order.items}
 Kwota łączna: ${order.totalPrice}
-Link do śledzenia przesyłki: ${order.trackingUrl || "Brak (zamówienie cyfrowe lub nie wysłane jeszcze)"}
-Data zamówienia: ${order.createdAt.toISOString().split('T')[0]}
+Link do śledzenia przesyłki: ${order.trackingUrl || "Brak"}
+Data zamówienia: ${order.createdAt.toISOString().split("T")[0]}
 ========================================
-Wykorzystaj te dane, aby udzielić precyzyjnej informacji klientowi. Jeśli pyta o zwrot, poinformuj o procedurze zależnie od statusu (np. jeśli wysłane - musi najpierw odebrać i odesłać; jeśli w realizacji - możemy anulować).
+Jeśli klient pyta o zwrot, poinformuj o procedurze adekwatnej do statusu.
 `;
   } catch (error) {
-    console.error("[Order Lookup] Błąd podczas wyszukiwania zamówienia:", error);
+    console.error("[Order Lookup] Błąd:", error);
     return "";
   }
 }
