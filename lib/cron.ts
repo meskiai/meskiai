@@ -488,12 +488,13 @@ async function processMessage({
     orderBy: { receivedAt: 'asc' },
   }).catch(() => []);
 
-  const last5Emails = [...threadEmails].reverse().slice(0, 5);
-  const recentAutoReplies = last5Emails.filter(
-    (e) => e.isFromAgent && (Date.now() - e.receivedAt.getTime() < 15 * 60 * 1000)
+  // Loop protection: allow up to 3 automatic replies in a 30-minute window.
+  // This lets clients converse normally while still cutting off infinite bot loops.
+  const recentAutoReplies = threadEmails.filter(
+    (e) => e.isFromAgent && (Date.now() - e.receivedAt.getTime() < 30 * 60 * 1000)
   );
-  if (recentAutoReplies.length > 0) {
-    console.log(`[Agent AI] 🛑 Wykryto potencjalną pętlę w wątku ${dbThread.id}. Ignoruję auto-odpowiedź (cooldown).`);
+  if (recentAutoReplies.length >= 3) {
+    console.log(`[Agent AI] 🛑 Wykryto potencjalną pętlę w wątku ${dbThread.id} (wysłano już ${recentAutoReplies.length} auto-odpowiedzi w ciągu ostatnich 30 min). Blokuję kolejny automat.`);
     return false;
   }
 
