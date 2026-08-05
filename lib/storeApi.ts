@@ -122,8 +122,32 @@ async function shopifyLookupProducts(settings: StoreSettings, query: string): Pr
     if (!res.ok) return { found: false, error: `Shopify API error: ${res.status}` };
 
     const data = await res.json();
-    const products = data.products;
-    if (!products || products.length === 0) return { found: false };
+    let products = data.products || [];
+
+    if (products.length === 0) {
+      // Fallback: fetch recent 50 products and perform fuzzy search in JS
+      const fallbackUrl = `${baseUrl}/admin/api/2024-01/products.json?limit=50`;
+      const fallbackRes = await fetch(fallbackUrl, {
+        headers: {
+          "X-Shopify-Access-Token": settings.storeApiKey,
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        },
+        signal: AbortSignal.timeout(6000),
+      });
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        const allProducts = fallbackData.products || [];
+        const queryLower = query.toLowerCase();
+        products = allProducts.filter((p: any) => 
+          p.title?.toLowerCase().includes(queryLower) ||
+          p.body_html?.toLowerCase().includes(queryLower) ||
+          p.variants?.some((v: any) => v.title?.toLowerCase().includes(queryLower))
+        ).slice(0, 5);
+      }
+    }
+
+    if (products.length === 0) return { found: false };
 
     return {
       found: true,

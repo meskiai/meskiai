@@ -36,6 +36,13 @@ export async function getOrderContextForEmail(
   customerEmail: string
 ): Promise<string> {
   try {
+    // Clean raw display names from email (e.g. "John Doe <john@gmail.com>" -> "john@gmail.com")
+    let cleanEmail = customerEmail.trim();
+    const emailMatch = cleanEmail.match(/<([^>]+)>/);
+    if (emailMatch && emailMatch[1]) {
+      cleanEmail = emailMatch[1].trim();
+    }
+
     // 1. Pobierz ustawienia użytkownika (w tym konfigurację sklepu)
     const userSettings = await prisma.userSettings.findUnique({
       where: { userId },
@@ -48,7 +55,7 @@ export async function getOrderContextForEmail(
       const liveContext = await getLiveStoreContextForEmail(
         userSettings,
         emailBody,
-        customerEmail,
+        cleanEmail,
         extractOrderNumbers
       );
       if (liveContext) return liveContext;
@@ -67,9 +74,9 @@ export async function getOrderContextForEmail(
       if (order) break;
     }
 
-    if (!order && customerEmail) {
+    if (!order && cleanEmail) {
       order = await prisma.order.findFirst({
-        where: { userId, customerEmail: { equals: customerEmail.trim(), mode: "insensitive" } },
+        where: { userId, customerEmail: { equals: cleanEmail, mode: "insensitive" } },
         orderBy: { createdAt: "desc" },
       });
     }
