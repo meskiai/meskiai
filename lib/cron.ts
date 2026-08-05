@@ -128,21 +128,26 @@ export async function runSync() {
       const chunk = users.slice(i, i + chunkSize);
       await Promise.allSettled(
         chunk.map(async (user) => {
-          // Attempt to lock this user atomically for 10 minutes to prevent concurrent serverless executions
-          const now = new Date();
-          const locked = await prisma.userSettings.updateMany({
-            where: {
-              userId: user.id,
-              OR: [
-                { runLockedUntil: null },
-                { runLockedUntil: { lte: now } }
-              ]
-            },
-            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) }
-          }).catch(() => ({ count: 0 }));
+          // Attempt to lock this user for 10 minutes to prevent concurrent serverless executions
+          const settings = await prisma.userSettings.findUnique({
+            where: { userId: user.id },
+            select: { runLockedUntil: true }
+          }).catch(() => null);
 
-          if (!locked || (locked as any).count === 0) {
+          const now = new Date();
+          if (settings?.runLockedUntil && settings.runLockedUntil > now) {
             console.log(`[Agent AI] 🔒 Użytkownik ${user.email} jest zablokowany przez inną instancję, pomijam.`);
+            return;
+          }
+
+          // Write the lock
+          const locked = await prisma.userSettings.update({
+            where: { userId: user.id },
+            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) }
+          }).catch(() => null);
+
+          if (!locked) {
+            console.log(`[Agent AI] 🔒 Błąd zapisu blokady dla ${user.email}, pomijam.`);
             return;
           }
 
