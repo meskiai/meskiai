@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤖 MESKIAI — Email & Sales AI Agent Platform
 
-## Getting Started
+Zaawansowana platforma SaaS (Software as a Service) oparta o Next.js, automatyzująca obsługę skrzynki e-mail klienta, analizę konkurencji (strategię URL), wyszukiwanie prospektów B2B (leadów) oraz wystawianie faktur przy użyciu sztucznej inteligencji (Gemini).
 
-First, run the development server:
+---
 
+## 🚀 Główne Funkcje
+
+1. **24/7 Agent AI ds. E-maili** — Pobiera wiadomości przez POP3, klasyfikuje je (Spam / Ważne / Do Odpowiedzi), przeszukuje bazę wiedzy firmy i zamówienia e-commerce, a następnie generuje lub automatycznie wysyła (SMTP) spersonalizowane odpowiedzi.
+2. **Integracja z E-commerce** — Wsparcie dla Shopify, WooCommerce oraz Custom API. Agent AI pobiera dane o zamówieniach i produktach na żywo przed napisaniem maila.
+3. **Generowanie Leadów B2B** — Przeszukuje Google Search pod kątem firm pasujących do profilu i znajduje ich autentyczne dane kontaktowe.
+4. **Analiza Strategii** — Przeszukuje i analizuje konkurencyjne strony www, generując kompletne raporty SWOT i dopasowania do rynku.
+5. **System Płatności Stripe** — Trzy plany taryfowe (Basic, Pro, Max) z automatyczną weryfikacją limitów i cyklu rozliczeniowego.
+
+---
+
+## 🛠️ Architektura i Technologie
+
+* **Framework**: Next.js (Turbopack, App Router)
+* **Baza Danych**: PostgreSQL (Neon Serverless) + Prisma ORM
+* **Uwierzytelnianie**: NextAuth (Google OAuth)
+* **AI Engine**: `@ai-sdk/google` (modele Gemini 3.5 Flash, Gemini 3.5 Flash-lite, Gemini 1.5 Pro)
+* **Obsługa Poczty**: POP3 (`node-pop3`) i SMTP (`nodemailer` + Gmail App Passwords)
+* **Zadania w Tle**: Netlify Background Functions (`sync-background`) + Scheduled Functions (`sync-cron` wywoływany co 2 minuty)
+
+---
+
+## 📦 Uruchomienie Lokalne
+
+1. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+2. Skonfiguruj plik `.env` na bazie `.env.example`.
+3. Wygeneruj klienta Prisma:
+   ```bash
+   npx prisma generate
+   ```
+4. Uruchom serwer deweloperski:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🌍 Wdrożenie (Netlify)
+
+Projekt jest skonfigurowany do wdrożenia na platformie Netlify.
+Wdrożenie produkcyjne odbywa się za pomocą komendy:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx netlify deploy --prod --build
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Logika harmonogramu zadań (CRON) jest opisana w pliku `netlify.toml` oraz w folderze `netlify/functions/`.
