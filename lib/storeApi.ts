@@ -168,7 +168,7 @@ async function woocommerceLookupOrder(settings: StoreSettings, orderNumber: stri
   try {
     const baseUrl = normalizeUrl(settings.storeUrl);
     const auth = Buffer.from(`${settings.storeApiKey}:${settings.storeApiSecret || ""}`).toString("base64");
-
+    const url = `${baseUrl}/wp-json/wc/v3/orders/${encodeURIComponent(orderNumber)}`;
     let res = await fetch(url, {
       headers: { 
         Authorization: `Basic ${auth}`, 
