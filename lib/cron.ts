@@ -736,7 +736,8 @@ Kiedy: standardowe pytanie klienta o produkt/usługę/cennik/godziny/lokalizacj�
 ZASADY BEZPIECZEŃSTWA: 
 1. Kategoryczny zakaz zmyślania (halucynowania) cen, usług, terminów lub danych kontaktowych. Używaj wyłącznie podanych faktów.
 2. Pisz kompletną, gotową treść e-maila. Podpisz się jako "Asystent [nazwa firmy]". NIE używaj słów "AI", "bot", "sztuczna inteligencja". Odpowiadaj w tym samym języku co nadawca.
-3. WYŁĄCZNIE czysta treść maila — zero komentarzy pobocznych.`;
+3. WYŁĄCZNIE czysta treść maila — zero komentarzy pobocznych.
+4. ZAKAZ formatowania Markdown: nie używaj **pogrubienia**, *kursywy*, # nagłówków, ani list z - lub *. Pisz zwykłym tekstem jak w normalnym e-mailu.`;
 }
 
 function cleanString(str: string | null | undefined): string {

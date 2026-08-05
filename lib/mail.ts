@@ -244,7 +244,23 @@ export async function sendReplySMTP(
     auth: { user: email, pass: appPassword }
   });
 
-  const mailOptions: any = { from: email, to, subject, text };
+  // Clean any accidental markdown formatting from AI-generated text
+  const cleanedText = text
+    .replace(/\*\*(.+?)\*\*/g, '$1')   // **bold** → plain
+    .replace(/\*(.+?)\*/g, '$1')       // *italic* → plain
+    .replace(/^#{1,6}\s+/gm, '')       // # Heading → plain
+    .replace(/^[-*]\s+/gm, '• ')       // - item / * item → bullet
+    .trim();
+
+  // Build an HTML version for better rendering across email clients
+  const htmlBody = `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#222">${
+    cleanedText
+      .split('\n')
+      .map(line => line.trim() === '' ? '<br>' : `<p style="margin:0 0 8px 0">${line}</p>`)
+      .join('')
+  }</body></html>`;
+
+  const mailOptions: any = { from: email, to, subject, text: cleanedText, html: htmlBody };
 
   if (inReplyToMessageId) mailOptions.inReplyTo = inReplyToMessageId;
   if (references) mailOptions.references = references;
