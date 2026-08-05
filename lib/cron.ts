@@ -687,11 +687,11 @@ function buildSystemPrompt(settings: any, websiteContent = '', orderContext = ''
   const ctx  = settings?.businessContext ?? 'Firma dbająca o profesjonalną obsługę klienta.';
 
   const toneInstr =
-    tone === 'CASUALOWY'
-      ? 'Pisz nieformalnie, zacznij od "Cześć", nie używaj "Szanowny Panie".'
-      : tone === 'KROTKI'
-      ? 'Odpowiedź maksymalnie 2-3 zdania. Zero zbędnych uprzejmości.'
-      : 'Pisz profesjonalnie i oficjalnie.';
+    tone === 'LUŹNY (CASUAL)' || tone === 'CASUALOWY'
+      ? 'Pisz nieformalnie, zacznij od "Cześć" lub "Witaj", używaj zwrotów bezpośrednich na "Ty" (np. "dzięki", "pozdrawiam"), nie używaj sztywnych zwrotów grzecznościowych.'
+      : tone === 'KRÓTKO I NA TEMAT' || tone === 'KROTKI'
+      ? 'Odpowiedź maksymalnie 2-3 zdania. Odpowiadaj samymi konkretami, bez zbędnych wstępów i uprzejmości.'
+      : 'Pisz profesjonalnie i oficjalnie, używaj form grzecznościowych typu Szanowny Panie / Szanowna Pani, Z poważaniem.';
 
   const websiteSection = websiteContent
     ? `\n\n─── TREŚĆ STRONY FIRMOWEJ (źródło prawdy o ofercie, cenach, godzinach itp.) ───\n${websiteContent}\n────────────────────────────────────────────────────────────────────────────────`
