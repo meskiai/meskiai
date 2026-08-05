@@ -32,23 +32,29 @@ export async function POST(req: Request) {
       data: { feedbackSubmitted: true }
     });
 
-    // Attempt to send email to miloszmeski@icloud.com using user's SMTP credentials if configured
-    if (user.email && user.settings?.appPassword) {
+    // Attempt to send email to support@meskiai.com
+    const systemEmail = process.env.SYSTEM_SMTP_EMAIL;
+    const systemPassword = process.env.SYSTEM_SMTP_PASSWORD;
+
+    const senderEmail = user.email && user.settings?.appPassword ? user.email : systemEmail;
+    const senderPassword = user.email && user.settings?.appPassword ? user.settings.appPassword : systemPassword;
+
+    if (senderEmail && senderPassword) {
       try {
         await sendReplySMTP(
-          user.email,
-          user.settings.appPassword,
-          "miloszmeski@icloud.com",
+          senderEmail,
+          senderPassword,
+          "support@meskiai.com",
           `[MESKIAI Feedback] Nowa opinia (${stars}/5) od ${user.email}`,
           `Użytkownik: ${user.email}\nOcena: ${stars} / 5 gwiazdek\n\nOpinia:\n${comment || "(brak opisu)"}`
         );
-        console.log(`[Feedback] Wysłano opinię użytkownika ${user.email} na miloszmeski@icloud.com`);
+        console.log(`[Feedback] Wysłano opinię użytkownika ${user.email} na support@meskiai.com`);
       } catch (emailError: any) {
         console.error(`[Feedback] Błąd podczas wysyłania maila SMTP z opinią:`, emailError.message);
         // We still return success since feedbackSubmitted was updated in the DB
       }
     } else {
-      console.warn(`[Feedback] Brak połączonego SMTP dla ${user.email}. Nie można wysłać maila, ale opinia została oznaczona jako przesłana.`);
+      console.warn(`[Feedback] Brak SMTP (użytkownika ani systemowego). Nie można wysłać maila, ale opinia została oznaczona w bazie.`);
     }
 
     return NextResponse.json({ success: true });
