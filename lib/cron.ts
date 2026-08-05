@@ -300,7 +300,7 @@ async function processMessage({
   const isTooOld = messageAgeHours > 48;
   const isSelf   = (msg as any)._isSelf === true; // sent by the agent itself
   const isBot    = isSelf ||
-    /noreply|no-reply|daemon|mailer-daemon|bounce|notification|receipt|billing|invoice|alert/i.test(msg.from.toLowerCase());
+    /noreply|no-reply|daemon|mailer-daemon|bounce/i.test(msg.from.toLowerCase());
 
   // ── Duplicate check ──────────────────────────────────────────────────────────
   const existing = await prisma.email.findUnique({ where: { messageId } });
@@ -550,15 +550,18 @@ async function processMessage({
 
     // ── WAŻNA SPRAWA — wyślij potwierdzenie do klienta, pokaż w zakładce Ważne ──
     if (isAttention) {
-      const parts = cleanedAiText.split(/\n[-*_]{3,}\n/);
+      const normalized = cleanedAiText.replace(/^REQUIRES_ATTENTION\s*/i, '');
+      const rawParts = normalized.split(/\r?\n\s*[-*_]{3,}\s*\r?\n/);
+      const cleanParts = rawParts.map(p => p.trim()).filter(Boolean);
+      
       let analysisText = '';
       let ackText = '';
       
-      if (parts.length >= 3) {
-        analysisText = parts[1]?.trim();
-        ackText = parts[2]?.trim();
+      if (cleanParts.length >= 2) {
+        analysisText = cleanParts[0];
+        ackText = cleanParts[1];
       } else {
-        ackText = parts[1]?.trim() || '';
+        ackText = cleanParts[0] || '';
       }
 
       analysisText = cleanString(analysisText);
