@@ -167,12 +167,15 @@ export default function Dashboard() {
   
   const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
   const searchesUsed = subscriptionData?.competitorSearchesThisMonth || 0;
+  const leadsUsed = subscriptionData?.leadSearchesThisMonth || 0;
   // Fallback to basic limits if price ID is unknown (e.g. grandfathered plan)
   const emailLimit = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 50;
   const searchLimit = isBasic ? 10 : isPro ? 100 : isMax ? Infinity : 10;
+  const leadLimit = isBasic ? 20 : isPro ? 200 : isMax ? Infinity : 20;
 
   const isEmailLimitReached = !isUnlimited && emailsUsed >= emailLimit && emailLimit > 0;
   const isSearchLimitReached = !isUnlimited && searchesUsed >= searchLimit && searchLimit > 0;
+  const isLeadLimitReached = !isUnlimited && leadsUsed >= leadLimit && leadLimit > 0;
 
   const fetchSettings = async () => {
     try {
@@ -624,6 +627,10 @@ export default function Dashboard() {
   };
 
   const handleGenerateLeads = async () => {
+    if (isLeadLimitReached) {
+      showToast("Wykorzystałeś swój miesięczny limit generowania leadów. Przejdź do 'Moje Konto' i zrób upgrade pakietu, aby kontynuować.", "error");
+      return;
+    }
     if (!businessContext || businessContext.length < 20) {
       showToast("Twoja baza wiedzy jest pusta lub zbyt krótka. Uzupełnij opis firmy w Ustawieniach, aby AI wiedziało dla kogo szukać klientów.", "error");
       return;
