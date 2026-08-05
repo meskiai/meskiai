@@ -63,12 +63,16 @@ export async function POST(req: Request) {
     }
 
     // Krok 1: Głębokie badanie rynku za pomocą Google Search Grounding
-    // gemini-3.5-flash obsługuje Google Search Grounding (w odróżnieniu od gemini-3.5-flash)
+    // Próbujemy najpierw gemini-3.5-flash-lite dla maksymalnej prędkości i braku timeoutu
     let researchReportText = "";
-    try {
-      const researchResponse = await generateText({
-        model: google("gemini-3.5-flash"),
-        system: `Jesteś elitarnym doradcą biznesowym, Głównym Strategiem i Analitykiem Rynku w firmie doradczej Wielkiej Czwórki (Big 4).
+    const groundingModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+
+    for (const modelName of groundingModels) {
+      try {
+        console.log(`[Strategy] Krok 1: Badanie rynku za pomocą modelu: ${modelName} z Google Search Grounding`);
+        const researchResponse = await generateText({
+          model: google(modelName),
+          system: `Jesteś elitarnym doradcą biznesowym, Głównym Strategiem i Analitykiem Rynku w firmie doradczej Wielkiej Czwórki (Big 4).
 Twoim zadaniem jest przeprowadzenie kompleksowego badania i audytu biznesowego dla podanej domeny/firmy.
 Użyj narzędzia Google Search, aby znaleźć rzeczywiste i szczegółowe informacje o tej firmie, jej usługach, pozycji rynkowej, konkurentach oraz stawkach reklamowych w jej branży.
 
@@ -78,35 +82,46 @@ Zrób głęboki wywiad gospodarczy pod kątem:
 3. Klasycznej analizy SWOT (Słabe strony, Mocne strony, Szanse, Zagrożenia).
 4. Stawek CPC i trudności pozycjonowania (SEO Difficulty) dla powiązanych słów kluczowych.
 5. Konkretnych, precyzyjnych i natychmiastowo wykonalnych kroków strategicznych (Action Plan) dla tej firmy.`,
-        prompt: `Przeprowadź dokładny wywiad rynkowy i analizę strategiczną dla firmy: ${targetUrl}
+          prompt: `Przeprowadź dokładny wywiad rynkowy i analizę strategiczną dla firmy: ${targetUrl}
 Treść zeskrapowana ze strony głównej (jako punkt wyjścia):
 ${pageText}`,
-        tools: {
-          google_search: google.tools.googleSearch({}),
-        },
-      });
-      researchReportText = researchResponse.text;
-    } catch (groundingError: any) {
-      console.warn("Google Search grounding failed, falling back to direct analysis:", groundingError?.message);
+          tools: {
+            google_search: google.tools.googleSearch({}),
+          },
+        });
+        researchReportText = researchResponse.text;
+        break;
+      } catch (groundingError: any) {
+        console.warn(`[Strategy] Google Search grounding failed with ${modelName}:`, groundingError?.message);
+      }
+    }
+
+    if (!researchReportText) {
       // Fallback: analiza bez Google Search (na podstawie samej treści strony)
-      const fallbackResponse = await generateText({
-        model: google("gemini-3.5-flash"),
-        system: `Jesteś elitarnym doradcą biznesowym. Przeprowadź analizę rynkową firmy na podstawie dostępnych danych.`,
-        prompt: `Przeprowadź analizę strategiczną dla: ${targetUrl}
+      console.log(`[Strategy] Krok 1 Fallback: Analiza bez Google Search Grounding`);
+      try {
+        const fallbackResponse = await generateText({
+          model: google("gemini-3.5-flash-lite"),
+          system: `Jesteś elitarnym doradcą biznesowym. Przeprowadź analizę rynkową firmy na podstawie dostępnych danych.`,
+          prompt: `Przeprowadź analizę strategiczną dla: ${targetUrl}
 Treść strony: ${pageText}
 
 Uwzględnij: analizę SWOT, potencjalnych konkurentów w branży, metryki SEO/CPC oraz plan działania.`,
-      });
-      researchReportText = fallbackResponse.text;
+        });
+        researchReportText = fallbackResponse.text;
+      } catch (err: any) {
+        console.error("[Strategy] Fallback direct analysis failed:", err.message);
+        throw new Error("All analysis attempts failed.");
+      }
     }
 
     // Krok 2: Ustrukturyzowanie raportu do formatu JSON z fallbackami modelowymi
     let parsedObject: any = null;
-    const modelsToTry = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
     
     for (const modelName of modelsToTry) {
       try {
-        console.log(`[Strategy] Próba strukturyzacji JSON za pomocą modelu: ${modelName}`);
+        console.log(`[Strategy] Krok 2: Próba strukturyzacji JSON za pomocą modelu: ${modelName}`);
         const { object } = await generateObject({
           model: google(modelName),
           system: "Jesteś analitykiem technicznym. Twoim zadaniem jest przełożenie szczegółowego raportu rynkowego na ustrukturyzowany format JSON.",

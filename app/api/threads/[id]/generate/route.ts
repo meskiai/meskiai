@@ -80,7 +80,7 @@ export async function POST(
     );
 
     let generatedTextResult = "";
-    const generateModels = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
 
     for (const modelName of generateModels) {
       try {

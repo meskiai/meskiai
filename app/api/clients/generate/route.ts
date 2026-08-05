@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
     let searchResultText = "";
-    const searchModels = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    const searchModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
     
     for (const modelName of searchModels) {
       try {
@@ -67,7 +67,7 @@ ZASADY POZYSKIWANIA DANYCH KONTAKTOWYCH (KRYTYCZNE):
 4. Jeżeli firma posiada jedynie formularz kontaktowy na stronie i brak jest jakiegokolwiek adresu e-mail, podaj adres URL do formularza kontaktowego jako alternatywę (np. https://firma.pl/kontakt).
  
 Baza wiedzy firmy, dla której szukasz klientów:
-"${businessContext}"`,
+"Let's check: ${businessContext}"`,
           prompt: "Wygeneruj listę 3 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie). Pisz niezwykle zwięźle, w punktach, bez wstępów.",
           tools: {
             google_search: googleAI.tools.googleSearch({}) as any,

@@ -495,12 +495,29 @@ async function processMessage({
       msg.from || ''
     );
 
-    const { text } = await generateText({
-      model:  googleAI('gemini-3.5-flash'),
-      system: buildSystemPrompt(settings, websiteContent, orderContext),
-      prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${formattedHistory}\n\nNOWA WIADOMOŚĆ DO ODPOWIEDZI / PRZEANALIZOWANIA:\nOd: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść nowej wiadomości:\n${(msg.text || '').substring(0, 2500)}`,
-    });
-    const cleanedAiText = cleanString(text.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
+    let generatedReplyText = "";
+    const cronModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+
+    for (const modelName of cronModels) {
+      try {
+        console.log(`[Agent AI] Generowanie odpowiedzi za pomocą modelu: ${modelName}`);
+        const { text } = await generateText({
+          model: googleAI(modelName),
+          system: buildSystemPrompt(settings, websiteContent, orderContext),
+          prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${formattedHistory}\n\nNOWA WIADOMOŚĆ DO ODPOWIEDZI / PRZEANALIZOWANIA:\nOd: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść nowej wiadomości:\n${(msg.text || '').substring(0, 2500)}`,
+        });
+        generatedReplyText = text;
+        break;
+      } catch (err: any) {
+        console.warn(`[Agent AI] Model ${modelName} zawiódł:`, err.message);
+      }
+    }
+
+    if (!generatedReplyText) {
+      throw new Error("Wszystkie modele AI dla automatycznej odpowiedzi zawiodły.");
+    }
+
+    const cleanedAiText = cleanString(generatedReplyText.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
     const firstLines = cleanedAiText.split('\n').slice(0, 3).join('\n').toUpperCase();
     const isSpam = firstLines.includes('SPAM') || firstLines.includes('BOT') || firstLines.includes('IGNORE');
     const isAttention = firstLines.includes('REQUIRES_ATTENTION');

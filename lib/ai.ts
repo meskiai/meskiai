@@ -22,13 +22,27 @@ Nie dodawaj żadnych dopisków od siebie, zwróć samą treść e-maila gotową 
   }
   prompt += `NAJNOWSZA WIADOMOŚĆ OD KLIENTA:\n${newEmail}\n\nTWOJA ODPOWIEDŹ:`;
 
-  const { text } = await generateText({
-    model: google("gemini-3.5-flash"),
-    system: systemPrompt,
-    prompt,
-  });
+  const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+  let generatedText = "";
+  
+  for (const modelName of modelsToTry) {
+    try {
+      const { text } = await generateText({
+        model: google(modelName),
+        system: systemPrompt,
+        prompt,
+      });
+      generatedText = text;
+      break;
+    } catch (err: any) {
+      console.warn(`[generateEmailReply] Model ${modelName} failed:`, err.message);
+    }
+  }
 
-  return text;
+  if (!generatedText) {
+    throw new Error("All AI models failed to generate reply.");
+  }
+  return generatedText;
 }
 
 export async function analyzeCV(emailBody: string, businessContext: string) {
@@ -43,14 +57,29 @@ Oceń kandydata i zwróć wynik JEDYNIE w formacie JSON (bez bloków kodu i doda
   "analysis": "Krótkie, profesjonalne podsumowanie (max 3-4 zdania) z uzasadnieniem oceny pod kątem zgodności z firmą."
 }`;
 
-  const { text } = await generateText({
-    model: google("gemini-3.5-flash"),
-    system: systemPrompt,
-    prompt: emailBody,
-  });
+  const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+  let generatedText = "";
+
+  for (const modelName of modelsToTry) {
+    try {
+      const { text } = await generateText({
+        model: google(modelName),
+        system: systemPrompt,
+        prompt: emailBody,
+      });
+      generatedText = text;
+      break;
+    } catch (err: any) {
+      console.warn(`[analyzeCV] Model ${modelName} failed:`, err.message);
+    }
+  }
+
+  if (!generatedText) {
+    return { name: "Nieznane", isTopCandidate: false, analysis: "Błąd generowania analizy kandydata." };
+  }
 
   try {
-    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const cleanText = generatedText.replace(/```json/g, '').replace(/```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (e) {
     console.error("AI parse error", e);
