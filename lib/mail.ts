@@ -141,8 +141,10 @@ export async function fetchUnreadEmailsPOP3(
 
         fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
         
+        const cleanFrom = (fromAddr.match(/<(.+?)>/)?.[1] || fromAddr).trim().toLowerCase();
+        
         // ── KRYTYCZNE: Pomijaj maile wysłane przez samego agenta (zapobiega pętli auto-reply) ──
-        if (fromAddr.toLowerCase() === emailLower) {
+        if (cleanFrom === emailLower) {
           // Zapisujemy UID i pełną treść żeby asystent widział co odpisaliśmy ręcznie
           fetchedEmails.push({
             pop3Uid: uid,

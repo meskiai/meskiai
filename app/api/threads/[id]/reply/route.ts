@@ -81,13 +81,13 @@ export async function POST(
     }
 
     // Get the original email to reply to
-    const originalEmail = thread.emails.find(e => !e.isFromAgent);
+    const originalEmail = thread.emails.find(e => !e.isFromAgent) || thread.emails[0];
     if (!originalEmail) {
       return NextResponse.json({ error: "No original email found in thread" }, { status: 400 });
     }
 
     // Extract sender email
-    let toEmail = originalEmail.from;
+    let toEmail = originalEmail.isFromAgent ? originalEmail.to : originalEmail.from;
     const emailMatch = toEmail.match(/<([^>]+)>/);
     if (emailMatch && emailMatch[1]) {
       toEmail = emailMatch[1];

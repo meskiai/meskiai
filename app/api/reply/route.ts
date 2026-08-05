@@ -52,7 +52,8 @@ export async function POST(req: Request) {
     }
 
     const originalEmail = thread.emails.find(e => !e.isFromAgent) || thread.emails[0];
-    const replyTo = originalEmail.from.replace(/.*<(.+)>.*/, '$1').trim() || originalEmail.from;
+    const rawReplyTo = originalEmail.isFromAgent ? originalEmail.to : originalEmail.from;
+    const replyTo = rawReplyTo.replace(/.*<(.+)>.*/, '$1').trim() || rawReplyTo;
     const references = thread.emails.filter(e => !e.isFromAgent).map(e => e.messageId).join(' ');
 
     const replySubject = originalEmail.subject.startsWith('Re:') ? originalEmail.subject : `Re: ${originalEmail.subject}`;
