@@ -122,7 +122,10 @@ ZASADY:
       data: { draftReply: generatedTextResult.trim() }
     });
 
-    return NextResponse.json({ reply: generatedTextResult.trim() });
+    return NextResponse.json({ 
+      reply: generatedTextResult.trim(),
+      draftReply: generatedTextResult.trim()
+    });
   } catch (error: any) {
     console.error("Generate AI error:", error);
     return NextResponse.json({ error: "Failed to generate AI response" }, { status: 500 });

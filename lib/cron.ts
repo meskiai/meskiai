@@ -596,8 +596,8 @@ async function processMessage({
       return false;
     }
 
-    // ── Save Draft and exit if AutoReply is disabled OR if thread is previously important ──────────────────────────
-    if (!settings.autoReply || isPreviouslyImportant) {
+    // ── Save Draft and exit if AutoReply is disabled ──────────────────────────
+    if (!settings.autoReply) {
       await prisma.thread.update({
         where: { id: dbThread.id },
         data: { 
@@ -605,7 +605,7 @@ async function processMessage({
           draftReply: cleanedAiText 
         }
       }).catch(() => {});
-      console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false lub wątek ważny) | "${msg.subject}"`);
+      console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false) | "${msg.subject}"`);
       return false;
     }
 

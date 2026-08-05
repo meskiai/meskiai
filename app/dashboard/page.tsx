@@ -3277,7 +3277,7 @@ export default function Dashboard() {
                               const res = await fetch(`/api/threads/${selectedThread.id}/generate`, { method: "POST" });
                               if (res.ok) {
                                 const data = await res.json();
-                                setEditedReply(data.draftReply || "");
+                                setEditedReply(data.draftReply || data.reply || "");
                                 await fetchThreads();
                               } else {
                                 showToast("Nie udało się wygenerować odpowiedzi.", "error");
@@ -3388,7 +3388,7 @@ export default function Dashboard() {
                                         const res = await fetch(`/api/threads/${selectedThread.id}/generate`, { method: 'POST' });
                                         if (res.ok) {
                                           const data = await res.json();
-                                          setEditedReply(data.draftReply || '');
+                                          setEditedReply(data.draftReply || data.reply || '');
                                           await fetchThreads();
                                         } else {
                                           showToast('Nie udało się wygenerować odpowiedzi.', 'error');
