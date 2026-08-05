@@ -27,6 +27,11 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Brak użytkownika" }, { status: 404 });
 
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
     const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
     const searchesCount = user.settings?.competitorSearchesThisMonth || 0;

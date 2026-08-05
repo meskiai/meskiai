@@ -293,8 +293,7 @@ async function processMessage({
   const isTooOld = messageAgeHours > 48;
   const isSelf   = (msg as any)._isSelf === true; // sent by the agent itself
   const isBot    = isSelf ||
-    /noreply|no-reply|daemon|mailer-daemon|bounce|notification|receipt|billing|invoice|alert/i.test(msg.from.toLowerCase()) ||
-    /potwierdzenie|faktura|rachunek|płatność|subskrypcja|transakcja|receipt|invoice|billing|payment|subscription|transaction/i.test(msg.subject.toLowerCase());
+    /noreply|no-reply|daemon|mailer-daemon|bounce|notification|receipt|billing|invoice|alert/i.test(msg.from.toLowerCase());
 
   // ── Duplicate check ──────────────────────────────────────────────────────────
   const existing = await prisma.email.findUnique({ where: { messageId } });

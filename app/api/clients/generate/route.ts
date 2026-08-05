@@ -20,6 +20,15 @@ export async function POST(req: Request) {
       include: { settings: true }
     });
 
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const businessContext = user?.settings?.businessContext;
 
     if (!businessContext) {

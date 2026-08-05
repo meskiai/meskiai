@@ -31,6 +31,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const { orderNumber, customerEmail, status, items, totalPrice, trackingUrl } = await req.json();
 
     if (!orderNumber || !customerEmail || !status || !items || !totalPrice) {
@@ -74,6 +87,19 @@ export async function DELETE(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);

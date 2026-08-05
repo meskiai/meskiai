@@ -16,6 +16,19 @@ export async function POST(
   }
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const resolvedParams = await params;
     const threadId = resolvedParams.id;
 

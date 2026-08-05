@@ -56,20 +56,25 @@ export async function POST(req: Request) {
 
     console.log(`[Webhook Order] Otrzymano zdarzenie dla uzytkownika ${userId}`);
 
-    // Log raw payload to scratch/last-webhook-payload.json for debugging
-    try {
-      const fs = require('fs');
-      const path = require('path');
-      const logDir = '/Users/miloszmeski/Desktop/strona meski ai/email-ai-agent/scratch';
-      const logFile = path.join(logDir, 'last-webhook-payload.json');
-      fs.writeFileSync(logFile, JSON.stringify({
-        url: req.url,
-        headers: Object.fromEntries(req.headers.entries()),
-        body
-      }, null, 2));
-      console.log(`[Webhook Debug] Saved payload to ${logFile}`);
-    } catch (logErr) {
-      console.error("[Webhook Debug] Failed to save payload:", logErr);
+    // Log raw payload to scratch/last-webhook-payload.json for debugging only in local development
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const logDir = path.join(process.cwd(), 'scratch');
+        if (!fs.existsSync(logDir)) {
+          fs.mkdirSync(logDir, { recursive: true });
+        }
+        const logFile = path.join(logDir, 'last-webhook-payload.json');
+        fs.writeFileSync(logFile, JSON.stringify({
+          url: req.url,
+          headers: Object.fromEntries(req.headers.entries()),
+          body
+        }, null, 2));
+        console.log(`[Webhook Debug] Saved payload to ${logFile}`);
+      } catch (logErr) {
+        console.error("[Webhook Debug] Failed to save payload:", logErr);
+      }
     }
 
     // ─── 1. VALIDATE TOPIC ───
