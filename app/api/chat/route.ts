@@ -17,6 +17,12 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    const isSubscriptionActive = user?.subscriptionStatus === 'active' || user?.subscriptionStatus === 'trialing';
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: 'Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji.' }, { status: 403 });
+    }
+
     const userSettings = await prisma.userSettings.findUnique({
       where: { userId: session.user.id },
     }) as any;

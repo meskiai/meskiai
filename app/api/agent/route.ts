@@ -3,6 +3,7 @@ import { streamText } from 'ai';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
+import { prisma } from '../../../lib/prisma';
 
 export async function POST(req: Request) {
   // Require authentication
@@ -12,6 +13,12 @@ export async function POST(req: Request) {
   }
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    const isSubscriptionActive = user?.subscriptionStatus === 'active' || user?.subscriptionStatus === 'trialing';
+    if (!isSubscriptionActive) {
+      return NextResponse.json({ error: 'Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji.' }, { status: 403 });
+    }
+
     const { prompt } = await req.json();
 
     if (!prompt) {

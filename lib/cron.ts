@@ -82,6 +82,7 @@ export async function runSync() {
           subscriptionStatus: { in: ['active', 'trialing'] },
           settings: {
             appPassword: { not: null },
+            autoReply: true,   // Only process users who have auto-reply enabled
           },
         },
         include: { settings: true },
@@ -178,6 +179,12 @@ async function processUser(user: any) {
   // Guard: app password required
   if (!settings?.appPassword) {
     console.log(`[Agent AI] ${user.email}: brak hasła aplikacji — pomijam.`);
+    return;
+  }
+
+  // Guard: autoReply must be enabled
+  if (!settings?.autoReply) {
+    console.log(`[Agent AI] ${user.email}: autoReply wyłączony — pomijam.`);
     return;
   }
 
