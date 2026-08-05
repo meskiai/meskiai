@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     const settings = await prisma.userSettings.upsert({
       where: { userId: session.user.id },
-      update: Object.keys(dataToUpdate).length > 0 ? dataToUpdate : { businessContext: businessContext ?? "" },
+      update: Object.keys(dataToUpdate).length > 0 ? dataToUpdate : {},
       create: { 
         userId: session.user.id, 
         autoReply: autoReply ?? false, // Safe default — user must explicitly enable auto-reply
