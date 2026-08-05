@@ -7,7 +7,7 @@ import { prisma } from "../../../../lib/prisma";
 export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
-  apiVersion: "2024-04-10" as any,
+  apiVersion: "2026-06-24.dahlia" as any,
 });
 
 // GET: fetch subscription details including payment method card info

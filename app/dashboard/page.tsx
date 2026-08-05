@@ -300,7 +300,9 @@ export default function Dashboard() {
             }
           }
         } else {
-          router.push("/onboarding");
+          // No settings record yet — user is new. Show the guide and let them complete setup.
+          setShowGuide(true);
+          setGuideIndex(0);
         }
       }
     } catch (e) {
@@ -482,7 +484,7 @@ export default function Dashboard() {
 
         const overdue = (data.threads || []).some((t: any) => 
           t.status === "REQUIRES_ATTENTION" &&
-          !(t.emails || []).some((e: any) => e.isFromAgent) &&
+          !t.draftReply && // not being worked on by agent
           (Date.now() - new Date(t.updatedAt).getTime()) > 2 * 60 * 60 * 1000
         );
         setShowOverdueImportantAlert(overdue && !isSnoozed);
