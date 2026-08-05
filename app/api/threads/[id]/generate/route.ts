@@ -80,7 +80,7 @@ export async function POST(
     );
 
     const { text } = await generateText({
-      model: googleAI("gemini-flash-latest"),
+      model: googleAI("gemini-3.5-flash"),
       system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.
 Twoja firma kieruje się następującymi zasadami i informacjami:
 "${userSettings?.businessContext || "Profesjonalna obsługa klienta."}"

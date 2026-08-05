@@ -25,7 +25,7 @@ Jeśli e-mail jest skargą, bądź empatyczny. Jeśli to zapytanie, udziel wycze
 Odpowiadaj bezpośrednio treścią e-maila, bez żadnych wstępów w stylu "Oto moja propozycja".`;
 
     const result = await streamText({
-      model: google('gemini-flash-latest'),
+      model: google('gemini-3.5-flash'),
       system: systemPrompt,
       prompt: `Oto treść wiadomości e-mail od klienta:\n\n"${prompt}"\n\nNapisz na nią odpowiedź:`,
     });

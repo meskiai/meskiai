@@ -7,11 +7,12 @@
     "dev": "concurrently \"next dev\" \"npx tsx --env-file=.env.local worker.ts\"",
     "build": "next build",
     "start": "concurrently \"next start\" \"npx tsx --env-file=.env.local worker.ts\"",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "netlify deploy --prod --build"
   },
   "dependencies": {
-    "@ai-sdk/google": "^4.0.14",
-    "@ai-sdk/react": "^4.0.32",
+    "@ai-sdk/google": "^4.0.34",
+    "@ai-sdk/react": "^4.0.55",
     "@auth/prisma-adapter": "^2.11.2",
     "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.1.0",
@@ -23,7 +24,9 @@
     "@stripe/stripe-js": "^9.12.0",
     "@types/mailparser": "^3.4.6",
     "@types/nodemailer": "^8.0.1",
-    "ai": "^7.0.29",
+    "ai": "^7.0.52",
+    "ajv": "8.20.0",
+    "ajv-errors": "3.0.0",
     "googleapis": "^173.0.0",
     "imap": "^0.8.19",
     "imap-simple": "^5.1.0",
@@ -55,6 +58,11 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "jimp": "^1.6.1",
+    "netlify-cli": "^27.0.3",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "netlify-cli@27.0.3": true
   }
 }

@@ -127,6 +127,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  white-space: nowrap;
 }
 
 .loginBtn:hover {
@@ -166,15 +167,15 @@
 
 /* HERO SECTION (Centered, Massive) */
 .hero {
-  padding-top: clamp(120px, 12vh, 160px);
+  padding-top: clamp(120px, 12vh, 170px);
   padding-left: 20px;
   padding-right: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 45vh;
+  justify-content: center;
+  min-height: 60vh;
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
@@ -202,15 +203,15 @@
 }
 
 .heroTitle {
-  font-size: clamp(2rem, 5.5vw, 4.5rem); /* Shrunk from clamp(2rem, 7vw, 7.5rem) */
+  font-size: clamp(2rem, 5.5vw, 5rem);
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.08;
-  margin-bottom: clamp(10px, 1.8vh, 18px);
+  line-height: 1.06;
+  margin-bottom: clamp(14px, 2vh, 22px);
   background: linear-gradient(180deg, var(--foreground) 0%, rgba(134, 134, 139, 0.6) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  max-width: 900px;
+  max-width: 920px;
 }
 
 [data-theme="dark"] .heroTitle {
@@ -220,13 +221,13 @@
 }
 
 .heroSubtitle {
-  font-size: clamp(0.85rem, 1.4vw, 1.15rem); /* Shrunk from clamp(0.9rem, 2.2vw, 1.6rem) */
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--subtext);
-  margin-bottom: clamp(20px, 3.5vh, 32px); /* Reduced from 48px */
-  line-height: 1.5;
-  max-width: 600px;
+  margin-bottom: clamp(24px, 4vh, 40px);
+  line-height: 1.6;
+  max-width: 580px;
 }
 
 .ctaWrapper {
@@ -310,8 +311,8 @@
 
 /* Premium Pricing Section (Apple Style) */
 .pricingSection {
-  padding: 100px 5% 120px 5%;
-  max-width: 1200px;
+  padding: 120px 5% 140px 5%;
+  max-width: 1260px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -323,17 +324,17 @@
 }
 
 .pricingHeader h2 {
-  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-size: clamp(2.8rem, 4.5vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.04em;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   background: linear-gradient(135deg, var(--foreground) 0%, var(--subtext) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .pricingHeader p {
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
   color: var(--subtext);
   font-weight: 500;
 }
@@ -341,8 +342,9 @@
 .pricingGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 28px;
   align-items: stretch;
+  width: 100%;
 }
 
 /* Deep Glass Pricing Cards */
@@ -505,7 +507,7 @@
 
 /* Why Us Statement (Apple Style) */
 .whyUsSection {
-  padding: 100px 5% 100px 5%;
+  padding: 120px 5% 120px 5%;
   max-width: 1000px;
   margin: 0 auto;
   text-align: center;
@@ -514,12 +516,12 @@
 }
 
 .whyUsContent h2 {
-  font-size: clamp(1.8rem, 3.5vw, 2.8rem); /* Shrunk from clamp(2.5rem, 5vw, 4.5rem) */
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  line-height: 1.15;
-  margin-bottom: 24px;
+  line-height: 1.12;
+  margin-bottom: 28px;
 }
 
 .whyUsContent h2 span {
@@ -543,8 +545,8 @@
    ============================================= */
 
 .macosSection {
-  padding: 100px 5% 120px;
-  max-width: 1200px;
+  padding: 120px 5% 140px;
+  max-width: 1260px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
@@ -566,12 +568,12 @@
 }
 
 .macosTitle {
-  font-size: clamp(2.2rem, 3.8vw, 3rem);
+  font-size: clamp(2.4rem, 3.8vw, 3.4rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  margin-bottom: 14px;
-  line-height: 1.15;
+  margin-bottom: 16px;
+  line-height: 1.12;
 }
 
 .macosSubtitle {
@@ -600,7 +602,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 580px;
+  height: 660px;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -654,10 +656,10 @@
 
 /* Sidebar */
 .macosSidebar {
-  width: 240px;
+  width: 260px;
   border-right: 1px solid var(--glass-border);
   background: rgba(0, 0, 0, 0.06);
-  padding: 16px 10px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -701,7 +703,7 @@
 /* Content Area */
 .macosContent {
   flex: 1;
-  padding: 40px;
+  padding: 48px;
   overflow-y: auto;
   background: rgba(255, 255, 255, 0.01);
 }
@@ -987,10 +989,10 @@
 /* Footer */
 .footer {
   text-align: center;
-  padding: 60px 5%;
+  padding: 72px 5%;
   color: var(--subtext);
   border-top: 1px solid var(--glass-border);
-  margin-top: 60px;
+  margin-top: 80px;
   position: relative;
   z-index: 10;
   background: var(--nav-bg);
@@ -1092,15 +1094,18 @@
 @media (max-width: 1199px) {
   .pricingGrid {
     grid-template-columns: 1fr;
-    max-width: 480px;
+    max-width: 520px;
     margin: 0 auto;
-    gap: 40px;
+    gap: 24px;
   }
   .pricingCard.pro {
     transform: none;
   }
   .pricingCard.pro:hover {
     transform: translateY(-8px);
+  }
+  .pricingHeader p {
+    font-size: 1.1rem;
   }
 }
 
@@ -1145,7 +1150,7 @@
 @media (max-width: 767px) {
   .hero {
     padding-top: 90px;
-    padding-bottom: 16px;
+    padding-bottom: 24px;
     padding-left: 20px;
     padding-right: 20px;
   }
@@ -1155,35 +1160,36 @@
   }
   .heroSubtitle {
     font-size: 0.9rem;
-    line-height: 1.5;
+    line-height: 1.55;
     font-weight: 400;
     max-width: 100%;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     opacity: 0.8;
   }
   .ctaWrapper {
     flex-direction: column;
     width: 100%;
-    gap: 12px;
+    gap: 10px;
     align-items: stretch;
   }
   .ctaBtnPrimary,
   .ctaBtnSecondary {
     width: 100%;
     justify-content: center;
-    padding: 14px 28px;
-    font-size: 0.95rem;
+    padding: 15px 28px;
+    font-size: 1rem;
+    border-radius: 16px;
   }
   .pricingSection,
   .whyUsSection,
   .macosSection {
-    padding: 44px 20px;
+    padding: 52px 20px;
     max-width: 100%;
     overflow-x: hidden;
   }
   .pricingHeader {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
@@ -1191,14 +1197,37 @@
     font-size: clamp(1.6rem, 6vw, 2.2rem);
     letter-spacing: -0.03em;
   }
+  .pricingHeader p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .pricingGrid {
+    max-width: 100%;
+    gap: 16px;
+  }
+  .pricingCard {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+  .pricingPrice {
+    font-size: 2.2rem;
+  }
+  .pricingFeatures li {
+    font-size: 0.88rem;
+    gap: 10px;
+  }
+  .pricingBtn {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
   .macosWindow {
-    height: 540px;
-    min-height: auto;
-    overflow: hidden;
+    height: auto;
+    min-height: 480px;
+    max-height: 560px;
   }
   .macosBody {
     flex-direction: column;
-    height: calc(100% - 48px); /* Height minus titlebar */
+    height: calc(100% - 48px);
   }
   .macosSidebar {
     width: 100%;
@@ -1210,54 +1239,61 @@
     gap: 6px;
     -webkit-overflow-scrolling: touch;
     flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  .macosSidebar::-webkit-scrollbar {
+    display: none;
   }
   .macosSidebarItem {
-    padding: 6px 10px;
+    padding: 7px 12px;
     font-size: 0.78rem;
     white-space: nowrap;
     border-radius: 8px;
     gap: 6px;
+    flex-shrink: 0;
   }
   .macosContent {
-    padding: 20px 14px;
+    padding: 20px 16px;
     overflow-y: auto;
     flex: 1;
   }
   .featureView {
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
+    height: auto;
   }
   .featureInfo {
     width: 100%;
   }
   .featureInfo h3 {
-    font-size: 1.25rem;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
   }
   .featureInfo p {
-    font-size: 0.82rem;
-    line-height: 1.5;
-    margin-bottom: 16px;
+    font-size: 0.83rem;
+    line-height: 1.55;
+    margin-bottom: 14px;
   }
   .featureVisual {
     width: 100%;
-    margin-top: 5px;
+    height: auto;
+    margin-top: 4px;
   }
   /* Hide mail list inside mockup on mobile to save space */
   .mockMailList {
     display: none;
   }
   .mockMailApp {
-    height: 180px;
+    height: 160px;
   }
   .mockMailDetail {
     padding: 12px;
   }
   .mockDetailBody {
-    margin: 12px 0;
+    margin: 10px 0;
   }
   .mockTableApp {
-    font-size: 0.65rem;
+    font-size: 0.63rem;
   }
   .mockTableHeader, .mockTableRow {
     padding: 8px 10px;
@@ -1266,35 +1302,33 @@
     gap: 6px;
   }
   .swotBox {
-    padding: 10px;
+    padding: 10px 12px;
   }
   .swotBox p {
     font-size: 0.72rem;
-  }
-  .pricingCard {
-    padding: 24px 20px;
-  }
-  .pricingPrice {
-    font-size: 2.2rem;
-  }
-  .pricingFeatures li {
-    font-size: 0.88rem;
   }
   .navContent {
     padding: 0 16px;
   }
   .logo {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+  }
+  .whyUsSection {
+    padding: 52px 20px;
+  }
+  .footer {
+    padding: 40px 20px;
   }
 }
 
 /* Small phones 390–599px */
 @media (max-width: 599px) {
   .nav {
-    height: 56px;
+    height: 52px;
   }
   .loginBtn {
-    display: none; /* Hide 'Wybierz pakiet' on mobile navbar to prevent overflow */
+    padding: 7px 14px;
+    font-size: 0.82rem;
   }
   .warningBox {
     flex-direction: column;
@@ -1310,62 +1344,126 @@
     line-height: 1.4;
   }
   .hero {
-    padding-top: 80px;
+    padding-top: 76px;
   }
   .heroTitle {
-    font-size: clamp(1.8rem, 8vw, 2.2rem);
+    font-size: clamp(1.75rem, 9vw, 2.2rem);
+    line-height: 1.1;
   }
   .heroSubtitle {
-    font-size: 0.82rem;
-    line-height: 1.45;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
   }
   .badge {
     font-size: 0.72rem;
     padding: 4px 10px;
+    margin-bottom: 16px;
+  }
+  .pricingSection,
+  .whyUsSection,
+  .macosSection {
+    padding: 44px 16px;
   }
   .pricingHeader {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
   .pricingHeader h2,
   .whyUsContent h2,
   .macosTitle {
-    font-size: clamp(1.35rem, 6vw, 1.7rem) !important;
+    font-size: clamp(1.4rem, 7vw, 1.8rem) !important;
+  }
+  .pricingHeader p {
+    font-size: 0.88rem;
+  }
+  .pricingGrid {
+    gap: 14px;
   }
   .pricingCard {
-    padding: 24px 16px;
-    border-radius: 24px;
+    padding: 22px 18px;
+    border-radius: 20px;
   }
   .pricingPrice {
-    font-size: 2.1rem;
+    font-size: 2rem;
+  }
+  .pricingFeatures {
+    gap: 10px;
+  }
+  .pricingName {
+    font-size: 1.15rem;
+  }
+  /* macOS window smaller on phone */
+  .macosWindow {
+    min-height: 420px;
+    max-height: 500px;
+  }
+  .macosHeader {
+    margin-bottom: 32px;
+  }
+  .featureInfo h3 {
+    font-size: 1.1rem;
+  }
+  /* Footer compact */
+  .footer {
+    padding: 36px 16px;
+  }
+  .footerLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .footerLinks a {
+    font-size: 0.88rem;
   }
 }
 
 /* Very small phones < 390px */
 @media (max-width: 389px) {
   .heroTitle {
-    font-size: clamp(1.6rem, 12vw, 2rem);
+    font-size: clamp(1.55rem, 11vw, 1.9rem);
+    letter-spacing: -0.04em;
+  }
+  .heroSubtitle {
+    font-size: 0.8rem;
   }
   .pricingHeader h2,
   .whyUsContent h2,
   .macosTitle {
-    font-size: 1.25rem !important;
+    font-size: 1.3rem !important;
   }
   .ctaBtnPrimary,
   .ctaBtnSecondary {
-    padding: 13px 20px;
-    font-size: 0.95rem;
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    border-radius: 14px;
   }
   .navContent {
     padding: 0 12px;
   }
   .logo span {
-    display: none; /* show only icon on tiny screens */
+    display: none;
+  }
+  .loginBtn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
   }
   .pricingSection,
   .whyUsSection,
   .macosSection {
-    padding: 32px 16px !important;
+    padding: 36px 14px !important;
+  }
+  .pricingCard {
+    padding: 20px 16px;
+  }
+  .macosWindow {
+    min-height: 380px;
+    max-height: 460px;
+  }
+  .footer {
+    padding: 32px 14px;
   }
 }
 

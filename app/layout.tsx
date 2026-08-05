@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 
 import { Providers } from "./providers";
 import CookieBanner from "./components/CookieBanner";
+import { MetaPixel } from "./components/MetaPixel";
 
 export default function RootLayout({
   children,
@@ -45,6 +46,7 @@ export default function RootLayout({
     <html lang="pl" suppressHydrationWarning>
       <body>
         <Providers>
+          <MetaPixel />
           {children}
           <CookieBanner />
         </Providers>

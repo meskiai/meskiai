@@ -496,7 +496,7 @@ async function processMessage({
     );
 
     const { text } = await generateText({
-      model:  googleAI('gemini-flash-latest'),
+      model:  googleAI('gemini-3.5-flash'),
       system: buildSystemPrompt(settings, websiteContent, orderContext),
       prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${formattedHistory}\n\nNOWA WIADOMOŚĆ DO ODPOWIEDZI / PRZEANALIZOWANIA:\nOd: ${msg.from}\nTemat: ${msg.subject}\nData: ${msg.date}\n\nTreść nowej wiadomości:\n${(msg.text || '').substring(0, 2500)}`,
     });

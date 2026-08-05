@@ -23,7 +23,7 @@ Nie dodawaj żadnych dopisków od siebie, zwróć samą treść e-maila gotową 
   prompt += `NAJNOWSZA WIADOMOŚĆ OD KLIENTA:\n${newEmail}\n\nTWOJA ODPOWIEDŹ:`;
 
   const { text } = await generateText({
-    model: google("gemini-flash-latest"),
+    model: google("gemini-3.5-flash"),
     system: systemPrompt,
     prompt,
   });
@@ -44,7 +44,7 @@ Oceń kandydata i zwróć wynik JEDYNIE w formacie JSON (bez bloków kodu i doda
 }`;
 
   const { text } = await generateText({
-    model: google("gemini-flash-latest"),
+    model: google("gemini-3.5-flash"),
     system: systemPrompt,
     prompt: emailBody,
   });

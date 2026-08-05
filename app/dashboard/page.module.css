@@ -460,13 +460,14 @@ input:checked + .slider:before { transform: translateX(16px); }
   width: 100%;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 14px 16px;
   color: var(--foreground);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem; /* 16px prevents iOS zoom-in on focus */
   resize: vertical;
   margin-bottom: 16px;
+  line-height: 1.5;
 }
 
 .textarea:focus {
@@ -1220,11 +1221,12 @@ input:checked + .slider:before { transform: translateX(16px); }
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 66px;
+    height: calc(66px + env(safe-area-inset-bottom, 0px));
     flex-direction: row;
     padding: 6px 12px;
-    border-radius: 18px 18px 0 0;
-    align-items: center;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px 20px 0 0;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 4px;
     background: var(--card-bg);
@@ -1253,23 +1255,24 @@ input:checked + .slider:before { transform: translateX(16px); }
 
   .navItem {
     width: auto;
-    min-width: 56px;
-    min-height: 48px;
-    padding: 8px 12px;
-    border-radius: 12px;
+    min-width: 52px;
+    min-height: 50px;
+    padding: 6px 10px;
+    border-radius: 14px;
     background: transparent;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    font-size: 0.65rem;
+    gap: 3px;
+    font-size: 0.62rem;
+    font-weight: 600;
   }
   .navItem span {
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60px;
+    max-width: 64px;
   }
   .navItem.active {
     box-shadow: none;
@@ -1306,20 +1309,21 @@ input:checked + .slider:before { transform: translateX(16px); }
 
   /* Main content area */
   .mainContent {
-    height: calc(100dvh - 66px);
+    height: calc(100dvh - 66px - env(safe-area-inset-bottom, 0px));
     min-height: auto;
     border-radius: 0;
-    /* overflow:clip keeps visual clipping but allows children to scroll */
     overflow: clip;
   }
   .topbar {
-    padding: 0 14px;
+    padding: 0 16px;
     height: 54px;
     gap: 8px;
     flex-shrink: 0;
+    border-bottom: 1px solid var(--glass-border);
   }
   .topbarTitle {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1328,33 +1332,58 @@ input:checked + .slider:before { transform: translateX(16px); }
   /* Mail workspace */
   .workspace {
     flex-direction: column;
+    overflow-y: auto;
   }
   .threadListPanel {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--glass-border);
-    max-height: 36vh;
-    min-height: 140px;
+    max-height: 38vh;
+    min-height: 160px;
+    flex-shrink: 0;
+  }
+  .threadList {
+    padding: 10px;
+    gap: 8px;
   }
   .threadItem {
-    padding: 10px 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
   }
-  .threadSender {
+  .sender {
     font-size: 0.88rem;
   }
-  .threadSubject {
-    font-size: 0.8rem;
+  .subject {
+    font-size: 0.78rem;
   }
   .threadViewPanel {
     width: 100%;
-    border-radius: 0 0 16px 16px;
-    min-height: 40vh;
+    border-radius: 0;
+    flex: 1;
+    min-height: 0;
+  }
+  .threadViewHeader {
+    padding: 12px 16px;
   }
   .conversationHistory {
-    padding: 12px;
+    padding: 14px;
+    gap: 16px;
+  }
+  .emailBubble {
+    max-width: 96%;
   }
   .emailBodyCard {
-    padding: 12px;
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    border-radius: 16px;
+  }
+  .approvalSection {
+    padding: 12px 14px;
+  }
+  .approvalSection .textarea {
+    resize: none;
+    font-size: 1rem;
+    min-height: 80px;
   }
 
   /* Module selection screen */
@@ -1370,15 +1399,20 @@ input:checked + .slider:before { transform: translateX(16px); }
     border-radius: 18px !important;
   }
   .horizontalModuleCard {
-    border-radius: 16px !important;
-    padding: 14px !important;
-    gap: 12px !important;
+    border-radius: 18px !important;
+    padding: 16px !important;
+    gap: 14px !important;
     flex-direction: row !important;
     align-items: center !important;
   }
+  .moduleCardIcon {
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 14px !important;
+  }
   .horizontalModuleCard h2 {
     font-size: 1rem !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 3px !important;
   }
   .horizontalModuleCard p {
     font-size: 0.8rem !important;
@@ -1386,10 +1420,41 @@ input:checked + .slider:before { transform: translateX(16px); }
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
+    line-height: 1.4 !important;
   }
   .moduleArrow {
-    width: 30px !important;
-    height: 30px !important;
+    width: 32px !important;
+    height: 32px !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Account page */
+  .accountInfoGrid {
+    grid-template-columns: 1fr;
+    gap: 12px 0;
+  }
+  .infoValue {
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  .infoLabel {
+    font-size: 0.8rem;
+    color: var(--subtext);
+  }
+  .accountBtnRow {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .accountBtnSecondary,
+  .accountBtnPrimary {
+    width: 100%;
+    padding: 14px;
+  }
+  .accountBtnCancel {
+    width: calc(100% - 32px) !important;
+    padding: 14px;
   }
 
   /* Guide modal — clamp() in the base class handles most scaling */
@@ -1431,9 +1496,10 @@ input:checked + .slider:before { transform: translateX(16px); }
     display: none;
   }
   .navItem {
-    min-width: 40px;
+    min-width: 44px;
     padding: 8px;
     gap: 0;
+    border-radius: 12px;
   }
   .horizontalModuleCard h2 {
     font-size: 0.95rem !important;
@@ -1441,19 +1507,36 @@ input:checked + .slider:before { transform: translateX(16px); }
   .horizontalModuleCard p {
     font-size: 0.78rem !important;
   }
+  .moduleCardIcon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+  }
   .topbar {
     height: 50px;
     padding: 0 12px;
+  }
+  .topbarTitle {
+    font-size: 0.95rem !important;
+  }
+  /* Account info grid stacked */
+  .accountInfoGrid {
+    grid-template-columns: 1fr;
+  }
+  .limitsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
 /* ── Very small phones < 390px ─────────────────────── */
 @media (max-width: 389px) {
   .sidebar {
-    height: 60px;
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
   }
   .mainContent {
-    height: calc(100dvh - 60px);
+    height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px));
   }
   .navItem {
     min-width: 36px;
@@ -1462,6 +1545,11 @@ input:checked + .slider:before { transform: translateX(16px); }
   .horizontalModuleCard {
     padding: 12px !important;
     gap: 10px !important;
+  }
+  .moduleCardIcon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
   }
   .horizontalModuleCard h2 {
     font-size: 0.88rem !important;
@@ -1474,7 +1562,7 @@ input:checked + .slider:before { transform: translateX(16px); }
     padding: 0 10px;
   }
   .topbarTitle {
-    font-size: 0.82rem !important;
+    font-size: 0.85rem !important;
   }
   .moduleSelectionContent {
     padding-top: 64px;
@@ -1491,6 +1579,14 @@ input:checked + .slider:before { transform: translateX(16px); }
   .guideCard {
     max-height: calc(100dvh - 70px);
     padding: 20px 16px !important;
+  }
+  .threadListPanel {
+    max-height: 35vh;
+    min-height: 130px;
+  }
+  .emailBodyCard {
+    font-size: 0.83rem;
+    padding: 12px;
   }
 }
 
