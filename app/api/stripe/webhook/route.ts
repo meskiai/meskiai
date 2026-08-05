@@ -8,6 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
 });
 
 import { prisma } from "../../../../lib/prisma";
+import { sendSystemWelcomeEmail } from "../../../../lib/mail";
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
               || (subscription as any).items?.data?.[0]?.current_period_end
               || (Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
 
-            await prisma.user.update({
+            const dbUser = await prisma.user.update({
               where: { id: userId },
               data: {
                 stripeSubscriptionId: subscriptionId,
@@ -76,6 +77,14 @@ export async function POST(req: Request) {
             });
 
             console.log(`[Stripe] Subskrypcja aktywowana dla userId=${userId}. autoReply=true automatycznie.`);
+
+            // Send premium welcome email to the subscriber
+            const toEmail = session.customer_details?.email || dbUser.email;
+            if (toEmail) {
+              await sendSystemWelcomeEmail(toEmail).catch((welcomeErr) => {
+                console.error(`[Welcome Email] Failed to send welcome email to ${toEmail}:`, welcomeErr.message);
+              });
+            }
 
             // Cancel the OLD subscription immediately if this was an upgrade
             if (oldSubscriptionId && oldSubscriptionId !== subscriptionId) {

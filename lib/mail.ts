@@ -273,6 +273,232 @@ export async function sendReplySMTP(
 }
 
 /**
+ * Sends a premium system welcome email to a new subscriber.
+ */
+export async function sendSystemWelcomeEmail(toEmail: string) {
+  const systemEmail = process.env.SYSTEM_SMTP_EMAIL;
+  const systemPassword = process.env.SYSTEM_SMTP_PASSWORD;
+
+  if (!systemEmail || !systemPassword) {
+    console.warn("[Welcome Email] SYSTEM_SMTP_EMAIL or SYSTEM_SMTP_PASSWORD not configured. Skipping welcome email.");
+    return null;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { user: systemEmail, pass: systemPassword }
+  });
+
+  const subject = "Witamy w MESKIAI! Twój wirtualny pracownik AI jest gotowy 🚀";
+  
+  const textBody = `
+Dziękujemy za zakup subskrypcji MESKIAI!
+
+Cieszymy się, że dołączyłeś do grona przedsiębiorców, którzy delegują powtarzalne zadania i zyskują czas dzięki sztucznej inteligencji.
+
+Twój osobisty asystent AI został automatycznie włączony.
+
+CO DALEJ?
+1. Przejdź do swojego panelu: https://meskiai.com/dashboard
+2. Skonfiguruj Hasło Aplikacji Google w zakładce "Konfiguracja", aby umożliwić asystentowi bezpieczne odczytywanie i odpisywanie na wiadomości.
+3. Wprowadź podstawowe informacje o swojej firmie w Bazie Wiedzy — dzięki temu odpowiedzi AI będą w 100% precyzyjne i dopasowane do Twojej branży.
+
+PRIORYTETOWY KONTAKT Z NAMI:
+Jako nasz subskrybent zyskujesz błyskawiczny i bezpośredni kontakt z naszym zespołem technicznym. Jeśli potrzebujesz pomocy przy wdrożeniu lub masz pytania:
+- Odpowiedz bezpośrednio na ten e-mail
+- Napisz na: miloszmeski@icloud.com
+Jesteśmy do Twojej dyspozycji, aby pomóc Ci wycisnąć 100% możliwości z platformy.
+
+Życzymy udanej automatyzacji,
+Zespół MESKIAI
+  `.trim();
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1c1c1e;
+      background-color: #f5f5f7;
+      margin: 0;
+      padding: 0;
+    }
+    .wrapper {
+      width: 100%;
+      background-color: #f5f5f7;
+      padding: 40px 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #e5e5ea;
+    }
+    .header {
+      background: linear-gradient(135deg, #007aff, #5856d6);
+      padding: 32px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .content {
+      padding: 32px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+    p {
+      margin: 0 0 16px 0;
+      color: #3a3a3c;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .steps {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      border: 1px solid #e5e5ea;
+    }
+    .steps h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 15px;
+      color: #1c1c1e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .step-item {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #3a3a3c;
+    }
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+    .step-number {
+      font-weight: 700;
+      color: #007aff;
+    }
+    .support-box {
+      border-left: 4px solid #5856d6;
+      background: rgba(88, 86, 214, 0.05);
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+    }
+    .support-box h4 {
+      margin: 0 0 8px 0;
+      color: #5856d6;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .button-container {
+      text-align: center;
+      margin: 32px 0 16px 0;
+    }
+    .btn {
+      display: inline-block;
+      background: #007aff;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(0,122,255,0.25);
+    }
+    .footer {
+      background: #f5f5f7;
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #8e8e93;
+      border-top: 1px solid #e5e5ea;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="header">
+        <h1>Witamy w MESKIAI!</h1>
+      </div>
+      <div class="content">
+        <div class="greeting">Cześć!</div>
+        <p>Dziękujemy za zakup subskrypcji platformy MESKIAI. Cieszymy się, że dołączyłeś do grona nowoczesnych firm, które delegują powtarzalne zadania i zyskują wolny czas dzięki sztucznej inteligencji.</p>
+        
+        <div class="badge">Twój Asystent AI został aktywowany</div>
+
+        <div class="steps">
+          <h3>Szybki start (Kolejne kroki):</h3>
+          <div class="step-item"><span class="step-number">1.</span> Wejdź do swojego panelu sterowania na <a href="https://meskiai.com/dashboard" style="color:#007aff;text-decoration:none;font-weight:500;">meskiai.com/dashboard</a>.</div>
+          <div class="step-item"><span class="step-number">2.</span> Skonfiguruj <strong>Hasło Aplikacji Google</strong> w zakładce "Konfiguracja", aby umożliwić asystentowi bezpieczną pracę.</div>
+          <div class="step-item"><span class="step-number">3.</span> Uzupełnij <strong>Bazę Wiedzy</strong> o firmie, aby asystent AI znał Twoją ofertę i pisał ze 100% precyzją.</div>
+        </div>
+
+        <div class="support-box">
+          <h4>Błyskawiczny kontakt z nami:</h4>
+          <p style="margin: 0; font-size: 14px;">Jako nasz subskrybent masz zapewniony priorytetowy i bezpośredni kontakt z nami. Jeśli potrzebujesz pomocy przy konfiguracji lub wdrożeniu:</p>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 14px; color: #3a3a3c;">
+            <li>Odpowiedz bezpośrednio na tego maila</li>
+            <li>Napisz na nasz bezpośredni adres: <a href="mailto:miloszmeski@icloud.com" style="color:#5856d6;text-decoration:none;font-weight:500;">miloszmeski@icloud.com</a></li>
+          </ul>
+        </div>
+
+        <div class="button-container">
+          <a href="https://meskiai.com/dashboard" class="btn" style="color: #ffffff;">Przejdź do Panelu Dashboard</a>
+        </div>
+      </div>
+      <div class="footer">
+        Wiadomość wygenerowana automatycznie przez platformę MESKIAI.<br>
+        &copy; 2026 MESKIAI. Wszelkie prawa zastrzeżone.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  const mailOptions = {
+    from: `"MESKIAI Support" <${systemEmail}>`,
+    to: toEmail,
+    subject,
+    text: textBody,
+    html: htmlBody
+  };
+
+  const info = await transporter.sendMail(mailOptions);
+  console.log(`[Welcome Email] Wysłano e-mail powitalny do ${toEmail}`);
+  return info;
+}
+
+/**
  * Validates POP3 credentials with detailed error reporting.
  */
 export async function validatePop3CredentialsDetailed(
