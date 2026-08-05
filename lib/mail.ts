@@ -104,17 +104,17 @@ export async function fetchUnreadEmailsPOP3(
 
         const messageAgeHours = (Date.now() - msgDate.getTime()) / (1000 * 60 * 60);
 
-        // If the email is older than 48 hours or is from ourselves, skip full download and record it as processed
-        if (messageAgeHours > 48 || fromAddr.toLowerCase() === emailLower) {
+        // If the email is older than 48 hours, skip full download and record it as processed
+        if (messageAgeHours > 48) {
           fetchedEmails.push({
             pop3Uid: uid,
             messageId: messageId,
             from: fromAddr || 'ignored@old.com',
             to: email,
-            subject: headersParsed.subject || '(Old/Self skipped)',
+            subject: headersParsed.subject || '(Old skipped)',
             text: '',
             date: msgDate,
-            _isSelf: true // Ignores it in cron, but saves UID to database
+            _isSelf: false
           } as any);
           continue;
         }
@@ -143,14 +143,14 @@ export async function fetchUnreadEmailsPOP3(
         
         // ── KRYTYCZNE: Pomijaj maile wysłane przez samego agenta (zapobiega pętli auto-reply) ──
         if (fromAddr.toLowerCase() === emailLower) {
-          // Zapisujemy UID żeby następnym razem ten mail był pominięty szybciej
+          // Zapisujemy UID i pełną treść żeby asystent widział co odpisaliśmy ręcznie
           fetchedEmails.push({
             pop3Uid: uid,
             messageId: parsed.messageId || `self-${uid}`,
             from: fromAddr,
             to: email,
             subject: parsed.subject || '',
-            text: '',
+            text: parsed.text || parsed.html || '',
             date: parsed.date || new Date(),
             _isSelf: true
           } as any);

@@ -318,8 +318,10 @@ async function processMessage({
   // ── Find or create the DB thread ─────────────────────────────────────────────
   let dbThread: any;
 
-  if (isTooOld || isBot) {
-    // All old / bot emails go into one silent "HISTORY" thread per user
+  const isBotOnly = isBot && !isSelf;
+
+  if (isTooOld || (isSelf && !msg.inReplyTo && (!msg.references || msg.references.length === 0))) {
+    // All old / direct self emails go into one silent "HISTORY" thread per user
     let historyThread = await prisma.thread
       .findUnique({ where: { threadId: `HISTORY_${userId}` } })
       .catch(() => null);
@@ -419,6 +421,10 @@ async function processMessage({
 
   // ── Save email to DB (so its UID is permanently remembered) ─────────────────
   if (!existing) {
+    const fromClean = extractEmail(msg.from).toLowerCase();
+    const userEmailClean = user.email.toLowerCase();
+    const isFromAgent = fromClean === userEmailClean || isSelf;
+
     const created = await prisma.email
       .create({
         data: {
@@ -431,7 +437,7 @@ async function processMessage({
           snippet:     (msg.text || '').substring(0, 100),
           body:        msg.text || '',
           receivedAt:  msg.date,
-          isFromAgent: false,
+          isFromAgent: isFromAgent,
         },
       })
       .catch(async (err: any) => {
@@ -453,8 +459,13 @@ async function processMessage({
     if (created === 'DUPLICATE') return false;
   }
 
-  // Old / bot / self emails — UID saved, no AI needed
-  if (isTooOld || isBot) {
+  // Old / self emails — UID saved, no AI needed
+  if (isTooOld || isSelf) {
+    return false;
+  }
+
+  // Bots / newsletters go directly to SPAM (ignored tab)
+  if (isBotOnly) {
     if (dbThread.status !== 'IGNORED') {
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'IGNORED' } })
