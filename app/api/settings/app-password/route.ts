@@ -4,8 +4,6 @@ import { authOptions } from '../../auth/[...nextauth]/route';
 import { prisma } from '../../../../lib/prisma';
 import { validatePop3CredentialsDetailed } from '../../../../lib/mail';
 
-import { runSync } from '../../../../lib/cron';
-
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);

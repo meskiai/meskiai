@@ -15,10 +15,11 @@ export async function GET(req: Request) {
   try {
     const threads = await prisma.thread.findMany({
       where: { userId: session.user.id },
-      take: 500, // Zwiększony limit z 50 do 500, aby zakładki Wysłane i Spam nie znikały
+      take: 500,
       include: {
         emails: {
-          orderBy: { receivedAt: 'desc' }
+          orderBy: { receivedAt: 'desc' },
+          take: 1, // Only the latest email per thread — enough for preview, avoids loading thousands of records
         }
       },
       orderBy: { updatedAt: 'desc' }
