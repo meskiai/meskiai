@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     // Krok 1: Głębokie badanie rynku za pomocą Google Search Grounding
     // Próbujemy najpierw gemini-3.5-flash-lite dla maksymalnej prędkości i braku timeoutu
     let researchReportText = "";
-    const groundingModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+    const groundingModels = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
 
     for (const modelName of groundingModels) {
       try {
@@ -106,7 +106,7 @@ ${pageText}`,
       console.log(`[Strategy] Krok 1 Fallback: Analiza bez Google Search Grounding`);
       try {
         const fallbackResponse = await generateText({
-          model: google("gemini-3.5-flash-lite"),
+          model: google("gemini-2.0-flash-lite"),
           system: `Jesteś elitarnym doradcą biznesowym. Przeprowadź analizę rynkową firmy na podstawie dostępnych danych.`,
           prompt: `Przeprowadź analizę strategiczną dla: ${targetUrl}
 Treść strony: ${pageText}
@@ -122,7 +122,7 @@ Uwzględnij: analizę SWOT, potencjalnych konkurentów w branży, metryki SEO/CP
 
     // Krok 2: Ustrukturyzowanie raportu do formatu JSON z fallbackami modelowymi
     let parsedObject: any = null;
-    const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
     
     for (const modelName of modelsToTry) {
       try {

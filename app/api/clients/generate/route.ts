@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
     let searchResultText = "";
-    const searchModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+    const searchModels = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
     
     for (const modelName of searchModels) {
       try {

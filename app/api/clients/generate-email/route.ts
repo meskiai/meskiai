@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     let parsedObject: any = null;
-    const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-1.5-pro"];
+    const generateModels = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
 
     for (const modelName of generateModels) {
        try {
