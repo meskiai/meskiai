@@ -9,6 +9,7 @@ export const handler = schedule('*/2 * * * *', async () => {
 
   console.log(`[Cron] Wyzwalam sync-background @ ${new Date().toISOString()}`);
 
+  try {
     // Bypass self-signed or internal DNS cert warnings
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
