@@ -48,51 +48,79 @@ export async function POST(req: Request) {
     }
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
-    const searchResponse = await generateText({
-      model: googleAI("gemini-3.5-flash"),
-      system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
+    let searchResultText = "";
+    const searchModels = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    
+    for (const modelName of searchModels) {
+      try {
+        console.log(`[Clients] Próba wyszukiwania leadów za pomocą modelu: ${modelName}`);
+        const searchResponse = await generateText({
+          model: googleAI(modelName),
+          system: `Jesteś zaawansowanym ekspertem ds. wywiadu gospodarczego i generowania leadów (Lead Generation).
 Twoim zadaniem jest znalezienie 3 potencjalnych, wysoce trafnych i przede wszystkim REALNYCH klientów na polskim rynku (lub globalnym, jeśli profil wskazuje na eksport) na podstawie bazy wiedzy firmy użytkownika.
 Użyj narzędzia Google Search, aby znaleźć prawdziwe, istniejące firmy i sprawdzić ich autentyczne dane kontaktowe.
-
+ 
 ZASADY POZYSKIWANIA DANYCH KONTAKTOWYCH (KRYTYCZNE):
 1. Podaj wyłącznie PRAWDZIWY, publicznie opublikowany na stronie firmy lub w rejestrach adres e-mail.
 2. Jeśli bezpośredni e-mail do decydenta nie jest podany publicznie, podaj OFICJALNY OGÓLNY E-MAIL KONTAKTOWY firmy (np. biuro@firma.pl, kontakt@firma.pl, office@firma.pl, info@firma.pl).
 3. POD ŻADNYM POZOREM NIE ZMYŚLAJ, NIE ZGADUJ ani NIE GENERUJ fikcyjnych adresów e-mail (np. nie twórz adresów typu dyrektor@firma.pl, prezes@firma.pl lub imie.nazwisko@firma.pl na podstawie domniemanych danych, jeśli nie masz 100% potwierdzenia z wyszukiwarki, że taki adres istnieje).
 4. Jeżeli firma posiada jedynie formularz kontaktowy na stronie i brak jest jakiegokolwiek adresu e-mail, podaj adres URL do formularza kontaktowego jako alternatywę (np. https://firma.pl/kontakt).
-
+ 
 Baza wiedzy firmy, dla której szukasz klientów:
 "${businessContext}"`,
-      prompt: "Wygeneruj listę 3 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie). Pisz niezwykle zwięźle, w punktach, bez wstępów.",
-      tools: {
-        google_search: googleAI.tools.googleSearch({}) as any,
-      },
-    });
+          prompt: "Wygeneruj listę 3 realnych firm odpowiadających profilowi wraz z ich autentycznymi danymi kontaktowymi (e-mail, telefon, decydent, uzasadnienie). Pisz niezwykle zwięźle, w punktach, bez wstępów.",
+          tools: {
+            google_search: googleAI.tools.googleSearch({}) as any,
+          },
+        });
+        searchResultText = searchResponse.text;
+        break;
+      } catch (err: any) {
+        console.warn(`[Clients] Model wyszukiwania ${modelName} zwrócił błąd:`, err.message);
+      }
+    }
 
-    const searchResultText = searchResponse.text;
+    if (!searchResultText) {
+      throw new Error("Wszystkie modele wyszukiwania leadów zawiodły.");
+    }
 
-    // Krok 2: Przetworzenie tekstu na ustrukturyzowany format JSON
-    const { object } = await generateObject({
-      model: googleAI("gemini-3.5-flash"),
-      system: "Jesteś parserem danych. Przekształć tekst z raportu o leadach na ustrukturyzowany format JSON.",
-      prompt: `Przetwórz poniższy tekst na JSON. W opisie (description) każdego leada zawrzyj precyzyjnie:
+    // Krok 2: Przetworzenie tekstu na ustrukturyzowany format JSON z fallbackami
+    let parsedLeads: any = null;
+    for (const modelName of searchModels) {
+      try {
+        console.log(`[Clients] Próba parsowania leadów za pomocą modelu: ${modelName}`);
+        const { object } = await generateObject({
+          model: googleAI(modelName),
+          system: "Jesteś parserem danych. Przekształć tekst z raportu o leadach na ustrukturyzowany format JSON.",
+          prompt: `Przetwórz poniższy tekst na JSON. W opisie (description) każdego leada zawrzyj precyzyjnie:
 - Imię i nazwisko osoby decyzyjnej
 - Uzasadnienie dopasowania
 - RZECZYWISTY ADRES E-MAIL (zawsze z prefiksem "E-mail: ") lub URL formularza kontaktowego.
 - Telefon i profil LinkedIn (jeśli są dostępne).
-
+ 
 Tekst do przetworzenia:
 ${searchResultText}`,
-      schema: z.object({
-        leads: z.array(z.object({
-          name: z.string().describe("Prawdziwa nazwa firmy"),
-          description: z.string().describe("Uzasadnienie potrzeby usług oraz prawdziwe dane kontaktowe: E-mail (wyraźnie oznaczony), telefon, LinkedIn, osoba decyzyjna."),
-          source: z.string().describe("Źródło pozyskania (np. Google Search)"),
-          probability: z.number().min(50).max(99).describe("Prawdopodobieństwo zainteresowania w %")
-        }))
-      })
-    });
+          schema: z.object({
+            leads: z.array(z.object({
+              name: z.string().describe("Prawdziwa nazwa firmy"),
+              description: z.string().describe("Uzasadnienie potrzeby usług oraz prawdziwe dane kontaktowe: E-mail (wyraźnie oznaczony), telefon, LinkedIn, osoba decyzyjna."),
+              source: z.string().describe("Źródło pozyskania (np. Google Search)"),
+              probability: z.number().min(50).max(99).describe("Prawdopodobieństwo zainteresowania w %")
+            }))
+          })
+        });
+        parsedLeads = object.leads;
+        break;
+      } catch (err: any) {
+        console.warn(`[Clients] Model parsowania ${modelName} zwrócił błąd:`, err.message);
+      }
+    }
 
-    const generatedLeads = object.leads;
+    if (!parsedLeads) {
+      throw new Error("Wszystkie modele parsowania leadów zawiodły.");
+    }
+
+    const generatedLeads = parsedLeads;
 
     const savedLeads = [];
     for (const lead of generatedLeads) {

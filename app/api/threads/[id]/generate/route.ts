@@ -79,40 +79,50 @@ export async function POST(
       latestEmail.from || ""
     );
 
-    const { text } = await generateText({
-      model: googleAI("gemini-3.5-flash"),
-      system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.
+    let generatedTextResult = "";
+    const generateModels = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+
+    for (const modelName of generateModels) {
+      try {
+        console.log(`[Manual Draft] Próba generowania odpowiedzi za pomocą modelu: ${modelName}`);
+        const { text } = await generateText({
+          model: googleAI(modelName),
+          system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.
 Twoja firma kieruje się następującymi zasadami i informacjami:
 "${userSettings?.businessContext || "Profesjonalna obsługa klienta."}"
-
+ 
 ${websiteContent ? `Dodatkowe informacje o ofercie, cenniku i usługach firmy pobrane z jej strony internetowej:\n"${websiteContent.substring(0, 4000)}"` : ""}
-
+ 
 ${orderContext}
-
+ 
 Zadanie: Napisz kompletną, gotową do wysłania, profesjonalną i uprzejmą propozycję odpowiedzi na poniższego e-maila od klienta.
 Ton odpowiedzi: ${userSettings?.replyTone || "PROFESJONALNY"}.
-
+ 
 ZASADY:
-1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacjach o firmie.
+1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacijama o firmie.
 2. Podpisz się jako profesjonalny pracownik/asystent firmy użytkownika.
 3. NIE używaj słów kluczowych "BOT", "SPAM", "REQUIRES_ATTENTION", ani "MESKIAI".
 4. Podaj tylko i wyłącznie samą treść e-maila, która jest gotowa do skopiowania i wysłania (bez żadnych komentarzy w stylu "Oto moja propozycja:").`,
-      prompt: `
-Oto e-mail od klienta:
-Nadawca: ${latestEmail.from}
-Temat: ${latestEmail.subject}
-Treść wiadomości:
-${latestEmail.body || latestEmail.snippet}`,
-    });
+          prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n[WIADOMOŚĆ KLIENTA]:\n${latestEmail.body || latestEmail.snippet}\n\nNapisz na nią odpowiedź.`,
+        });
+        generatedTextResult = text;
+        break;
+      } catch (err: any) {
+        console.warn(`[Manual Draft] Model ${modelName} zwrócił błąd:`, err.message);
+      }
+    }
 
-    const aiResponse = text.trim();
+    if (!generatedTextResult) {
+      throw new Error("Wszystkie modele generowania odpowiedzi zawiodły.");
+    }
 
+    // Save draft to database
     await prisma.thread.update({
-      where: { id: thread.id },
-      data: { draftReply: aiResponse },
+      where: { id: threadId },
+      data: { draftReply: generatedTextResult.trim() }
     });
 
-    return NextResponse.json({ draftReply: aiResponse });
+    return NextResponse.json({ reply: generatedTextResult.trim() });
   } catch (error: any) {
     console.error("Generate AI error:", error);
     return NextResponse.json({ error: "Failed to generate AI response" }, { status: 500 });

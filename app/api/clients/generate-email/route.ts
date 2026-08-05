@@ -47,35 +47,51 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Zrób upgrade, aby wygenerować wiadomość." }, { status: 403 });
     }
 
-    const { object } = await generateObject({
-      model: googleAI("gemini-3.5-flash"),
-      system: `Jesteś ekspertem ds. sprzedaży B2B (B2B Sales Executive) reprezentującym firmę.
-Twoim celem jest napisanie skutecznego, "zimnego maila" (cold email) z propozycją współpracy do potencjalnego klienta.
+    let parsedObject: any = null;
+    const generateModels = ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
 
+    for (const modelName of generateModels) {
+       try {
+         console.log(`[Clients Email] Próba generowania maila za pomocą modelu: ${modelName}`);
+         const { object } = await generateObject({
+           model: googleAI(modelName),
+           system: `Jesteś ekspertem ds. sprzedaży B2B (B2B Sales Executive) reprezentującym firmę.
+Twoim celem jest napisanie skutecznego, "zimnego maila" (cold email) z propozycją współpracy do potencjalnego klienta.
+ 
 Baza wiedzy firmy, którą reprezentujesz:
 "${businessContext}"
-
+ 
 Ton odpowiedzi: ${userSettings?.replyTone || "Profesjonalny"}
-
+ 
 Wymagania dotyczące maila:
 1. Temat musi być chwytliwy, intrygujący i krótki.
 2. Treść powinna być spersonalizowana pod klienta (odnieś się do jego profilu/branży).
 3. Przedstaw konkretną wartość, jaką Twoja firma może dostarczyć.
 4. Zakończ wyraźnym Call To Action (np. propozycją krótkiej rozmowy).
-
+ 
 Dodatkowo, przeanalizuj uważnie profil klienta i wyodrębnij z niego jego adres e-mail, jeśli został podany w opisie. Jeśli nie ma adresu, zostaw pole puste.`,
-      prompt: `Wygeneruj maila do klienta:\n\nNazwa: ${lead.name}\nOpis: ${lead.description}`,
-      schema: z.object({
-        emailAddress: z.string().describe("Wyodrębniony rzeczywisty adres e-mail klienta z opisu (np. kontakt@firma.pl). Usuń wszelkie zbędne znaki. Jeśli w opisie podano tylko URL formularza kontaktowego lub nie ma żadnego e-maila, zwróć pusty string."),
-        subject: z.string().describe("Temat maila"),
-        body: z.string().describe("Treść maila sprzedażowego")
-      })
-    });
+           prompt: `Wygeneruj maila do klienta:\n\nNazwa: ${lead.name}\nOpis: ${lead.description}`,
+           schema: z.object({
+             emailAddress: z.string().describe("Wyodrębniony rzeczywisty adres e-mail klienta z opisu (np. kontakt@firma.pl). Usuń wszelkie zbędne znaki. Jeśli w opisie podano tylko URL formularza kontaktowego lub nie ma żadnego e-maila, zwróć pusty string."),
+             subject: z.string().describe("Temat maila"),
+             body: z.string().describe("Treść maila sprzedażowego")
+           })
+         });
+         parsedObject = object;
+         break;
+       } catch (err: any) {
+         console.warn(`[Clients Email] Model ${modelName} zwrócił błąd:`, err.message);
+       }
+    }
+
+    if (!parsedObject) {
+       throw new Error("Wszystkie modele generowania maila dla klienta zawiodły.");
+    }
 
     return NextResponse.json({ 
-      emailAddress: object.emailAddress || "",
-      subject: object.subject,
-      body: object.body
+      emailAddress: parsedObject.emailAddress || "",
+      subject: parsedObject.subject,
+      body: parsedObject.body
     });
   } catch (error: any) {
     console.error("Error generating email:", error);
