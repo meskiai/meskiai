@@ -3266,7 +3266,7 @@ export default function Dashboard() {
                   </div>
                   
                   <div className={styles.conversationHistory}>
-                    {(selectedThread.emails || []).slice().reverse().map((email: any) => (
+                    {(selectedThread.emails || []).map((email: any) => (
                       <div key={email.id} className={`${styles.emailBubble} ${email.isFromAgent ? styles.fromAgent : styles.fromClient}`}>
                         <div className={styles.emailHeader}>
                           <strong>{email.from.split('<')[0]}</strong> • {new Date(email.receivedAt).toLocaleString()}
