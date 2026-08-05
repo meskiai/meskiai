@@ -999,9 +999,7 @@ export default function Dashboard() {
     if (currentTab === "SPAM") return t.status === "IGNORED" && !t.threadId.startsWith("HISTORY_");
     return true;
   }).sort((a, b) => {
-    const timeA = a.emails?.[0]?.receivedAt ? new Date(a.emails[0].receivedAt).getTime() : 0;
-    const timeB = b.emails?.[0]?.receivedAt ? new Date(b.emails[0].receivedAt).getTime() : 0;
-    return timeB - timeA;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
   const isRepliedImportant = selectedThread && selectedThread.status === 'REQUIRES_ATTENTION' && (selectedThread.emails || []).some((e: any) => e.isFromAgent);
@@ -3166,13 +3164,24 @@ export default function Dashboard() {
                       <div 
                         key={thread.id} 
                         className={`animate-fade-in ${styles.threadItem} ${selectedThread?.id === thread.id ? styles.selected : ''}`}
-                        onClick={() => {
+                        onClick={async () => {
+                          // Show the thread immediately with the preview data (1 email)
                           setSelectedThread(thread);
                           setShowManualReply(false);
                           if (thread.status === 'REQUIRES_ATTENTION') {
                             setEditedReply(getCleanDraftReply(thread.draftReply));
                           } else {
                             setEditedReply(thread.draftReply || "");
+                          }
+                          // Then fetch full conversation history (all emails) in the background
+                          try {
+                            const fullRes = await fetch(`/api/threads/${thread.id}`);
+                            if (fullRes.ok) {
+                              const fullData = await fullRes.json();
+                              setSelectedThread(fullData.thread);
+                            }
+                          } catch (e) {
+                            console.error("Failed to load full thread:", e);
                           }
                         }}
                         style={{ animationDelay: `${index * 0.05}s` }}

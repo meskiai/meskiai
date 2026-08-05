@@ -3,6 +3,41 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
 
+// GET: fetch a single thread with all its emails (for the detail / conversation view)
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const resolvedParams = await params;
+    const threadId = resolvedParams.id;
+
+    const thread = await prisma.thread.findUnique({
+      where: { id: threadId },
+      include: {
+        emails: {
+          orderBy: { receivedAt: "asc" } // oldest first for conversation view
+        }
+      }
+    });
+
+    if (!thread || thread.userId !== session.user.id) {
+      return NextResponse.json({ error: "Thread not found or unauthorized" }, { status: 404 });
+    }
+
+    return NextResponse.json({ thread });
+  } catch (error: any) {
+    console.error("Get thread error:", error);
+    return NextResponse.json({ error: "Failed to fetch thread" }, { status: 500 });
+  }
+}
+
 // PATCH: update thread status (e.g., mark as completed/replied)
 export async function PATCH(
   req: Request,
