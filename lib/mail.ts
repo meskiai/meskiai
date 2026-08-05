@@ -78,48 +78,7 @@ export async function fetchUnreadEmailsPOP3(
       }
 
       try {
-        // Fetch only headers first to check the date and messageId quickly
-        let topTimeoutId: any;
-        const topPromise = pop3.TOP(msgNum, 0);
-        const topTimeout = new Promise<any>((_, reject) =>
-          topTimeoutId = setTimeout(() => {
-            reject(new Error('POP3 TOP timeout'));
-          }, 15000)
-        );
-
-        let headersRaw;
-        try {
-          headersRaw = await Promise.race([topPromise, topTimeout]);
-        } catch (e) {
-          console.warn(`POP3 TOP failed for msgNum ${msgNum}:`, e);
-          continue;
-        } finally {
-          clearTimeout(topTimeoutId);
-        }
-
-        const headersParsed: any = await simpleParser(headersRaw);
-        const msgDate = headersParsed.date || new Date();
-        let messageId = headersParsed.messageId || `uid-${uid}`;
-        let fromAddr = headersParsed.from?.value?.[0]?.address || headersParsed.from?.text || '';
-
-        const messageAgeHours = (Date.now() - msgDate.getTime()) / (1000 * 60 * 60);
-
-        // If the email is older than 48 hours, skip full download and record it as processed
-        if (messageAgeHours > 48) {
-          fetchedEmails.push({
-            pop3Uid: uid,
-            messageId: messageId,
-            from: fromAddr || 'ignored@old.com',
-            to: email,
-            subject: headersParsed.subject || '(Old skipped)',
-            text: '',
-            date: msgDate,
-            _isSelf: false
-          } as any);
-          continue;
-        }
-
-        // It is a recent email, now fetch the full body
+        // Fetch the full body directly to avoid double POP3 commands and round-trips
         let retrTimeoutId: any;
         const retrPromise = pop3.RETR(msgNum);
         const retrTimeout = new Promise<any>((_, reject) =>
@@ -133,11 +92,32 @@ export async function fetchUnreadEmailsPOP3(
           rawMsg = await Promise.race([retrPromise, retrTimeout]);
         } catch (e) {
           console.warn(`POP3 RETR failed for msgNum ${msgNum}:`, e);
-          continue;
+          throw e; // Abort session on failure to avoid hanging on a dead socket
         } finally {
           clearTimeout(retrTimeoutId);
         }
+
         const parsed: any = await simpleParser(rawMsg);
+        const msgDate = parsed.date || new Date();
+        let messageId = parsed.messageId || `uid-${uid}`;
+        let fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
+
+        const messageAgeHours = (Date.now() - msgDate.getTime()) / (1000 * 60 * 60);
+
+        // If the email is older than 48 hours, skip processing it (but record UID so we don't download it again)
+        if (messageAgeHours > 48) {
+          fetchedEmails.push({
+            pop3Uid: uid,
+            messageId: messageId,
+            from: fromAddr || 'ignored@old.com',
+            to: email,
+            subject: parsed.subject || '(Old skipped)',
+            text: '',
+            date: msgDate,
+            _isSelf: false
+          } as any);
+          continue;
+        }
 
         fromAddr = parsed.from?.value?.[0]?.address || parsed.from?.text || '';
         
@@ -202,6 +182,18 @@ export async function fetchUnreadEmailsPOP3(
         });
       } catch (err: any) {
         console.error(`[Agent AI] Błąd parsowania POP3 UID ${uid}:`, err.message);
+        
+        const isConnectionError = 
+          err.message.toLowerCase().includes('timeout') || 
+          err.message.toLowerCase().includes('connection') || 
+          err.message.toLowerCase().includes('econn') || 
+          err.message.toLowerCase().includes('socket') ||
+          err.message.toLowerCase().includes('closed');
+          
+        if (isConnectionError) {
+          throw err; // Rethrow to abort the entire POP3 session immediately
+        }
+        
         // Push a placeholder so the UID is recorded and not fetched infinitely
         fetchedEmails.push({
           pop3Uid: uid,
