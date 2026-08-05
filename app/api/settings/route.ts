@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       update: Object.keys(dataToUpdate).length > 0 ? dataToUpdate : { businessContext: businessContext ?? "" },
       create: { 
         userId: session.user.id, 
-        autoReply: autoReply ?? true,
+        autoReply: autoReply ?? false, // Safe default — user must explicitly enable auto-reply
         onboardingDone: onboardingDone ?? false,
         businessContext: businessContext ?? "",
         companyName: companyName ?? null,

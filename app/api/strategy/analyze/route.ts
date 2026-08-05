@@ -178,7 +178,7 @@ ${researchReportText}`,
       create: { 
         userId: user.id, 
         competitorSearchesThisMonth: 1,
-        autoReply: true,
+        autoReply: false, // Never enable auto-reply without explicit user consent
         onboardingDone: false,
         businessContext: ""
       }

@@ -36,8 +36,7 @@ export async function POST(
       where: { id: threadId },
       include: {
         emails: {
-          orderBy: { receivedAt: 'desc' },
-          take: 1
+          orderBy: { receivedAt: 'asc' } // full history for AI context
         }
       }
     });
@@ -112,11 +111,11 @@ Zadanie: Napisz kompletną, gotową do wysłania, profesjonalną i uprzejmą pro
 Ton odpowiedzi: ${userSettings?.replyTone || "PROFESJONALNY"}.
  
 ZASADY:
-1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacijama o firmie.
+1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacjach o firmie.
 2. Podpisz się jako profesjonalny pracownik/asystent firmy użytkownika.
 3. NIE używaj słów kluczowych "BOT", "SPAM", "REQUIRES_ATTENTION", ani "MESKIAI".
 4. Podaj tylko i wyłącznie samą treść e-maila, która jest gotowa do skopiowania i wysłania (bez żadnych komentarzy w stylu "Oto moja propozycja:").`,
-          prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n[WIADOMOŚĆ KLIENTA]:\n${latestEmail.body || latestEmail.snippet}\n\nNapisz na nią odpowiedź.`,
+          prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${thread.emails.map(e => `[${e.isFromAgent ? 'TY/AGENT' : 'KLIENT'} - ${new Date(e.receivedAt).toLocaleString('pl-PL')}]:\n${e.body || e.snippet}`).join('\n\n')}\n\nNapisz profesjonalną odpowiedź na ostatnią wiadomość klienta.`,
         });
         generatedTextResult = text;
         break;
