@@ -212,7 +212,15 @@ export async function fetchUnreadEmailsPOP3(
 
   } catch (error: any) {
     console.error('[Agent AI] Błąd połączenia POP3:', error.message);
-    try { pop3.QUIT(); } catch (e) {}
+    const isConnErr = 
+      error.message.toLowerCase().includes('timeout') || 
+      error.message.toLowerCase().includes('connection') || 
+      error.message.toLowerCase().includes('econn') || 
+      error.message.toLowerCase().includes('socket') ||
+      error.message.toLowerCase().includes('closed');
+    if (!isConnErr) {
+      try { pop3.QUIT(); } catch (e) {}
+    }
     throw error;
   }
 
