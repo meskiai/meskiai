@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 export const maxDuration = 300;
 
@@ -19,23 +21,28 @@ async function triggerBackgroundSync() {
   }
 }
 
-export async function GET(req: Request) {
+// Returns true if the request is authorized (either via CRON_SECRET or valid user session)
+async function isAuthorized(req: Request): Promise<boolean> {
   const authHeader = req.headers.get('authorization');
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
+  const session = await getServerSession(authOptions);
+  return !!session?.user?.id;
+}
+
+export async function GET(req: Request) {
+  if (!(await isAuthorized(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
   console.log('[Cron] GET /api/cron/sync — Triggering Netlify Background Function');
   await triggerBackgroundSync();
   return NextResponse.json({ ok: true, trigger: 'forwarded_to_background_get' });
 }
 
 export async function POST(req: Request) {
-  const authHeader = req.headers.get('authorization');
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!(await isAuthorized(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
   console.log('[Cron] POST /api/cron/sync — Triggering Netlify Background Function');
   await triggerBackgroundSync();
   return NextResponse.json({ ok: true, trigger: 'forwarded_to_background_post' });

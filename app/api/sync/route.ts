@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { runSync } from "../../../lib/cron";
 
 export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/sync
- * Triggers a full IMAP sync for the current user's account.
- * Previously used Gmail API — now delegates to cron.ts (IMAP/SMTP).
+ * Triggers the background sync function for all users.
+ * Calls sync-background (non-blocking, returns 202 immediately).
  */
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -18,9 +17,18 @@ export async function POST(req: Request) {
   }
 
   try {
-    // runSync() processes ALL users with appPassword set.
-    // It reads from IMAP and saves threads/emails to DB.
-    await runSync();
+    const siteUrl = process.env.URL || process.env.NEXTAUTH_URL || 'https://meskiai.com';
+    const cronSecret = process.env.CRON_SECRET || '';
+
+    // Fire-and-forget: trigger background function (returns 202 immediately, runs for up to 15 min)
+    fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cronSecret}`,
+        'Content-Type': 'application/json',
+      },
+    }).catch(() => {}); // Ignore errors — it's non-critical
+
     return NextResponse.json({ message: "Zsynchronizowano pomyślnie" });
   } catch (error: any) {
     console.error("Sync error:", error);
