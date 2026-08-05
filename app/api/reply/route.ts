@@ -25,6 +25,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
+    // Email limit check
+    const userSettings = await prisma.userSettings.findUnique({ where: { userId: session.user.id } });
+    if (userSettings) {
+      const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+      const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+      const monthlyLimit = user.stripePriceId === PRICE_MAX ? Infinity : user.stripePriceId === PRICE_PRO ? 1000 : 50;
+      const emailsUsed = userSettings.emailsSentThisMonth || 0;
+      if (monthlyLimit !== Infinity && emailsUsed >= monthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit wysłanych e-maili (${monthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
+    }
+
     const { threadId, replyBody } = await req.json();
 
     const thread = await prisma.thread.findUnique({
@@ -35,10 +47,6 @@ export async function POST(req: Request) {
     if (!thread) return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     if (thread.emails.length === 0) return NextResponse.json({ error: 'No emails in thread' }, { status: 400 });
 
-    const userSettings = await prisma.userSettings.findUnique({
-      where: { userId: session.user.id }
-    });
-
     if (!userSettings?.appPassword) {
       return NextResponse.json({ error: 'Brak hasła aplikacji Google. Skonfiguruj je w panelu.' }, { status: 400 });
     }
@@ -47,11 +55,13 @@ export async function POST(req: Request) {
     const replyTo = originalEmail.from.replace(/.*<(.+)>.*/, '$1').trim() || originalEmail.from;
     const references = thread.emails.filter(e => !e.isFromAgent).map(e => e.messageId).join(' ');
 
+    const replySubject = originalEmail.subject.startsWith('Re:') ? originalEmail.subject : `Re: ${originalEmail.subject}`;
+
     const smtpInfo = await sendReplySMTP(
       session.user.email!,
       userSettings.appPassword,
       replyTo,
-      `Re: ${originalEmail.subject}`,
+      replySubject,
       replyBody,
       originalEmail.messageId,
       references
@@ -70,7 +80,7 @@ export async function POST(req: Request) {
         messageId: sentMsgId,
         from: session.user.email || 'Agent',
         to: replyTo,
-        subject: `Re: ${originalEmail.subject}`,
+        subject: replySubject,
         snippet: replyBody.substring(0, 150),
         body: replyBody,
         receivedAt: new Date(),

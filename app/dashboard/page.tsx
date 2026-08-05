@@ -954,10 +954,15 @@ export default function Dashboard() {
       const res = await fetch(`/api/threads/${id}`, { method: "DELETE" });
       if (res.ok) {
         setSelectedThread(null);
+        showToast("Wątek został usunięty.", "success");
         await fetchThreads();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast("Błąd podczas usuwania wątku: " + (errData.error || "Nieznany błąd."), "error");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      showToast("Błąd połączenia z serwerem.", "error");
     } finally {
       setDeleting(false);
     }
@@ -2146,9 +2151,9 @@ export default function Dashboard() {
                     const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
                     const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
                     const leadsUsed:    number = subscriptionData?.leadSearchesThisMonth ?? 0;
-                    const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 0;
-                    const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 0;
-                    const leadsLimit   = isBasic ? 20  : isPro ? 200  : isMax ? Infinity : 0;
+                    const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 50;
+                    const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 10;
+                    const leadsLimit   = isBasic ? 20  : isPro ? 200  : isMax ? Infinity : 20;
                     const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
                     const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
                     const leadsPct     = isUnlimited ? 0 : Math.min(100, Math.round((leadsUsed    / (leadsLimit   || 1)) * 100));
