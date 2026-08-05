@@ -31,6 +31,11 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const authHeader = req.headers.get('authorization');
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   console.log('[Cron] POST /api/cron/sync — Triggering Netlify Background Function');
   await triggerBackgroundSync();
   return NextResponse.json({ ok: true, trigger: 'forwarded_to_background_post' });
