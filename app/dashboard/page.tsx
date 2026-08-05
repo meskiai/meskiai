@@ -954,15 +954,10 @@ export default function Dashboard() {
       const res = await fetch(`/api/threads/${id}`, { method: "DELETE" });
       if (res.ok) {
         setSelectedThread(null);
-        showToast("Wątek został usunięty.", "success");
         await fetchThreads();
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        showToast("Błąd podczas usuwania wątku: " + (errData.error || "Nieznany błąd."), "error");
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error(e);
-      showToast("Błąd połączenia z serwerem.", "error");
     } finally {
       setDeleting(false);
     }
