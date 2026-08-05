@@ -84,7 +84,7 @@ export async function fetchUnreadEmailsPOP3(
         const topTimeout = new Promise<any>((_, reject) =>
           topTimeoutId = setTimeout(() => {
             reject(new Error('POP3 TOP timeout'));
-          }, 5000)
+          }, 15000)
         );
 
         let headersRaw;
@@ -125,7 +125,7 @@ export async function fetchUnreadEmailsPOP3(
         const retrTimeout = new Promise<any>((_, reject) =>
           retrTimeoutId = setTimeout(() => {
             reject(new Error('POP3 RETR timeout'));
-          }, 10000)
+          }, 15000)
         );
 
         let rawMsg;
