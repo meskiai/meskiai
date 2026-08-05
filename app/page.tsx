@@ -612,7 +612,7 @@ export default function Home() {
         <div className={styles.footerLinks} style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/regulamin">Regulamin</a>
           <a href="/polityka-prywatnosci">Polityka Prywatności i Cookies</a>
-          <a href="mailto:support@meskiai.com">Kontakt: support@meskiai.com</a>
+          <a href="mailto:kontakt@meskiai.com">Kontakt: kontakt@meskiai.com</a>
         </div>
         <p>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</p>
       </footer>

@@ -308,7 +308,7 @@ CO DALEJ?
 PRIORYTETOWY KONTAKT Z NAMI:
 Jako nasz subskrybent zyskujesz błyskawiczny i bezpośredni kontakt z naszym zespołem technicznym. Jeśli potrzebujesz pomocy przy wdrożeniu lub masz pytania:
 - Odpowiedz bezpośrednio na ten e-mail
-- Napisz na: miloszmeski@icloud.com
+- Napisz na: kontakt@meskiai.com
 Jesteśmy do Twojej dyspozycji, aby pomóc Ci wycisnąć 100% możliwości z platformy.
 
 Życzymy udanej automatyzacji,
@@ -467,7 +467,7 @@ Zespół MESKIAI
           <p style="margin: 0; font-size: 14px;">Jako nasz subskrybent masz zapewniony priorytetowy i bezpośredni kontakt z nami. Jeśli potrzebujesz pomocy przy konfiguracji lub wdrożeniu:</p>
           <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 14px; color: #3a3a3c;">
             <li>Odpowiedz bezpośrednio na tego maila</li>
-            <li>Napisz na nasz bezpośredni adres: <a href="mailto:miloszmeski@icloud.com" style="color:#5856d6;text-decoration:none;font-weight:500;">miloszmeski@icloud.com</a></li>
+            <li>Napisz na nasz bezpośredni adres: <a href="mailto:kontakt@meskiai.com" style="color:#5856d6;text-decoration:none;font-weight:500;">kontakt@meskiai.com</a></li>
           </ul>
         </div>
 
