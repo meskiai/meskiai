@@ -1552,11 +1552,11 @@
 }
 
 /* ==========================================================================
-   VERTICAL TIMELINE SECTION (FAQ / HOW IT WORKS)
+   VERTICAL TIMELINE SECTION (FAQ / HOW IT WORKS) - MINIMALIST & COMPACT
    ========================================================================== */
 .timelineSection {
-  padding: 120px 5% 140px;
-  max-width: 900px;
+  padding: 80px 5% 100px;
+  max-width: 750px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
@@ -1564,59 +1564,59 @@
 
 .timelineHeader {
   text-align: center;
-  margin-bottom: 70px;
+  margin-bottom: 48px;
 }
 
 .timelineEyebrow {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 12px;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
 }
 
 .timelineTitle {
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: var(--foreground);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .timelineSubtitle {
-  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  font-size: clamp(0.9rem, 1.1vw, 1.1rem);
   color: var(--subtext);
-  max-width: 700px;
+  max-width: 600px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .timelineWrapper {
   position: relative;
-  padding-left: 50px;
+  padding-left: 40px;
 }
 
-/* Timeline Vertical Line */
+/* Timeline Vertical Line - Thinner and more transparent */
 .timelineWrapper::before {
   content: '';
   position: absolute;
-  left: 20px;
+  left: 14px;
   top: 15px;
   bottom: 15px;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.2) 50%, rgba(255, 255, 255, 0.05) 100%);
+  width: 1px;
+  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.15) 50%, rgba(255, 255, 255, 0.03) 100%);
   z-index: 1;
 }
 
 :global([data-theme="light"]) .timelineWrapper::before {
-  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.3) 50%, rgba(0, 0, 0, 0.05) 100%);
+  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.2) 50%, rgba(0, 0, 0, 0.03) 100%);
 }
 
 .timelineItem {
   position: relative;
-  margin-bottom: 48px;
+  margin-bottom: 36px;
   z-index: 2;
 }
 
@@ -1624,195 +1624,203 @@
   margin-bottom: 0;
 }
 
-/* Timeline Badge (Circle) */
+/* Timeline Badge (Circle) - Smaller and cleaner */
 .timelineBadge {
   position: absolute;
-  left: -50px;
-  top: 12px;
-  width: 42px;
-  height: 42px;
+  left: -40px;
+  top: 10px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #15161c;
-  border: 2px solid var(--primary);
+  background: #111216;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--foreground);
-  font-weight: 800;
-  font-size: 1.1rem;
-  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+  color: var(--subtext);
+  font-weight: 700;
+  font-size: 0.85rem;
   z-index: 3;
+  transition: all 0.3s ease;
 }
 
 :global([data-theme="light"]) .timelineBadge {
   background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #555;
 }
 
-/* Timeline Card */
+.timelineItem:hover .timelineBadge {
+  border-color: var(--primary);
+  color: var(--foreground);
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Timeline Card - Sleeker and less padded */
 .timelineContent {
   background: var(--card-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(15px) saturate(160%);
+  -webkit-backdrop-filter: blur(15px) saturate(160%);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .timelineContent:hover {
-  transform: translateY(-4px);
-  border-color: rgba(var(--primary-rgb), 0.4);
-  box-shadow: 0 15px 45px rgba(var(--primary-rgb), 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(var(--primary-rgb), 0.3);
+  box-shadow: 0 10px 35px rgba(var(--primary-rgb), 0.05);
 }
 
 .timelineContent h3 {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--foreground);
-  margin: 0 0 12px 0;
-  letter-spacing: -0.02em;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
 }
 
 .timelineContent p {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--subtext);
-  line-height: 1.6;
-  margin: 0 0 20px 0;
+  line-height: 1.45;
+  margin: 0 0 16px 0;
 }
 
-/* Micro Preview Component inside card */
+/* Micro Preview Component inside card - Smaller and highly integrated */
 .microPreview {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 14px 16px;
   position: relative;
 }
 
 :global([data-theme="light"]) .microPreview {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.015);
+  border-color: rgba(0, 0, 0, 0.04);
 }
 
 /* Step-specific styles */
 .microEmailHeader {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--subtext);
-  margin-bottom: 8px;
-}
-
-.microEmailSubject {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--foreground);
   margin-bottom: 6px;
 }
 
+.microEmailSubject {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
 .microEmailBody {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   color: var(--subtext);
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .microPdf {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
 }
 
 :global([data-theme="light"]) .microPdf {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.04);
 }
 
 .microScanner {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: #27c93f;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 2px;
 }
 
 .microConsole {
-  background: #07080a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 16px;
+  background: #050608;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px 14px;
   font-family: monospace;
-  font-size: 0.8rem;
-  color: #8c909c;
+  font-size: 0.76rem;
+  color: #838793;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 :global([data-theme="light"]) .microConsole {
   background: #f8f9fa;
-  border-color: rgba(0, 0, 0, 0.05);
-  color: #333;
+  border-color: rgba(0, 0, 0, 0.04);
+  color: #444;
 }
 
 .microSentBanner {
-  background: rgba(39, 201, 63, 0.08);
-  border: 1px solid rgba(39, 201, 63, 0.2);
+  background: rgba(39, 201, 63, 0.05);
+  border: 1px solid rgba(39, 201, 63, 0.15);
   color: #27c93f;
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 16px;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
 }
 
 .microBadge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 8px;
+  padding: 2px 6px;
   border-radius: 20px;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .badgeAttention {
-  background: rgba(242, 153, 74, 0.15);
+  background: rgba(242, 153, 74, 0.1);
   color: #f2994a;
-  border: 1px solid rgba(242, 153, 74, 0.3);
+  border: 1px solid rgba(242, 153, 74, 0.2);
 }
 
 /* Responsive */
 @media (max-width: 767px) {
   .timelineSection {
-    padding: 60px 20px;
+    padding: 50px 16px;
   }
   .timelineWrapper {
-    padding-left: 36px;
+    padding-left: 30px;
   }
   .timelineWrapper::before {
-    left: 12px;
+    left: 8px;
   }
   .timelineBadge {
-    left: -32px;
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
-    top: 14px;
+    left: -28px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    top: 10px;
   }
   .timelineContent {
-    padding: 20px;
-    border-radius: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
   }
   .timelineContent h3 {
     font-size: 1.15rem;
