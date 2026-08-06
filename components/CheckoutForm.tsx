@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
+import styles from "./CheckoutForm.module.css";
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -36,8 +37,8 @@ export default function CheckoutForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
-      <div className="bg-[#1C1C1C]/60 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
+      <div className={styles.paymentWrapper}>
         <PaymentElement 
           options={{
             layout: 'tabs',
@@ -46,18 +47,18 @@ export default function CheckoutForm() {
       </div>
       
       {errorMessage && (
-        <div className="text-red-400 bg-red-400/10 border border-red-400/20 px-4 py-3 rounded-xl text-sm font-medium">
+        <div className={styles.errorBox}>
           {errorMessage}
         </div>
       )}
 
       <button
         disabled={isLoading || !stripe || !elements}
-        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        className={styles.submitBtn}
       >
         {isLoading ? (
           <>
-            <Loader2 className="animate-spin" size={20} />
+            <Loader2 className="animate-spin" style={{ animation: "spin 1s linear infinite" }} size={20} />
             Przetwarzanie...
           </>
         ) : (
@@ -65,7 +66,7 @@ export default function CheckoutForm() {
         )}
       </button>
       
-      <p className="text-center text-xs text-[var(--subtext)] mt-2">
+      <p className={styles.secureText}>
         Płatności są zabezpieczone i szyfrowane przez Stripe.
       </p>
     </form>
