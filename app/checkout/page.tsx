@@ -88,6 +88,8 @@ function CheckoutPageContent() {
         .then((data) => {
           if (data.error) {
             setError(data.error);
+          } else if (data.isActive) {
+            router.push("/dashboard?upgrade=success");
           } else {
             setClientSecret(data.clientSecret);
           }

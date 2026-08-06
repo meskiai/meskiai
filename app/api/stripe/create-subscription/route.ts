@@ -97,7 +97,7 @@ export async function POST(req: Request) {
       items: [{ price: priceId }],
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
+      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
       metadata,
     });
 
@@ -134,7 +134,32 @@ export async function POST(req: Request) {
     }
 
     if (!clientSecret) {
-      throw new Error("Nie można wygenerować sesji płatności (Brak client_secret w odpowiedzi Stripe).");
+      if (subscription.status === 'active' || subscription.status === 'trialing') {
+        return NextResponse.json({ 
+          subscriptionId: subscription.id,
+          clientSecret: null,
+          isActive: true
+        });
+      }
+      
+      let debugInfo = `Status: ${subscription.status}. `;
+      if (subscription.latest_invoice) {
+         let inv = subscription.latest_invoice as any;
+         debugInfo += `Invoice status: ${inv.status || 'unknown'}. `;
+         if (inv.payment_intent) {
+           debugInfo += `PI status: ${(inv.payment_intent as any).status || 'unknown'}. `;
+         } else {
+           debugInfo += `No PI on invoice. `;
+         }
+      } else {
+         debugInfo += `No invoice. `;
+      }
+      
+      if (subscription.pending_setup_intent) {
+         debugInfo += `Has SetupIntent. `;
+      }
+      
+      throw new Error(`Nie można wygenerować sesji płatności. ${debugInfo}`);
     }
 
     return NextResponse.json({ 
