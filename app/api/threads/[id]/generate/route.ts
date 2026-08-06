@@ -91,6 +91,14 @@ export async function POST(
       latestEmail.from || ""
     );
 
+    const tone = userSettings?.replyTone ?? 'PROFESJONALNY';
+    const toneInstr =
+      tone === 'LUŹNY (CASUAL)' || tone === 'CASUALOWY'
+        ? 'Pisz nieformalnie, zacznij od "Cześć" lub "Witaj", używaj zwrotów bezpośrednich na "Ty" (np. "dzięki", "pozdrawiam"), nie używaj sztywnych zwrotów grzecznościowych.'
+        : tone === 'KRÓTKO I NA TEMAT' || tone === 'KROTKI'
+        ? 'Odpowiedź maksymalnie 2-3 zdania. Odpowiadaj samymi konkretami, bez zbędnych wstępów i uprzejmości.'
+        : 'Pisz profesjonalnie i oficjalnie, używaj form grzecznościowych typu Szanowny Panie / Szanowna Pani, Z poważaniem.';
+
     let generatedTextResult = "";
     const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
 
@@ -108,7 +116,7 @@ ${websiteContent ? `Dodatkowe informacje o ofercie, cenniku i usługach firmy po
 ${orderContext}
  
 Zadanie: Napisz kompletną, gotową do wysłania, profesjonalną i uprzejmą propozycję odpowiedzi na poniższego e-maila od klienta.
-Ton odpowiedzi: ${userSettings?.replyTone || "PROFESJONALNY"}.
+Ton odpowiedzi: ${tone} — ${toneInstr}.
  
 ZASADY:
 1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacjach o firmie.
