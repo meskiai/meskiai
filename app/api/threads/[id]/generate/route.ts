@@ -4,6 +4,7 @@ import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { generateText } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
+import { cleanEmailContent } from "../../../../../lib/ai";
 
 export async function POST(
   req: Request,
@@ -128,15 +129,17 @@ ZASADY:
       throw new Error("Wszystkie modele generowania odpowiedzi zawiodły.");
     }
 
+    const cleanedReply = cleanEmailContent(generatedTextResult);
+
     // Save draft to database
     await prisma.thread.update({
       where: { id: threadId },
-      data: { draftReply: generatedTextResult.trim() }
+      data: { draftReply: cleanedReply }
     });
 
     return NextResponse.json({ 
-      reply: generatedTextResult.trim(),
-      draftReply: generatedTextResult.trim()
+      reply: cleanedReply,
+      draftReply: cleanedReply
     });
   } catch (error: any) {
     console.error("Generate AI error:", error);

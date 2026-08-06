@@ -1,6 +1,31 @@
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 
+export function cleanEmailContent(text: string): string {
+  if (!text) return "";
+  let cleaned = text.trim();
+  
+  // Remove markdown formatting if any is present despite rules
+  cleaned = cleaned.replace(/\*\*/g, "");
+  
+  // Clean prefix tags like [ODPOWIEDŹ DLA KLIENTA] or [POTWIERDZENIE]
+  cleaned = cleaned.replace(/^\[?\s*(ODPOWIEDŹ DLA KLIENTA|POTWIERDZENIE DLA KLIENTA|ODPOWIEDŹ|POTWIERDZENIE|DRAFT REPLY|SUGESTIA ODPOWIEDZI)\s*\]?\s*:?\s*/i, "");
+  cleaned = cleaned.replace(/^\[?\s*(POTWIERDZENIE DLA KLIENTA|ODPOWIEDŹ DLA KLIENTA|ODPOWIEDŹ|POTWIERDZENIE)\s*\]?\s*:?\s*/i, "");
+  
+  // Remove path selections like "Wybieram ścieżkę 3", "Ścieżka 3:", "Wybór: Ścieżka 2B"
+  cleaned = cleaned.replace(/^\[?\s*(wybieram\s+|wybór\s*:?\s*)?(ścieżkę|ścieżka)\s+\d[a-z]?\s*\]?\s*:?\s*/i, "");
+  
+  // Remove leading/trailing quotes
+  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+    cleaned = cleaned.substring(1, cleaned.length - 1);
+  }
+  if (cleaned.startsWith('„') && cleaned.endsWith('”')) {
+    cleaned = cleaned.substring(1, cleaned.length - 1);
+  }
+  
+  return cleaned.trim();
+}
+
 export async function generateEmailReply(contextEmails: string[], newEmail: string, businessContext: string = "") {
   const systemPrompt = `Jesteś zaawansowanym asystentem AI ds. obsługi klienta.
 Przeanalizuj poniższą historię konwersacji (od najstarszych do najnowszych) oraz najnowszą wiadomość.
@@ -42,7 +67,7 @@ Nie dodawaj żadnych dopisków od siebie, zwróć samą treść e-maila gotową 
   if (!generatedText) {
     throw new Error("All AI models failed to generate reply.");
   }
-  return generatedText;
+  return cleanEmailContent(generatedText);
 }
 
 export async function analyzeCV(emailBody: string, businessContext: string) {
