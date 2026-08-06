@@ -22,7 +22,7 @@ export default function Home() {
     if (!isAutoPlaying) return;
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < 4 ? prev + 1 : 1));
-    }, 8000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
 
