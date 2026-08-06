@@ -12,8 +12,40 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [currentPriceId, setCurrentPriceId] = useState<string | null>(null);
+  const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleCheckout = async (priceId: string) => {
+    setLoadingPriceId(priceId);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || "Błąd podczas tworzenia sesji płatności");
+        setLoadingPriceId(null);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Błąd połączenia z serwerem");
+      setLoadingPriceId(null);
+    }
+  };
+
+  const handlePlanSelection = async (priceId: string) => {
+    if (status === "authenticated") {
+      await handleCheckout(priceId);
+    } else {
+      localStorage.setItem('selectedPlan', JSON.stringify({ id: priceId, time: Date.now() }));
+      signIn("google", { callbackUrl: "/dashboard" });
+    }
+  };
   const [activeFeature, setActiveFeature] = useState('agent');
   const [activeStep, setActiveStep] = useState<number>(1);
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
@@ -498,22 +530,18 @@ export default function Home() {
             
             <button 
               className={styles.pricingBtn} 
-              disabled={userTier >= 1}
-              style={{ opacity: userTier >= 1 ? 0.5 : 1, cursor: userTier >= 1 ? 'not-allowed' : 'pointer' }}
+              disabled={userTier >= 1 || loadingPriceId !== null}
+              style={{ opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 1) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
+                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic';
+                handlePlanSelection(priceId);
               }}
             >
-              {userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet"}
+              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic') ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet")}
             </button>
           </div>
-
+ 
           {/* Pakiet 2 (PRO) - Rekomendowany */}
           <div className={`${styles.pricingCard} ${styles.pro} animate-fade-in-up animate-delay-3`}>
             <div>
@@ -535,22 +563,18 @@ export default function Home() {
             
             <button 
               className={styles.pricingBtn} 
-              disabled={userTier >= 2}
-              style={{ opacity: userTier >= 2 ? 0.5 : 1, cursor: userTier >= 2 ? 'not-allowed' : 'pointer' }}
+              disabled={userTier >= 2 || loadingPriceId !== null}
+              style={{ opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 2) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
+                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro';
+                handlePlanSelection(priceId);
               }}
             >
-              {userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO"}
+              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro') ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO")}
             </button>
           </div>
-
+ 
           {/* Pakiet 3 (MAX) */}
           <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-4`}>
             <div className={styles.pricingName}>MESKIAI MAX</div>
@@ -569,19 +593,15 @@ export default function Home() {
             
             <button 
               className={styles.pricingBtn} 
-              disabled={userTier >= 3}
-              style={{ opacity: userTier >= 3 ? 0.5 : 1, cursor: userTier >= 3 ? 'not-allowed' : 'pointer' }}
+              disabled={userTier >= 3 || loadingPriceId !== null}
+              style={{ opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 3) return;
-                localStorage.setItem('selectedPlan', JSON.stringify({ id: process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max', time: Date.now() }));
-                if (status === "authenticated") {
-                  router.push("/dashboard");
-                } else {
-                  signIn("google", { callbackUrl: "/dashboard" });
-                }
+                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max';
+                handlePlanSelection(priceId);
               }}
             >
-              {userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max"}
+              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max') ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
             </button>
           </div>
         </div>
