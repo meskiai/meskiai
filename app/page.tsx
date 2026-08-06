@@ -580,10 +580,10 @@ export default function Home() {
       {/* Apple Minimalist Typographic Timeline Section */}
       <section className={styles.timelineSection} id="how-it-works">
         <div className={styles.timelineHeader}>
-          <span className={styles.timelineEyebrow}>Jak to działa?</span>
-          <h2 className={styles.timelineTitle}>Droga wiadomości krok po kroku</h2>
+          <span className={styles.timelineEyebrow}>Możliwości systemu</span>
+          <h2 className={styles.timelineTitle}>Wszystko, czego potrzebujesz w jednym panelu</h2>
           <p className={styles.timelineSubtitle}>
-            Bez zbędnych narzędzi i skomplikowanej konfiguracji. Zobacz, jak MESKIAI przetwarza każde zapytanie w pełnej harmonii z Twoim biznesem.
+            MESKIAI łączy zaawansowane narzędzia asystenta AI, integracje e-commerce i automatyczne pozyskiwanie klientów w prostym, przejrzystym kokpicie.
           </p>
         </div>
 
@@ -593,22 +593,22 @@ export default function Home() {
           <div className={styles.timelineItem}>
             <div className={styles.timelineNumber}>01</div>
             <div className={styles.timelineContent}>
-              <h3>Odebranie i rejestracja wątku</h3>
+              <h3>Inteligentna skrzynka odbiorcza i asystent</h3>
               <p>
-                Wiadomość klienta trafia do systemu natychmiast po jej wysłaniu. MESKIAI łączy się bezpiecznie z serwerem pocztowym, analizując metadane nadawcy oraz nagłówki e-maila.
+                Zarządzaj korespondencją w czasie rzeczywistym. Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
               </p>
               <div className={styles.timelineSpec}>
                 <div className={styles.timelineSpecItem}>
                   <Mail size={14} />
-                  <span>POP3 SSL</span>
+                  <span>Poczta POP3/SMTP</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
-                  <Globe size={14} />
-                  <span>Czas rzeczywisty</span>
+                  <Inbox size={14} />
+                  <span>Katalogowanie wątków</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
                   <Clock size={14} />
-                  <span>&lt; 1 sekunda</span>
+                  <span>Obsługa 24/7</span>
                 </div>
               </div>
             </div>
@@ -618,22 +618,22 @@ export default function Home() {
           <div className={styles.timelineItem}>
             <div className={styles.timelineNumber}>02</div>
             <div className={styles.timelineContent}>
-              <h3>Analiza kontekstu i załączników PDF</h3>
+              <h3>Automatyzacja e-commerce (Shopify/Woo)</h3>
               <p>
-                Zaawansowany model sztucznej inteligencji interpretuje intencję klienta, automatycznie parsując załączone dokumenty (np. faktury, specyfikacje) i wyodrębniając kluczowe dane.
+                Połącz swój sklep internetowy i zapomnij o powtarzalnych pytaniach. Agent w ułamku sekundy pobiera z bazy status zamówienia, informacje o dostawie i linki śledzenia kurierów (InPost, DPD), wysyłając je bezpośrednio do klientów.
               </p>
               <div className={styles.timelineSpec}>
                 <div className={styles.timelineSpecItem}>
-                  <Sparkles size={14} />
-                  <span>Gemini 3.5</span>
+                  <ShoppingBag size={14} />
+                  <span>Sklepy internetowe</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
-                  <FileText size={14} />
-                  <span>OCR Parser PDF</span>
+                  <Sliders size={14} />
+                  <span>Webhooki i API</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
                   <Shield size={14} />
-                  <span>Ekstrakcja danych</span>
+                  <span>Bezpieczne połączenie</span>
                 </div>
               </div>
             </div>
@@ -643,22 +643,22 @@ export default function Home() {
           <div className={styles.timelineItem}>
             <div className={styles.timelineNumber}>03</div>
             <div className={styles.timelineContent}>
-              <h3>Weryfikacja w systemie e-commerce</h3>
+              <h3>Audyt konkurencji i analiza rynkowa</h3>
               <p>
-                System łączy się z platformami takimi jak Shopify czy WooCommerce, sprawdzając status zamówień, płatności oraz numery przesyłek kurierskich dla pełnej precyzji odpowiedzi.
+                Zyskaj przewagę dzięki automatycznemu wywiadowi rynkowemu. Narzędzie zeskrapuje wskazaną stronę konkurencji, połączy się z Google Search i natychmiast wygeneruje kompletną analizę SWOT oraz rekomendacje strategiczne.
               </p>
               <div className={styles.timelineSpec}>
                 <div className={styles.timelineSpecItem}>
-                  <ShoppingBag size={14} />
-                  <span>Shopify & Woo</span>
+                  <Globe size={14} />
+                  <span>Skaner stron WWW</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
-                  <Sliders size={14} />
-                  <span>API Integration</span>
+                  <Sparkles size={14} />
+                  <span>Analizy SWOT</span>
                 </div>
                 <div className={styles.timelineSpecItem}>
                   <CheckCircle size={14} />
-                  <span>Baza Zamówień</span>
+                  <span>Google Grounding</span>
                 </div>
               </div>
             </div>
@@ -668,22 +668,22 @@ export default function Home() {
           <div className={styles.timelineItem}>
             <div className={styles.timelineNumber}>04</div>
             <div className={styles.timelineContent}>
-              <h3>Automatyczna odpowiedź i klasyfikacja</h3>
+              <h3>Pozyskiwanie klientów i baza leadów B2B</h3>
               <p>
-                Spersonalizowany e-mail zostaje wysłany przez bezpieczny protokół SMTP. System klasyfikuje priorytet wątku i oznacza go jako ważny w panelu właściciela, zapewniając pełną kontrolę.
+                Automatycznie rozwijaj sprzedaż. Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe szyte na miarę ich profili działalności.
               </p>
               <div className={styles.timelineSpec}>
                 <div className={styles.timelineSpecItem}>
+                  <Target size={14} />
+                  <span>Wyszukiwarka B2B</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <Users size={14} />
+                  <span>Bazy kontaktów</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
                   <Zap size={14} />
-                  <span>SMTP Send</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Inbox size={14} />
-                  <span>Oznaczenie: Ważne</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Settings size={14} />
-                  <span>Pełna kontrola</span>
+                  <span>Ofertowanie AI</span>
                 </div>
               </div>
             </div>
