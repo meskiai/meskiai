@@ -101,12 +101,45 @@ export async function POST(req: Request) {
       metadata,
     });
 
-    const invoice = subscription.latest_invoice as Stripe.Invoice;
-    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+    // Safely extract client_secret
+    let clientSecret: string | null | undefined = null;
+
+    if (subscription.latest_invoice) {
+      let invoice = subscription.latest_invoice;
+      // If invoice is just an ID (string), fetch it
+      if (typeof invoice === 'string') {
+        invoice = await stripe.invoices.retrieve(invoice, { expand: ['payment_intent'] });
+      }
+
+      if (typeof invoice !== 'string' && invoice.payment_intent) {
+        let paymentIntent = invoice.payment_intent;
+        // If paymentIntent is just an ID (string), fetch it
+        if (typeof paymentIntent === 'string') {
+          paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent);
+        }
+        if (typeof paymentIntent !== 'string') {
+          clientSecret = paymentIntent.client_secret;
+        }
+      }
+    }
+
+    if (!clientSecret && subscription.pending_setup_intent) {
+      let setupIntent = subscription.pending_setup_intent;
+      if (typeof setupIntent === 'string') {
+        setupIntent = await stripe.setupIntents.retrieve(setupIntent);
+      }
+      if (typeof setupIntent !== 'string') {
+        clientSecret = setupIntent.client_secret;
+      }
+    }
+
+    if (!clientSecret) {
+      throw new Error("Nie można wygenerować sesji płatności (Brak client_secret w odpowiedzi Stripe).");
+    }
 
     return NextResponse.json({ 
       subscriptionId: subscription.id,
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: clientSecret,
     });
   } catch (error: any) {
     console.error("Stripe Create Subscription Error:", error);
