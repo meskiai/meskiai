@@ -1552,127 +1552,172 @@
 }
 
 /* ==========================================================================
-   INTERACTIVE SIMULATOR (Premium Product Walkthrough / FAQ Replace)
+   VISUAL FLOW TIMELINE & DASHBOARD MOCKUP
    ========================================================================== */
-.simSection {
-  padding: 100px 5% 120px;
-  max-width: 1200px;
+.flowSection {
+  padding: 120px 5% 140px;
+  max-width: 1300px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.simHeader {
+.flowHeader {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 70px;
 }
 
-.simEyebrow {
+.flowEyebrow {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   margin-bottom: 12px;
 }
 
-.simTitle {
-  font-size: clamp(2rem, 4vw, 3rem);
+.flowTitle {
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   color: var(--foreground);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.simSubtitle {
+.flowSubtitle {
   font-size: clamp(1rem, 1.2vw, 1.25rem);
   color: var(--subtext);
-  max-width: 700px;
+  max-width: 750px;
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.simContainer {
+.flowGrid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 40px;
-  align-items: stretch;
+  grid-template-columns: 1.1fr 1.4fr;
+  gap: 50px;
+  align-items: start;
 }
 
-.simMenu {
+.flowTimeline {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  justify-content: center;
-}
-
-.simMenuItem {
-  background: var(--card-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  padding: 22px 24px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   position: relative;
-  overflow: hidden;
+  padding-left: 24px;
 }
 
-.simMenuItem:hover {
+/* Timeline Vertical Line */
+.flowTimeline::before {
+  content: '';
+  position: absolute;
+  left: 36px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 1;
+}
+
+:global([data-theme="light"]) .flowTimeline::before {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.flowStep {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+
+.flowStep:last-child {
+  margin-bottom: 0;
+}
+
+.flowStep:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+:global([data-theme="light"]) .flowStep:hover {
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.flowStepActive {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateX(4px);
+  border-color: var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
-:global([data-theme="light"]) .simMenuItem:hover {
-  background: rgba(0, 0, 0, 0.015);
-  border-color: rgba(0, 0, 0, 0.08);
+:global([data-theme="light"]) .flowStepActive {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
 }
 
-.simMenuItem.active {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--primary);
-  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.15);
-}
-
-:global([data-theme="light"]) .simMenuItem.active {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: var(--primary);
-}
-
-.simMenuHeader {
+.flowStepNumber {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1e1e24;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--subtext);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  z-index: 3;
+  margin-top: 2px;
 }
 
-.simMenuHeader svg {
-  color: var(--primary);
+:global([data-theme="light"]) .flowStepNumber {
+  background: #f0f0f4;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #777;
 }
 
-.simMenuItem h3 {
+.flowStepActive .flowStepNumber {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.5);
+}
+
+.flowStepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.flowStepContent h3 {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--foreground);
   margin: 0;
-  letter-spacing: -0.01em;
+  transition: color 0.3s ease;
 }
 
-.simMenuDesc {
+.flowStepActive .flowStepContent h3 {
+  color: var(--primary);
+}
+
+.flowStepContent p {
+  font-size: 0.92rem;
   color: var(--subtext);
-  font-size: 0.9rem;
-  line-height: 1.45;
+  line-height: 1.5;
   margin: 0;
 }
 
-/* Right Display Mockup */
-.simDisplay {
+/* Dashboard Mockup Panel */
+.flowDashboardMockup {
   background: #0d0e12;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -1680,18 +1725,19 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: 480px;
+  height: 520px;
   position: relative;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
 }
 
-:global([data-theme="light"]) .simDisplay {
+:global([data-theme="light"]) .flowDashboardMockup {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-.simDisplayHeader {
+/* Header style for mockup */
+.mockHeader {
   background: #15161c;
   padding: 14px 20px;
   display: flex;
@@ -1700,246 +1746,225 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-:global([data-theme="light"]) .simDisplayHeader {
+:global([data-theme="light"]) .mockHeader {
   background: #f5f6f8;
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
-.simDots {
+/* Mockup Layout */
+.mockBody {
   display: flex;
+  flex: 1;
+  overflow: hidden;
+  height: calc(100% - 49px);
+}
+
+.mockSidebar {
+  width: 180px;
+  background: #111216;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.simDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+:global([data-theme="light"]) .mockSidebar {
+  background: #f0f1f4;
+  border-right-color: rgba(0, 0, 0, 0.06);
 }
 
-.simDotRed { background: #ff5f56; }
-.simDotYellow { background: #ffbd2e; }
-.simDotGreen { background: #27c93f; }
-
-.simAddressBar {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  padding: 4px 20px;
-  font-size: 0.78rem;
-  color: var(--subtext);
-  font-family: monospace;
-  letter-spacing: 0.5px;
-  width: 50%;
-  text-align: center;
-}
-
-:global([data-theme="light"]) .simAddressBar {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
-  color: #555;
-}
-
-.simStatusIndicator {
+.mockSidebarItem {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  color: #27c93f;
-  font-weight: 600;
-  letter-spacing: 0.2px;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--subtext);
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.simScreen {
-  padding: 24px;
+.mockSidebarActive {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+:global([data-theme="light"]) .mockSidebarActive {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.mockContent {
   flex: 1;
+  padding: 24px;
+  background: #0d0e12;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow-y: auto;
-  font-size: 0.9rem;
 }
 
-/* Animations and custom styles for display screens */
-.simMailBubble {
-  background: rgba(255, 255, 255, 0.03);
+:global([data-theme="light"]) .mockContent {
+  background: #ffffff;
+}
+
+/* Screen 1: Inbox view */
+.mockInboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mockInboxItem {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+:global([data-theme="light"]) .mockInboxItem {
+  background: rgba(0, 0, 0, 0.01);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.mockInboxItemUnread {
+  border-left: 3px solid var(--primary);
+  background: rgba(var(--primary-rgb), 0.03);
+}
+
+.mockInboxItemMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--subtext);
+  margin-bottom: 6px;
+}
+
+.mockInboxSubject {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.mockInboxPreview {
+  font-size: 0.82rem;
+  color: var(--subtext);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Screen 2: Detail with PDF attachment parsing */
+.mockDetailCard {
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  animation: fadeIn 0.4s ease forwards;
 }
 
-:global([data-theme="light"]) .simMailBubble {
-  background: rgba(0, 0, 0, 0.015);
-  border-color: rgba(0, 0, 0, 0.05);
+:global([data-theme="light"]) .mockDetailCard {
+  background: rgba(0, 0, 0, 0.01);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
-.simMailHeader {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--subtext);
-}
-
-.simMailBody {
-  line-height: 1.45;
-  color: var(--foreground);
-}
-
-.simAiAction {
-  border-left: 2px solid var(--primary);
-  padding-left: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  animation: slideIn 0.5s ease forwards;
-}
-
-.simAiTitle {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.simTypingText {
-  color: var(--foreground);
-  line-height: 1.45;
-  white-space: pre-wrap;
-}
-
-.simSuccessBanner {
-  background: rgba(39, 201, 63, 0.08);
-  border: 1px solid rgba(39, 201, 63, 0.2);
-  color: #27c93f;
-  padding: 12px 16px;
-  border-radius: 10px;
+.mockPdfAttachment {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
-  font-size: 0.82rem;
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 12px;
 }
 
-/* E-commerce specific simulation */
-.simLogContainer {
+:global([data-theme="light"]) .mockPdfAttachment {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.mockScanner {
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #27c93f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Screen 3: Shopify / WooCommerce Integration Log */
+.mockStoreStatus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+:global([data-theme="light"]) .mockStoreStatus {
+  background: rgba(0, 0, 0, 0.01);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.mockConsole {
   background: #07080a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 16px;
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #8c909c;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 8px;
+  flex: 1;
 }
 
-:global([data-theme="light"]) .simLogContainer {
+:global([data-theme="light"]) .mockConsole {
   background: #f8f9fa;
   border-color: rgba(0, 0, 0, 0.05);
   color: #333;
 }
 
-.simLogLine {
-  display: flex;
-  gap: 8px;
-  animation: fadeIn 0.3s ease forwards;
-}
-
-.simLogTime {
-  color: #ffbd2e;
-}
-
-.simLogGreen {
-  color: #27c93f;
-}
-
-.simLogBlue {
-  color: var(--primary);
-}
-
-/* SWOT Table specific simulation */
-.simSwotGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.simSwotBox {
-  padding: 12px 14px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-}
-
-.simSwotS { background: rgba(39, 201, 63, 0.08); border: 1px solid rgba(39, 201, 63, 0.15); color: #27c93f; }
-.simSwotW { background: rgba(255, 95, 86, 0.08); border: 1px solid rgba(255, 95, 86, 0.15); color: #ff5f56; }
-.simSwotO { background: rgba(47, 128, 237, 0.08); border: 1px solid rgba(47, 128, 237, 0.15); color: #2f80ed; }
-.simSwotT { background: rgba(255, 189, 46, 0.08); border: 1px solid rgba(255, 189, 46, 0.15); color: #ffbd2e; }
-
-.simSwotBox h4 {
-  margin: 0 0 4px 0;
+/* Screen 4: Response sent view */
+.mockBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
   font-weight: 700;
-  font-size: 0.85rem;
   text-transform: uppercase;
 }
 
-.simSwotBox p {
-  margin: 0;
-  line-height: 1.35;
-  opacity: 0.9;
+.badgeAttention {
+  background: rgba(242, 153, 74, 0.15);
+  color: #f2994a;
+  border: 1px solid rgba(242, 153, 74, 0.3);
 }
 
-/* Keyframes */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+.mockResponseSent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(39, 201, 63, 0.03);
+  border: 1px dashed rgba(39, 201, 63, 0.3);
+  padding: 16px;
+  border-radius: 12px;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-8px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Responsive Overrides */
 @media (max-width: 991px) {
   .simContainer {
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  .simDisplay {
-    height: 420px;
-  }
 }
 
-@media (max-width: 767px) {
-  .simSection {
-    padding: 60px 20px;
-  }
-  .simHeader {
-    margin-bottom: 32px;
-  }
-  .simMenuItem {
-    padding: 16px 20px;
-    border-radius: 12px;
-  }
-  .simMenuItem h3 {
-    font-size: 1rem;
-  }
-  .simMenuDesc {
-    font-size: 0.82rem;
-  }
-  .simDisplay {
-    height: 380px;
-  }
-}

@@ -15,17 +15,14 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeFeature, setActiveFeature] = useState('agent');
-  const [simTab, setSimTab] = useState<"agent" | "ecommerce" | "competitor" | "leads">("agent");
-
-  const [typingStep, setTypingStep] = useState(0);
+  const [simStep, setSimStep] = useState<number>(1);
 
   useEffect(() => {
-    setTypingStep(0);
     const interval = setInterval(() => {
-      setTypingStep((prev) => (prev < 3 ? prev + 1 : 0));
-    }, 4500);
+      setSimStep((prev) => (prev < 4 ? prev + 1 : 1));
+    }, 6000);
     return () => clearInterval(interval);
-  }, [simTab]);
+  }, []);
 
   useEffect(() => {
     const features = ['agent', 'cold', 'swot', 'security'];
@@ -587,276 +584,203 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Simulator Section */}
-      <section className={styles.simSection} id="simulator">
-        <div className={styles.simHeader}>
-          <span className={styles.simEyebrow}>Prezentacja Live</span>
-          <h2 className={styles.simTitle}>Jak MESKIAI automatyzuje Twój biznes?</h2>
-          <p className={styles.simSubtitle}>
-            Zobacz w czasie rzeczywistym, jak nasz asystent obsługuje maile, łączy się z systemem sklepowym, analizuje Twoją konkurencję oraz pozyskuje nowych klientów.
+      {/* Interactive Flow Timeline Section */}
+      <section className={styles.flowSection} id="how-it-works">
+        <div className={styles.flowHeader}>
+          <span className={styles.flowEyebrow}>Jak to działa?</span>
+          <h2 className={styles.flowTitle}>Droga wiadomości krok po kroku</h2>
+          <p className={styles.flowSubtitle}>
+            Zobacz, jak MESKIAI obsługuje skrzynkę pocztową w czasie rzeczywistym – od pierwszego maila klienta aż po w pełni zautomatyzowane rozwiązanie problemu.
           </p>
         </div>
 
-        <div className={styles.simContainer}>
-          {/* Left Menu / Tabs */}
-          <div className={styles.simMenu}>
-            <button 
-              className={`${styles.simMenuItem} ${simTab === "agent" ? styles.active : ""}`}
-              onClick={() => setSimTab("agent")}
+        <div className={styles.flowGrid}>
+          {/* Left Side: Timeline Steps */}
+          <div className={styles.flowTimeline}>
+            <div 
+              className={`${styles.flowStep} ${simStep === 1 ? styles.flowStepActive : ''}`}
+              onClick={() => setSimStep(1)}
             >
-              <div className={styles.simMenuHeader}>
-                <Inbox size={20} />
-                <h3>Autonomiczny Agent Poczty</h3>
+              <div className={styles.flowStepNumber}>1</div>
+              <div className={styles.flowStepContent}>
+                <h3>Odebranie wiadomości</h3>
+                <p>
+                  Klient wysyła e-mail na Twoją skrzynkę. MESKIAI za pomocą bezpiecznej, nieustannej synchronizacji POP3 rejestruje wiadomość w systemie w ułamku sekundy.
+                </p>
               </div>
-              <p className={styles.simMenuDesc}>
-                Odbiera wiadomości 24/7, czyta załączniki PDF i samoczynnie odpisuje klientom. Trudne tematy segreguje jako "Ważne".
-              </p>
-            </button>
+            </div>
 
-            <button 
-              className={`${styles.simMenuItem} ${simTab === "ecommerce" ? styles.active : ""}`}
-              onClick={() => setSimTab("ecommerce")}
+            <div 
+              className={`${styles.flowStep} ${simStep === 2 ? styles.flowStepActive : ''}`}
+              onClick={() => setSimStep(2)}
             >
-              <div className={styles.simMenuHeader}>
-                <ShoppingBag size={20} />
-                <h3>Integracje E-commerce (Shopify/Woo)</h3>
+              <div className={styles.flowStepNumber}>2</div>
+              <div className={styles.flowStepContent}>
+                <h3>Analiza AI i PDF</h3>
+                <p>
+                  Sztuczna inteligencja analizuje treść pod kątem intencji oraz odczytuje i parsuje wszelkie załączniki, np. faktury w formacie PDF.
+                </p>
               </div>
-              <p className={styles.simMenuDesc}>
-                Przed napisaniem maila, agent w tle odpytuje bazę danych o status zamówienia, produkty i numer śledzenia przesyłki kurierskiej.
-              </p>
-            </button>
+            </div>
 
-            <button 
-              className={`${styles.simMenuItem} ${simTab === "competitor" ? styles.active : ""}`}
-              onClick={() => setSimTab("competitor")}
+            <div 
+              className={`${styles.flowStep} ${simStep === 3 ? styles.flowStepActive : ''}`}
+              onClick={() => setSimStep(3)}
             >
-              <div className={styles.simMenuHeader}>
-                <BarChart2 size={20} />
-                <h3>Audyt Konkurencji w 30 Sekund</h3>
+              <div className={styles.flowStepNumber}>3</div>
+              <div className={styles.flowStepContent}>
+                <h3>Weryfikacja ze sklepem</h3>
+                <p>
+                  System łączy się z Twoją platformą e-commerce (Shopify/WooCommerce) lub bazą danych, aby zweryfikować status zamówienia, płatności i wysyłki.
+                </p>
               </div>
-              <p className={styles.simMenuDesc}>
-                Zeskrapuje wybraną stronę internetową, odpytuje Google Search i w mgnieniu oka tworzy kompletną analizę SWOT oraz strategię.
-              </p>
-            </button>
+            </div>
 
-            <button 
-              className={`${styles.simMenuItem} ${simTab === "leads" ? styles.active : ""}`}
-              onClick={() => setSimTab("leads")}
+            <div 
+              className={`${styles.flowStep} ${simStep === 4 ? styles.flowStepActive : ''}`}
+              onClick={() => setSimStep(4)}
             >
-              <div className={styles.simMenuHeader}>
-                <Target size={20} />
-                <h3>Masowy Lead Generation</h3>
+              <div className={styles.flowStepNumber}>4</div>
+              <div className={styles.flowStepContent}>
+                <h3>Wysyłka & Oznaczenie</h3>
+                <p>
+                  Agent wysyła precyzyjną, automatyczną odpowiedź, a w Twoim panelu oznacza wątek jako "Do uwagi" (Ważne), abyś miał pełną kontrolę.
+                </p>
               </div>
-              <p className={styles.simMenuDesc}>
-                Automatycznie wyszukuje firmy z wybranej branży w danym mieście, pobiera kontakty i generuje spersonalizowane kampanie mailowe.
-              </p>
-            </button>
+            </div>
           </div>
 
-          {/* Right Display Console Mockup */}
-          <div className={styles.simDisplay}>
-            <div className={styles.simDisplayHeader}>
+          {/* Right Side: Dashboard Mockup */}
+          <div className={styles.flowDashboardMockup}>
+            <div className={styles.mockHeader}>
               <div className={styles.simDots}>
                 <div className={`${styles.simDot} ${styles.simDotRed}`}></div>
                 <div className={`${styles.simDot} ${styles.simDotYellow}`}></div>
                 <div className={`${styles.simDot} ${styles.simDotGreen}`}></div>
               </div>
               <div className={styles.simAddressBar}>
-                {simTab === "agent" && "meskiai.com/dashboard/agent"}
-                {simTab === "ecommerce" && "meskiai.com/dashboard/sklep-api"}
-                {simTab === "competitor" && "meskiai.com/dashboard/analiza-seo"}
-                {simTab === "leads" && "meskiai.com/dashboard/baza-leadow"}
+                app.meskiai.com/dashboard/inbox
               </div>
               <div className={styles.simStatusIndicator}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#27c93f', display: 'inline-block' }}></span>
-                System Live
+                Agent 24/7 Aktywny
               </div>
             </div>
 
-            <div className={styles.simScreen}>
-              {/* Screen 1: Agent Sync Simulator */}
-              {simTab === "agent" && (
-                <>
-                  <div className={styles.simMailBubble}>
-                    <div className={styles.simMailHeader}>
-                      <span>Od: Jan Kowalski (klient@onet.pl)</span>
-                      <span>Dzisiaj, 14:02</span>
-                    </div>
-                    <div className={styles.simMailBody}>
-                      Dzień dobry, przesyłam w załączniku fakturę (Faktura_12_2026.pdf) i proszę o informację, jak wygląda u Państwa procedura zwrotu środków za uszkodzony towar. Dziękuję.
+            <div className={styles.mockBody}>
+              {/* Mockup Sidebar */}
+              <div className={styles.mockSidebar}>
+                <div className={`${styles.mockSidebarItem} ${styles.mockSidebarActive}`}>
+                  <Inbox size={14} />
+                  <span>Odebrane</span>
+                </div>
+                <div className={styles.mockSidebarItem}>
+                  <FileText size={14} />
+                  <span>Zamówienia</span>
+                </div>
+                <div className={styles.mockSidebarItem}>
+                  <Settings size={14} />
+                  <span>Ustawienia</span>
+                </div>
+              </div>
+
+              {/* Mockup Content Area */}
+              <div className={styles.mockContent}>
+                
+                {/* Step 1: Incoming Email in Inbox */}
+                {simStep === 1 && (
+                  <div className={styles.mockInboxList}>
+                    <div className={{...styles.mockInboxItem, ...styles.mockInboxItemUnread} as any}>
+                      <div className={styles.mockInboxItemMeta}>
+                        <span>jan.kowalski@gmail.com</span>
+                        <span>Przed chwilą</span>
+                      </div>
+                      <div className={styles.mockInboxSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
+                      <div className={styles.mockInboxPreview}>Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację...</div>
+                      <div style={{ marginTop: '8px', fontSize: '0.75rem', color: '#ff5f56', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff5f56' }}></span>
+                        Nowa nieprzeczytana
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  {typingStep >= 1 && (
-                    <div className={styles.simAiAction}>
-                      <span className={styles.simAiTitle}>Proces Myślowy Agenta AI</span>
-                      <div style={{ fontStyle: 'italic', color: 'var(--subtext)', fontSize: '0.85rem' }}>
-                        &gt; Wykryto załącznik PDF oraz słowa kluczowe: "faktura", "zwrot".<br />
-                        &gt; Uruchamiam parser PDF... wyodrębniono kwotę 349,00 PLN oraz datę zakupu.<br />
-                        &gt; Kategoria: WAŻNE. Przygotowuję streszczenie dla właściciela + potwierdzenie dla klienta.
+                {/* Step 2: AI Parsing Attachment */}
+                {simStep === 2 && (
+                  <div className={styles.mockDetailCard}>
+                    <div className={styles.mockInboxItemMeta}>
+                      <span>Od: jan.kowalski@gmail.com</span>
+                      <span>1 min temu</span>
+                    </div>
+                    <div className={styles.mockInboxSubject} style={{ fontSize: '1rem' }}>
+                      Reklamacja i zwrot - Zamówienie #1042
+                    </div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--subtext)', margin: '8px 0 12px' }}>
+                      "Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację kurtki. Załączam fakturę zakupową w formacie PDF. Proszę o zwrot pieniędzy."
+                    </p>
+                    <div className={styles.mockPdfAttachment}>
+                      <FileText size={18} style={{ color: '#ff5f56' }} />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Faktura_1042.pdf</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>142 KB</span>
                       </div>
                     </div>
-                  )}
-
-                  {typingStep >= 2 && (
-                    <div className={styles.simAiAction}>
-                      <span className={styles.simAiTitle}>Wersja Robocza Odpowiedzi (SMTP)</span>
-                      <div className={styles.simTypingText}>
-                        {typingStep === 2 && "Pisanie odpowiedzi..."}
-                        {typingStep >= 3 && "Szanowny Panie,\n\nPotwierdzamy otrzymanie zgłoszenia reklamacyjnego wraz z fakturą. Sprawę przekazaliśmy do Działu Finansów w celu zrealizowania zwrotu kwoty 349,00 PLN. Poinformujemy o zleceniu przelewu.\n\nZ poważaniem,\nTwój Wirtualny Asystent"}
-                      </div>
-                    </div>
-                  )}
-
-                  {typingStep >= 3 && (
-                    <div className={styles.simSuccessBanner}>
-                      <CheckCircle size={16} />
-                      Wysłano automatyczną odpowiedź SMTP. Wątek dodany do zakładki: WAŻNE.
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Screen 2: E-commerce Sync Simulator */}
-              {simTab === "ecommerce" && (
-                <>
-                  <div className={styles.simLogContainer}>
-                    <div className={styles.simLogLine}>
-                      <span className={styles.simLogTime}>[14:10:02]</span>
-                      <span className={styles.simLogBlue}>[Shopify Webhook]</span>
-                      <span>Otrzymano nową wiadomość od: milosz@meski.pl</span>
-                    </div>
-                    {typingStep >= 1 && (
-                      <div className={styles.simLogLine}>
-                        <span className={styles.simLogTime}>[14:10:04]</span>
-                        <span className={styles.simLogBlue}>[Baza Danych]</span>
-                        <span>Szukanie zamówień dla maila milosz@meski.pl... Znaleziono zamówienie #1042</span>
-                      </div>
-                    )}
-                    {typingStep >= 1 && (
-                      <div className={styles.simLogLine}>
-                        <span className={styles.simLogTime}>[14:10:05]</span>
-                        <span className={styles.simLogBlue}>[InPost API]</span>
-                        <span>Pobieranie statusu paczki: W TRANCIE (In Transit). Kurier odebrał przesyłkę.</span>
-                      </div>
-                    )}
-                    {typingStep >= 2 && (
-                      <div className={styles.simLogLine}>
-                        <span className={styles.simLogTime}>[14:10:07]</span>
-                        <span className={styles.simLogGreen}>[Agent AI]</span>
-                        <span>Generowanie odpowiedzi z linkiem śledzenia: https://inpost.pl/track/1042</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {typingStep >= 2 && (
-                    <div className={styles.simAiAction} style={{ marginTop: 8 }}>
-                      <span className={styles.simAiTitle}>Wygenerowana odpowiedź (Automatyczna)</span>
-                      <div className={styles.simTypingText}>
-                        {typingStep === 2 && "Pisanie wiadomości..."}
-                        {typingStep >= 3 && "Cześć Miłosz!\n\nTwoje zamówienie #1042 jest już w drodze! Przesyłka została przekazana kurierowi InPost. Możesz na bieżąco monitorować jej trasę klikając w ten link śledzenia: https://inpost.pl/track/1042.\n\nPozdrawiamy,\nObsługa Klienta"}
-                      </div>
-                    </div>
-                  )}
-
-                  {typingStep >= 3 && (
-                    <div className={styles.simSuccessBanner}>
-                      <CheckCircle size={16} />
-                      Wysłano odpowiedź ze statusem wysyłki. Klient obsłużony w 6 sekund bez Twojego udziału.
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Screen 3: Competitor SWOT Simulator */}
-              {simTab === "competitor" && (
-                <>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', fontFamily: 'monospace' }}>
-                      {typingStep === 0 && "https://"}
-                      {typingStep === 1 && "https://konkurencyjny-sklep.pl"}
-                      {typingStep >= 2 && "https://konkurencyjny-sklep.pl"}
-                    </div>
-                    <div className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {typingStep <= 1 ? "Analizowanie..." : "Gotowe"}
+                    <div className={styles.mockScanner}>
+                      <Sparkles size={14} />
+                      <span>[AI] Odczytywanie pliku PDF... Dane: Jan Kowalski, Zamówienie: #1042, Kwota: 349.00 PLN, Temat: Reklamacja</span>
                     </div>
                   </div>
+                )}
 
-                  {typingStep >= 1 && (
-                    <div className={styles.simLogContainer} style={{ padding: '12px' }}>
-                      <div className={styles.simLogLine}>
-                        <span className={styles.simLogGreen}>✔</span>
-                        <span>Pobrano treść strony konkurencyjny-sklep.pl</span>
+                {/* Step 3: Database & Store Check */}
+                {simStep === 3 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+                    <div className={styles.mockStoreStatus}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <ShoppingBag size={18} style={{ color: 'var(--primary)' }} />
+                        <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Integracja Shopify / WooCommerce</span>
                       </div>
-                      {typingStep >= 2 && (
-                        <div className={styles.simLogLine}>
-                          <span className={styles.simLogGreen}>✔</span>
-                          <span>Uruchomiono Google Search Grounding dla analizy rynkowej</span>
+                      <span style={{ fontSize: '0.75rem', color: '#27c93f', background: 'rgba(39, 201, 63, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>Połączono</span>
+                    </div>
+                    <div className={styles.mockConsole}>
+                      <div>&gt; Odpytywanie API sklepu o klienta: jan.kowalski@gmail.com...</div>
+                      <div>&gt; Pobieranie szczegółów zamówienia #1042...</div>
+                      <div style={{ color: '#27c93f' }}>&gt; ZNALEZIONO. Status: DORĘCZONE (Kurier DPD). Kwota: 349,00 PLN.</div>
+                      <div>&gt; Dopasowanie do bazy danych: ZGODNE.</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: SMTP Send & Attention Flag */}
+                {simStep === 4 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className={styles.mockResponseSent}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#27c93f', fontSize: '0.82rem', fontWeight: 600 }}>
+                          <CheckCircle size={14} />
+                          Automatyczna odpowiedź wysłana (SMTP)
                         </div>
-                      )}
+                      </div>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--subtext)', fontStyle: 'italic', margin: 0 }}>
+                        "Dzień dobry Panie Janie, potwierdzamy przyjęcie zgłoszenia reklamacyjnego dotyczącego zamówienia #1042 na kwotę 349,00 PLN. Zlecenie zwrotu środków zostało przekazane do realizacji..."
+                      </p>
                     </div>
-                  )}
-
-                  {typingStep >= 2 && (
-                    <div className={styles.simSwotGrid}>
-                      <div className={`${styles.simSwotBox} ${styles.simSwotS}`}>
-                        <h4>Mocne strony (S)</h4>
-                        <p>Darmowa wysyłka od 150zł, duży ruch z SEO na frazy ogólne.</p>
+                    
+                    <div className={styles.mockInboxItem} style={{ borderLeft: '3px solid #f2994a' }}>
+                      <div className={styles.mockInboxItemMeta}>
+                        <span>jan.kowalski@gmail.com</span>
+                        <span>Oznaczenie:</span>
+                        <span className={`${styles.mockBadge} ${styles.badgeAttention}`}>Do uwagi (Ważne)</span>
                       </div>
-                      <div className={`${styles.simSwotBox} ${styles.simSwotW}`}>
-                        <h4>Słabe strony (W)</h4>
-                        <p>Brak obsługi czatu na żywo, powolny support mailowy.</p>
+                      <div className={styles.mockInboxSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
+                      <div style={{ fontSize: '0.78rem', color: '#f2994a' }}>
+                        Wątek wymaga ostatecznej akceptacji zwrotu przez administratora.
                       </div>
-                      <div className={`${styles.simSwotBox} ${styles.simSwotO}`}>
-                        <h4>Szansa (O)</h4>
-                        <p>Wdrożenie u Ciebie bota 24/7 przejmie klientów zmęczonych czekaniem.</p>
-                      </div>
-                      <div className={`${styles.simSwotBox} ${styles.simSwotT}`}>
-                        <h4>Zagrożenie (T)</h4>
-                        <p>Rywal może rozwinąć sekcję FAQ i zoptymalizować koszyk.</p>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Screen 4: Lead Generation Simulator */}
-              {simTab === "leads" && (
-                <>
-                  <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '12px' }}>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--subtext)', marginBottom: '8px', fontWeight: 'bold' }}>Kryteria wyszukiwania leadów:</div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={{ background: 'var(--primary-glow)', border: '1px solid var(--primary)', color: 'var(--foreground)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem' }}>Branża: Hotele</span>
-                      <span style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--subtext)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem' }}>Miasto: Zakopane</span>
                     </div>
                   </div>
+                )}
 
-                  {typingStep >= 1 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(39, 201, 63, 0.04)', border: '1px solid rgba(39, 201, 63, 0.1)', padding: '10px 14px', borderRadius: '8px' }}>
-                        <span style={{ fontWeight: '600' }}>🏢 Giewont Resort & Spa</span>
-                        <span style={{ color: 'var(--primary)', fontFamily: 'monospace' }}>kontakt@giewontresort.pl</span>
-                      </div>
-                      {typingStep >= 2 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(39, 201, 63, 0.04)', border: '1px solid rgba(39, 201, 63, 0.1)', padding: '10px 14px', borderRadius: '8px' }}>
-                          <span style={{ fontWeight: '600' }}>🏢 Hotel Tatry View</span>
-                          <span style={{ color: 'var(--primary)', fontFamily: 'monospace' }}>recepcja@hotel-tatry.pl</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {typingStep >= 2 && (
-                    <div className={styles.simAiAction}>
-                      <span className={styles.simAiTitle}>Spersonalizowany Mail Sprzedażowy (Cold Email)</span>
-                      <div className={styles.simTypingText} style={{ fontSize: '0.85rem' }}>
-                        {typingStep === 2 && "Generowanie oferty..."}
-                        {typingStep >= 3 && "Dzień dobry,\n\nZauważyłem, że Giewont Resort oferuje wyjątkowe pakiety spa w Zakopanem. Ponieważ turyści często rezerwują noclegi późnym wieczorem, chcemy zaproponować wdrożenie asystenta AI, który odpowie na pytania o wolne pokoje 24/7 na Waszym mailu supportowym...\n\nPozdrawiam,\nKamil - Twój Handlowiec"}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+              </div>
             </div>
           </div>
         </div>
