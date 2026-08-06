@@ -8,7 +8,7 @@ import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
-  apiVersion: "2026-06-24.dahlia" as any,
+  apiVersion: "2023-10-16" as any,
 });
 
 export async function POST(req: Request) {
