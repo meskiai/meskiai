@@ -1,0 +1,164 @@
+.checkoutContainer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 24px 64px 24px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkoutLayout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@media (min-width: 1024px) {
+  .checkoutLayout {
+    flex-direction: row;
+    gap: 48px;
+  }
+}
+
+.glassCard {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 32px;
+  padding: 32px;
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  box-shadow: var(--mac-shadow);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .glassCard {
+    padding: 48px;
+  }
+}
+
+.leftColumn {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .leftColumn {
+    width: 45%;
+  }
+}
+
+.rightColumn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 400px;
+}
+
+@media (min-width: 1024px) {
+  .rightColumn {
+    width: 55%;
+  }
+}
+
+.glowBlob {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  opacity: 0.15;
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+  pointer-events: none;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.securityBox {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--background);
+  border: 1px solid var(--glass-border);
+  z-index: 10;
+}
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 4px solid var(--primary);
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.errorBox {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btnPrimary {
+  display: inline-block;
+  background: var(--background);
+  border: 1px solid var(--glass-border);
+  color: var(--foreground);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.btnPrimary:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
