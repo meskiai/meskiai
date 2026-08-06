@@ -15,6 +15,16 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeFeature, setActiveFeature] = useState('agent');
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev < 4 ? prev + 1 : 1));
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
 
 
   useEffect(() => {
@@ -577,118 +587,131 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Apple Minimalist Typographic Timeline Section */}
-      <section className={styles.timelineSection} id="how-it-works">
-        <div className={styles.timelineHeader}>
-          <span className={styles.timelineEyebrow}>Możliwości systemu</span>
-          <h2 className={styles.timelineTitle}>Wszystko, czego potrzebujesz w jednym panelu</h2>
-          <p className={styles.timelineSubtitle}>
+      {/* Apple Minimalist Horizontal Timeline Track & Slider Section */}
+      <section className={styles.trackSection} id="how-it-works">
+        <div className={styles.trackHeader}>
+          <span className={styles.trackEyebrow}>Możliwości systemu</span>
+          <h2 className={styles.trackTitle}>Wszystko, czego potrzebujesz w jednym panelu</h2>
+          <p className={styles.trackSubtitle}>
             MESKIAI łączy zaawansowane narzędzia asystenta AI, integracje e-commerce i automatyczne pozyskiwanie klientów w prostym, przejrzystym kokpicie.
           </p>
         </div>
 
-        <div className={styles.timelineWrapper}>
-          
-          {/* Step 1 */}
-          <div className={styles.timelineItem}>
-            <div className={styles.timelineNumber}>01</div>
-            <div className={styles.timelineContent}>
-              <h3>Inteligentna skrzynka odbiorcza i asystent</h3>
-              <p>
-                Zarządzaj korespondencją w czasie rzeczywistym. Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
-              </p>
-              <div className={styles.timelineSpec}>
-                <div className={styles.timelineSpecItem}>
-                  <Mail size={14} />
-                  <span>Poczta POP3/SMTP</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Inbox size={14} />
-                  <span>Katalogowanie wątków</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Clock size={14} />
-                  <span>Obsługa 24/7</span>
-                </div>
-              </div>
-            </div>
+        <div className={styles.trackWrapper}>
+          {/* Horizontal Track bar */}
+          <div className={styles.trackTimeline}>
+            <div 
+              className={styles.trackLineProgress} 
+              style={{ width: `${(activeStep - 1) * 33.33}%` }}
+            ></div>
+            {[1, 2, 3, 4].map((step) => (
+              <button
+                key={step}
+                className={`${styles.trackNode} ${activeStep === step ? styles.trackNodeActive : ''}`}
+                onClick={() => {
+                  setActiveStep(step);
+                  setIsAutoPlaying(false); // Stop autoplay when user interacts
+                }}
+              >
+                0{step}
+              </button>
+            ))}
           </div>
 
-          {/* Step 2 */}
-          <div className={styles.timelineItem}>
-            <div className={styles.timelineNumber}>02</div>
-            <div className={styles.timelineContent}>
-              <h3>Automatyzacja e-commerce (Shopify/Woo)</h3>
-              <p>
-                Połącz swój sklep internetowy i zapomnij o powtarzalnych pytaniach. Agent w ułamku sekundy pobiera z bazy status zamówienia, informacje o dostawie i linki śledzenia kurierów (InPost, DPD), wysyłając je bezpośrednio do klientów.
-              </p>
-              <div className={styles.timelineSpec}>
-                <div className={styles.timelineSpecItem}>
-                  <ShoppingBag size={14} />
-                  <span>Sklepy internetowe</span>
+          {/* Dynamic Content Card */}
+          <div key={activeStep} className={`${styles.trackContentCard} ${styles.animateFadeIn}`}>
+            {activeStep === 1 && (
+              <>
+                <h3>Inteligentna skrzynka odbiorcza i asystent</h3>
+                <p>
+                  Zarządzaj korespondencją w czasie rzeczywistym. Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
+                </p>
+                <div className={styles.trackSpecs}>
+                  <div className={styles.trackSpecItem}>
+                    <Mail size={16} />
+                    <span>Poczta POP3/SMTP</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Inbox size={16} />
+                    <span>Katalogowanie wątków</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Clock size={16} />
+                    <span>Obsługa 24/7</span>
+                  </div>
                 </div>
-                <div className={styles.timelineSpecItem}>
-                  <Sliders size={14} />
-                  <span>Webhooki i API</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Shield size={14} />
-                  <span>Bezpieczne połączenie</span>
-                </div>
-              </div>
-            </div>
-          </div>
+              </>
+            )}
 
-          {/* Step 3 */}
-          <div className={styles.timelineItem}>
-            <div className={styles.timelineNumber}>03</div>
-            <div className={styles.timelineContent}>
-              <h3>Audyt konkurencji i analiza rynkowa</h3>
-              <p>
-                Zyskaj przewagę dzięki automatycznemu wywiadowi rynkowemu. Narzędzie zeskrapuje wskazaną stronę konkurencji, połączy się z Google Search i natychmiast wygeneruje kompletną analizę SWOT oraz rekomendacje strategiczne.
-              </p>
-              <div className={styles.timelineSpec}>
-                <div className={styles.timelineSpecItem}>
-                  <Globe size={14} />
-                  <span>Skaner stron WWW</span>
+            {activeStep === 2 && (
+              <>
+                <h3>Automatyzacja e-commerce (Shopify/Woo)</h3>
+                <p>
+                  Połącz swój sklep internetowy i zapomnij o powtarzalnych pytaniach. Agent w ułamku sekundy pobiera z bazy status zamówienia, informacje o dostawie i linki śledzenia kurierów (InPost, DPD), wysyłając je bezpośrednio do klientów.
+                </p>
+                <div className={styles.trackSpecs}>
+                  <div className={styles.trackSpecItem}>
+                    <ShoppingBag size={16} />
+                    <span>Sklepy internetowe</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Sliders size={16} />
+                    <span>Webhooki i API</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Shield size={16} />
+                    <span>Bezpieczne połączenie</span>
+                  </div>
                 </div>
-                <div className={styles.timelineSpecItem}>
-                  <Sparkles size={14} />
-                  <span>Analizy SWOT</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <CheckCircle size={14} />
-                  <span>Google Grounding</span>
-                </div>
-              </div>
-            </div>
-          </div>
+              </>
+            )}
 
-          {/* Step 4 */}
-          <div className={styles.timelineItem}>
-            <div className={styles.timelineNumber}>04</div>
-            <div className={styles.timelineContent}>
-              <h3>Pozyskiwanie klientów i baza leadów B2B</h3>
-              <p>
-                Automatycznie rozwijaj sprzedaż. Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe szyte na miarę ich profili działalności.
-              </p>
-              <div className={styles.timelineSpec}>
-                <div className={styles.timelineSpecItem}>
-                  <Target size={14} />
-                  <span>Wyszukiwarka B2B</span>
+            {activeStep === 3 && (
+              <>
+                <h3>Audyt konkurencji i analiza rynkowa</h3>
+                <p>
+                  Zyskaj przewagę dzięki automatycznemu wywiadowi rynkowemu. Narzędzie zeskrapuje wskazaną stronę konkurencji, połączy się z Google Search i natychmiast wygeneruje kompletną analizę SWOT oraz rekomendacje strategiczne.
+                </p>
+                <div className={styles.trackSpecs}>
+                  <div className={styles.trackSpecItem}>
+                    <Globe size={16} />
+                    <span>Skaner stron WWW</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Sparkles size={16} />
+                    <span>Analizy SWOT</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <CheckCircle size={16} />
+                    <span>Google Grounding</span>
+                  </div>
                 </div>
-                <div className={styles.timelineSpecItem}>
-                  <Users size={14} />
-                  <span>Bazy kontaktów</span>
-                </div>
-                <div className={styles.timelineSpecItem}>
-                  <Zap size={14} />
-                  <span>Ofertowanie AI</span>
-                </div>
-              </div>
-            </div>
-          </div>
+              </>
+            )}
 
+            {activeStep === 4 && (
+              <>
+                <h3>Pozyskiwanie klientów i baza leadów B2B</h3>
+                <p>
+                  Automatycznie rozwijaj sprzedaż. Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe szyte na miarę ich profili działalności.
+                </p>
+                <div className={styles.trackSpecs}>
+                  <div className={styles.trackSpecItem}>
+                    <Target size={16} />
+                    <span>Wyszukiwarka B2B</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Users size={16} />
+                    <span>Bazy kontaktów</span>
+                  </div>
+                  <div className={styles.trackSpecItem}>
+                    <Zap size={16} />
+                    <span>Ofertowanie AI</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
