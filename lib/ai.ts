@@ -22,7 +22,7 @@ Nie dodawaj żadnych dopisków od siebie, zwróć samą treść e-maila gotową 
   }
   prompt += `NAJNOWSZA WIADOMOŚĆ OD KLIENTA:\n${newEmail}\n\nTWOJA ODPOWIEDŹ:`;
 
-  const modelsToTry = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
+  const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
   let generatedText = "";
   
   for (const modelName of modelsToTry) {
@@ -57,7 +57,7 @@ Oceń kandydata i zwróć wynik JEDYNIE w formacie JSON (bez bloków kodu i doda
   "analysis": "Krótkie, profesjonalne podsumowanie (max 3-4 zdania) z uzasadnieniem oceny pod kątem zgodności z firmą."
 }`;
 
-  const modelsToTry = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"];
+  const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
   let generatedText = "";
 
   for (const modelName of modelsToTry) {
