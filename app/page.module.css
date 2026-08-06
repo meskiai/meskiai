@@ -1552,22 +1552,22 @@
 }
 
 /* ==========================================================================
-   FAQ SECTION (Apple Style Accordion)
+   INTERACTIVE SIMULATOR (Premium Product Walkthrough / FAQ Replace)
    ========================================================================== */
-.faqSection {
+.simSection {
   padding: 100px 5% 120px;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.faqHeader {
+.simHeader {
   text-align: center;
   margin-bottom: 56px;
 }
 
-.faqEyebrow {
+.simEyebrow {
   display: block;
   font-size: 0.78rem;
   font-weight: 700;
@@ -1577,7 +1577,7 @@
   margin-bottom: 12px;
 }
 
-.faqTitle {
+.simTitle {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -1585,132 +1585,361 @@
   margin-bottom: 16px;
 }
 
-.faqSubtitle {
+.simSubtitle {
   font-size: clamp(1rem, 1.2vw, 1.25rem);
   color: var(--subtext);
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   line-height: 1.5;
 }
 
-.faqGrid {
+.simContainer {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 40px;
+  align-items: stretch;
+}
+
+.simMenu {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 100%;
+  justify-content: center;
 }
 
-.faqCard {
+.simMenuItem {
   background: var(--card-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 16px;
-  padding: 24px;
+  padding: 22px 24px;
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
+  text-align: left;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
-.faqCard:hover {
+.simMenuItem:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(4px);
 }
 
-:global([data-theme="light"]) .faqCard:hover {
+:global([data-theme="light"]) .simMenuItem:hover {
   background: rgba(0, 0, 0, 0.015);
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-.faqQuestionRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+.simMenuItem.active {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.15);
 }
 
-.faqQuestionRow h3 {
-  font-size: 1.1rem;
+:global([data-theme="light"]) .simMenuItem.active {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--primary);
+}
+
+.simMenuHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.simMenuHeader svg {
+  color: var(--primary);
+}
+
+.simMenuItem h3 {
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--foreground);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
-.faqIconWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
-}
-
-:global([data-theme="light"]) .faqIconWrapper {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.faqIcon {
-  color: var(--foreground);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.faqCard.active .faqIconWrapper {
-  transform: rotate(180deg);
-  background: var(--primary);
-}
-
-.faqCard.active .faqIcon {
-  color: #fff;
-}
-
-.faqAnswerWrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding-top 0.3s ease;
-  overflow: hidden;
-}
-
-.faqCard.active .faqAnswerWrapper {
-  grid-template-rows: 1fr;
-  padding-top: 16px;
-}
-
-.faqAnswer {
-  min-height: 0;
+.simMenuDesc {
   color: var(--subtext);
-  line-height: 1.6;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.45;
   margin: 0;
 }
 
-/* Responsive FAQ overrides */
-@media (max-width: 767px) {
-  .faqSection {
-    padding: 44px 20px;
+/* Right Display Mockup */
+.simDisplay {
+  background: #0d0e12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 480px;
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+:global([data-theme="light"]) .simDisplay {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.simDisplayHeader {
+  background: #15161c;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+:global([data-theme="light"]) .simDisplayHeader {
+  background: #f5f6f8;
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.simDots {
+  display: flex;
+  gap: 8px;
+}
+
+.simDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.simDotRed { background: #ff5f56; }
+.simDotYellow { background: #ffbd2e; }
+.simDotGreen { background: #27c93f; }
+
+.simAddressBar {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 4px 20px;
+  font-size: 0.78rem;
+  color: var(--subtext);
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  width: 50%;
+  text-align: center;
+}
+
+:global([data-theme="light"]) .simAddressBar {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #555;
+}
+
+.simStatusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #27c93f;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.simScreen {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+/* Animations and custom styles for display screens */
+.simMailBubble {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+:global([data-theme="light"]) .simMailBubble {
+  background: rgba(0, 0, 0, 0.015);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.simMailHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--subtext);
+}
+
+.simMailBody {
+  line-height: 1.45;
+  color: var(--foreground);
+}
+
+.simAiAction {
+  border-left: 2px solid var(--primary);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: slideIn 0.5s ease forwards;
+}
+
+.simAiTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.simTypingText {
+  color: var(--foreground);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.simSuccessBanner {
+  background: rgba(39, 201, 63, 0.08);
+  border: 1px solid rgba(39, 201, 63, 0.2);
+  color: #27c93f;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* E-commerce specific simulation */
+.simLogContainer {
+  background: #07080a;
+  border-radius: 10px;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #8c909c;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+:global([data-theme="light"]) .simLogContainer {
+  background: #f8f9fa;
+  border-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.simLogLine {
+  display: flex;
+  gap: 8px;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.simLogTime {
+  color: #ffbd2e;
+}
+
+.simLogGreen {
+  color: #27c93f;
+}
+
+.simLogBlue {
+  color: var(--primary);
+}
+
+/* SWOT Table specific simulation */
+.simSwotGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.simSwotBox {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.simSwotS { background: rgba(39, 201, 63, 0.08); border: 1px solid rgba(39, 201, 63, 0.15); color: #27c93f; }
+.simSwotW { background: rgba(255, 95, 86, 0.08); border: 1px solid rgba(255, 95, 86, 0.15); color: #ff5f56; }
+.simSwotO { background: rgba(47, 128, 237, 0.08); border: 1px solid rgba(47, 128, 237, 0.15); color: #2f80ed; }
+.simSwotT { background: rgba(255, 189, 46, 0.08); border: 1px solid rgba(255, 189, 46, 0.15); color: #ffbd2e; }
+
+.simSwotBox h4 {
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.simSwotBox p {
+  margin: 0;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Overrides */
+@media (max-width: 991px) {
+  .simContainer {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
-  .faqHeader {
-    margin-bottom: 32px;
-  }
-  .faqCard {
-    padding: 18px 20px;
-    border-radius: 14px;
-  }
-  .faqQuestionRow h3 {
-    font-size: 0.98rem;
-    line-height: 1.4;
-  }
-  .faqAnswer {
-    font-size: 0.88rem;
-    line-height: 1.5;
+  .simDisplay {
+    height: 420px;
   }
 }
 
-@media (max-width: 389px) {
-  .faqSection {
-    padding: 32px 16px !important;
+@media (max-width: 767px) {
+  .simSection {
+    padding: 60px 20px;
+  }
+  .simHeader {
+    margin-bottom: 32px;
+  }
+  .simMenuItem {
+    padding: 16px 20px;
+    border-radius: 12px;
+  }
+  .simMenuItem h3 {
+    font-size: 1rem;
+  }
+  .simMenuDesc {
+    font-size: 0.82rem;
+  }
+  .simDisplay {
+    height: 380px;
   }
 }

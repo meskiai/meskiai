@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown } from "lucide-react";
+import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown, Target, ShoppingBag } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { ThemeToggle } from "./components/ThemeToggle";
 import styles from "./page.module.css";
@@ -15,7 +15,17 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeFeature, setActiveFeature] = useState('agent');
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [simTab, setSimTab] = useState<"agent" | "ecommerce" | "competitor" | "leads">("agent");
+
+  const [typingStep, setTypingStep] = useState(0);
+
+  useEffect(() => {
+    setTypingStep(0);
+    const interval = setInterval(() => {
+      setTypingStep((prev) => (prev < 3 ? prev + 1 : 0));
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [simTab]);
 
   useEffect(() => {
     const features = ['agent', 'cold', 'swot', 'security'];
@@ -577,37 +587,281 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className={styles.faqSection} id="faq">
-        <div className={styles.faqHeader}>
-          <span className={styles.faqEyebrow}>Centrum Pomocy</span>
-          <h2 className={styles.faqTitle}>Najczęściej zadawane pytania</h2>
-          <p className={styles.faqSubtitle}>
-            Masz pytania dotyczące działania MESKIAI? Sprawdź odpowiedzi na najczęstsze wątpliwości.
+      {/* Interactive Simulator Section */}
+      <section className={styles.simSection} id="simulator">
+        <div className={styles.simHeader}>
+          <span className={styles.simEyebrow}>Prezentacja Live</span>
+          <h2 className={styles.simTitle}>Jak MESKIAI automatyzuje Twój biznes?</h2>
+          <p className={styles.simSubtitle}>
+            Zobacz w czasie rzeczywistym, jak nasz asystent obsługuje maile, łączy się z systemem sklepowym, analizuje Twoją konkurencję oraz pozyskuje nowych klientów.
           </p>
         </div>
 
-        <div className={styles.faqGrid}>
-          {faqItems.map((item, idx) => (
-            <div 
-              key={idx} 
-              className={`${styles.faqCard} ${openFaq === idx ? styles.active : ''}`}
-              onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+        <div className={styles.simContainer}>
+          {/* Left Menu / Tabs */}
+          <div className={styles.simMenu}>
+            <button 
+              className={`${styles.simMenuItem} ${simTab === "agent" ? styles.active : ""}`}
+              onClick={() => setSimTab("agent")}
             >
-              <div className={styles.faqQuestionRow}>
-                <h3>{item.q}</h3>
-                <div className={styles.faqIconWrapper}>
-                  <ChevronDown size={18} className={styles.faqIcon} />
-                </div>
+              <div className={styles.simMenuHeader}>
+                <Inbox size={20} />
+                <h3>Autonomiczny Agent Poczty</h3>
               </div>
-              <div className={styles.faqAnswerWrapper}>
-                <p className={styles.faqAnswer}>{item.a}</p>
+              <p className={styles.simMenuDesc}>
+                Odbiera wiadomości 24/7, czyta załączniki PDF i samoczynnie odpisuje klientom. Trudne tematy segreguje jako "Ważne".
+              </p>
+            </button>
+
+            <button 
+              className={`${styles.simMenuItem} ${simTab === "ecommerce" ? styles.active : ""}`}
+              onClick={() => setSimTab("ecommerce")}
+            >
+              <div className={styles.simMenuHeader}>
+                <ShoppingBag size={20} />
+                <h3>Integracje E-commerce (Shopify/Woo)</h3>
+              </div>
+              <p className={styles.simMenuDesc}>
+                Przed napisaniem maila, agent w tle odpytuje bazę danych o status zamówienia, produkty i numer śledzenia przesyłki kurierskiej.
+              </p>
+            </button>
+
+            <button 
+              className={`${styles.simMenuItem} ${simTab === "competitor" ? styles.active : ""}`}
+              onClick={() => setSimTab("competitor")}
+            >
+              <div className={styles.simMenuHeader}>
+                <BarChart2 size={20} />
+                <h3>Audyt Konkurencji w 30 Sekund</h3>
+              </div>
+              <p className={styles.simMenuDesc}>
+                Zeskrapuje wybraną stronę internetową, odpytuje Google Search i w mgnieniu oka tworzy kompletną analizę SWOT oraz strategię.
+              </p>
+            </button>
+
+            <button 
+              className={`${styles.simMenuItem} ${simTab === "leads" ? styles.active : ""}`}
+              onClick={() => setSimTab("leads")}
+            >
+              <div className={styles.simMenuHeader}>
+                <Target size={20} />
+                <h3>Masowy Lead Generation</h3>
+              </div>
+              <p className={styles.simMenuDesc}>
+                Automatycznie wyszukuje firmy z wybranej branży w danym mieście, pobiera kontakty i generuje spersonalizowane kampanie mailowe.
+              </p>
+            </button>
+          </div>
+
+          {/* Right Display Console Mockup */}
+          <div className={styles.simDisplay}>
+            <div className={styles.simDisplayHeader}>
+              <div className={styles.simDots}>
+                <div className={`${styles.simDot} ${styles.simDotRed}`}></div>
+                <div className={`${styles.simDot} ${styles.simDotYellow}`}></div>
+                <div className={`${styles.simDot} ${styles.simDotGreen}`}></div>
+              </div>
+              <div className={styles.simAddressBar}>
+                {simTab === "agent" && "meskiai.com/dashboard/agent"}
+                {simTab === "ecommerce" && "meskiai.com/dashboard/sklep-api"}
+                {simTab === "competitor" && "meskiai.com/dashboard/analiza-seo"}
+                {simTab === "leads" && "meskiai.com/dashboard/baza-leadow"}
+              </div>
+              <div className={styles.simStatusIndicator}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#27c93f', display: 'inline-block' }}></span>
+                System Live
               </div>
             </div>
-          ))}
+
+            <div className={styles.simScreen}>
+              {/* Screen 1: Agent Sync Simulator */}
+              {simTab === "agent" && (
+                <>
+                  <div className={styles.simMailBubble}>
+                    <div className={styles.simMailHeader}>
+                      <span>Od: Jan Kowalski (klient@onet.pl)</span>
+                      <span>Dzisiaj, 14:02</span>
+                    </div>
+                    <div className={styles.simMailBody}>
+                      Dzień dobry, przesyłam w załączniku fakturę (Faktura_12_2026.pdf) i proszę o informację, jak wygląda u Państwa procedura zwrotu środków za uszkodzony towar. Dziękuję.
+                    </div>
+                  </div>
+
+                  {typingStep >= 1 && (
+                    <div className={styles.simAiAction}>
+                      <span className={styles.simAiTitle}>Proces Myślowy Agenta AI</span>
+                      <div style={{ fontStyle: 'italic', color: 'var(--subtext)', fontSize: '0.85rem' }}>
+                        &gt; Wykryto załącznik PDF oraz słowa kluczowe: "faktura", "zwrot".<br />
+                        &gt; Uruchamiam parser PDF... wyodrębniono kwotę 349,00 PLN oraz datę zakupu.<br />
+                        &gt; Kategoria: WAŻNE. Przygotowuję streszczenie dla właściciela + potwierdzenie dla klienta.
+                      </div>
+                    </div>
+                  )}
+
+                  {typingStep >= 2 && (
+                    <div className={styles.simAiAction}>
+                      <span className={styles.simAiTitle}>Wersja Robocza Odpowiedzi (SMTP)</span>
+                      <div className={styles.simTypingText}>
+                        {typingStep === 2 && "Pisanie odpowiedzi..."}
+                        {typingStep >= 3 && "Szanowny Panie,\n\nPotwierdzamy otrzymanie zgłoszenia reklamacyjnego wraz z fakturą. Sprawę przekazaliśmy do Działu Finansów w celu zrealizowania zwrotu kwoty 349,00 PLN. Poinformujemy o zleceniu przelewu.\n\nZ poważaniem,\nTwój Wirtualny Asystent"}
+                      </div>
+                    </div>
+                  )}
+
+                  {typingStep >= 3 && (
+                    <div className={styles.simSuccessBanner}>
+                      <CheckCircle size={16} />
+                      Wysłano automatyczną odpowiedź SMTP. Wątek dodany do zakładki: WAŻNE.
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Screen 2: E-commerce Sync Simulator */}
+              {simTab === "ecommerce" && (
+                <>
+                  <div className={styles.simLogContainer}>
+                    <div className={styles.simLogLine}>
+                      <span className={styles.simLogTime}>[14:10:02]</span>
+                      <span className={styles.simLogBlue}>[Shopify Webhook]</span>
+                      <span>Otrzymano nową wiadomość od: milosz@meski.pl</span>
+                    </div>
+                    {typingStep >= 1 && (
+                      <div className={styles.simLogLine}>
+                        <span className={styles.simLogTime}>[14:10:04]</span>
+                        <span className={styles.simLogBlue}>[Baza Danych]</span>
+                        <span>Szukanie zamówień dla maila milosz@meski.pl... Znaleziono zamówienie #1042</span>
+                      </div>
+                    )}
+                    {typingStep >= 1 && (
+                      <div className={styles.simLogLine}>
+                        <span className={styles.simLogTime}>[14:10:05]</span>
+                        <span className={styles.simLogBlue}>[InPost API]</span>
+                        <span>Pobieranie statusu paczki: W TRANCIE (In Transit). Kurier odebrał przesyłkę.</span>
+                      </div>
+                    )}
+                    {typingStep >= 2 && (
+                      <div className={styles.simLogLine}>
+                        <span className={styles.simLogTime}>[14:10:07]</span>
+                        <span className={styles.simLogGreen}>[Agent AI]</span>
+                        <span>Generowanie odpowiedzi z linkiem śledzenia: https://inpost.pl/track/1042</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {typingStep >= 2 && (
+                    <div className={styles.simAiAction} style={{ marginTop: 8 }}>
+                      <span className={styles.simAiTitle}>Wygenerowana odpowiedź (Automatyczna)</span>
+                      <div className={styles.simTypingText}>
+                        {typingStep === 2 && "Pisanie wiadomości..."}
+                        {typingStep >= 3 && "Cześć Miłosz!\n\nTwoje zamówienie #1042 jest już w drodze! Przesyłka została przekazana kurierowi InPost. Możesz na bieżąco monitorować jej trasę klikając w ten link śledzenia: https://inpost.pl/track/1042.\n\nPozdrawiamy,\nObsługa Klienta"}
+                      </div>
+                    </div>
+                  )}
+
+                  {typingStep >= 3 && (
+                    <div className={styles.simSuccessBanner}>
+                      <CheckCircle size={16} />
+                      Wysłano odpowiedź ze statusem wysyłki. Klient obsłużony w 6 sekund bez Twojego udziału.
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Screen 3: Competitor SWOT Simulator */}
+              {simTab === "competitor" && (
+                <>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', fontFamily: 'monospace' }}>
+                      {typingStep === 0 && "https://"}
+                      {typingStep === 1 && "https://konkurencyjny-sklep.pl"}
+                      {typingStep >= 2 && "https://konkurencyjny-sklep.pl"}
+                    </div>
+                    <div className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {typingStep <= 1 ? "Analizowanie..." : "Gotowe"}
+                    </div>
+                  </div>
+
+                  {typingStep >= 1 && (
+                    <div className={styles.simLogContainer} style={{ padding: '12px' }}>
+                      <div className={styles.simLogLine}>
+                        <span className={styles.simLogGreen}>✔</span>
+                        <span>Pobrano treść strony konkurencyjny-sklep.pl</span>
+                      </div>
+                      {typingStep >= 2 && (
+                        <div className={styles.simLogLine}>
+                          <span className={styles.simLogGreen}>✔</span>
+                          <span>Uruchomiono Google Search Grounding dla analizy rynkowej</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {typingStep >= 2 && (
+                    <div className={styles.simSwotGrid}>
+                      <div className={`${styles.simSwotBox} ${styles.simSwotS}`}>
+                        <h4>Mocne strony (S)</h4>
+                        <p>Darmowa wysyłka od 150zł, duży ruch z SEO na frazy ogólne.</p>
+                      </div>
+                      <div className={`${styles.simSwotBox} ${styles.simSwotW}`}>
+                        <h4>Słabe strony (W)</h4>
+                        <p>Brak obsługi czatu na żywo, powolny support mailowy.</p>
+                      </div>
+                      <div className={`${styles.simSwotBox} ${styles.simSwotO}`}>
+                        <h4>Szansa (O)</h4>
+                        <p>Wdrożenie u Ciebie bota 24/7 przejmie klientów zmęczonych czekaniem.</p>
+                      </div>
+                      <div className={`${styles.simSwotBox} ${styles.simSwotT}`}>
+                        <h4>Zagrożenie (T)</h4>
+                        <p>Rywal może rozwinąć sekcję FAQ i zoptymalizować koszyk.</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Screen 4: Lead Generation Simulator */}
+              {simTab === "leads" && (
+                <>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--subtext)', marginBottom: '8px', fontWeight: 'bold' }}>Kryteria wyszukiwania leadów:</div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ background: 'var(--primary-glow)', border: '1px solid var(--primary)', color: 'var(--foreground)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem' }}>Branża: Hotele</span>
+                      <span style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--subtext)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem' }}>Miasto: Zakopane</span>
+                    </div>
+                  </div>
+
+                  {typingStep >= 1 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(39, 201, 63, 0.04)', border: '1px solid rgba(39, 201, 63, 0.1)', padding: '10px 14px', borderRadius: '8px' }}>
+                        <span style={{ fontWeight: '600' }}>🏢 Giewont Resort & Spa</span>
+                        <span style={{ color: 'var(--primary)', fontFamily: 'monospace' }}>kontakt@giewontresort.pl</span>
+                      </div>
+                      {typingStep >= 2 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(39, 201, 63, 0.04)', border: '1px solid rgba(39, 201, 63, 0.1)', padding: '10px 14px', borderRadius: '8px' }}>
+                          <span style={{ fontWeight: '600' }}>🏢 Hotel Tatry View</span>
+                          <span style={{ color: 'var(--primary)', fontFamily: 'monospace' }}>recepcja@hotel-tatry.pl</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {typingStep >= 2 && (
+                    <div className={styles.simAiAction}>
+                      <span className={styles.simAiTitle}>Spersonalizowany Mail Sprzedażowy (Cold Email)</span>
+                      <div className={styles.simTypingText} style={{ fontSize: '0.85rem' }}>
+                        {typingStep === 2 && "Generowanie oferty..."}
+                        {typingStep >= 3 && "Dzień dobry,\n\nZauważyłem, że Giewont Resort oferuje wyjątkowe pakiety spa w Zakopanem. Ponieważ turyści często rezerwują noclegi późnym wieczorem, chcemy zaproponować wdrożenie asystenta AI, który odpowie na pytania o wolne pokoje 24/7 na Waszym mailu supportowym...\n\nPozdrawiam,\nKamil - Twój Handlowiec"}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
-      
+
       <footer className={styles.footer}>
         <div className={styles.footerLinks} style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/regulamin">Regulamin</a>
@@ -619,26 +873,3 @@ export default function Home() {
     </main>
   );
 }
-
-const faqItems = [
-  {
-    q: "Jak działa logowanie przez Google? Czy MESKIAI ma dostęp do moich maili?",
-    a: "Logowanie za pomocą Google służy wyłącznie do bezpiecznej identyfikacji i autoryzacji Twojego profilu w panelu MESKIAI. Aplikacja nie żąda uprawnień do czytania Twojej poczty przez Google API. Połączenie z Twoją skrzynką odbywa się za pomocą dedykowanego, wyizolowanego klucza dostępu, co gwarantuje pełne bezpieczeństwo i kontrolę."
-  },
-  {
-    q: "Jak działa integracja ze sklepem (Shopify / WooCommerce)?",
-    a: "Integracja opiera się na prostym i bezpiecznym połączeniu Webhook. Wystarczy wkleić wygenerowany link w panelu swojego sklepu. Agent automatycznie pobiera informacje o zamówieniach w tle, dzięki czemu w czasie rzeczywistym odpowiada na pytania o status przesyłki, pomaga w procedurze zwrotu towaru oraz obsługuje zgłoszenia reklamacyjne."
-  },
-  {
-    q: "Czy konfiguracja poczty jest bezpieczna?",
-    a: "Tak, bezpieczeństwo to nasz priorytet. Wszystkie dane dostępowe są szyfrowane kryptograficznie i przechowywane w zabezpieczonej infrastrukturze. Wykorzystanie jednorazowego klucza dostępu sprawia, że nie podajesz nam swojego głównego hasła logowania do Google, a sam dostęp możesz natychmiastowo zablokować w panelu swojego dostawcy poczty."
-  },
-  {
-    q: "Co to jest 'Audyt Konkurencji' i jak działa baza leadów?",
-    a: "Audyt Konkurencji to moduł, który na podstawie analizy struktury oferty innej firmy wskazuje jej mocne i słabe strony oraz rynkowe szanse i zagrożenia. Z kolei baza leadów automatyzuje docieranie do nowych odbiorców: znajduje idealne dopasowania biznesowe i projektuje zindywidualizowane kampanie kontaktowe."
-  },
-  {
-    q: "Jak mogę anulować subskrypcję?",
-    a: "W każdej chwili. Z poziomu ustawień w panelu masz dostęp do portalu rozliczeniowego Stripe, gdzie jednym kliknięciem możesz anulować subskrypcję lub zmienić pakiet na inny. Brak długoterminowych zobowiązań."
-  }
-];
