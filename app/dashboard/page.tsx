@@ -10,6 +10,7 @@ import {
   Target, Zap, TrendingUp, ShieldAlert, Plus, BarChart2, Activity, Lightbulb, PieChart, ExternalLink, Settings,
   X, DollarSign, CheckSquare, ArrowDownRight, Info, Star
 } from "lucide-react";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 import { ThemeToggle } from "../components/ThemeToggle";
 import styles from "./page.module.css";
 const getCleanDraftReply = (draft: string | null): string => {
@@ -152,17 +153,17 @@ export default function Dashboard() {
   };
   // Computed Limits
   const getTier = (priceId: string | null | undefined) => {
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+    if (priceId === PRICE_MAX) return 3;
+    if (priceId === PRICE_PRO) return 2;
+    if (priceId === PRICE_BASIC) return 1;
     return 0;
   };
   const userTier = getTier(subscriptionData?.stripePriceId);
 
   const pid = subscriptionData?.stripePriceId;
-  const isBasic = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-  const isPro = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-  const isMax = pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+  const isBasic = pid === PRICE_BASIC;
+  const isPro = pid === PRICE_PRO;
+  const isMax = pid === PRICE_MAX;
   const isUnlimited = isMax;
   
   const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
@@ -1989,10 +1990,6 @@ export default function Dashboard() {
 
           {/* ACCOUNT SETTINGS VIEW */}
           {currentTab === "ACCOUNT" && (() => {
-            const PRICE_BASIC = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-            const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-            const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-
             const currentPriceId = subscriptionData?.stripePriceId;
             const planName =
               currentPriceId === PRICE_MAX ? "MAX" :
@@ -2134,9 +2131,6 @@ export default function Dashboard() {
 
                   {/* ── Row 3: Usage limits ── */}
                   {(() => {
-                    const PRICE_BASIC = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-                    const PRICE_PRO   = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
-                    const PRICE_MAX   = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
                     const pid         = subscriptionData?.stripePriceId;
                     const isBasic     = pid === PRICE_BASIC;
                     const isPro       = pid === PRICE_PRO;

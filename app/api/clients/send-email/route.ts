@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
+import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
 import { sendReplySMTP } from "../../../../lib/mail";
 
 export async function POST(req: Request) {
@@ -48,8 +49,8 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const isBasic = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user?.stripePriceId === PRICE_BASIC;
+    const isPro = user?.stripePriceId === PRICE_PRO;
     const emailsCount = userSettings.emailsSentThisMonth || 0;
 
     if (isBasic && emailsCount >= 50) {

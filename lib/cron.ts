@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
 import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
+import { PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
 
@@ -29,8 +30,8 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
 
 // ─── Price limits ──────────────────────────────────────────────────────────────
 function getMonthlyLimit(stripePriceId: string | null): number {
-  const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-  const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+  const PRICE_MAX = PRICE_MAX;
+  const PRICE_PRO = PRICE_PRO;
   if (stripePriceId === PRICE_MAX) return Infinity;
   if (stripePriceId === PRICE_PRO) return 1000;
   return 50; // Basic (default for any active subscription)

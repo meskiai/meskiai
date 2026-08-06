@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
+import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
 import { generateObject, generateText } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
 import { z } from "zod";
@@ -46,8 +47,8 @@ export async function POST(req: Request) {
       }
     });
 
-    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user.stripePriceId === PRICE_BASIC;
+    const isPro = user.stripePriceId === PRICE_PRO;
 
     if (isBasic && leadsCount >= 20) {
       return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu BASIC (20). Zrób upgrade pakietu, aby kontynuować." }, { status: 403 });

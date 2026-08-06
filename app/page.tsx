@@ -92,9 +92,9 @@ export default function Home() {
 
   const getTier = (priceId: string | null) => {
     if (!priceId) return 0;
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+    if (priceId === 'max') return 3;
+    if (priceId === 'pro') return 2;
+    if (priceId === 'basic') return 1;
     return 0;
   };
 
@@ -534,11 +534,11 @@ export default function Home() {
               style={{ opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 1) return;
-                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic';
+                const priceId = 'basic';
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC || 'basic') ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet")}
+              {loadingPriceId === 'basic' ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet")}
             </button>
           </div>
  
@@ -567,11 +567,11 @@ export default function Home() {
               style={{ opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 2) return;
-                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro';
+                const priceId = 'pro';
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'pro') ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO")}
+              {loadingPriceId === 'pro' ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO")}
             </button>
           </div>
  
@@ -597,11 +597,11 @@ export default function Home() {
               style={{ opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 3) return;
-                const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max';
+                const priceId = 'max';
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX || 'max') ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
+              {loadingPriceId === 'max' ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
             </button>
           </div>
         </div>

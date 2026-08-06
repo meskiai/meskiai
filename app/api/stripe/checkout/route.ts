@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Stripe from "stripe";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,12 @@ export async function POST(req: Request) {
     }
 
     const { priceId: rawPriceId } = await req.json();
-    const priceId = rawPriceId?.trim();
+    let priceId = rawPriceId?.trim();
+    
+    // Map tier strings to actual Stripe Price IDs
+    if (priceId === 'basic') priceId = PRICE_BASIC;
+    if (priceId === 'pro') priceId = PRICE_PRO;
+    if (priceId === 'max') priceId = PRICE_MAX;
 
     if (!priceId) {
       return NextResponse.json({ error: "Price ID is required" }, { status: 400 });
@@ -35,9 +41,9 @@ export async function POST(req: Request) {
     }
 
     function getTier(pid: string | null) {
-      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
-      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
-      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+      if (pid === PRICE_MAX || pid === 'max') return 3;
+      if (pid === PRICE_PRO || pid === 'pro') return 2;
+      if (pid === PRICE_BASIC || pid === 'basic') return 1;
       return 0;
     }
 

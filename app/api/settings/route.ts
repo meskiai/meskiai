@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { prisma } from '../../../lib/prisma';
+import { PRICE_PRO, PRICE_MAX } from '@/lib/pricing';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
 
   try {
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    const isProOrMax = user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || user?.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
+    const isProOrMax = user?.stripePriceId === PRICE_PRO || user?.stripePriceId === PRICE_MAX;
 
     const { autoReply, onboardingDone, businessContext, companyName, companyNip, companyAddress, companyBankAccount, companyWebsite, defaultVatRate, replyTone, storeType, storeUrl, storeApiKey, storeApiSecret } = await req.json();
 

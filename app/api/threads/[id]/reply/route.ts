@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { sendReplySMTP } from "../../../../../lib/mail";
+import { PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 
 export async function POST(
   req: Request,
@@ -60,8 +61,8 @@ export async function POST(
       const emailsCount = userSettings.emailsSentThisMonth || 0;
 
       // Use the same limit logic as lib/cron.ts getMonthlyLimit()
-      const PRICE_MAX = process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX;
-      const PRICE_PRO = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+      const PRICE_MAX = PRICE_MAX;
+      const PRICE_PRO = PRICE_PRO;
       const priceId = user?.stripePriceId ?? null;
       
       const monthlyLimit =

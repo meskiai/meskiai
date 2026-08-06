@@ -4,6 +4,7 @@ import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
+import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
 import { prisma } from "../../../../lib/prisma";
 
 export const maxDuration = 60;
@@ -32,8 +33,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
-    const isBasic = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC;
-    const isPro = user.stripePriceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+    const isBasic = user.stripePriceId === PRICE_BASIC;
+    const isPro = user.stripePriceId === PRICE_PRO;
     const searchesCount = user.settings?.competitorSearchesThisMonth || 0;
 
     if (isBasic && searchesCount >= 10) {
