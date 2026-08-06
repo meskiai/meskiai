@@ -19,24 +19,8 @@ export default function Home() {
 
   const handleCheckout = async (priceId: string) => {
     setLoadingPriceId(priceId);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || "Błąd podczas tworzenia sesji płatności");
-        setLoadingPriceId(null);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Błąd połączenia z serwerem");
-      setLoadingPriceId(null);
-    }
+    // Przekierowanie na customową stronę płatności Stripe Elements
+    router.push(`/checkout?priceId=${priceId}`);
   };
 
   const handlePlanSelection = async (priceId: string) => {

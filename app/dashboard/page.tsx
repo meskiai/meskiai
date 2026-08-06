@@ -316,23 +316,7 @@ export default function Dashboard() {
 
   const handleCheckout = async (priceId: string) => {
     setIsRedirectingToCheckout(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        showToast("Błąd podczas tworzenia sesji płatności", "error");
-        setIsRedirectingToCheckout(false);
-      }
-    } catch (e) {
-      console.error(e);
-      setIsRedirectingToCheckout(false);
-    }
+    window.location.href = `/checkout?priceId=${priceId}`;
   };
 
   const [isOpeningPortal, setIsOpeningPortal] = useState(false);
