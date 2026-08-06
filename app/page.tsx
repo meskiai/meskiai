@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown, Target, ShoppingBag } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -92,9 +93,9 @@ export default function Home() {
 
   const getTier = (priceId: string | null) => {
     if (!priceId) return 0;
-    if (priceId === 'max') return 3;
-    if (priceId === 'pro') return 2;
-    if (priceId === 'basic') return 1;
+    if (priceId === PRICE_MAX) return 3;
+    if (priceId === PRICE_PRO) return 2;
+    if (priceId === PRICE_BASIC) return 1;
     return 0;
   };
 

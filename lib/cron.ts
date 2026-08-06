@@ -30,8 +30,6 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
 
 // ─── Price limits ──────────────────────────────────────────────────────────────
 function getMonthlyLimit(stripePriceId: string | null): number {
-  const PRICE_MAX = PRICE_MAX;
-  const PRICE_PRO = PRICE_PRO;
   if (stripePriceId === PRICE_MAX) return Infinity;
   if (stripePriceId === PRICE_PRO) return 1000;
   return 50; // Basic (default for any active subscription)

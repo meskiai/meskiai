@@ -61,8 +61,6 @@ export async function POST(
       const emailsCount = userSettings.emailsSentThisMonth || 0;
 
       // Use the same limit logic as lib/cron.ts getMonthlyLimit()
-      const PRICE_MAX = PRICE_MAX;
-      const PRICE_PRO = PRICE_PRO;
       const priceId = user?.stripePriceId ?? null;
       
       const monthlyLimit =
