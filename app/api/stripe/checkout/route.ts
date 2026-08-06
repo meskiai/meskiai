@@ -19,7 +19,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { priceId } = await req.json();
+    const { priceId: rawPriceId } = await req.json();
+    const priceId = rawPriceId?.trim();
 
     if (!priceId) {
       return NextResponse.json({ error: "Price ID is required" }, { status: 400 });
