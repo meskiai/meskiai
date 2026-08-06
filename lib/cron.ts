@@ -568,7 +568,7 @@ async function processMessage({
       analysisText = cleanString(analysisText);
       ackText = cleanString(ackText);
 
-      const shouldSendAck = settings.autoReply && !isPreviouslyImportant && ackText && ackText.length > 10;
+      const shouldSendAck = settings.autoReply && ackText && ackText.length > 10;
       let ackSent = false;
       if (shouldSendAck) {
         const replyTo = extractEmail(msg.from);
@@ -613,7 +613,7 @@ async function processMessage({
       await prisma.thread
         .update({ where: { id: dbThread.id }, data: { status: 'REQUIRES_ATTENTION', draftReply: draftContent } })
         .catch(() => {});
-      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${settings.autoReply && !isPreviouslyImportant && !!ackText})`);
+      console.log(`[Agent AI] ⚠️ Ważna sprawa → REQUIRES_ATTENTION (potwierdzenie wysłane: ${settings.autoReply && !!ackText})`);
       return false;
     }
 
