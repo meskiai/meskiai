@@ -102,10 +102,10 @@ export async function POST(req: Request) {
         break;
       }
 
-      
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
+        const previousAttributes = event.data.previous_attributes as Partial<Stripe.Subscription> | undefined;
         
         const user = await prisma.user.findUnique({
           where: { stripeCustomerId: customerId }
@@ -119,6 +119,10 @@ export async function POST(req: Request) {
           const newStatus = (subscription as any).status as string;
           const isActive = newStatus === 'active' || newStatus === 'trialing';
 
+          // Sprawdzamy czy to nowa subskrypcja aktywowana przez Stripe Elements
+          const wasIncomplete = previousAttributes?.status === 'incomplete';
+          const isNewlyActivated = wasIncomplete && isActive;
+
           await prisma.user.update({
             where: { id: user.id },
             data: {
@@ -128,6 +132,52 @@ export async function POST(req: Request) {
               subscriptionStatus: newStatus,
             },
           });
+
+          // NEW SUBSCRIPTION SETUP (from Elements)
+          if (isNewlyActivated) {
+            const userId = user.id;
+            const oldSubscriptionId = subscription.metadata?.oldSubscriptionId;
+
+            // Reset monthly usage on new subscription and AUTO-ENABLE the AI agent
+            await prisma.userSettings.upsert({
+              where: { userId },
+              update: {
+                emailsSentThisMonth: 0,
+                competitorSearchesThisMonth: 0,
+                leadSearchesThisMonth: 0,
+                autoReply: true,
+              },
+              create: {
+                userId,
+                emailsSentThisMonth: 0,
+                competitorSearchesThisMonth: 0,
+                leadSearchesThisMonth: 0,
+                autoReply: true,
+                onboardingDone: false,
+                replyTone: 'PROFESJONALNY',
+              }
+            });
+
+            console.log(`[Stripe Elements] Subskrypcja aktywowana dla userId=${userId}. autoReply=true.`);
+
+            // Send premium welcome email
+            const toEmail = user.email;
+            if (toEmail) {
+              await sendSystemWelcomeEmail(toEmail).catch((welcomeErr) => {
+                console.error(`[Welcome Email] Failed to send welcome email to ${toEmail}:`, welcomeErr.message);
+              });
+            }
+
+            // Cancel the OLD subscription immediately if this was an upgrade
+            if (oldSubscriptionId && oldSubscriptionId !== subscription.id) {
+              try {
+                await stripe.subscriptions.cancel(oldSubscriptionId);
+                console.log(`Cancelled old subscription ${oldSubscriptionId} after upgrade to ${subscription.id}`);
+              } catch (cancelErr: any) {
+                console.warn(`Could not cancel old subscription ${oldSubscriptionId}:`, cancelErr.message);
+              }
+            }
+          }
 
           // If subscription becomes inactive (past_due, unpaid, paused) → stop the agent
           if (!isActive) {
