@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -55,7 +55,7 @@ const PLAN_DETAILS: Record<string, any> = {
   }
 };
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const priceId = searchParams?.get("priceId") || "";
   const { data: session, status } = useSession();
@@ -190,5 +190,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0C0C0E] text-white">Wczytywanie...</div>}>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
