@@ -577,13 +577,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Vertical Timeline Section */}
+      {/* Apple Minimalist Typographic Timeline Section */}
       <section className={styles.timelineSection} id="how-it-works">
         <div className={styles.timelineHeader}>
           <span className={styles.timelineEyebrow}>Jak to działa?</span>
           <h2 className={styles.timelineTitle}>Droga wiadomości krok po kroku</h2>
           <p className={styles.timelineSubtitle}>
-            Zobacz, jak MESKIAI obsługuje skrzynkę pocztową w czasie rzeczywistym – od pierwszego maila klienta aż po w pełni zautomatyzowane rozwiązanie problemu.
+            Bez zbędnych narzędzi i skomplikowanej konfiguracji. Zobacz, jak MESKIAI przetwarza każde zapytanie w pełnej harmonii z Twoim biznesem.
           </p>
         </div>
 
@@ -591,21 +591,24 @@ export default function Home() {
           
           {/* Step 1 */}
           <div className={styles.timelineItem}>
-            <div className={styles.timelineBadge}>1</div>
+            <div className={styles.timelineNumber}>01</div>
             <div className={styles.timelineContent}>
-              <h3>Odebranie wiadomości (Sync POP3)</h3>
+              <h3>Odebranie i rejestracja wątku</h3>
               <p>
-                Klient wysyła e-mail na Twoją skrzynkę. MESKIAI za pomocą bezpiecznej, nieustannej synchronizacji POP3 rejestruje wiadomość w systemie w ułamku sekundy.
+                Wiadomość klienta trafia do systemu natychmiast po jej wysłaniu. MESKIAI łączy się bezpiecznie z serwerem pocztowym, analizując metadane nadawcy oraz nagłówki e-maila.
               </p>
-              
-              <div className={styles.microPreview}>
-                <div className={styles.microEmailHeader}>
-                  <span>jan.kowalski@gmail.com</span>
-                  <span>Przed chwilą</span>
+              <div className={styles.timelineSpec}>
+                <div className={styles.timelineSpecItem}>
+                  <Mail size={14} />
+                  <span>POP3 SSL</span>
                 </div>
-                <div className={styles.microEmailSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
-                <div className={styles.microEmailBody}>
-                  Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację kurtki. Załączam fakturę zakupową w formacie PDF. Proszę o zwrot pieniędzy.
+                <div className={styles.timelineSpecItem}>
+                  <Globe size={14} />
+                  <span>Czas rzeczywisty</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <Clock size={14} />
+                  <span>&lt; 1 sekunda</span>
                 </div>
               </div>
             </div>
@@ -613,24 +616,24 @@ export default function Home() {
 
           {/* Step 2 */}
           <div className={styles.timelineItem}>
-            <div className={styles.timelineBadge}>2</div>
+            <div className={styles.timelineNumber}>02</div>
             <div className={styles.timelineContent}>
-              <h3>Analiza AI i odczyt PDF</h3>
+              <h3>Analiza kontekstu i załączników PDF</h3>
               <p>
-                Sztuczna inteligencja natychmiast analizuje treść pod kątem intencji oraz odczytuje i parsuje wszelkie załączone pliki, takie jak faktury czy specyfikacje w formacie PDF.
+                Zaawansowany model sztucznej inteligencji interpretuje intencję klienta, automatycznie parsując załączone dokumenty (np. faktury, specyfikacje) i wyodrębniając kluczowe dane.
               </p>
-              
-              <div className={styles.microPreview}>
-                <div className={styles.microPdf}>
-                  <FileText size={18} style={{ color: '#ff5f56' }} />
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Faktura_1042.pdf</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>142 KB</span>
-                  </div>
-                </div>
-                <div className={styles.microScanner}>
+              <div className={styles.timelineSpec}>
+                <div className={styles.timelineSpecItem}>
                   <Sparkles size={14} />
-                  <span>[AI] Odczytywanie pliku PDF... Dane: Jan Kowalski, Zamówienie: #1042, Kwota: 349.00 PLN, Temat: Reklamacja</span>
+                  <span>Gemini 3.5</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <FileText size={14} />
+                  <span>OCR Parser PDF</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <Shield size={14} />
+                  <span>Ekstrakcja danych</span>
                 </div>
               </div>
             </div>
@@ -638,19 +641,24 @@ export default function Home() {
 
           {/* Step 3 */}
           <div className={styles.timelineItem}>
-            <div className={styles.timelineBadge}>3</div>
+            <div className={styles.timelineNumber}>03</div>
             <div className={styles.timelineContent}>
-              <h3>Automatyczne sprawdzenie sklepu</h3>
+              <h3>Weryfikacja w systemie e-commerce</h3>
               <p>
-                System łączy się z Twoją platformą e-commerce (Shopify, WooCommerce) lub bazą danych przez API, aby w mgnieniu oka zweryfikować status zamówienia, status płatności i wysyłki.
+                System łączy się z platformami takimi jak Shopify czy WooCommerce, sprawdzając status zamówień, płatności oraz numery przesyłek kurierskich dla pełnej precyzji odpowiedzi.
               </p>
-              
-              <div className={styles.microPreview}>
-                <div className={styles.microConsole}>
-                  <div>&gt; Odpytywanie API sklepu o klienta: jan.kowalski@gmail.com...</div>
-                  <div>&gt; Pobieranie szczegółów zamówienia #1042...</div>
-                  <div style={{ color: '#27c93f' }}>&gt; ZNALEZIONO. Status: DORĘCZONE (Kurier DPD). Kwota: 349,00 PLN.</div>
-                  <div>&gt; Dopasowanie kwoty z faktury: Zgodne.</div>
+              <div className={styles.timelineSpec}>
+                <div className={styles.timelineSpecItem}>
+                  <ShoppingBag size={14} />
+                  <span>Shopify & Woo</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <Sliders size={14} />
+                  <span>API Integration</span>
+                </div>
+                <div className={styles.timelineSpecItem}>
+                  <CheckCircle size={14} />
+                  <span>Baza Zamówień</span>
                 </div>
               </div>
             </div>
@@ -658,24 +666,24 @@ export default function Home() {
 
           {/* Step 4 */}
           <div className={styles.timelineItem}>
-            <div className={styles.timelineBadge}>4</div>
+            <div className={styles.timelineNumber}>04</div>
             <div className={styles.timelineContent}>
               <h3>Automatyczna odpowiedź i klasyfikacja</h3>
               <p>
-                Agent wysyła precyzyjną, automatyczną odpowiedź SMTP, a wątek oznacza w Twoim panelu etykietą "Do uwagi" (Ważne), dając Ci pełną kontrolę i oszczędzając czas.
+                Spersonalizowany e-mail zostaje wysłany przez bezpieczny protokół SMTP. System klasyfikuje priorytet wątku i oznacza go jako ważny w panelu właściciela, zapewniając pełną kontrolę.
               </p>
-              
-              <div className={styles.microPreview}>
-                <div className={styles.microSentBanner}>
-                  <CheckCircle size={16} />
-                  Odpowiedź wysłana automatycznie
+              <div className={styles.timelineSpec}>
+                <div className={styles.timelineSpecItem}>
+                  <Zap size={14} />
+                  <span>SMTP Send</span>
                 </div>
-                <div className={styles.microEmailBody} style={{ fontStyle: 'italic', marginBottom: '16px' }}>
-                  "Dzień dobry Panie Janie, potwierdzamy przyjęcie zgłoszenia reklamacyjnego dotyczącego zamówienia #1042 na kwotę 349,00 PLN. Zlecenie zwrotu środków zostało przekazane do realizacji..."
+                <div className={styles.timelineSpecItem}>
+                  <Inbox size={14} />
+                  <span>Oznaczenie: Ważne</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
-                  <span style={{ color: 'var(--subtext)' }}>Status wątku:</span>
-                  <span className={`${styles.microBadge} ${styles.badgeAttention}`}>Do uwagi (Ważne)</span>
+                <div className={styles.timelineSpecItem}>
+                  <Settings size={14} />
+                  <span>Pełna kontrola</span>
                 </div>
               </div>
             </div>
