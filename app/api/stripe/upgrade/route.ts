@@ -32,6 +32,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No active subscription found to upgrade." }, { status: 400 });
     }
 
+    function getTier(pid: string | null) {
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+      return 0;
+    }
+
+    const currentTier = getTier(user.stripePriceId);
+    const targetTier = getTier(priceId);
+
+    if (currentTier === targetTier) {
+      return NextResponse.json({ error: "Posiadasz już ten plan subskrypcyjny." }, { status: 400 });
+    }
+
+    if (targetTier < currentTier) {
+      return NextResponse.json({ error: "Downgrade planu nie jest możliwy za pomocą tej operacji. Użyj portalu rozliczeniowego Stripe." }, { status: 400 });
+    }
+
     // Retrieve the current subscription
     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 

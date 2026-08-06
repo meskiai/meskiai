@@ -33,15 +33,34 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Prevent subscribing to the exact same plan they already have
-    if (
-      user.stripePriceId === priceId &&
-      ["active", "trialing"].includes(user.subscriptionStatus || "")
-    ) {
-      return NextResponse.json(
-        { error: "Masz już ten plan. Wybierz wyższy pakiet, aby dokonać ulepszenia." },
-        { status: 400 }
-      );
+    function getTier(pid: string | null) {
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_MAX) return 3;
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) return 2;
+      if (pid === process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC) return 1;
+      return 0;
+    }
+
+    const currentPriceId = user.stripePriceId;
+    const currentStatus = user.subscriptionStatus;
+    const isCurrentActive = ["active", "trialing"].includes(currentStatus || "");
+
+    if (isCurrentActive && currentPriceId) {
+      const currentTier = getTier(currentPriceId);
+      const targetTier = getTier(priceId);
+
+      if (currentTier === targetTier) {
+        return NextResponse.json(
+          { error: "Masz już ten plan. Wybierz wyższy pakiet, aby dokonać ulepszenia." },
+          { status: 400 }
+        );
+      }
+
+      if (targetTier < currentTier) {
+        return NextResponse.json(
+          { error: "Przejście na niższy pakiet (downgrade) nie jest dostępne bezpośrednio. Zarządzaj swoimi płatnościami w portalu Stripe." },
+          { status: 400 }
+        );
+      }
     }
 
     let customerId = user.stripeCustomerId;
