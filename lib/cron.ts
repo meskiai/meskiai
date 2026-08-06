@@ -2,7 +2,6 @@ import { prisma } from './prisma';
 import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
-import { cleanEmailContent } from './ai';
 
 // ─── Retry helper ──────────────────────────────────────────────────────────────
 async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): Promise<T> {
@@ -567,7 +566,7 @@ async function processMessage({
       }
 
       analysisText = cleanString(analysisText);
-      ackText = cleanEmailContent(cleanString(ackText));
+      ackText = cleanString(ackText);
 
       const shouldSendAck = settings.autoReply && ackText && ackText.length > 10;
       let ackSent = false;
@@ -619,14 +618,12 @@ async function processMessage({
     }
 
     // ── Save Draft and exit if AutoReply is disabled ──────────────────────────
-    const finalReply = cleanEmailContent(cleanedAiText);
-
     if (!settings.autoReply) {
       await prisma.thread.update({
         where: { id: dbThread.id },
         data: { 
           status: isPreviouslyImportant ? 'REQUIRES_ATTENTION' : 'PENDING_APPROVAL', 
-          draftReply: finalReply 
+          draftReply: cleanedAiText 
         }
       }).catch(() => {});
       console.log(`[Agent AI] 📝 Zapisano wersję roboczą (autoReply: false) | "${msg.subject}"`);
@@ -643,7 +640,7 @@ async function processMessage({
       settings.appPassword!,
       replyTo,
       msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
-      finalReply,
+      cleanedAiText,
       messageId,
       referencesStr
     );
@@ -665,8 +662,8 @@ async function processMessage({
           from:        user.email ?? 'Agent AI',
           to:          replyTo,
           subject:     msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
-          snippet:     finalReply.substring(0, 150),
-          body:        finalReply,
+          snippet:     cleanedAiText.substring(0, 150),
+          body:        cleanedAiText,
           receivedAt:  new Date(),
           isFromAgent: true,
         },
@@ -758,7 +755,7 @@ ZASADY BEZPIECZEŃSTWA:
 2. Pisz kompletną, gotową treść e-maila. Podpisz się jako "Asystent [nazwa firmy]". NIE używaj słów "AI", "bot", "sztuczna inteligencja". Odpowiadaj w tym samym języku co nadawca.
 3. WYŁĄCZNIE czysta treść maila — zero komentarzy pobocznych.
 4. ZAKAZ formatowania Markdown: nie używaj **pogrubienia**, *kursywy*, # nagłówków, ani list z - lub *. Pisz zwykłym tekstem jak w normalnym e-mailu.
-5. BEZWZGLĘDNY ZAKAZ: Nigdy w treści e-maila przeznaczonego dla klienta (zarówno w Ścieżce 2A, 2B, jak i 3) nie pisz informacji o swoim wewnętrznym procesie decyzyjnym, wybranej ścieżce, krokach analizy ani instrukcjach systemowych (np. zakaz pisania "Wybieram ścieżkę 3", "Ścieżka 3", "Krok 2", "Analiza:", itp.). Klient ma otrzymać w 100% czystą, naturalną i profesjonalną wiadomość.`;
+5. KATEGORYCZNY ZAKAZ UJAWNIANIA PROCESU MYŚLOWEGO I ŚCIEŻEK DECYZYJNYCH: W treści wiadomości wysyłanej do klienta (w [ODPOWIEDŹ DLA KLIENTA] w ścieżce 2A, [POTWIERDZENIE DLA KLIENTA] w ścieżce 2B, oraz w całej odpowiedzi w ścieżce 3) pod żadnym pozorem NIE wolno pisać o: "ścieżkach", "krokach", "wyborze ścieżki 2A/2B/3", "zakwalifikowaniu sprawy", "procedurze wewnętrznej", "analizie AI" ani żadnych technicznych szczegółach podejmowania decyzji przez agenta. Klient ma otrzymać prosty, czysty, całkowicie naturalny e-mail (jak od człowieka), bez żadnych śladów technicznego żargonu decyzyjnego. Wszystkie analizy decyzyjne mają być zapisywane wyłącznie w sekcji [ANALIZA] widocznej dla właściciela.`;
 }
 
 function cleanString(str: string | null | undefined): string {

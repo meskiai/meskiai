@@ -4,7 +4,6 @@ import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { generateText } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
-import { cleanEmailContent } from "../../../../../lib/ai";
 
 export async function POST(
   req: Request,
@@ -115,7 +114,8 @@ ZASADY:
 1. Odpowiedz bezpośrednio na poruszone kwestie w e-mailu klienta, bazując na powyższych informacjach o firmie.
 2. Podpisz się jako profesjonalny pracownik/asystent firmy użytkownika.
 3. NIE używaj słów kluczowych "BOT", "SPAM", "REQUIRES_ATTENTION", ani "MESKIAI".
-4. Podaj tylko i wyłącznie samą treść e-maila, która jest gotowa do skopiowania i wysłania (bez żadnych komentarzy w stylu "Oto moja propozycja:").`,
+4. Podaj tylko i wyłącznie samą treść e-maila, która jest gotowa do skopiowania i wysłania (bez żadnych komentarzy w stylu "Oto moja propozycja:").
+5. KATEGORYCZNY ZAKAZ UJAWNIANIA PROCESU DECYZYJNEGO: Pod żadnym pozorem nie pisz o wewnętrznych procedurach, ścieżkach decyzyjnych, kategoriach spraw ani żadnej terminologii technicznej AI. Odpowiedź musi brzmieć całkowicie naturalnie, jak od człowieka.`,
           prompt: `HISTORIA KONWERSACJI W TYM WĄTKU (od najstarszej do najnowszej):\n${thread.emails.map(e => `[${e.isFromAgent ? 'TY/AGENT' : 'KLIENT'} - ${new Date(e.receivedAt).toLocaleString('pl-PL')}]:\n${e.body || e.snippet}`).join('\n\n')}\n\nNapisz profesjonalną odpowiedź na ostatnią wiadomość klienta.`,
         });
         generatedTextResult = text;
@@ -129,17 +129,15 @@ ZASADY:
       throw new Error("Wszystkie modele generowania odpowiedzi zawiodły.");
     }
 
-    const cleanedReply = cleanEmailContent(generatedTextResult);
-
     // Save draft to database
     await prisma.thread.update({
       where: { id: threadId },
-      data: { draftReply: cleanedReply }
+      data: { draftReply: generatedTextResult.trim() }
     });
 
     return NextResponse.json({ 
-      reply: cleanedReply,
-      draftReply: cleanedReply
+      reply: generatedTextResult.trim(),
+      draftReply: generatedTextResult.trim()
     });
   } catch (error: any) {
     console.error("Generate AI error:", error);
