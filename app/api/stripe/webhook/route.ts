@@ -64,12 +64,14 @@ export async function POST(req: Request) {
               update: {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
+                leadSearchesThisMonth: 0,
                 autoReply: true,   // ← automatically ON after purchase
               },
               create: {
                 userId,
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
+                leadSearchesThisMonth: 0,
                 autoReply: true,   // ← automatically ON after purchase
                 onboardingDone: false,
                 replyTone: 'PROFESJONALNY',
@@ -181,6 +183,7 @@ export async function POST(req: Request) {
               data: {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
+                leadSearchesThisMonth: 0,
               }
             });
           }

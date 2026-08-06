@@ -109,11 +109,12 @@ export async function runSync() {
         await prisma.userSettings
           .update({
             where: { userId: user.id },
-            data: { emailsSentThisMonth: 0, competitorSearchesThisMonth: 0, lastMonthlyReset: new Date() },
+            data: { emailsSentThisMonth: 0, competitorSearchesThisMonth: 0, leadSearchesThisMonth: 0, lastMonthlyReset: new Date() },
           })
           .catch(() => {});
         user.settings!.emailsSentThisMonth = 0;
         user.settings!.competitorSearchesThisMonth = 0;
+        user.settings!.leadSearchesThisMonth = 0;
         console.log(`[Agent AI] ↺ Reset licznika miesięcznego dla ${user.email}`);
       }
     }
