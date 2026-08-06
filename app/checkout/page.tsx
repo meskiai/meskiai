@@ -10,6 +10,10 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+// Reuse main page styles and components
+import styles from "../page.module.css";
+import { ThemeToggle } from "../components/ThemeToggle";
+
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const PLAN_DETAILS: Record<string, any> = {
@@ -95,9 +99,19 @@ function CheckoutPageContent() {
 
   if (!plan) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0C0C0E] text-white">
-        <p>Nieprawidłowy plan. <Link href="/#cennik" className="text-blue-500 underline">Wróć do cennika</Link></p>
-      </div>
+      <main className={styles.main}>
+        <div className={styles.ambientBackground}>
+          <div className={styles.ambientBlob}></div>
+        </div>
+        <div className="min-h-screen flex items-center justify-center relative z-10">
+          <div className="bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-2xl p-8 backdrop-blur-xl flex flex-col items-center">
+            <p className="text-[var(--foreground)] mb-4 text-lg">Nieprawidłowy plan.</p>
+            <Link href="/#cennik" className="text-[var(--primary)] hover:underline font-medium">
+              Wróć do cennika
+            </Link>
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -105,7 +119,7 @@ function CheckoutPageContent() {
     theme: 'night' as const,
     variables: {
       colorPrimary: '#3b82f6',
-      colorBackground: '#1c1c1c',
+      colorBackground: 'transparent',
       colorText: '#ffffff',
       colorDanger: '#ef4444',
       fontFamily: 'Inter, system-ui, sans-serif',
@@ -113,89 +127,140 @@ function CheckoutPageContent() {
     },
     rules: {
       '.Input': {
-        backgroundColor: '#2a2a2a',
-        border: '1px solid #333',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: 'none',
+        color: '#fff',
       },
       '.Input:focus': {
         border: '1px solid #3b82f6',
         boxShadow: '0 0 0 1px #3b82f6',
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      },
+      '.Label': {
+        color: '#a1a1aa',
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0C0E] text-white flex flex-col md:flex-row relative selection:bg-blue-500/30">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+    <main className={styles.main}>
+      {/* Tło aurora (zgodne z main) */}
+      <div className={styles.ambientBackground}>
+        <div className={styles.ambientBlob}></div>
+      </div>
       
-      {/* Kolumna lewa: Podsumowanie (widoczna też na mobilkach na górze) */}
-      <div className="w-full md:w-[45%] lg:w-[40%] p-8 md:p-12 lg:p-20 flex flex-col z-10 border-b md:border-b-0 md:border-r border-white/10 bg-[#0C0C0E]/50 backdrop-blur-md">
-        <Link href="/#cennik" className="inline-flex items-center text-sm text-[var(--subtext)] hover:text-white transition-colors mb-12 w-max">
-          <ArrowLeft size={16} className="mr-2" />
-          Wróć do cennika
-        </Link>
-        
-        <h2 className="text-sm font-semibold text-blue-500 tracking-wider uppercase mb-2">Podsumowanie zamówienia</h2>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-          {plan.name}
-        </h1>
-        <div className="text-3xl font-light mb-8 text-white">{plan.price} <span className="text-base text-[var(--subtext)]">/ miesięcznie</span></div>
-        
-        <p className="text-[var(--subtext)] mb-10 leading-relaxed text-lg">
-          {plan.desc}
-        </p>
-
-        <div className="space-y-4 mb-auto">
-          {plan.features.map((feature: string, idx: number) => (
-            <div key={idx} className="flex items-start gap-3 text-sm md:text-base text-gray-300">
-              <CheckCircle size={20} className="text-blue-500 shrink-0 mt-0.5" />
-              <span>{feature}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-          <Shield size={24} className="text-blue-400" />
-          <div className="text-sm text-gray-400">
-            <span className="text-white font-medium block">Gwarancja bezpiecznej płatności</span>
-            Dane Twojej karty są szyfrowane i przetwarzane bezpośrednio przez Stripe.
+      {/* Nawigacja (zgodna z main) */}
+      <nav className={`${styles.nav} animate-fade-in`}>
+        <div className={styles.navContent}>
+          <div className={styles.logo}>
+            <img
+              src="/logo.png"
+              alt="MESKIAI logo"
+              style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }}
+            />
+            <span style={{ color: 'var(--foreground)' }}>MESKIAI</span>
+          </div>
+          
+          <div className={styles.navActions}>
+            <ThemeToggle />
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Kolumna prawa: Formularz płatności */}
-      <div className="w-full md:w-[55%] lg:w-[60%] p-8 md:p-12 lg:p-20 flex items-center justify-center z-10">
-        <div className="w-full max-w-md">
-          {status === "loading" || (!clientSecret && !error) ? (
-            <div className="flex flex-col items-center justify-center gap-4 text-gray-400">
-              <div className="w-12 h-12 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin" />
-              <p>Inicjalizacja bezpiecznej płatności...</p>
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pt-32 pb-16 min-h-screen flex items-center justify-center">
+        <div className="w-full flex flex-col lg:flex-row gap-8 lg:gap-12 animate-fade-in-up">
+          
+          {/* Kolumna lewa: Podsumowanie w glassmorphismie */}
+          <div className="w-full lg:w-[45%] flex flex-col bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-[32px] p-8 lg:p-12 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
+            
+            <Link href="/#cennik" className="inline-flex items-center text-sm text-[var(--subtext)] hover:text-[var(--foreground)] transition-colors mb-10 w-max z-10">
+              <ArrowLeft size={16} className="mr-2" />
+              Wróć do cennika
+            </Link>
+            
+            <div className="z-10 flex-grow">
+              <h2 className="text-xs font-bold text-[var(--primary)] tracking-widest uppercase mb-3">
+                Podsumowanie zamówienia
+              </h2>
+              <h1 className="text-3xl lg:text-4xl font-extrabold mb-3 text-[var(--foreground)]">
+                {plan.name}
+              </h1>
+              <div className="text-2xl font-light mb-8 text-[var(--foreground)]">
+                {plan.price} <span className="text-sm text-[var(--subtext)]">/ miesięcznie</span>
+              </div>
+              
+              <p className="text-[var(--subtext)] mb-8 leading-relaxed text-sm lg:text-base">
+                {plan.desc}
+              </p>
+
+              <div className="space-y-4 mb-8">
+                {plan.features.map((feature: string, idx: number) => (
+                  <div key={idx} className="flex items-start gap-3 text-sm text-[var(--foreground)] opacity-90">
+                    <CheckCircle size={18} className="text-[var(--primary)] shrink-0 mt-0.5" />
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : error ? (
-            <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-2xl text-center">
-              <div className="text-red-400 text-lg font-medium mb-4">{error}</div>
-              <Link href="/#cennik" className="inline-block bg-white/10 hover:bg-white/20 px-6 py-2 rounded-xl transition-colors">
-                Wróć i wybierz inny plan
-              </Link>
+
+            <div className="mt-auto flex items-start gap-4 p-5 rounded-2xl bg-[var(--background)] border border-[var(--glass-border)] z-10">
+              <Shield size={20} className="text-[var(--primary)] shrink-0 mt-0.5" />
+              <div className="text-xs text-[var(--subtext)] leading-relaxed">
+                <span className="text-[var(--foreground)] font-semibold block mb-1">Gwarancja bezpieczeństwa</span>
+                Dane Twojej karty są zaszyfrowane. Przetwarzaniem płatności zajmuje się Stripe – światowy lider.
+              </div>
             </div>
-          ) : clientSecret ? (
-            <div className="animate-fade-in-up">
-              <h3 className="text-2xl font-bold mb-8 text-center">Dane płatności</h3>
-              <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                <CheckoutForm />
-              </Elements>
+          </div>
+
+          {/* Kolumna prawa: Formularz płatności w glassmorphismie */}
+          <div className="w-full lg:w-[55%] flex items-center justify-center">
+            <div className="w-full bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-[32px] p-8 lg:p-12 backdrop-blur-2xl shadow-2xl relative overflow-hidden min-h-[400px] flex flex-col justify-center">
+              
+              {status === "loading" || (!clientSecret && !error) ? (
+                <div className="flex flex-col items-center justify-center gap-6">
+                  <div className="w-12 h-12 rounded-full border-4 border-[var(--primary)] border-t-transparent animate-spin opacity-80" />
+                  <p className="text-[var(--subtext)] font-medium tracking-wide animate-pulse">
+                    Łączenie z operatorem Stripe...
+                  </p>
+                </div>
+              ) : error ? (
+                <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-2xl text-center flex flex-col items-center">
+                  <div className="text-red-400 text-lg font-medium mb-6">{error}</div>
+                  <Link href="/#cennik" className="inline-block bg-[var(--background)] border border-[var(--glass-border)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] px-6 py-3 rounded-xl transition-all duration-300 font-medium">
+                    Wróć i wybierz inny plan
+                  </Link>
+                </div>
+              ) : clientSecret ? (
+                <div className="animate-fade-in-up w-full">
+                  <h3 className="text-xl font-bold mb-8 text-[var(--foreground)] flex items-center">
+                    Dane płatności <Shield size={16} className="ml-2 text-[var(--subtext)]" />
+                  </h3>
+                  <div className="stripe-container">
+                    <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+                      <CheckoutForm />
+                    </Elements>
+                  </div>
+                </div>
+              ) : null}
+              
             </div>
-          ) : null}
+          </div>
+
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0C0C0E] text-white">Wczytywanie...</div>}>
+    <Suspense fallback={
+      <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0C0C0E', color: 'white' }}>
+        Wczytywanie...
+      </main>
+    }>
       <CheckoutPageContent />
     </Suspense>
   );
