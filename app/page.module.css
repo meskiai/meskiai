@@ -1552,22 +1552,22 @@
 }
 
 /* ==========================================================================
-   VISUAL FLOW TIMELINE & DASHBOARD MOCKUP
+   VERTICAL TIMELINE SECTION (FAQ / HOW IT WORKS)
    ========================================================================== */
-.flowSection {
+.timelineSection {
   padding: 120px 5% 140px;
-  max-width: 1300px;
+  max-width: 900px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
-.flowHeader {
+.timelineHeader {
   text-align: center;
   margin-bottom: 70px;
 }
 
-.flowEyebrow {
+.timelineEyebrow {
   display: block;
   font-size: 0.8rem;
   font-weight: 700;
@@ -1577,7 +1577,7 @@
   margin-bottom: 12px;
 }
 
-.flowTitle {
+.timelineTitle {
   font-size: clamp(2.2rem, 4.5vw, 3.2rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -1585,336 +1585,165 @@
   margin-bottom: 18px;
 }
 
-.flowSubtitle {
+.timelineSubtitle {
   font-size: clamp(1rem, 1.2vw, 1.25rem);
   color: var(--subtext);
-  max-width: 750px;
+  max-width: 700px;
   margin: 0 auto;
   line-height: 1.6;
 }
 
-.flowGrid {
-  display: grid;
-  grid-template-columns: 1.1fr 1.4fr;
-  gap: 50px;
-  align-items: start;
-}
-
-.flowTimeline {
-  display: flex;
-  flex-direction: column;
+.timelineWrapper {
   position: relative;
-  padding-left: 24px;
+  padding-left: 50px;
 }
 
 /* Timeline Vertical Line */
-.flowTimeline::before {
+.timelineWrapper::before {
   content: '';
   position: absolute;
-  left: 36px;
-  top: 40px;
-  bottom: 40px;
+  left: 20px;
+  top: 15px;
+  bottom: 15px;
   width: 2px;
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.2) 50%, rgba(255, 255, 255, 0.05) 100%);
   z-index: 1;
 }
 
-:global([data-theme="light"]) .flowTimeline::before {
-  background: rgba(0, 0, 0, 0.08);
+:global([data-theme="light"]) .timelineWrapper::before {
+  background: linear-gradient(to bottom, var(--primary) 0%, rgba(var(--primary-rgb), 0.3) 50%, rgba(0, 0, 0, 0.05) 100%);
 }
 
-.flowStep {
-  display: flex;
-  gap: 24px;
-  padding: 24px;
-  border-radius: 16px;
-  cursor: pointer;
+.timelineItem {
   position: relative;
+  margin-bottom: 48px;
   z-index: 2;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: 16px;
-  border: 1px solid transparent;
 }
 
-.flowStep:last-child {
+.timelineItem:last-child {
   margin-bottom: 0;
 }
 
-.flowStep:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-:global([data-theme="light"]) .flowStep:hover {
-  background: rgba(0, 0, 0, 0.01);
-}
-
-.flowStepActive {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-}
-
-:global([data-theme="light"]) .flowStepActive {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
-}
-
-.flowStepNumber {
-  width: 26px;
-  height: 26px;
+/* Timeline Badge (Circle) */
+.timelineBadge {
+  position: absolute;
+  left: -50px;
+  top: 12px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: #1e1e24;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #15161c;
+  border: 2px solid var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--subtext);
-  flex-shrink: 0;
-  transition: all 0.3s ease;
+  color: var(--foreground);
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
   z-index: 3;
-  margin-top: 2px;
 }
 
-:global([data-theme="light"]) .flowStepNumber {
-  background: #f0f0f4;
-  border-color: rgba(0, 0, 0, 0.2);
-  color: #777;
+:global([data-theme="light"]) .timelineBadge {
+  background: #ffffff;
 }
 
-.flowStepActive .flowStepNumber {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.5);
-}
-
-.flowStepContent {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.flowStepContent h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--foreground);
-  margin: 0;
-  transition: color 0.3s ease;
-}
-
-.flowStepActive .flowStepContent h3 {
-  color: var(--primary);
-}
-
-.flowStepContent p {
-  font-size: 0.92rem;
-  color: var(--subtext);
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* Dashboard Mockup Panel */
-.flowDashboardMockup {
-  background: #0d0e12;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Timeline Card */
+.timelineContent {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 20px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: 520px;
-  position: relative;
-  transition: all 0.3s ease;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-:global([data-theme="light"]) .flowDashboardMockup {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+.timelineContent:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--primary-rgb), 0.4);
+  box-shadow: 0 15px 45px rgba(var(--primary-rgb), 0.1);
 }
 
-/* Header style for mockup */
-.mockHeader {
-  background: #15161c;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-:global([data-theme="light"]) .mockHeader {
-  background: #f5f6f8;
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-/* Mockup Layout */
-.mockBody {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  height: calc(100% - 49px);
-}
-
-.mockSidebar {
-  width: 180px;
-  background: #111216;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 20px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-:global([data-theme="light"]) .mockSidebar {
-  background: #f0f1f4;
-  border-right-color: rgba(0, 0, 0, 0.06);
-}
-
-.mockSidebarItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  color: var(--subtext);
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.mockSidebarActive {
-  background: rgba(255, 255, 255, 0.05);
+.timelineContent h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--foreground);
-  font-weight: 600;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
 }
 
-:global([data-theme="light"]) .mockSidebarActive {
-  background: rgba(0, 0, 0, 0.04);
+.timelineContent p {
+  font-size: 1rem;
+  color: var(--subtext);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
 }
 
-.mockContent {
-  flex: 1;
-  padding: 24px;
-  background: #0d0e12;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-:global([data-theme="light"]) .mockContent {
-  background: #ffffff;
-}
-
-/* Screen 1: Inbox view */
-.mockInboxList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.mockInboxItem {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  padding: 16px;
-  transition: all 0.3s ease;
+/* Micro Preview Component inside card */
+.microPreview {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
   position: relative;
 }
 
-:global([data-theme="light"]) .mockInboxItem {
-  background: rgba(0, 0, 0, 0.01);
+:global([data-theme="light"]) .microPreview {
+  background: rgba(0, 0, 0, 0.02);
   border-color: rgba(0, 0, 0, 0.06);
 }
 
-.mockInboxItemUnread {
-  border-left: 3px solid var(--primary);
-  background: rgba(var(--primary-rgb), 0.03);
-}
-
-.mockInboxItemMeta {
+/* Step-specific styles */
+.microEmailHeader {
   display: flex;
   justify-content: space-between;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--subtext);
+  margin-bottom: 8px;
+}
+
+.microEmailSubject {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--foreground);
   margin-bottom: 6px;
 }
 
-.mockInboxSubject {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--foreground);
-  margin-bottom: 4px;
-}
-
-.mockInboxPreview {
-  font-size: 0.82rem;
+.microEmailBody {
+  font-size: 0.88rem;
   color: var(--subtext);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.5;
 }
 
-/* Screen 2: Detail with PDF attachment parsing */
-.mockDetailCard {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-:global([data-theme="light"]) .mockDetailCard {
-  background: rgba(0, 0, 0, 0.01);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-.mockPdfAttachment {
+.microPdf {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 16px;
   border-radius: 8px;
-  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
-:global([data-theme="light"]) .mockPdfAttachment {
+:global([data-theme="light"]) .microPdf {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.06);
 }
 
-.mockScanner {
-  font-size: 0.8rem;
+.microScanner {
   font-family: monospace;
+  font-size: 0.82rem;
   color: #27c93f;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
-/* Screen 3: Shopify / WooCommerce Integration Log */
-.mockStoreStatus {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-:global([data-theme="light"]) .mockStoreStatus {
-  background: rgba(0, 0, 0, 0.01);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-.mockConsole {
+.microConsole {
   background: #07080a;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
@@ -1925,17 +1754,29 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
 }
 
-:global([data-theme="light"]) .mockConsole {
+:global([data-theme="light"]) .microConsole {
   background: #f8f9fa;
   border-color: rgba(0, 0, 0, 0.05);
   color: #333;
 }
 
-/* Screen 4: Response sent view */
-.mockBadge {
+.microSentBanner {
+  background: rgba(39, 201, 63, 0.08);
+  border: 1px solid rgba(39, 201, 63, 0.2);
+  color: #27c93f;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.microBadge {
   display: inline-flex;
   align-items: center;
   padding: 3px 8px;
@@ -1951,20 +1792,34 @@
   border: 1px solid rgba(242, 153, 74, 0.3);
 }
 
-.mockResponseSent {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: rgba(39, 201, 63, 0.03);
-  border: 1px dashed rgba(39, 201, 63, 0.3);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-@media (max-width: 991px) {
-  .simContainer {
-    grid-template-columns: 1fr;
-    gap: 32px;
+/* Responsive */
+@media (max-width: 767px) {
+  .timelineSection {
+    padding: 60px 20px;
+  }
+  .timelineWrapper {
+    padding-left: 36px;
+  }
+  .timelineWrapper::before {
+    left: 12px;
+  }
+  .timelineBadge {
+    left: -32px;
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    top: 14px;
+  }
+  .timelineContent {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  .timelineContent h3 {
+    font-size: 1.15rem;
+  }
+  .timelineContent p {
+    font-size: 0.9rem;
   }
 }
+
 

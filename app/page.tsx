@@ -15,14 +15,7 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeFeature, setActiveFeature] = useState('agent');
-  const [simStep, setSimStep] = useState<number>(1);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSimStep((prev) => (prev < 4 ? prev + 1 : 1));
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const features = ['agent', 'cold', 'swot', 'security'];
@@ -584,205 +577,110 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Flow Timeline Section */}
-      <section className={styles.flowSection} id="how-it-works">
-        <div className={styles.flowHeader}>
-          <span className={styles.flowEyebrow}>Jak to działa?</span>
-          <h2 className={styles.flowTitle}>Droga wiadomości krok po kroku</h2>
-          <p className={styles.flowSubtitle}>
+      {/* Interactive Vertical Timeline Section */}
+      <section className={styles.timelineSection} id="how-it-works">
+        <div className={styles.timelineHeader}>
+          <span className={styles.timelineEyebrow}>Jak to działa?</span>
+          <h2 className={styles.timelineTitle}>Droga wiadomości krok po kroku</h2>
+          <p className={styles.timelineSubtitle}>
             Zobacz, jak MESKIAI obsługuje skrzynkę pocztową w czasie rzeczywistym – od pierwszego maila klienta aż po w pełni zautomatyzowane rozwiązanie problemu.
           </p>
         </div>
 
-        <div className={styles.flowGrid}>
-          {/* Left Side: Timeline Steps */}
-          <div className={styles.flowTimeline}>
-            <div 
-              className={`${styles.flowStep} ${simStep === 1 ? styles.flowStepActive : ''}`}
-              onClick={() => setSimStep(1)}
-            >
-              <div className={styles.flowStepNumber}>1</div>
-              <div className={styles.flowStepContent}>
-                <h3>Odebranie wiadomości</h3>
-                <p>
-                  Klient wysyła e-mail na Twoją skrzynkę. MESKIAI za pomocą bezpiecznej, nieustannej synchronizacji POP3 rejestruje wiadomość w systemie w ułamku sekundy.
-                </p>
-              </div>
-            </div>
-
-            <div 
-              className={`${styles.flowStep} ${simStep === 2 ? styles.flowStepActive : ''}`}
-              onClick={() => setSimStep(2)}
-            >
-              <div className={styles.flowStepNumber}>2</div>
-              <div className={styles.flowStepContent}>
-                <h3>Analiza AI i PDF</h3>
-                <p>
-                  Sztuczna inteligencja analizuje treść pod kątem intencji oraz odczytuje i parsuje wszelkie załączniki, np. faktury w formacie PDF.
-                </p>
-              </div>
-            </div>
-
-            <div 
-              className={`${styles.flowStep} ${simStep === 3 ? styles.flowStepActive : ''}`}
-              onClick={() => setSimStep(3)}
-            >
-              <div className={styles.flowStepNumber}>3</div>
-              <div className={styles.flowStepContent}>
-                <h3>Weryfikacja ze sklepem</h3>
-                <p>
-                  System łączy się z Twoją platformą e-commerce (Shopify/WooCommerce) lub bazą danych, aby zweryfikować status zamówienia, płatności i wysyłki.
-                </p>
-              </div>
-            </div>
-
-            <div 
-              className={`${styles.flowStep} ${simStep === 4 ? styles.flowStepActive : ''}`}
-              onClick={() => setSimStep(4)}
-            >
-              <div className={styles.flowStepNumber}>4</div>
-              <div className={styles.flowStepContent}>
-                <h3>Wysyłka & Oznaczenie</h3>
-                <p>
-                  Agent wysyła precyzyjną, automatyczną odpowiedź, a w Twoim panelu oznacza wątek jako "Do uwagi" (Ważne), abyś miał pełną kontrolę.
-                </p>
+        <div className={styles.timelineWrapper}>
+          
+          {/* Step 1 */}
+          <div className={styles.timelineItem}>
+            <div className={styles.timelineBadge}>1</div>
+            <div className={styles.timelineContent}>
+              <h3>Odebranie wiadomości (Sync POP3)</h3>
+              <p>
+                Klient wysyła e-mail na Twoją skrzynkę. MESKIAI za pomocą bezpiecznej, nieustannej synchronizacji POP3 rejestruje wiadomość w systemie w ułamku sekundy.
+              </p>
+              
+              <div className={styles.microPreview}>
+                <div className={styles.microEmailHeader}>
+                  <span>jan.kowalski@gmail.com</span>
+                  <span>Przed chwilą</span>
+                </div>
+                <div className={styles.microEmailSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
+                <div className={styles.microEmailBody}>
+                  Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację kurtki. Załączam fakturę zakupową w formacie PDF. Proszę o zwrot pieniędzy.
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Side: Dashboard Mockup */}
-          <div className={styles.flowDashboardMockup}>
-            <div className={styles.mockHeader}>
-              <div className={styles.simDots}>
-                <div className={`${styles.simDot} ${styles.simDotRed}`}></div>
-                <div className={`${styles.simDot} ${styles.simDotYellow}`}></div>
-                <div className={`${styles.simDot} ${styles.simDotGreen}`}></div>
-              </div>
-              <div className={styles.simAddressBar}>
-                app.meskiai.com/dashboard/inbox
-              </div>
-              <div className={styles.simStatusIndicator}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#27c93f', display: 'inline-block' }}></span>
-                Agent 24/7 Aktywny
-              </div>
-            </div>
-
-            <div className={styles.mockBody}>
-              {/* Mockup Sidebar */}
-              <div className={styles.mockSidebar}>
-                <div className={`${styles.mockSidebarItem} ${styles.mockSidebarActive}`}>
-                  <Inbox size={14} />
-                  <span>Odebrane</span>
+          {/* Step 2 */}
+          <div className={styles.timelineItem}>
+            <div className={styles.timelineBadge}>2</div>
+            <div className={styles.timelineContent}>
+              <h3>Analiza AI i odczyt PDF</h3>
+              <p>
+                Sztuczna inteligencja natychmiast analizuje treść pod kątem intencji oraz odczytuje i parsuje wszelkie załączone pliki, takie jak faktury czy specyfikacje w formacie PDF.
+              </p>
+              
+              <div className={styles.microPreview}>
+                <div className={styles.microPdf}>
+                  <FileText size={18} style={{ color: '#ff5f56' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Faktura_1042.pdf</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>142 KB</span>
+                  </div>
                 </div>
-                <div className={styles.mockSidebarItem}>
-                  <FileText size={14} />
-                  <span>Zamówienia</span>
+                <div className={styles.microScanner}>
+                  <Sparkles size={14} />
+                  <span>[AI] Odczytywanie pliku PDF... Dane: Jan Kowalski, Zamówienie: #1042, Kwota: 349.00 PLN, Temat: Reklamacja</span>
                 </div>
-                <div className={styles.mockSidebarItem}>
-                  <Settings size={14} />
-                  <span>Ustawienia</span>
-                </div>
-              </div>
-
-              {/* Mockup Content Area */}
-              <div className={styles.mockContent}>
-                
-                {/* Step 1: Incoming Email in Inbox */}
-                {simStep === 1 && (
-                  <div className={styles.mockInboxList}>
-                    <div className={{...styles.mockInboxItem, ...styles.mockInboxItemUnread} as any}>
-                      <div className={styles.mockInboxItemMeta}>
-                        <span>jan.kowalski@gmail.com</span>
-                        <span>Przed chwilą</span>
-                      </div>
-                      <div className={styles.mockInboxSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
-                      <div className={styles.mockInboxPreview}>Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację...</div>
-                      <div style={{ marginTop: '8px', fontSize: '0.75rem', color: '#ff5f56', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff5f56' }}></span>
-                        Nowa nieprzeczytana
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: AI Parsing Attachment */}
-                {simStep === 2 && (
-                  <div className={styles.mockDetailCard}>
-                    <div className={styles.mockInboxItemMeta}>
-                      <span>Od: jan.kowalski@gmail.com</span>
-                      <span>1 min temu</span>
-                    </div>
-                    <div className={styles.mockInboxSubject} style={{ fontSize: '1rem' }}>
-                      Reklamacja i zwrot - Zamówienie #1042
-                    </div>
-                    <p style={{ fontSize: '0.82rem', color: 'var(--subtext)', margin: '8px 0 12px' }}>
-                      "Dzień dobry, z powodu wady fabrycznej zgłaszam reklamację kurtki. Załączam fakturę zakupową w formacie PDF. Proszę o zwrot pieniędzy."
-                    </p>
-                    <div className={styles.mockPdfAttachment}>
-                      <FileText size={18} style={{ color: '#ff5f56' }} />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Faktura_1042.pdf</span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--subtext)' }}>142 KB</span>
-                      </div>
-                    </div>
-                    <div className={styles.mockScanner}>
-                      <Sparkles size={14} />
-                      <span>[AI] Odczytywanie pliku PDF... Dane: Jan Kowalski, Zamówienie: #1042, Kwota: 349.00 PLN, Temat: Reklamacja</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Database & Store Check */}
-                {simStep === 3 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-                    <div className={styles.mockStoreStatus}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <ShoppingBag size={18} style={{ color: 'var(--primary)' }} />
-                        <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Integracja Shopify / WooCommerce</span>
-                      </div>
-                      <span style={{ fontSize: '0.75rem', color: '#27c93f', background: 'rgba(39, 201, 63, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>Połączono</span>
-                    </div>
-                    <div className={styles.mockConsole}>
-                      <div>&gt; Odpytywanie API sklepu o klienta: jan.kowalski@gmail.com...</div>
-                      <div>&gt; Pobieranie szczegółów zamówienia #1042...</div>
-                      <div style={{ color: '#27c93f' }}>&gt; ZNALEZIONO. Status: DORĘCZONE (Kurier DPD). Kwota: 349,00 PLN.</div>
-                      <div>&gt; Dopasowanie do bazy danych: ZGODNE.</div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 4: SMTP Send & Attention Flag */}
-                {simStep === 4 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div className={styles.mockResponseSent}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', width: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#27c93f', fontSize: '0.82rem', fontWeight: 600 }}>
-                          <CheckCircle size={14} />
-                          Automatyczna odpowiedź wysłana (SMTP)
-                        </div>
-                      </div>
-                      <p style={{ fontSize: '0.82rem', color: 'var(--subtext)', fontStyle: 'italic', margin: 0 }}>
-                        "Dzień dobry Panie Janie, potwierdzamy przyjęcie zgłoszenia reklamacyjnego dotyczącego zamówienia #1042 na kwotę 349,00 PLN. Zlecenie zwrotu środków zostało przekazane do realizacji..."
-                      </p>
-                    </div>
-                    
-                    <div className={styles.mockInboxItem} style={{ borderLeft: '3px solid #f2994a' }}>
-                      <div className={styles.mockInboxItemMeta}>
-                        <span>jan.kowalski@gmail.com</span>
-                        <span>Oznaczenie:</span>
-                        <span className={`${styles.mockBadge} ${styles.badgeAttention}`}>Do uwagi (Ważne)</span>
-                      </div>
-                      <div className={styles.mockInboxSubject}>Reklamacja i zwrot - Zamówienie #1042</div>
-                      <div style={{ fontSize: '0.78rem', color: '#f2994a' }}>
-                        Wątek wymaga ostatecznej akceptacji zwrotu przez administratora.
-                      </div>
-                    </div>
-                  </div>
-                )}
-
               </div>
             </div>
           </div>
+
+          {/* Step 3 */}
+          <div className={styles.timelineItem}>
+            <div className={styles.timelineBadge}>3</div>
+            <div className={styles.timelineContent}>
+              <h3>Automatyczne sprawdzenie sklepu</h3>
+              <p>
+                System łączy się z Twoją platformą e-commerce (Shopify, WooCommerce) lub bazą danych przez API, aby w mgnieniu oka zweryfikować status zamówienia, status płatności i wysyłki.
+              </p>
+              
+              <div className={styles.microPreview}>
+                <div className={styles.microConsole}>
+                  <div>&gt; Odpytywanie API sklepu o klienta: jan.kowalski@gmail.com...</div>
+                  <div>&gt; Pobieranie szczegółów zamówienia #1042...</div>
+                  <div style={{ color: '#27c93f' }}>&gt; ZNALEZIONO. Status: DORĘCZONE (Kurier DPD). Kwota: 349,00 PLN.</div>
+                  <div>&gt; Dopasowanie kwoty z faktury: Zgodne.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className={styles.timelineItem}>
+            <div className={styles.timelineBadge}>4</div>
+            <div className={styles.timelineContent}>
+              <h3>Automatyczna odpowiedź i klasyfikacja</h3>
+              <p>
+                Agent wysyła precyzyjną, automatyczną odpowiedź SMTP, a wątek oznacza w Twoim panelu etykietą "Do uwagi" (Ważne), dając Ci pełną kontrolę i oszczędzając czas.
+              </p>
+              
+              <div className={styles.microPreview}>
+                <div className={styles.microSentBanner}>
+                  <CheckCircle size={16} />
+                  Odpowiedź wysłana automatycznie
+                </div>
+                <div className={styles.microEmailBody} style={{ fontStyle: 'italic', marginBottom: '16px' }}>
+                  "Dzień dobry Panie Janie, potwierdzamy przyjęcie zgłoszenia reklamacyjnego dotyczącego zamówienia #1042 na kwotę 349,00 PLN. Zlecenie zwrotu środków zostało przekazane do realizacji..."
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
+                  <span style={{ color: 'var(--subtext)' }}>Status wątku:</span>
+                  <span className={`${styles.microBadge} ${styles.badgeAttention}`}>Do uwagi (Ważne)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
