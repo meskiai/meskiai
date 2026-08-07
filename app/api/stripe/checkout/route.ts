@@ -7,7 +7,7 @@ import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
-  apiVersion: "2025-03-31.basil" as any,
+  apiVersion: "2023-10-16" as any,
 });
 
 import { prisma } from "../../../../lib/prisma";
@@ -126,7 +126,14 @@ export async function POST(req: Request) {
     }
 
     if (!clientSecret) {
-      throw new Error("Nie udało się zainicjować intencji płatności.");
+      console.error("DEBUG: Missing client_secret. Subscription:", JSON.stringify({
+         status: subscription.status,
+         latest_invoice: typeof subscription.latest_invoice === 'string' ? 'string ID' : invoice?.id,
+         payment_intent: typeof invoice?.payment_intent === 'string' ? 'string ID' : paymentIntent?.id,
+         has_client_secret: !!paymentIntent?.client_secret,
+         setup_intent: typeof subscription.pending_setup_intent,
+      }));
+      throw new Error(`Nie udało się zainicjować intencji płatności. DEBUG Info: invoice=${invoice?.id ? 'yes' : 'no'}, pi=${paymentIntent?.id ? 'yes' : 'no'}, pi_cs=${paymentIntent?.client_secret ? 'yes' : 'no'}`);
     }
 
     return NextResponse.json({ 
