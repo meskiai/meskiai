@@ -82,8 +82,8 @@ function CheckoutPageContent() {
     }
 
     if (status === "authenticated" && priceId) {
-      // Inicjalizuj płatność
-      fetch("/api/stripe/create-subscription", {
+      // Inicjalizuj płatność przez Stripe Hosted Checkout
+      fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ priceId }),
@@ -92,10 +92,8 @@ function CheckoutPageContent() {
         .then((data) => {
           if (data.error) {
             setError(data.error);
-          } else if (data.isActive) {
-            router.push("/dashboard?upgrade=success");
-          } else {
-            setClientSecret(data.clientSecret);
+          } else if (data.url) {
+            window.location.href = data.url;
           }
         })
         .catch(() => setError("Wystąpił błąd podczas połączenia z serwerem."));
@@ -230,18 +228,15 @@ function CheckoutPageContent() {
                     Jeśli testujesz lokalnie, zrestartuj serwer (Ctrl+C i npm run dev). Jeśli na Netlify, upewnij się, że klucz jest dodany w zakładce Environment Variables i strona została przebudowana.
                   </div>
                 </div>
-              ) : clientSecret ? (
-                <div style={{ width: '100%', animation: 'fadeIn 0.5s ease-out forwards' }}>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '32px', color: 'var(--foreground)', display: 'flex', alignItems: 'center' }}>
-                    Dane płatności (Karta) <Shield size={16} style={{ marginLeft: '8px', color: 'var(--subtext)' }} />
-                  </h3>
-                  <div>
-                    <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                      <CheckoutForm />
-                    </Elements>
-                  </div>
+              ) : (
+                <div className={checkoutStyles.loaderContainer}>
+                  <div className={checkoutStyles.spinner} />
+                  <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
+                    Przekierowywanie do bezpiecznej bramki płatności Stripe...<br/><br/>
+                    Za chwilę będziesz mógł wpisać dane karty oraz opcjonalnie NIP.
+                  </p>
                 </div>
-              ) : null}
+              )}
               
             </div>
           </div>

@@ -103,6 +103,8 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?checkout=success`,
       cancel_url: `${process.env.NEXTAUTH_URL}/#cennik`,
+      tax_id_collection: { enabled: true },
+      billing_address_collection: "auto",
       metadata,
       // Prevent duplicate subscriptions from Stripe's side
       subscription_data: {
