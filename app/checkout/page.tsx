@@ -17,7 +17,9 @@ const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 if (!stripeKey) {
   console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
 }
-const stripePromise = stripeKey ? loadStripe(stripeKey.trim()) : null;
+// Dokładnie czyścimy klucz z ukrytych znaków (np. spacji w środku, cudzysłowów z Netlify, białych znaków)
+const cleanStripeKey = stripeKey ? stripeKey.replace(/[^a-zA-Z0-9_]/g, '') : "";
+const stripePromise = cleanStripeKey ? loadStripe(cleanStripeKey) : null;
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
