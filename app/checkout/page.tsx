@@ -126,27 +126,11 @@ function CheckoutPageContent() {
     theme: 'night' as const,
     variables: {
       colorPrimary: '#3b82f6',
-      colorBackground: 'transparent',
+      colorBackground: '#1c1c1c',
       colorText: '#ffffff',
       colorDanger: '#ef4444',
       fontFamily: 'Inter, system-ui, sans-serif',
       borderRadius: '12px',
-    },
-    rules: {
-      '.Input': {
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: 'none',
-        color: '#fff',
-      },
-      '.Input:focus': {
-        border: '1px solid #3b82f6',
-        boxShadow: '0 0 0 1px #3b82f6',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-      },
-      '.Label': {
-        color: '#a1a1aa',
-      }
     }
   };
 
