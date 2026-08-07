@@ -13,6 +13,7 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,15 +102,24 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
       </div>
 
       <div style={{ position: "relative", marginTop: "12px", padding: "20px", borderRadius: "12px", background: "rgba(20, 20, 20, 0.3)", border: "1px solid rgba(255,255,255,0.05)", minHeight: "200px" }}>
-        {!isReady && (
+        {!isReady && !loadError && (
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
             <div className={styles.spinner} style={{ width: "32px", height: "32px", borderWidth: "3px" }} />
+          </div>
+        )}
+        {loadError && (
+          <div style={{ color: "#ff6b6b", fontSize: "0.875rem", padding: "12px", background: "rgba(255, 107, 107, 0.1)", borderRadius: "8px", textAlign: "center" }}>
+            Błąd ładowania formularza Stripe: {loadError}
           </div>
         )}
         <div style={{ opacity: isReady ? 1 : 0, transition: "opacity 0.3s ease" }}>
           <PaymentElement 
             options={{ layout: "tabs" }} 
             onReady={() => setIsReady(true)} 
+            onLoadError={(e) => {
+              console.error("Stripe Load Error:", e);
+              setLoadError(e.error.message || "Nieznany błąd ładowania Stripe.");
+            }}
           />
         </div>
       </div>
