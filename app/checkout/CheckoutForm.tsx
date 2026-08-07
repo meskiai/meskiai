@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import type { StripePaymentElementOptions } from "@stripe/stripe-js";
 import styles from "./checkout.module.css";
 import { Shield } from "lucide-react";
+
+const PAYMENT_ELEMENT_OPTIONS: StripePaymentElementOptions = { 
+  layout: "tabs" 
+};
 
 export function CheckoutForm({ planName, clientSecret }: { planName: string, clientSecret: string }) {
   const stripe = useStripe();
@@ -86,6 +91,12 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
     setIsProcessing(false);
   };
 
+  const handleReady = useCallback(() => setIsReady(true), []);
+  const handleError = useCallback((e: any) => {
+    console.error("Stripe Load Error:", e);
+    setLoadError(e.error?.message || "Nieznany błąd ładowania Stripe.");
+  }, []);
+
   const inputStyle = {
     width: "100%",
     padding: "12px",
@@ -160,12 +171,9 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
         )}
         <div style={{ opacity: isReady ? 1 : 0, transition: "opacity 0.3s ease" }}>
           <PaymentElement 
-            options={{ layout: "tabs" }} 
-            onReady={() => setIsReady(true)} 
-            onLoadError={(e) => {
-              console.error("Stripe Load Error:", e);
-              setLoadError(e.error.message || "Nieznany błąd ładowania Stripe.");
-            }}
+            options={PAYMENT_ELEMENT_OPTIONS} 
+            onReady={handleReady} 
+            onLoadError={handleError}
           />
         </div>
       </div>
