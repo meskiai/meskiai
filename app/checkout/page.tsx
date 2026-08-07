@@ -20,7 +20,7 @@ const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 if (!stripeKey) {
   console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
 }
-const stripePromise = loadStripe((stripeKey || "").trim());
+const stripePromise = stripeKey ? loadStripe(stripeKey.trim()) : null;
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
@@ -229,9 +229,11 @@ function CheckoutPageContent() {
                   </div>
                 </div>
               ) : clientSecret ? (
-                <EmbeddedCheckoutProvider stripe={stripePromise} options={{clientSecret}}>
-                  <EmbeddedCheckout />
-                </EmbeddedCheckoutProvider>
+                <div id="checkout" style={{ width: '100%', minHeight: '600px' }}>
+                  <EmbeddedCheckoutProvider stripe={stripePromise} options={{clientSecret}}>
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
               ) : (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
