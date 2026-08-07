@@ -13,12 +13,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
+
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { nip, companyName, companyAddress } = await req.json();
-    if (!nip && !companyName && !companyAddress) {
+    const { nip } = await req.json();
+
+    if (!nip || nip.trim() === "") {
       return NextResponse.json({ success: true });
     }
 
@@ -27,35 +29,33 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.stripeCustomerId) {
-      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found or no Stripe Customer ID" }, { status: 404 });
     }
 
-    const metadata: any = {};
-    if (nip) metadata.nip = nip;
-    if (companyName) metadata.companyName = companyName;
-    if (companyAddress) metadata.companyAddress = companyAddress;
+    const customerId = user.stripeCustomerId;
 
-    // Dodaj NIP (Tax ID) do profilu klienta w Stripe
-    // Zakładamy typ 'eu_vat' dla Polski, ale w razie błędu ignorujemy, żeby nie zablokować płatności
-    try {
-      if (nip) {
-        await stripe.customers.createTaxId(user.stripeCustomerId, {
-          type: 'eu_vat',
-          value: nip,
-        });
-      }
-    } catch (e: any) {
-      console.warn("Failed to add NIP to Stripe customer:", e.message);
+    // Pobierz obecne tax_ids i usuń stare jeśli istnieją
+    const taxIds = await stripe.customers.listTaxIds(customerId);
+    for (const taxId of taxIds.data) {
+      await stripe.customers.deleteTaxId(customerId, taxId.id);
     }
-    
-    // Zawsze updatujemy metadane, niezależnie od tego czy dodanie TaxId się powiodło
-    await stripe.customers.update(user.stripeCustomerId, {
-      metadata
+
+    // Wyczyść PL z początku jeśli użytkownik podał, bo Stripe często oczekuje formatu bez lub z - zależnie od wpisu
+    // Stripe dla eu_vat oczekuje kodu kraju na początku. 
+    let formattedNip = nip.trim().toUpperCase().replace(/\s+/g, '').replace(/-/g, '');
+    if (!formattedNip.startsWith("PL") && formattedNip.length === 10) {
+        formattedNip = "PL" + formattedNip;
+    }
+
+    // Dodaj nowy NIP jako eu_vat (dla Polski) lub odpowiedni
+    await stripe.customers.createTaxId(customerId, {
+      type: 'eu_vat',
+      value: formattedNip,
     });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Stripe Update Customer Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

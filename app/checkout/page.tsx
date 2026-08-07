@@ -7,10 +7,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  EmbeddedCheckoutProvider,
-  EmbeddedCheckout
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 import styles from "../page.module.css";
 import checkoutStyles from "./checkout.module.css";
@@ -65,13 +62,15 @@ const PLAN_DETAILS: Record<string, any> = {
   }
 };
 
+import { CheckoutForm } from "./CheckoutForm";
+
 function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const priceId = searchParams?.get("priceId") || "";
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,8 +81,8 @@ function CheckoutPageContent() {
       return;
     }
 
-    if (status === "authenticated" && priceId) {
-      // Inicjalizuj płatność przez Stripe Hosted Checkout
+    if (status === "authenticated" && priceId && stripePromise) {
+      // Pobierz clientSecret z backendu
       fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,9 +92,8 @@ function CheckoutPageContent() {
         .then((data) => {
           if (data.error) {
             setError(data.error);
-          } else if (data.url) {
-            setIsRedirecting(true);
-            window.location.href = data.url;
+          } else if (data.clientSecret) {
+            setClientSecret(data.clientSecret);
           }
         })
         .catch(() => setError("Wystąpił błąd podczas połączenia z serwerem."));
@@ -126,11 +124,31 @@ function CheckoutPageContent() {
     theme: 'night' as const,
     variables: {
       colorPrimary: '#3b82f6',
-      colorBackground: '#1c1c1c',
+      colorBackground: 'transparent',
       colorText: '#ffffff',
-      colorDanger: '#ef4444',
+      colorDanger: '#ff6b6b',
       fontFamily: 'Inter, system-ui, sans-serif',
-      borderRadius: '12px',
+      borderRadius: '8px',
+      spacingUnit: '4px',
+    },
+    rules: {
+      '.Input': {
+        backgroundColor: 'rgba(20, 20, 20, 0.5)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: 'none',
+      },
+      '.Label': {
+        color: 'var(--foreground)',
+        fontWeight: '500',
+      },
+      '.Tab': {
+        backgroundColor: 'rgba(20, 20, 20, 0.5)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+      '.Tab--selected': {
+        borderColor: 'var(--primary)',
+        boxShadow: '0 0 0 1px var(--primary)',
+      },
     }
   };
 
@@ -207,9 +225,9 @@ function CheckoutPageContent() {
 
           {/* Kolumna prawa: Formularz płatności w glassmorphismie */}
           <div className={checkoutStyles.rightColumn}>
-            <div className={checkoutStyles.glassCard}>
+            <div className={checkoutStyles.glassCard} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               
-              {status === "loading" || (!error && !isRedirecting) ? (
+              {status === "loading" || (!error && !clientSecret) ? (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
                   <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
@@ -224,11 +242,10 @@ function CheckoutPageContent() {
                   </Link>
                 </div>
               ) : (
-                <div className={checkoutStyles.loaderContainer}>
-                  <div className={checkoutStyles.spinner} />
-                  <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
-                    Przekierowywanie do Stripe...
-                  </p>
+                <div id="checkout" style={{ width: '100%' }}>
+                  <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+                    <CheckoutForm planName={plan.name} />
+                  </Elements>
                 </div>
               )}
               

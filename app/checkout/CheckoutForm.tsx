@@ -1,0 +1,122 @@
+"use client";
+
+import React, { useState } from "react";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import styles from "./checkout.module.css";
+import { Shield } from "lucide-react";
+
+export function CheckoutForm({ planName }: { planName: string }) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const [nip, setNip] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setMessage(null);
+
+    // 1. Zapisz NIP w Stripe Customer jeśli został podany
+    if (nip.trim() !== "") {
+      try {
+        const nipRes = await fetch("/api/stripe/update-customer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nip }),
+        });
+        const nipData = await nipRes.json();
+        if (nipData.error) {
+          console.error("Błąd zapisu NIP:", nipData.error);
+          // Opcjonalnie: możemy przerwać płatność lub kontynuować mimo to
+          // setMessage("Błąd zapisu NIP, ale spróbujemy kontynuować płatność...");
+        }
+      } catch (err) {
+        console.error("Błąd sieci przy zapisie NIP:", err);
+      }
+    }
+
+    // 2. Potwierdź płatność
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/dashboard?checkout=success`,
+      },
+    });
+
+    if (error) {
+      setMessage(error.message || "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.");
+    } else {
+      // Przy sukcesie user jest przekierowany przez Stripe do return_url
+    }
+
+    setIsProcessing(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div>
+        <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, color: "var(--foreground)", marginBottom: "8px" }}>
+          NIP (Opcjonalnie)
+        </label>
+        <input
+          type="text"
+          value={nip}
+          onChange={(e) => setNip(e.target.value)}
+          placeholder="Podaj NIP do faktury B2B"
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "rgba(20, 20, 20, 0.5)",
+            color: "var(--foreground)",
+            outline: "none",
+            fontSize: "1rem"
+          }}
+        />
+        <p style={{ fontSize: "0.75rem", color: "var(--subtext)", marginTop: "6px" }}>
+          Jeśli zostawisz puste, wygenerujemy zwykły rachunek.
+        </p>
+      </div>
+
+      <div style={{ marginTop: "12px", padding: "20px", borderRadius: "12px", background: "rgba(20, 20, 20, 0.3)", border: "1px solid rgba(255,255,255,0.05)" }}>
+        <PaymentElement options={{ layout: "tabs" }} />
+      </div>
+
+      {message && (
+        <div style={{ color: "#ff6b6b", fontSize: "0.875rem", padding: "12px", background: "rgba(255, 107, 107, 0.1)", borderRadius: "8px" }}>
+          {message}
+        </div>
+      )}
+
+      <button
+        disabled={isProcessing || !stripe || !elements}
+        className={styles.btnPrimary}
+        style={{ width: "100%", padding: "16px", marginTop: "8px", fontSize: "1.125rem", position: "relative" }}
+      >
+        {isProcessing ? (
+          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            <div className={styles.spinner} style={{ width: "20px", height: "20px", borderWidth: "2px" }} />
+            Przetwarzanie...
+          </span>
+        ) : (
+          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            Zapłać i odblokuj {planName}
+          </span>
+        )}
+      </button>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "var(--subtext)", fontSize: "0.75rem", marginTop: "-8px" }}>
+        <Shield size={14} />
+        Bezpieczna, szyfrowana płatność
+      </div>
+    </form>
+  );
+}

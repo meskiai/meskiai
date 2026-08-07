@@ -98,31 +98,34 @@ export async function POST(req: Request) {
     }
 
     const origin = req.headers.get("origin") || "https://meskiai.com";
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", "blik", "p24"],
-      mode: "subscription",
+    
+    // Zamiast checkoutSession, tworzymy Subskrypcję bezpośrednio dla Stripe Elements
+    const subscription = await stripe.subscriptions.create({
       customer: customerId,
-      line_items: [
+      items: [
         {
           price: priceId,
-          quantity: 1,
         },
       ],
-      success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/checkout?priceId=${priceId}`,
-      billing_address_collection: "required",
-      tax_id_collection: {
-        enabled: true,
-      },
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
       metadata,
-      subscription_data: {
-        metadata,
-      },
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+
+    if (!paymentIntent || !paymentIntent.client_secret) {
+      throw new Error("Nie udało się zainicjować intencji płatności.");
+    }
+
+    return NextResponse.json({ 
+      clientSecret: paymentIntent.client_secret,
+      subscriptionId: subscription.id
+    });
   } catch (error: any) {
-    console.error("Stripe Checkout Error:", error);
+    console.error("Stripe Subscription Creation Error:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
