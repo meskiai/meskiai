@@ -2,8 +2,8 @@ import { StripePaymentElementOptions } from '@stripe/stripe-js';
 const options: StripePaymentElementOptions = {
   fields: {
     billingDetails: {
-      email: 'always',
-      phone: 'always'
+      email: 'auto',
+      phone: 'auto'
     }
   }
 };

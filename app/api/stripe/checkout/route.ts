@@ -113,7 +113,7 @@ export async function POST(req: Request) {
       metadata,
     });
 
-    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const invoice = subscription.latest_invoice as any;
     const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
     const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
 
@@ -129,7 +129,7 @@ export async function POST(req: Request) {
       console.error("DEBUG: Missing client_secret. Subscription:", JSON.stringify({
          status: subscription.status,
          latest_invoice: typeof subscription.latest_invoice === 'string' ? 'string ID' : invoice?.id,
-         payment_intent: typeof invoice?.payment_intent === 'string' ? 'string ID' : paymentIntent?.id,
+         payment_intent: typeof (invoice as any)?.payment_intent === 'string' ? 'string ID' : paymentIntent?.id,
          has_client_secret: !!paymentIntent?.client_secret,
          setup_intent: typeof subscription.pending_setup_intent,
       }));

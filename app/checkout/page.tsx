@@ -24,7 +24,7 @@ const stripePromise = cleanStripeKey ? loadStripe(cleanStripeKey) : null;
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
     name: "MESKIAI BASIC",
-    price: "499 zł",
+    price: "299 zł",
     desc: "Zacznij automatyzować proste procesy e-mail i generować zapytania ofertowe bez kiwnięcia palcem.",
     features: [
       "Osobisty Agent AI do poczty",
@@ -245,8 +245,8 @@ function CheckoutPageContent() {
                 </div>
               ) : (
                 <div id="checkout" style={{ width: '100%' }}>
-                  <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                    <CheckoutForm planName={plan.name} clientSecret={clientSecret} />
+                  <Elements stripe={stripePromise} options={{ clientSecret: clientSecret as string, appearance }}>
+                    <CheckoutForm planName={plan.name} clientSecret={clientSecret as string} />
                   </Elements>
                 </div>
               )}

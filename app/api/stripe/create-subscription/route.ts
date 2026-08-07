@@ -107,21 +107,11 @@ export async function POST(req: Request) {
     let clientSecret: string | null | undefined = null;
 
     if (subscription.latest_invoice) {
-      let invoice = subscription.latest_invoice;
-      // If invoice is just an ID (string), fetch it
-      if (typeof invoice === 'string') {
-        invoice = await stripe.invoices.retrieve(invoice, { expand: ['payment_intent'] });
-      }
+      const invoice = subscription.latest_invoice as any;
+      const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
 
-      if (typeof invoice !== 'string' && invoice.payment_intent) {
-        let paymentIntent = invoice.payment_intent;
-        // If paymentIntent is just an ID (string), fetch it
-        if (typeof paymentIntent === 'string') {
-          paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent);
-        }
-        if (typeof paymentIntent !== 'string') {
-          clientSecret = paymentIntent.client_secret;
-        }
+      if (paymentIntent) {
+        clientSecret = paymentIntent.client_secret;
       }
     }
 
