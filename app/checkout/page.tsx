@@ -19,7 +19,7 @@ const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 if (!stripeKey) {
   console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
 }
-const stripePromise = loadStripe(stripeKey || "");
+const stripePromise = loadStripe((stripeKey || "").trim());
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
