@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PaymentElement, AddressElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
 import styles from "./CheckoutForm.module.css";
 
@@ -11,6 +11,7 @@ export default function CheckoutForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [nip, setNip] = useState("");
+  const [companyName, setCompanyName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +29,7 @@ export default function CheckoutForm() {
         await fetch("/api/stripe/update-customer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nip: nip.trim() })
+          body: JSON.stringify({ nip: nip.trim(), companyName: companyName.trim() })
         });
       } catch (err) {
         console.warn("Failed to save NIP:", err);
@@ -56,6 +57,17 @@ export default function CheckoutForm() {
         <h4 style={{ color: 'white', marginBottom: '16px', fontSize: '1rem', fontWeight: 600 }}>Dane firmy i adres rozliczeniowy</h4>
         
         <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', color: '#a1a1aa', fontSize: '0.875rem', marginBottom: '8px' }}>Nazwa firmy (Opcjonalnie)</label>
+          <input 
+            type="text" 
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="np. MESKIAI Sp. z o.o."
+            className={styles.nipInput}
+          />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', color: '#a1a1aa', fontSize: '0.875rem', marginBottom: '8px' }}>NIP (Opcjonalnie)</label>
           <input 
             type="text" 
@@ -65,23 +77,22 @@ export default function CheckoutForm() {
             className={styles.nipInput}
           />
         </div>
-
-        <AddressElement 
-          options={{
-            mode: 'billing',
-            fields: {
-              phone: 'always',
-            },
-            validation: {
-              phone: { required: 'never' }
-            }
-          }} 
-        />
       </div>
 
       <div className={styles.paymentWrapper}>
         <h4 style={{ color: 'white', marginBottom: '16px', fontSize: '1rem', fontWeight: 600 }}>Karta płatnicza</h4>
-        <PaymentElement />
+        <PaymentElement 
+          options={{
+            fields: {
+              billingDetails: {
+                address: 'full',
+                phone: 'always',
+                email: 'auto',
+                name: 'auto'
+              }
+            }
+          }} 
+        />
       </div>
       
       {errorMessage && (
