@@ -124,7 +124,7 @@ function CheckoutPageContent() {
     theme: 'night' as const,
     variables: {
       colorPrimary: '#3b82f6',
-      colorBackground: 'transparent',
+      colorBackground: '#141414',
       colorText: '#ffffff',
       colorDanger: '#ff6b6b',
       fontFamily: 'Inter, system-ui, sans-serif',
@@ -133,7 +133,7 @@ function CheckoutPageContent() {
     },
     rules: {
       '.Input': {
-        backgroundColor: 'rgba(20, 20, 20, 0.5)',
+        backgroundColor: '#1e1e1e',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: 'none',
       },
