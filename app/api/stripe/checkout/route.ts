@@ -99,21 +99,28 @@ export async function POST(req: Request) {
 
     const origin = req.headers.get("origin") || "https://meskiai.com";
     const checkoutSession = await stripe.checkout.sessions.create({
-      ui_mode: "embedded",
-      customer: customerId,
+      payment_method_types: ["card", "blik", "p24"],
       mode: "subscription",
-      line_items: [{ price: priceId, quantity: 1 }],
-      return_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-      tax_id_collection: { enabled: true },
+      customer: customerId,
+      line_items: [
+        {
+          price: targetPriceId,
+          quantity: 1,
+        },
+      ],
+      success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/checkout?priceId=${priceId}`,
       billing_address_collection: "required",
+      tax_id_collection: {
+        enabled: true,
+      },
       metadata,
-      // Prevent duplicate subscriptions from Stripe's side
       subscription_data: {
         metadata,
       },
     });
 
-    return NextResponse.json({ clientSecret: checkoutSession.client_secret });
+    return NextResponse.json({ url: checkoutSession.url });
   } catch (error: any) {
     console.error("Stripe Checkout Error:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });

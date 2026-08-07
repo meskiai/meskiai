@@ -93,8 +93,8 @@ function CheckoutPageContent() {
         .then((data) => {
           if (data.error) {
             setError(data.error);
-          } else if (data.clientSecret) {
-            setClientSecret(data.clientSecret);
+          } else if (data.url) {
+            window.location.href = data.url;
           }
         })
         .catch(() => setError("Wystąpił błąd podczas połączenia z serwerem."));
@@ -208,11 +208,12 @@ function CheckoutPageContent() {
           <div className={checkoutStyles.rightColumn}>
             <div className={checkoutStyles.glassCard}>
               
-              {status === "loading" || (!clientSecret && !error) ? (
+// ... logic for right column
+              {status === "loading" || (!error && !clientSecret) ? (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
-                  <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate' }}>
-                    Łączenie z operatorem Stripe...
+                  <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
+                    Przygotowywanie bezpiecznej płatności...
                   </p>
                 </div>
               ) : error ? (
@@ -222,23 +223,11 @@ function CheckoutPageContent() {
                     Wróć i wybierz inny plan
                   </Link>
                 </div>
-              ) : !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
-                <div className={checkoutStyles.errorBox}>
-                  <div style={{ color: '#ff6b6b', fontSize: '1.125rem', fontWeight: 500, marginBottom: '24px' }}>
-                    Błąd Krytyczny: Brakuje klucza publicznego Stripe (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY).
-                  </div>
-                </div>
-              ) : clientSecret ? (
-                <div id="checkout" style={{ width: '100%', minHeight: '600px' }}>
-                  <EmbeddedCheckoutProvider stripe={stripePromise} options={{clientSecret}}>
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
-                </div>
               ) : (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
                   <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
-                    Przygotowywanie bezpiecznej płatności...
+                    Przekierowywanie do Stripe...
                   </p>
                 </div>
               )}
