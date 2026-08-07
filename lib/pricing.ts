@@ -2,8 +2,8 @@
 // We use string concatenation to bypass Netlify's aggressive secret masking
 // which replaces literal matches of environment variables with asterisks (e.g., ****************KUnC).
 
-export const PRICE_BASIC = ['price_1Tw', 'UOYFzXC0AYLvX', 'gDvOKUnC'].join('');
-export const PRICE_PRO = ['price_1U1', 'YipFzXC0AYLvX', '65CDZVyC'].join('');
+export const PRICE_BASIC = ['price_1Tw', 'OpKFzXC0AYLvX', 'RN5NkhvC'].join('');
+export const PRICE_PRO = ['price_1Tw', 'OrBFzXC0AYLvX', 'lm7peRuB'].join('');
 export const PRICE_MAX = ['price_1Tw', 'OruFzXC0AYLvX', 'QUYUXyT4'].join('');
 
 export const getPlanTier = (priceId: string | null | undefined): number => {

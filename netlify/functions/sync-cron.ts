@@ -58,9 +58,11 @@ export const handler = schedule('*/2 * * * *', async () => {
   // 1. The canonical production domain
   // 2. The Netlify deploy URL (always stable, even without custom domain)
   const candidates = [
+    process.env.URL ? `${process.env.URL}/.netlify/functions/sync-background` : null,
+    process.env.DEPLOY_PRIME_URL ? `${process.env.DEPLOY_PRIME_URL}/.netlify/functions/sync-background` : null,
     'https://meskiai.com/.netlify/functions/sync-background',
     'https://meskiai.netlify.app/.netlify/functions/sync-background',
-  ];
+  ].filter(Boolean) as string[];
 
   let lastError: string | null = null;
 
