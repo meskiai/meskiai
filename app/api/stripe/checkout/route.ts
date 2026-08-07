@@ -104,7 +104,7 @@ export async function POST(req: Request) {
       customer: customerId,
       line_items: [
         {
-          price: targetPriceId,
+          price: priceId,
           quantity: 1,
         },
       ],

@@ -208,7 +208,7 @@ function CheckoutPageContent() {
           <div className={checkoutStyles.rightColumn}>
             <div className={checkoutStyles.glassCard}>
               
-// ... logic for right column
+
               {status === "loading" || (!error && !clientSecret) ? (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
