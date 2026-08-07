@@ -97,12 +97,13 @@ export async function POST(req: Request) {
       metadata.oldSubscriptionId = oldSubscriptionId;
     }
 
+    const origin = req.headers.get("origin") || "https://meskiai.com";
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXTAUTH_URL}/dashboard?checkout=success`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/#cennik`,
+      success_url: `${origin}/dashboard?checkout=success`,
+      cancel_url: `${origin}/#cennik`,
       tax_id_collection: { enabled: true },
       billing_address_collection: "auto",
       metadata,
