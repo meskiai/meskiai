@@ -25,6 +25,25 @@
   font-weight: 500;
 }
 
+.nipInput {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.nipInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .submitBtn {
   width: 100%;
   background-color: #2563eb;
