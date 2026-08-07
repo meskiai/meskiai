@@ -81,11 +81,7 @@ export default function CheckoutForm() {
 
       <div className={styles.paymentWrapper}>
         <h4 style={{ color: 'white', marginBottom: '16px', fontSize: '1rem', fontWeight: 600 }}>Karta płatnicza</h4>
-        <PaymentElement 
-          options={{
-            layout: 'tabs',
-          }} 
-        />
+        <PaymentElement />
       </div>
       
       {errorMessage && (
