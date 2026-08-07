@@ -15,7 +15,11 @@ import styles from "../page.module.css";
 import checkoutStyles from "./checkout.module.css";
 import { ThemeToggle } from "../components/ThemeToggle";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (!stripeKey) {
+  console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
+}
+const stripePromise = loadStripe(stripeKey || "");
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
@@ -235,10 +239,17 @@ function CheckoutPageContent() {
                     Wróć i wybierz inny plan
                   </Link>
                 </div>
+              ) : !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
+                <div className={checkoutStyles.errorBox}>
+                  <div style={{ color: '#ff6b6b', fontSize: '1.125rem', fontWeight: 500, marginBottom: '24px' }}>
+                    Błąd Krytyczny: Brakuje klucza publicznego Stripe (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY). 
+                    Jeśli testujesz lokalnie, zrestartuj serwer (Ctrl+C i npm run dev). Jeśli na Netlify, upewnij się, że klucz jest dodany w zakładce Environment Variables i strona została przebudowana.
+                  </div>
+                </div>
               ) : clientSecret ? (
                 <div style={{ width: '100%', animation: 'fadeIn 0.5s ease-out forwards' }}>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '32px', color: 'var(--foreground)', display: 'flex', alignItems: 'center' }}>
-                    Dane płatności <Shield size={16} style={{ marginLeft: '8px', color: 'var(--subtext)' }} />
+                    Dane płatności (Karta) <Shield size={16} style={{ marginLeft: '8px', color: 'var(--subtext)' }} />
                   </h3>
                   <div>
                     <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
