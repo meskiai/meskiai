@@ -71,7 +71,7 @@ function CheckoutPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,6 +94,7 @@ function CheckoutPageContent() {
           if (data.error) {
             setError(data.error);
           } else if (data.url) {
+            setIsRedirecting(true);
             window.location.href = data.url;
           }
         })
@@ -208,12 +209,11 @@ function CheckoutPageContent() {
           <div className={checkoutStyles.rightColumn}>
             <div className={checkoutStyles.glassCard}>
               
-
-              {status === "loading" || (!error && !clientSecret) ? (
+              {status === "loading" || (!error && !isRedirecting) ? (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
                   <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
-                    Przygotowywanie bezpiecznej płatności...
+                    Łączenie z operatorem Stripe...
                   </p>
                 </div>
               ) : error ? (
