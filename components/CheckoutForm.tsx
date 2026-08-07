@@ -12,6 +12,7 @@ export default function CheckoutForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [nip, setNip] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +30,11 @@ export default function CheckoutForm() {
         await fetch("/api/stripe/update-customer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nip: nip.trim(), companyName: companyName.trim() })
+          body: JSON.stringify({ 
+            nip: nip.trim(), 
+            companyName: companyName.trim(),
+            companyAddress: companyAddress.trim()
+          })
         });
       } catch (err) {
         console.warn("Failed to save NIP:", err);
@@ -77,6 +82,17 @@ export default function CheckoutForm() {
             className={styles.nipInput}
           />
         </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', color: '#a1a1aa', fontSize: '0.875rem', marginBottom: '8px' }}>Adres firmy do faktury (Opcjonalnie)</label>
+          <input 
+            type="text" 
+            value={companyAddress}
+            onChange={(e) => setCompanyAddress(e.target.value)}
+            placeholder="ul. Przykładowa 1, 00-001 Warszawa"
+            className={styles.nipInput}
+          />
+        </div>
       </div>
 
       <div className={styles.paymentWrapper}>
@@ -85,8 +101,8 @@ export default function CheckoutForm() {
           options={{
             fields: {
               billingDetails: {
-                address: 'full',
-                phone: 'always',
+                address: 'auto',
+                phone: 'auto',
                 email: 'auto',
                 name: 'auto'
               }

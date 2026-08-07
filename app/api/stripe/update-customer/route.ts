@@ -17,9 +17,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { nip } = await req.json();
-    if (!nip) {
-      return NextResponse.json({ success: true }); // No NIP provided, nothing to do
+    const { nip, companyName, companyAddress } = await req.json();
+    if (!nip && !companyName && !companyAddress) {
+      return NextResponse.json({ success: true });
     }
 
     const user = await prisma.user.findUnique({
@@ -30,22 +30,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
+    const metadata: any = {};
+    if (nip) metadata.nip = nip;
+    if (companyName) metadata.companyName = companyName;
+    if (companyAddress) metadata.companyAddress = companyAddress;
+
     // Dodaj NIP (Tax ID) do profilu klienta w Stripe
     // Zakładamy typ 'eu_vat' dla Polski, ale w razie błędu ignorujemy, żeby nie zablokować płatności
     try {
-      await stripe.customers.createTaxId(user.stripeCustomerId, {
-        type: 'eu_vat',
-        value: nip,
-      });
+      if (nip) {
+        await stripe.customers.createTaxId(user.stripeCustomerId, {
+          type: 'eu_vat',
+          value: nip,
+        });
+      }
     } catch (e: any) {
       console.warn("Failed to add NIP to Stripe customer:", e.message);
-      // Fallback: update customer description or metadata just to save it
-      await stripe.customers.update(user.stripeCustomerId, {
-        metadata: {
-          nip: nip
-        }
-      });
     }
+    
+    // Zawsze updatujemy metadane, niezależnie od tego czy dodanie TaxId się powiodło
+    await stripe.customers.update(user.stripeCustomerId, {
+      metadata
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
