@@ -244,7 +244,7 @@ function CheckoutPageContent() {
               ) : (
                 <div id="checkout" style={{ width: '100%' }}>
                   <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                    <CheckoutForm planName={plan.name} />
+                    <CheckoutForm planName={plan.name} clientSecret={clientSecret} />
                   </Elements>
                 </div>
               )}

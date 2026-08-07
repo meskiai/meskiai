@@ -109,19 +109,28 @@ export async function POST(req: Request) {
       ],
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
+      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
       metadata,
     });
 
     const invoice = subscription.latest_invoice as Stripe.Invoice;
-    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+    const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
+    const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
 
-    if (!paymentIntent || !paymentIntent.client_secret) {
+    let clientSecret = null;
+    
+    if (paymentIntent && paymentIntent.client_secret) {
+      clientSecret = paymentIntent.client_secret;
+    } else if (setupIntent && setupIntent.client_secret) {
+      clientSecret = setupIntent.client_secret;
+    }
+
+    if (!clientSecret) {
       throw new Error("Nie udało się zainicjować intencji płatności.");
     }
 
     return NextResponse.json({ 
-      clientSecret: paymentIntent.client_secret,
+      clientSecret,
       subscriptionId: subscription.id
     });
   } catch (error: any) {

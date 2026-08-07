@@ -5,7 +5,7 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import styles from "./checkout.module.css";
 import { Shield } from "lucide-react";
 
-export function CheckoutForm({ planName }: { planName: string }) {
+export function CheckoutForm({ planName, clientSecret }: { planName: string, clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -34,21 +34,34 @@ export function CheckoutForm({ planName }: { planName: string }) {
         const nipData = await nipRes.json();
         if (nipData.error) {
           console.error("Błąd zapisu NIP:", nipData.error);
-          // Opcjonalnie: możemy przerwać płatność lub kontynuować mimo to
-          // setMessage("Błąd zapisu NIP, ale spróbujemy kontynuować płatność...");
         }
       } catch (err) {
         console.error("Błąd sieci przy zapisie NIP:", err);
       }
     }
 
-    // 2. Potwierdź płatność
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/dashboard?checkout=success`,
-      },
-    });
+    // 2. Potwierdź płatność lub ustawienie
+    const isSetupIntent = clientSecret.startsWith('seti_');
+    
+    let error;
+    
+    if (isSetupIntent) {
+      const result = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard?checkout=success`,
+        },
+      });
+      error = result.error;
+    } else {
+      const result = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard?checkout=success`,
+        },
+      });
+      error = result.error;
+    }
 
     if (error) {
       setMessage(error.message || "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.");
