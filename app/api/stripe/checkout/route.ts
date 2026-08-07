@@ -105,7 +105,7 @@ export async function POST(req: Request) {
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/#cennik`,
       tax_id_collection: { enabled: true },
-      billing_address_collection: "auto",
+      billing_address_collection: "required",
       metadata,
       // Prevent duplicate subscriptions from Stripe's side
       subscription_data: {

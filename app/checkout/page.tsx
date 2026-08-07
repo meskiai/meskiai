@@ -2,24 +2,15 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import CheckoutForm from "@/components/CheckoutForm";
 import { CheckCircle, Shield, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-// Reuse main page styles and components
 import styles from "../page.module.css";
 import checkoutStyles from "./checkout.module.css";
 import { ThemeToggle } from "../components/ThemeToggle";
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-if (!stripeKey) {
-  console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
-}
-const stripePromise = loadStripe((stripeKey || "").trim());
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
@@ -220,13 +211,6 @@ function CheckoutPageContent() {
                   <Link href="/#cennik" className={checkoutStyles.btnPrimary}>
                     Wróć i wybierz inny plan
                   </Link>
-                </div>
-              ) : !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
-                <div className={checkoutStyles.errorBox}>
-                  <div style={{ color: '#ff6b6b', fontSize: '1.125rem', fontWeight: 500, marginBottom: '24px' }}>
-                    Błąd Krytyczny: Brakuje klucza publicznego Stripe (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY). 
-                    Jeśli testujesz lokalnie, zrestartuj serwer (Ctrl+C i npm run dev). Jeśli na Netlify, upewnij się, że klucz jest dodany w zakładce Environment Variables i strona została przebudowana.
-                  </div>
                 </div>
               ) : (
                 <div className={checkoutStyles.loaderContainer}>
