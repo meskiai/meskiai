@@ -6,11 +6,21 @@ import { CheckCircle, Shield, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  EmbeddedCheckoutProvider,
+  EmbeddedCheckout
+} from "@stripe/react-stripe-js";
 
 import styles from "../page.module.css";
 import checkoutStyles from "./checkout.module.css";
 import { ThemeToggle } from "../components/ThemeToggle";
 
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (!stripeKey) {
+  console.error("BRAK KLUCZA STRIPE! Upewnij się, że NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY jest ustawione w .env.local oraz w Netlify.");
+}
+const stripePromise = loadStripe((stripeKey || "").trim());
 
 const PLAN_DETAILS: Record<string, any> = {
   basic: {
@@ -83,8 +93,8 @@ function CheckoutPageContent() {
         .then((data) => {
           if (data.error) {
             setError(data.error);
-          } else if (data.url) {
-            window.location.href = data.url;
+          } else if (data.clientSecret) {
+            setClientSecret(data.clientSecret);
           }
         })
         .catch(() => setError("Wystąpił błąd podczas połączenia z serwerem."));
@@ -212,12 +222,21 @@ function CheckoutPageContent() {
                     Wróć i wybierz inny plan
                   </Link>
                 </div>
+              ) : !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
+                <div className={checkoutStyles.errorBox}>
+                  <div style={{ color: '#ff6b6b', fontSize: '1.125rem', fontWeight: 500, marginBottom: '24px' }}>
+                    Błąd Krytyczny: Brakuje klucza publicznego Stripe (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY).
+                  </div>
+                </div>
+              ) : clientSecret ? (
+                <EmbeddedCheckoutProvider stripe={stripePromise} options={{clientSecret}}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
               ) : (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
                   <p style={{ color: 'var(--subtext)', fontWeight: 500, letterSpacing: '0.025em', animation: 'fadeIn 1s infinite alternate', marginTop: '16px', textAlign: 'center' }}>
-                    Przekierowywanie do bezpiecznej bramki płatności Stripe...<br/><br/>
-                    Za chwilę będziesz mógł wpisać dane karty oraz opcjonalnie NIP.
+                    Przygotowywanie bezpiecznej płatności...
                   </p>
                 </div>
               )}

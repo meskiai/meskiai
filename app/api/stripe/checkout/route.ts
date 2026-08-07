@@ -99,11 +99,11 @@ export async function POST(req: Request) {
 
     const origin = req.headers.get("origin") || "https://meskiai.com";
     const checkoutSession = await stripe.checkout.sessions.create({
+      ui_mode: "embedded",
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/dashboard?checkout=success`,
-      cancel_url: `${origin}/#cennik`,
+      return_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       tax_id_collection: { enabled: true },
       billing_address_collection: "required",
       metadata,
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    return NextResponse.json({ clientSecret: checkoutSession.client_secret });
   } catch (error: any) {
     console.error("Stripe Checkout Error:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
