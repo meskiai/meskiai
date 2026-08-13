@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle, BrainCircuit, Zap, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart } from 'lucide-react';
 import { useEffect, useState, useRef } from "react";
 
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
@@ -112,17 +112,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
 
-
-  useEffect(() => {
-    const features = ['agent', 'cold', 'swot', 'security'];
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => {
-        const nextIndex = (features.indexOf(prev) + 1) % features.length;
-        return features[nextIndex];
-      });
-    }, 15000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
