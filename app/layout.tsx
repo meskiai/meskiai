@@ -1,9 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
-const manrope = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-manrope" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -52,8 +48,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" suppressHydrationWarning className={`${inter.variable} ${manrope.variable}`}>
-      <body className={inter.className}>
+    <html lang="pl" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      </head>
+      <body>
         <Providers>
           <MetaPixel />
           {children}
