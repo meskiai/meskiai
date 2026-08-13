@@ -602,6 +602,13 @@ export default function Home() {
           <div>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</div>
         </div>
       </footer>
+
+      {/* Sticky Mobile CTA */}
+      <div className={styles.stickyCta}>
+        <button onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
+          Wypróbuj za darmo <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+        </button>
+      </div>
     </main>
   );
 }

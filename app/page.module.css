@@ -2444,3 +2444,53 @@
   border-top-color: var(--glass-border);
   padding-top: 24px;
 }
+
+/* --- STICKY MOBILE CTA --- */
+.stickyCta {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  width: calc(100% - 48px);
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.stickyCta button {
+  pointer-events: auto;
+  width: 100%;
+  background: var(--foreground);
+  color: var(--background);
+  padding: 18px 24px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: slide-up-cta 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 2s;
+  opacity: 0;
+  transition: transform 0.2s;
+}
+
+.stickyCta button:active {
+  transform: scale(0.96);
+}
+
+@keyframes slide-up-cta {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (min-width: 768px) {
+  .stickyCta {
+    display: none;
+  }
+}

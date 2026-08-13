@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
+const manrope = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-manrope" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -48,8 +52,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" suppressHydrationWarning>
-      <body>
+    <html lang="pl" suppressHydrationWarning className={`${inter.variable} ${manrope.variable}`}>
+      <body className={inter.className}>
         <Providers>
           <MetaPixel />
           {children}
