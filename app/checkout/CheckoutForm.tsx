@@ -5,6 +5,7 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import type { StripePaymentElementOptions } from "@stripe/stripe-js";
 import styles from "./checkout.module.css";
 import { Shield } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const PAYMENT_ELEMENT_OPTIONS: StripePaymentElementOptions = { 
   layout: "tabs" 
@@ -13,6 +14,8 @@ const PAYMENT_ELEMENT_OPTIONS: StripePaymentElementOptions = {
 export function CheckoutForm({ planName, clientSecret }: { planName: string, clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   const [nip, setNip] = useState("");
   const [email, setEmail] = useState("");
@@ -101,8 +104,8 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
     width: "100%",
     padding: "12px",
     borderRadius: "8px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    background: "rgba(20, 20, 20, 0.5)",
+    border: isDark ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.1)",
+    background: isDark ? "rgba(20, 20, 20, 0.5)" : "rgba(0, 0, 0, 0.02)",
     color: "var(--foreground)",
     outline: "none",
     fontSize: "1rem"
@@ -149,7 +152,7 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
             type="text"
             value={nip}
             onChange={(e) => setNip(e.target.value)}
-            placeholder="Podaj NIP do faktury B2B"
+            placeholder="Podaj NIP do faktury"
             style={inputStyle}
           />
           <p style={{ fontSize: "0.75rem", color: "var(--subtext)", marginTop: "6px" }}>
@@ -158,7 +161,7 @@ export function CheckoutForm({ planName, clientSecret }: { planName: string, cli
         </div>
       </div>
 
-      <div style={{ position: "relative", padding: "20px", borderRadius: "12px", background: "rgba(20, 20, 20, 0.3)", border: "1px solid rgba(255,255,255,0.05)", minHeight: "200px" }}>
+      <div style={{ position: "relative", padding: "20px", borderRadius: "12px", background: isDark ? "rgba(20, 20, 20, 0.3)" : "rgba(0, 0, 0, 0.02)", border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)", minHeight: "200px" }}>
         {!isReady && !loadError && (
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
             <div className={styles.spinner} style={{ width: "32px", height: "32px", borderWidth: "3px" }} />

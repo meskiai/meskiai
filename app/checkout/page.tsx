@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, Shield, ArrowLeft } from "lucide-react";
+import { CheckCircle, Shield, ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,9 @@ import { Elements } from "@stripe/react-stripe-js";
 
 import styles from "../page.module.css";
 import checkoutStyles from "./checkout.module.css";
-import { ThemeToggle } from "../components/ThemeToggle";
+
+import { useTheme } from "next-themes";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 if (!stripeKey) {
@@ -22,7 +24,7 @@ const cleanStripeKey = stripeKey ? stripeKey.replace(/[^a-zA-Z0-9_]/g, '') : "";
 const stripePromise = cleanStripeKey ? loadStripe(cleanStripeKey) : null;
 
 const PLAN_DETAILS: Record<string, any> = {
-  basic: {
+  [PRICE_BASIC]: {
     name: "MESKIAI BASIC",
     price: "299 zł",
     desc: "Zacznij automatyzować proste procesy e-mail i generować zapytania ofertowe bez kiwnięcia palcem.",
@@ -31,10 +33,10 @@ const PLAN_DETAILS: Record<string, any> = {
       "Do 50 automatycznych e-maili miesięcznie",
       "Do 10 wyszukań konkurencji miesięcznie",
       "Podstawowe podpowiedzi biznesowe",
-      "Propozycje klientów (limit 20 B2B)",
+      "Propozycje klientów (limit 20)",
     ]
   },
-  pro: {
+  [PRICE_PRO]: {
     name: "MESKIAI PRO",
     price: "699 zł",
     desc: "Zbudowany dla skalujących się biznesów. Prawdziwy pracownik w chmurze.",
@@ -43,12 +45,12 @@ const PLAN_DETAILS: Record<string, any> = {
       "Do 1000 automatycznych e-maili miesięcznie",
       "Do 100 wyszukań konkurencji miesięcznie",
       "Zaawansowane podpowiedzi biznesowe",
-      "Propozycje klientów (limit 200 B2B)",
+      "Propozycje klientów (limit 200)",
       "Cold Email (Generowanie AI)",
       "Zmiana tonu i stylu pisania Agenta"
     ]
   },
-  max: {
+  [PRICE_MAX]: {
     name: "MESKIAI MAX",
     price: "899 zł",
     desc: "Bez limitów. Dla przedsiębiorstw pragnących absolutnej dominacji operacyjnej.",
@@ -74,6 +76,8 @@ function CheckoutPageContent() {
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -123,11 +127,11 @@ function CheckoutPageContent() {
   }
 
   const appearance = {
-    theme: 'night' as const,
+    theme: isDark ? 'night' as const : 'stripe' as const,
     variables: {
       colorPrimary: '#3b82f6',
-      colorBackground: '#141414',
-      colorText: '#ffffff',
+      colorBackground: isDark ? '#141414' : '#ffffff',
+      colorText: isDark ? '#ffffff' : '#1d1d1f',
       colorDanger: '#ff6b6b',
       fontFamily: 'Inter, system-ui, sans-serif',
       borderRadius: '8px',
@@ -135,8 +139,8 @@ function CheckoutPageContent() {
     },
     rules: {
       '.Input': {
-        backgroundColor: '#1e1e1e',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backgroundColor: isDark ? '#1e1e1e' : '#f5f5f7',
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
         boxShadow: 'none',
       },
       '.Label': {
@@ -144,8 +148,8 @@ function CheckoutPageContent() {
         fontWeight: '500',
       },
       '.Tab': {
-        backgroundColor: 'rgba(20, 20, 20, 0.5)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backgroundColor: isDark ? 'rgba(20, 20, 20, 0.5)' : 'rgba(0, 0, 0, 0.05)',
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
       },
       '.Tab--selected': {
         borderColor: 'var(--primary)',
@@ -174,7 +178,7 @@ function CheckoutPageContent() {
           </div>
           
           <div className={styles.navActions}>
-            <ThemeToggle />
+
           </div>
         </div>
       </nav>
@@ -229,6 +233,16 @@ function CheckoutPageContent() {
           <div className={checkoutStyles.rightColumn}>
             <div className={checkoutStyles.glassCard} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               
+              <div style={{ marginBottom: '24px', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                <div style={{ color: 'var(--primary)', marginTop: '2px' }}><Mail size={20} /></div>
+                <div>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '4px' }}>Ważne przed płatnością</h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--subtext)', lineHeight: 1.5, margin: 0 }}>
+                    Kupujesz abonament dla konta: <strong style={{ color: 'var(--foreground)' }}>{session?.user?.email}</strong>. Upewnij się, że to właściwy firmowy Gmail, na którym ma pracować Agent.
+                  </p>
+                </div>
+              </div>
+
               {status === "loading" || (!error && !clientSecret) ? (
                 <div className={checkoutStyles.loaderContainer}>
                   <div className={checkoutStyles.spinner} />
