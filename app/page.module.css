@@ -2201,3 +2201,148 @@
     text-align: center;
   }
 }
+
+/* Animated Terminal Panel (Lindy Style) */
+.animatedPanel {
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelHeader {
+  height: 48px;
+  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  position: relative;
+}
+
+.panelDots {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  left: 20px;
+}
+
+.panelDots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.panelTitle {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--subtext);
+  letter-spacing: 0.5px;
+}
+
+.panelBody {
+  display: flex;
+  height: 350px;
+}
+
+.taskSidebar {
+  width: 240px;
+  border-right: 1px solid var(--glass-border);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,0.02);
+}
+
+.taskItem {
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--subtext);
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.taskItem.activeTask {
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.taskContent {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.logLine {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0;
+  animation: slideInFade 0.5s ease forwards;
+}
+
+.logTime {
+  color: var(--subtext);
+  opacity: 0.7;
+  margin-right: 12px;
+}
+
+.logInfo {
+  color: #3b82f6;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.logAction {
+  color: #8b5cf6;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.logSuccess {
+  color: #10b981;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+@keyframes slideInFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .panelBody {
+    flex-direction: column;
+    height: auto;
+  }
+  .taskSidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .taskItem {
+    white-space: nowrap;
+  }
+}

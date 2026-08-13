@@ -352,7 +352,7 @@ export default function Home() {
             </div>
             <div className={styles.taskContent}>
               {activeFeature === 'agent' && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                <div key="agent" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
                   <div className={styles.logLine}><span className={styles.logTime}>10:42:01</span> <span className={styles.logInfo}>[INBOX]</span> Nowe zapytanie ofertowe od biuro@klient.pl</div>
                   <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>10:42:02</span> <span className={styles.logAction}>[AI]</span> Kategoryzacja intencji: <span style={{color: '#10b981'}}>Zainteresowanie usługą</span></div>
                   <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>10:42:03</span> <span className={styles.logAction}>[AI]</span> Generowanie spersonalizowanej odpowiedzi...</div>
@@ -360,7 +360,7 @@ export default function Home() {
                 </div>
               )}
               {activeFeature === 'cold' && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                <div key="cold" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
                   <div className={styles.logLine}><span className={styles.logTime}>11:15:00</span> <span className={styles.logAction}>[SCRAPER]</span> Rozpoczęto wyszukiwanie: "Agencje marketingowe, Warszawa"</div>
                   <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>11:15:04</span> <span className={styles.logInfo}>[DATA]</span> Znaleziono 42 potencjalnych klientów.</div>
                   <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>11:15:07</span> <span className={styles.logAction}>[AI]</span> Personalizacja treści dla CEO (Jan Kowalski)...</div>
@@ -368,14 +368,14 @@ export default function Home() {
                 </div>
               )}
               {activeFeature === 'swot' && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                <div key="swot" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
                   <div className={styles.logLine}><span className={styles.logTime}>13:30:12</span> <span className={styles.logAction}>[SYNC]</span> Pobieranie danych z bazy wiedzy...</div>
                   <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>13:30:15</span> <span className={styles.logInfo}>[AI]</span> Optymalizacja modelu odpowiedzi.</div>
                   <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>13:30:17</span> <span className={styles.logSuccess}>[SUCCESS]</span> Baza wiedzy zaktualizowana i gotowa do użycia.</div>
                 </div>
               )}
               {activeFeature === 'security' && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                <div key="security" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
                   <div className={styles.logLine}><span className={styles.logTime}>12:01:22</span> <span className={styles.logInfo}>[FIREWALL]</span> Wykryto podejrzaną wiadomość e-mail.</div>
                   <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>12:01:23</span> <span className={styles.logAction}>[AI]</span> Analiza nadawcy i linków (Phishing Score: 98%)</div>
                   <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>12:01:24</span> <span className={styles.logSuccess}>[BLOCKED]</span> Wiadomość przeniesiona do kwarantanny. Skrzynka bezpieczna.</div>
