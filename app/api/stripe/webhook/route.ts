@@ -112,12 +112,21 @@ export async function POST(req: Request) {
         });
 
         if (user) {
+          const newStatus = (subscription as any).status as string;
+          const isActive = newStatus === 'active' || newStatus === 'trialing';
+
+          // Ochrona przed zjawiskiem wyścigu (race condition) przy upgrade planów
+          if (user.stripeSubscriptionId && user.stripeSubscriptionId !== subscription.id) {
+            if (!isActive && (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing')) {
+              console.log(`[Stripe] Ignorowanie aktualizacji starej/anulowanej subskrypcji ${subscription.id} dla userId=${user.id}`);
+              break;
+            }
+          }
+
           const periodEndTs = (subscription as any).current_period_end
             || (subscription as any).items?.data?.[0]?.current_period_end
             || (Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
 
-          const newStatus = (subscription as any).status as string;
-          const isActive = newStatus === 'active' || newStatus === 'trialing';
 
           // Sprawdzamy czy to nowa subskrypcja aktywowana przez Stripe Elements
           const wasIncomplete = previousAttributes?.status === 'incomplete';
@@ -200,6 +209,12 @@ export async function POST(req: Request) {
         });
 
         if (user) {
+          // Ochrona: jeśli anulowana subskrypcja to stara subskrypcja, a użytkownik ma nową aktywną - ignoruj!
+          if (user.stripeSubscriptionId && user.stripeSubscriptionId !== subscription.id) {
+            console.log(`[Stripe] Ignorowanie eventu deleted dla starej subskrypcji ${subscription.id} (użytkownik ma aktywną inną: ${user.stripeSubscriptionId})`);
+            break;
+          }
+
           await prisma.user.update({
             where: { id: user.id },
             data: { subscriptionStatus: "canceled" },

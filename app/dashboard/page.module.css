@@ -165,7 +165,7 @@
   content: "";
   height: 20px; width: 20px;
   left: 2px; bottom: 2px;
-  background-color: white;
+  background-color: var(--card-bg);
   transition: .4s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -590,7 +590,7 @@ input:checked + .slider:before { transform: translateX(16px); }
     width: 72px;
     height: 72px;
     border-radius: 20px;
-    color: white;
+    color: var(--background);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -740,7 +740,7 @@ input:checked + .slider:before { transform: translateX(16px); }
   height: clamp(48px, 6vw, 64px);
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary), #3b82f6);
-  color: white;
+  color: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -938,7 +938,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .accountBtnPrimary {
   background: linear-gradient(135deg, var(--primary), #3b82f6);
   border: none;
-  color: white;
+  color: var(--background);
   box-shadow: 0 3px 10px rgba(59,130,246,0.3);
 }
 .accountBtnPrimary:hover { opacity: 0.88; }
