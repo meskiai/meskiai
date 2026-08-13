@@ -5,9 +5,78 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown, Target, ShoppingBag } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
-import { ThemeToggle } from "./components/ThemeToggle";
+
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 import styles from "./page.module.css";
+
+const TypingEmail = () => {
+  const [text, setText] = useState('');
+  const fullText = "Dzień dobry, na czym właściwie polega MESKIAI i jak może pomóc mojej firmie?";
+  const aiText = "Dzień dobry. MESKIAI to Twój nowy pracownik AI. Przejmujemy obsługę zapytań klientów w trybie 24/7 oraz automatyzujemy pozyskiwanie kontaktów biznesowych. Wszystko odbywa się bezobsługowo, uwalniając Twój czas.";
+  const [showAi, setShowAi] = useState(false);
+  const [aiTyped, setAiTyped] = useState('');
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setText(fullText.slice(0, i));
+      i++;
+      if (i > fullText.length) {
+        clearInterval(interval);
+        setTimeout(() => setShowAi(true), 500);
+      }
+    }, 20);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (showAi) {
+      let i = 0;
+      const interval = setInterval(() => {
+        setAiTyped(aiText.slice(0, i));
+        i++;
+        if (i > aiText.length) clearInterval(interval);
+      }, 15);
+      return () => clearInterval(interval);
+    }
+  }, [showAi]);
+
+  return (
+    <div className={styles.mockMailApp} style={{ flexDirection: 'column', padding: '0', height: 'auto', minHeight: '300px', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--mac-shadow)', backdropFilter: 'blur(20px)' }}>
+      {/* Window Header */}
+      <div style={{ padding: '12px 20px', display: 'flex', gap: '12px', borderBottom: '1px solid var(--border)', background: 'var(--card-bg)', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
+        </div>
+      </div>
+      
+      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--subtext)', fontWeight: 600, display: 'flex', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <span>Klient</span>
+            <span style={{ opacity: 0.5 }}>[INBOUND]</span>
+          </div>
+          <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
+            {text}{!showAi && <span className={styles.typingCursor} style={{ background: 'var(--foreground)' }}>|</span>}
+          </div>
+        </div>
+        
+        {showAi && (
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', marginTop: '12px', borderLeft: '2px solid var(--accent)', paddingLeft: '16px' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <Sparkles size={12} /> MESKIAI <span style={{ opacity: 0.5, color: 'var(--subtext)', fontWeight: 400 }}>[GENERATING]</span>
+            </div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--foreground)', lineHeight: 1.6 }}>
+              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: 'var(--accent)' }}>|</span> : ''}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -95,9 +164,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <div className={styles.ambientBackground}>
-        <div className={styles.ambientBlob}></div>
-      </div>
+      <div className={styles.ambientBackground}></div>
       
       {/* Navigation - Apple Style */}
       <nav className={`${styles.nav} animate-fade-in`}>
@@ -112,7 +179,7 @@ export default function Home() {
           </div>
           
           <div className={styles.navActions}>
-            <ThemeToggle />
+
             {status === "authenticated" ? (
               <div ref={menuRef} style={{ position: 'relative' }}>
                 <button
@@ -198,11 +265,9 @@ export default function Home() {
                 </button>
                 <button
                   className={styles.loginBtn}
-                  onClick={() => {
-                    document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
                 >
-                  Wybierz pakiet
+                  Załóż darmowe konto
                 </button>
               </div>
             )}
@@ -212,16 +277,13 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={`${styles.badge} animate-fade-in`}>
-          <Sparkles size={14} className={styles.badgeHighlight} /> Nowa era automatyzacji B2B
-        </div>
-        
+
         <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
           Zatrudnij AI. <br />Uwolnij swój czas.
         </h1>
         
         <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`}>
-          Aplikacja MESKIAI to innowacyjny panel zarządzania Twoim wirtualnym asystentem e-mail. Logowanie za pomocą Google pozwala nam na bezpieczną identyfikację Twojego konta w naszym systemie. Aplikacja nie wymaga i nie prosi o dostęp do czytania Twoich skrzynek pocztowych przez interfejs API Google.
+          Pierwszy w pełni autonomiczny asystent e-mail. System zdejmuje z Ciebie ciężar rutynowej komunikacji, gwarantując błyskawiczne i bezpieczne odpowiedzi 24/7.
         </h2>
         
         <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`}>
@@ -230,245 +292,150 @@ export default function Home() {
               Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
-            <>
-              <button className={styles.ctaBtnPrimary} onClick={() => {
-                document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                Wybierz pakiet
-              </button>
-              <button className={styles.ctaBtnSecondary} onClick={() => {
-                document.getElementById('cennik')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                Zobacz Cennik
-              </button>
-            </>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <button className={styles.ctaBtnPrimary} onClick={() => signIn("google", { callbackUrl: "/dashboard" })} style={{ padding: '16px 32px', fontSize: '1.05rem' }}>
+                  Rozpocznij 7-dniowy okres próbny
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </section>
 
-      {/* Premium macOS-Style Interactive Features Section */}
-      <section className={styles.macosSection}>
-        <div className={styles.macosHeader}>
-          <span className={styles.macosEyebrow}>System Operacyjny Sprzedaży</span>
-          <h2 className={styles.macosTitle}>Zaprojektowany, by działać w tle.</h2>
-          <p className={styles.macosSubtitle}>
-            Kliknij na funkcje w panelu poniżej, aby zobaczyć jak MESKIAI rewolucjonizuje codzienną obsługę poczty.
+      {/* Live AI Demo Section */}
+      <section style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Zaprojektowany, by działać w tle.</h2>
+            <p style={{ color: 'var(--subtext)', marginTop: '12px', fontSize: '1.05rem' }}>Zobacz, jak system samodzielnie obsługuje zapytania Twoich klientów.</p>
+          </div>
+          
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 60%)', zIndex: -1, pointerEvents: 'none' }}></div>
+            <TypingEmail />
+          </div>
+        </div>
+      </section>
+
+      {/* Active Tasks Animation Panel */}
+      <section style={{ padding: '60px 20px', maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
+            Pracuje dla Ciebie. Zawsze.
+          </h2>
+          <p style={{ color: 'var(--subtext)', fontSize: '1.1rem', marginTop: '12px' }}>
+            System automatycznie analizuje zapytania, tworzy szkice i zarządza kontaktami.
           </p>
         </div>
 
-        <div className={styles.macosWindowWrapper}>
-          <div className={styles.macosWindow}>
-            {/* Window Header / Titlebar */}
-            <div className={styles.macosTitlebar} style={{ justifyContent: 'center' }}>
-              <div className={styles.macosWindowTitle}>MESKIAI Panel</div>
+        <div className={styles.animatedPanel}>
+          <div className={styles.panelHeader}>
+            <div className={styles.panelDots}>
+              <span style={{background: '#ff5f56'}}></span>
+              <span style={{background: '#ffbd2e'}}></span>
+              <span style={{background: '#27c93f'}}></span>
             </div>
-
-            {/* Window Content Layout */}
-            <div className={styles.macosBody}>
-              {/* Sidebar */}
-              <div className={styles.macosSidebar}>
-                <button
-                  className={`${styles.macosSidebarItem} ${activeFeature === 'agent' ? styles.active : ''}`}
-                  onClick={() => setActiveFeature('agent')}
-                >
-                  <Bot size={16} />
-                  <span>Poczta AI</span>
-                </button>
-                <button
-                  className={`${styles.macosSidebarItem} ${activeFeature === 'cold' ? styles.active : ''}`}
-                  onClick={() => setActiveFeature('cold')}
-                >
-                  <Mail size={16} />
-                  <span>Generowanie Leadów</span>
-                </button>
-                <button
-                  className={`${styles.macosSidebarItem} ${activeFeature === 'swot' ? styles.active : ''}`}
-                  onClick={() => setActiveFeature('swot')}
-                >
-                  <BarChart2 size={16} />
-                  <span>Analiza SWOT</span>
-                </button>
-                <button
-                  className={`${styles.macosSidebarItem} ${activeFeature === 'security' ? styles.active : ''}`}
-                  onClick={() => setActiveFeature('security')}
-                >
-                  <Shield size={16} />
-                  <span>Bezpieczeństwo</span>
-                </button>
+            <div className={styles.panelTitle}>Terminal MESKIAI</div>
+          </div>
+          <div className={styles.panelBody}>
+            <div className={styles.taskSidebar}>
+              <div className={`${styles.taskItem} ${activeFeature === 'agent' ? styles.activeTask : ''}`}>
+                <Mail size={16} /> Analiza skrzynki
               </div>
-
-              {/* Main view area */}
-              <div className={styles.macosContent}>
-                {activeFeature === 'agent' && (
-                  <div className={`${styles.featureView} animate-fade-in`}>
-                    <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>POP3 & SMTP & Webhooks</span>
-                      <h3>Agent AI do pelnej obslugi Twoich klientow.</h3>
-                      <p>
-                        Podlacz skrzynke pocztowa i przekaz rutynowa komunikacje sztucznej inteligencji. Agent nie tylko weryfikuje statusy i realizacje zamowien w Shopify i WooCommerce, ale rowniez odpowiada na ogolne pytania, doradza, rozwiazuje codzienne problemy oraz dba o profesjonalna obsluge kazdego klienta.
-                      </p>
-                      <ul className={styles.featureSpecs}>
-                        <li><span>Pelna obsluga:</span> Pytania, maile, pomoc klientom</li>
-                        <li><span>Sklepy:</span> Statusy, zwroty i reklamacje</li>
-                        <li><span>Czas reakcji:</span> ponizej 2 minut</li>
-                      </ul>
-                    </div>
-                    <div className={styles.featureVisual}>
-                      {/* CSS Mockup of Mail app */}
-                      <div className={styles.mockMailApp}>
-                        <div className={styles.mockMailList}>
-                          <div className={`${styles.mockMailItem} ${styles.mockMailActive}`}>
-                            <div className={styles.mockMailHeader}>
-                              <span className={styles.mockMailSender}>Jan Kowalski</span>
-                              <span className={styles.mockMailTime}>Teraz</span>
-                            </div>
-                            <div className={styles.mockMailSubject}>Wycena wdrożenia...</div>
-                          </div>
-                          <div className={styles.mockMailItem}>
-                            <div className={styles.mockMailHeader}>
-                              <span className={styles.mockMailSender}>Anna Nowak</span>
-                              <span className={styles.mockMailTime}>10 min</span>
-                            </div>
-                            <div className={styles.mockMailSubject}>Spotkanie w środę</div>
-                          </div>
-                        </div>
-                        <div className={styles.mockMailDetail}>
-                          <div className={styles.mockDetailHeader}>Pisanie odpowiedzi AI...</div>
-                          <div className={styles.mockDetailBody}>
-                            <div className={styles.mockLine} style={{ width: '80%' }}></div>
-                            <div className={styles.mockLine} style={{ width: '90%' }}></div>
-                            <div className={styles.mockLine} style={{ width: '60%' }}></div>
-                            <div className={styles.mockDraftBadge}>Szkic gotowy do wysłania</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeFeature === 'cold' && (
-                  <div className={`${styles.featureView} animate-fade-in`}>
-                    <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(16,185,129,0.1)', color: '#34d399' }}>Silnik Prospekcji</span>
-                      <h3>Automatyczne pozyskiwanie klientów.</h3>
-                      <p>
-                        Pozwól algorytmom zidentyfikować i sprofilować Twoją grupę docelową. System precyzyjnie dociera do kluczowych decydentów i automatycznie projektuje spersonalizowaną ścieżkę kontaktu.
-                      </p>
-                      <ul className={styles.featureSpecs}>
-                        <li><span>Dopasowanie:</span> Precyzyjne (ICP)</li>
-                        <li><span>Komunikacja:</span> Zorientowana na wartość</li>
-                        <li><span>Efektywność:</span> Zoptymalizowana konwersja</li>
-                      </ul>
-                    </div>
-                    <div className={styles.featureVisual}>
-                      {/* CSS Mockup of Lead Table */}
-                      <div className={styles.mockTableApp}>
-                        <div className={styles.mockTableHeader}>
-                          <span>Nazwa firmy</span>
-                          <span>Kontakt</span>
-                          <span>Status</span>
-                        </div>
-                        <div className={styles.mockTableRow}>
-                          <span>Omnipack Sp. z o.o.</span>
-                          <span>CEO</span>
-                          <span className={styles.statusPill} style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>Wysłano</span>
-                        </div>
-                        <div className={styles.mockTableRow}>
-                          <span>Your KAYA</span>
-                          <span>Founder</span>
-                          <span className={styles.statusPill} style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>Zainteresowany</span>
-                        </div>
-                        <div className={styles.mockTableRow}>
-                          <span>Sklep XYZ</span>
-                          <span>Marketing</span>
-                          <span className={styles.statusPill} style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>W kolejce</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeFeature === 'swot' && (
-                  <div className={`${styles.featureView} animate-fade-in`}>
-                    <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>Skaner Rynkowy</span>
-                      <h3>Błyskawiczny audyt konkurencji.</h3>
-                      <p>
-                        Chcesz błyskawicznie poznać potencjał partnera lub konkurenta? Podaj adres URL, a zaawansowany skaner przetworzy strukturę oferty i przygotuje pełną analizę mocnych i słabych stron w kilka sekund.
-                      </p>
-                      <ul className={styles.featureSpecs}>
-                        <li><span>Szybkość:</span> Natychmiastowa</li>
-                        <li><span>Analiza:</span> Głębia strategiczna</li>
-                        <li><span>Zakres:</span> Nisze rynkowe i przewagi</li>
-                      </ul>
-                    </div>
-                    <div className={styles.featureVisual}>
-                      {/* CSS Mockup of SWOT Grid */}
-                      <div className={styles.mockSwotGrid}>
-                        <div className={styles.swotBox} style={{ borderColor: 'rgba(16,185,129,0.3)' }}>
-                          <span className={styles.swotLabel} style={{ color: '#34d399' }}>Mocne strony</span>
-                          <p>Szybka dostawa</p>
-                        </div>
-                        <div className={styles.swotBox} style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
-                          <span className={styles.swotLabel} style={{ color: '#f87171' }}>Słabe strony</span>
-                          <p>Drogi cennik</p>
-                        </div>
-                        <div className={styles.swotBox} style={{ borderColor: 'rgba(59,130,246,0.3)' }}>
-                          <span className={styles.swotLabel} style={{ color: '#60a5fa' }}>Szanse</span>
-                          <p>Nisza na rynku DE</p>
-                        </div>
-                        <div className={styles.swotBox} style={{ borderColor: 'rgba(251,191,36,0.3)' }}>
-                          <span className={styles.swotLabel} style={{ color: '#fbbf24' }}>Zagrożenia</span>
-                          <p>Nowa konkurencja</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeFeature === 'security' && (
-                  <div className={`${styles.featureView} animate-fade-in`}>
-                    <div className={styles.featureInfo}>
-                      <span className={styles.featureBadge} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}>Tarcza Bezpieczeństwa</span>
-                      <h3>Bezpieczne szyfrowanie AES-256.</h3>
-                      <p>
-                        Dbamy o Twoją prywatność. Połączenie opiera się na wydzielonych, dedykowanych kluczach dostępu. Wszystkie wrażliwe dane są szyfrowane kryptograficznie na poziomie infrastruktury.
-                      </p>
-                      <ul className={styles.featureSpecs}>
-                        <li><span>Integracja:</span> Szyfrowana chmura</li>
-                        <li><span>Standard:</span> Klasa wojskowa (AES-256)</li>
-                        <li><span>Zgodność:</span> Standardy RODO / GDPR</li>
-                      </ul>
-                    </div>
-                    <div className={styles.featureVisual}>
-                      {/* CSS Mockup of Secure Lock screen */}
-                      <div className={styles.mockSecureShield}>
-                        <div className={styles.shieldPulse}>
-                          <Shield size={36} color="#c084fc" />
-                        </div>
-                        <span className={styles.secureStatus}>Szyfrowanie Aktywne</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div className={`${styles.taskItem} ${activeFeature === 'cold' ? styles.activeTask : ''}`}>
+                <Target size={16} /> Pozyskiwanie leadów
               </div>
+              <div className={`${styles.taskItem} ${activeFeature === 'security' ? styles.activeTask : ''}`}>
+                <Shield size={16} /> Ochrona spamu
+              </div>
+            </div>
+            <div className={styles.taskContent}>
+              {activeFeature === 'agent' && (
+                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                  <div className={styles.logLine}><span className={styles.logTime}>10:42:01</span> <span className={styles.logInfo}>[INBOX]</span> Nowe zapytanie ofertowe od biuro@klient.pl</div>
+                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>10:42:02</span> <span className={styles.logAction}>[AI]</span> Kategoryzacja intencji: <span style={{color: '#10b981'}}>Zainteresowanie usługą</span></div>
+                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>10:42:03</span> <span className={styles.logAction}>[AI]</span> Generowanie spersonalizowanej odpowiedzi...</div>
+                  <div className={styles.logLine} style={{ animationDelay: '3s' }}><span className={styles.logTime}>10:42:05</span> <span className={styles.logSuccess}>[SUCCESS]</span> Szkic zapisany w zakładce "Gotowe do wysyłki".</div>
+                </div>
+              )}
+              {activeFeature === 'cold' && (
+                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                  <div className={styles.logLine}><span className={styles.logTime}>11:15:00</span> <span className={styles.logAction}>[SCRAPER]</span> Rozpoczęto wyszukiwanie: "Agencje marketingowe, Warszawa"</div>
+                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>11:15:04</span> <span className={styles.logInfo}>[DATA]</span> Znaleziono 42 potencjalnych klientów.</div>
+                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>11:15:07</span> <span className={styles.logAction}>[AI]</span> Personalizacja treści dla CEO (Jan Kowalski)...</div>
+                  <div className={styles.logLine} style={{ animationDelay: '3s' }}><span className={styles.logTime}>11:15:10</span> <span className={styles.logSuccess}>[SUCCESS]</span> Kampania gotowa do uruchomienia.</div>
+                </div>
+              )}
+              {activeFeature === 'swot' && (
+                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                  <div className={styles.logLine}><span className={styles.logTime}>13:30:12</span> <span className={styles.logAction}>[SYNC]</span> Pobieranie danych z bazy wiedzy...</div>
+                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>13:30:15</span> <span className={styles.logInfo}>[AI]</span> Optymalizacja modelu odpowiedzi.</div>
+                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>13:30:17</span> <span className={styles.logSuccess}>[SUCCESS]</span> Baza wiedzy zaktualizowana i gotowa do użycia.</div>
+                </div>
+              )}
+              {activeFeature === 'security' && (
+                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace' }}>
+                  <div className={styles.logLine}><span className={styles.logTime}>12:01:22</span> <span className={styles.logInfo}>[FIREWALL]</span> Wykryto podejrzaną wiadomość e-mail.</div>
+                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>12:01:23</span> <span className={styles.logAction}>[AI]</span> Analiza nadawcy i linków (Phishing Score: 98%)</div>
+                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>12:01:24</span> <span className={styles.logSuccess}>[BLOCKED]</span> Wiadomość przeniesiona do kwarantanny. Skrzynka bezpieczna.</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why Us Statement (Apple Style) */}
-      <section className={styles.whyUsSection}>
-        <div className={styles.whyUsContent}>
-          <h2 className="animate-fade-in-up">
-            Nie sprzedajemy oprogramowania.<br/>
-            <span>Sprzedajemy Twój wolny czas.</span>
+      {/* Features Bento Section */}
+      <section style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
+            Jeden system. Wiele możliwości.
           </h2>
-          <p className="animate-fade-in-up animate-delay-1">
-            Większość narzędzi wymaga Twojej uwagi. MESKIAI działa całkowicie w tle. Ty zyskujesz klientów i opłacone faktury, a my zajmujemy się całą czarną robotą. 
+          <p style={{ color: 'var(--subtext)', fontSize: '1.1rem', marginTop: '12px' }}>
+            Poznaj potężne narzędzia ukryte pod maską MESKIAI.
           </p>
         </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          
+          {/* Feature 1 */}
+          <div style={{ padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
+            <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Mail size={24} />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Inteligentna skrzynka odbiorcza</h3>
+            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
+              Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Podłącz własne skrzynki POP3/SMTP</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Automatyczne katalogowanie wątków</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Błyskawiczne szkice odpowiedzi</li>
+            </ul>
+          </div>
+
+          {/* Feature 2 */}
+          <div style={{ padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
+            <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Target size={24} />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Pozyskiwanie nowych klientów</h3>
+            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
+              Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Wyszukiwarka firm i decydentów</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Nielimitowane bazy kontaktów</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Personalizacja ofert przez AI</li>
+            </ul>
+          </div>
+
+        </div>
       </section>
+
+
 
       {/* Pricing Section (Apple Style) */}
       <section className={styles.pricingSection} id="cennik">
@@ -477,26 +444,7 @@ export default function Home() {
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
         </div>
         
-        <div className={`animate-fade-in-up animate-delay-1 ${styles.warningBox}`}>
-          {/* Subtle glow effect in the background */}
-          <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
-          <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
 
-          <div style={{ 
-            width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, var(--primary), #3b82f6)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 16px rgba(0,122,255,0.25)' 
-          }}>
-            <Mail size={24} color="white" />
-          </div>
-          
-          <div style={{ fontSize: '1rem', lineHeight: '1.6', zIndex: 1 }}>
-            <h3 style={{ margin: '0 0 8px 0', color: 'var(--foreground)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.3px' }}>Ważna informacja przed zakupem</h3>
-            <p style={{ margin: 0, opacity: 0.9 }}>
-              Pamiętaj, aby dokonać zakupu <strong>logując się dokładnie na konto Gmail firmowe</strong>, na którym ma działać Agent AI. Twój asystent zostanie trwale przypisany do konta, z którego wykupiono subskrypcję, aby móc płynnie zarządzać Twoją komunikacją biznesową.
-            </p>
-          </div>
-        </div>
-        
         <div className={styles.pricingGrid}>
           {/* Pakiet 1 */}
           <div className={`${styles.pricingCard} animate-fade-in-up animate-delay-2`}>
@@ -509,7 +457,7 @@ export default function Home() {
               <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
               <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
               <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 10 B2B)</li>
+              <li><CheckCircle size={18} /> Propozycje klientów (limit 10)</li>
               <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
             </ul>
             
@@ -519,11 +467,11 @@ export default function Home() {
               style={{ opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 1) return;
-                const priceId = 'basic';
+                const priceId = PRICE_BASIC;
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === 'basic' ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet")}
+              {loadingPriceId === PRICE_BASIC ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Wybieram ten pakiet")}
             </button>
           </div>
  
@@ -541,7 +489,7 @@ export default function Home() {
               <li><CheckCircle size={18} /> Do 1000 automatycznych e-maili miesięcznie</li>
               <li><CheckCircle size={18} /> Do 100 wyszukań konkurencji miesięcznie</li>
               <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 200 B2B)</li>
+              <li><CheckCircle size={18} /> Propozycje klientów (limit 200)</li>
               <li><CheckCircle size={18} /> Cold Email (Generowanie AI)</li>
               <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
             </ul>
@@ -552,11 +500,11 @@ export default function Home() {
               style={{ opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 2) return;
-                const priceId = 'pro';
+                const priceId = PRICE_PRO;
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === 'pro' ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO")}
+              {loadingPriceId === PRICE_PRO ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Niedostępne (Downgrade)") : "Zaczynamy z PRO")}
             </button>
           </div>
  
@@ -582,151 +530,54 @@ export default function Home() {
               style={{ opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 3) return;
-                const priceId = 'max';
+                const priceId = PRICE_MAX;
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === 'max' ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
+              {loadingPriceId === PRICE_MAX ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
             </button>
           </div>
         </div>
       </section>
 
-      {/* Apple Minimalist Horizontal Timeline Track & Slider Section */}
-      <section className={styles.trackSection} id="how-it-works">
-        <div className={styles.trackHeader}>
-          <span className={styles.trackEyebrow}>Możliwości systemu</span>
-          <h2 className={styles.trackTitle}>Wszystko, czego potrzebujesz w jednym panelu</h2>
-          <p className={styles.trackSubtitle}>
-            MESKIAI łączy zaawansowane narzędzia asystenta AI, integracje e-commerce i automatyczne pozyskiwanie klientów w prostym, przejrzystym kokpicie.
-          </p>
-        </div>
-
-        <div className={styles.trackWrapper}>
-          {/* Horizontal Track bar */}
-          <div className={styles.trackTimeline}>
-            <div 
-              className={styles.trackLineProgress} 
-              style={{ width: `${(activeStep - 1) * 33.33}%` }}
-            ></div>
-            {[1, 2, 3, 4].map((step) => (
-              <button
-                key={step}
-                className={`${styles.trackNode} ${activeStep === step ? styles.trackNodeActive : ''}`}
-                onClick={() => {
-                  setActiveStep(step);
-                  setIsAutoPlaying(false); // Stop autoplay when user interacts
-                }}
-              >
-                0{step}
-              </button>
-            ))}
+      <footer className={styles.advancedFooter}>
+        <div className={styles.footerGrid}>
+          <div className={styles.footerCol}>
+            <div className={styles.footerLogo}>
+              <img src="/logo.png" alt="MESKIAI" style={{ width: '24px', height: '24px', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }} />
+              MESKIAI
+            </div>
+            <p className={styles.footerDesc}>
+              Zautomatyzuj swój biznes w 5 minut. Uwolnij czas swojego zespołu i przyspiesz wzrost dzięki potędze sztucznej inteligencji.
+            </p>
           </div>
-
-          {/* Dynamic Content Card */}
-          <div key={activeStep} className={`${styles.trackContentCard} ${styles.animateFadeIn}`}>
-            {activeStep === 1 && (
-              <>
-                <h3>Inteligentna skrzynka odbiorcza i asystent</h3>
-                <p>
-                  Zarządzaj korespondencją w czasie rzeczywistym. Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
-                </p>
-                <div className={styles.trackSpecs}>
-                  <div className={styles.trackSpecItem}>
-                    <Mail size={16} />
-                    <span>Poczta POP3/SMTP</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Inbox size={16} />
-                    <span>Katalogowanie wątków</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Clock size={16} />
-                    <span>Obsługa 24/7</span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {activeStep === 2 && (
-              <>
-                <h3>Automatyzacja e-commerce (Shopify/Woo)</h3>
-                <p>
-                  Połącz swój sklep internetowy i zapomnij o powtarzalnych pytaniach. Agent w ułamku sekundy pobiera z bazy status zamówienia, informacje o dostawie i linki śledzenia kurierów (InPost, DPD), wysyłając je bezpośrednio do klientów.
-                </p>
-                <div className={styles.trackSpecs}>
-                  <div className={styles.trackSpecItem}>
-                    <ShoppingBag size={16} />
-                    <span>Sklepy internetowe</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Sliders size={16} />
-                    <span>Webhooki i API</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Shield size={16} />
-                    <span>Bezpieczne połączenie</span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {activeStep === 3 && (
-              <>
-                <h3>Audyt konkurencji i analiza rynkowa</h3>
-                <p>
-                  Zyskaj przewagę dzięki automatycznemu wywiadowi rynkowemu. Narzędzie zeskrapuje wskazaną stronę konkurencji, połączy się z Google Search i natychmiast wygeneruje kompletną analizę SWOT oraz rekomendacje strategiczne.
-                </p>
-                <div className={styles.trackSpecs}>
-                  <div className={styles.trackSpecItem}>
-                    <Globe size={16} />
-                    <span>Skaner stron WWW</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Sparkles size={16} />
-                    <span>Analizy SWOT</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <CheckCircle size={16} />
-                    <span>Google Grounding</span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {activeStep === 4 && (
-              <>
-                <h3>Pozyskiwanie klientów i baza leadów B2B</h3>
-                <p>
-                  Automatycznie rozwijaj sprzedaż. Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe szyte na miarę ich profili działalności.
-                </p>
-                <div className={styles.trackSpecs}>
-                  <div className={styles.trackSpecItem}>
-                    <Target size={16} />
-                    <span>Wyszukiwarka B2B</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Users size={16} />
-                    <span>Bazy kontaktów</span>
-                  </div>
-                  <div className={styles.trackSpecItem}>
-                    <Zap size={16} />
-                    <span>Ofertowanie AI</span>
-                  </div>
-                </div>
-              </>
-            )}
+          <div className={styles.footerCol}>
+            <div className={styles.footerHeading}>Produkt</div>
+            <ul className={styles.footerLinks}>
+              <li><a href="#how-it-works">Jak to działa</a></li>
+              <li><a href="#cennik">Cennik</a></li>
+              <li><Link href="/bezpieczenstwo">Bezpieczeństwo</Link></li>
+              <li><Link href="/integracje">Integracje</Link></li>
+            </ul>
+          </div>
+          <div className={styles.footerCol}>
+            <div className={styles.footerHeading}>Firma</div>
+            <ul className={styles.footerLinks}>
+              <li><Link href="/o-nas">O nas</Link></li>
+              <li><Link href="/kontakt">Kontakt</Link></li>
+            </ul>
+          </div>
+          <div className={styles.footerCol}>
+            <div className={styles.footerHeading}>Legal</div>
+            <ul className={styles.footerLinks}>
+              <li><Link href="/regulamin">Regulamin</Link></li>
+              <li><Link href="/polityka-prywatnosci">Polityka Prywatności</Link></li>
+            </ul>
           </div>
         </div>
-      </section>
-
-      <footer className={styles.footer}>
-        <div className={styles.footerLinks} style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/regulamin">Regulamin</a>
-          <a href="/polityka-prywatnosci">Polityka Prywatności i Cookies</a>
-          <a href="mailto:support@meskiai.com">Kontakt: support@meskiai.com</a>
+        <div className={styles.footerBottom}>
+          <div>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</div>
         </div>
-        <p>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</p>
       </footer>
     </main>
   );
