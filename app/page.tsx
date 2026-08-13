@@ -42,7 +42,7 @@ const TypingEmail = () => {
   }, [showAi]);
 
   return (
-    <div className={styles.mockMailApp} style={{ flexDirection: 'column', padding: '0', height: 'auto', minHeight: '300px', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--mac-shadow)', backdropFilter: 'blur(20px)' }}>
+    <div className={styles.mockMailApp} style={{ textAlign: 'left', flexDirection: 'column', padding: '0', height: 'auto', minHeight: '300px', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--mac-shadow)', backdropFilter: 'blur(20px)' }}>
       {/* Window Header */}
       <div style={{ padding: '12px 20px', display: 'flex', gap: '12px', borderBottom: '1px solid var(--border)', background: 'var(--card-bg)', alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -64,7 +64,7 @@ const TypingEmail = () => {
         </div>
         
         {showAi && (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', marginTop: '12px', borderLeft: '2px solid var(--accent)', paddingLeft: '16px' }}>
+          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', marginTop: '12px', borderLeft: '2px solid var(--accent)', paddingLeft: '16px' }}>
             <div style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
               <Sparkles size={12} /> MESKIAI <span style={{ opacity: 0.5, color: 'var(--subtext)', fontWeight: 400 }}>[GENERATING]</span>
             </div>
@@ -267,7 +267,7 @@ export default function Home() {
       <section className={styles.hero}>
 
         <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
-          Twój kolejny pracownik <br />to Sztuczna Inteligencja.
+          Twój nowy pracownik to AI.
         </h1>
         
         <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`} style={{ fontSize: '1.15rem', maxWidth: '640px' }}>
