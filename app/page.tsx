@@ -267,11 +267,11 @@ export default function Home() {
       <section className={styles.hero}>
 
         <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
-          Autopilot dla Twojej <br />skrzynki odbiorczej.
+          Twój kolejny pracownik <br />to Sztuczna Inteligencja.
         </h1>
         
         <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`} style={{ fontSize: '1.15rem', maxWidth: '640px' }}>
-          Zostaw maile nam. Zajmij się biznesem. Pierwszy w pełni autonomiczny Pracownik AI, który nie tylko odpisuje, ale myśli, bada Twoją konkurencję i dostarcza wskazówki dla Twojej firmy.
+          Zostaw maile nam, a my zajmiemy się resztą. Pierwszy w pełni autonomiczny Pracownik AI, który wspiera cały Twój zespół – myśli, bada konkurencję i dostarcza Wam gotowe rozwiązania.
         </h2>
         
         <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`} style={{ marginTop: '10px' }}>
