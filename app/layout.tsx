@@ -15,14 +15,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "MESKIAI",
   description: "Inteligentny asystent e-mail dla Twojej firmy.",
-  keywords: ["AI email agent", "email automation", "AI assistant", "automated email replies", "meskiai"],
+  keywords: ["AI email agent", "email automation", "B2B AI assistant", "automated email replies", "meskiai"],
   verification: {
     google: "8vBRb58Hy261nwNRfWy_qTdnez3reAy6dGjoMhfUGqU",
-  },
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
   },
 
   openGraph: {

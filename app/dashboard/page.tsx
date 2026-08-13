@@ -1182,7 +1182,7 @@ export default function Dashboard() {
                     <Users size={28} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>Baza Leadów</h2>
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>Baza Leadów B2B</h2>
                     <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
                       AI podsuwa codziennie idealnych klientów gotowych na współpracę.
                     </p>
@@ -1212,7 +1212,7 @@ export default function Dashboard() {
                 </div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 1: Baza Wiedzy AI</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów i odpisywania na wiadomości.
+                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów B2B i odpisywania na wiadomości.
                 </p>
               </div>
             )}
@@ -1246,9 +1246,9 @@ export default function Dashboard() {
                 <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(139,92,246,0.2)', marginBottom: '16px' }}>
                   <Users size={48} />
                 </div>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Baza Leadów</h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Baza Leadów B2B</h2>
                 <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
-                  Wybierz moduł <strong>Baza Leadów</strong>. Kliknij wyszukiwanie klientów — AI samo znajdzie nowe firmy pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
+                  Wybierz moduł <strong>Baza Leadów B2B</strong>. Kliknij wyszukiwanie klientów — AI samo znajdzie nowe firmy B2B pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
                 </p>
               </div>
             )}
@@ -1286,7 +1286,7 @@ export default function Dashboard() {
                     setShowGuide(false);
                     fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
                   }}
-                  style={{ background: 'var(--primary)', color: 'var(--background)', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 16px rgba(59,130,246,0.4)' }}
+                  style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 16px rgba(59,130,246,0.4)' }}
                 >
                   Zacznijmy! <CheckCircle size={18} />
                 </button>
@@ -1328,7 +1328,7 @@ export default function Dashboard() {
             </div>
             <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
             <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '32px' }}>
-              Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać **większe limity wysyłki e-maili, dodatkowe analizy klientów (leadów) oraz zaawansowane analizy strategiczne**.
+              Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać **większe limity wysyłki e-maili, dodatkowe analizy klientów (leadów) B2B oraz zaawansowane analizy strategiczne**.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
@@ -1640,7 +1640,7 @@ export default function Dashboard() {
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <Users size={16} /> Klienci
+                  <Users size={16} /> Klienci (B2B)
                 </button>
               </div>
             )}
@@ -1902,7 +1902,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600, marginBottom: '8px' }}>Preferowany ton odpowiedzi:</div>
-                      <div style={{ display: 'inline-block', padding: '6px 16px', background: 'var(--primary)', color: 'var(--background)', borderRadius: '24px', fontWeight: 600, fontSize: '0.9rem' }}>
+                      <div style={{ display: 'inline-block', padding: '6px 16px', background: 'var(--primary)', color: 'white', borderRadius: '24px', fontWeight: 600, fontSize: '0.9rem' }}>
                         {replyTone}
                       </div>
                     </div>
@@ -2535,9 +2535,9 @@ export default function Dashboard() {
                         
                         <button 
                           onClick={() => { setDashboardMode("CLIENTS"); setCurrentTab("CLIENTS" as any); }}
-                          style={{ marginTop: '32px', width: '100%', background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', color: 'var(--background)', border: 'none', padding: '16px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 20px rgba(59,130,246,0.3)' }}
+                          style={{ marginTop: '32px', width: '100%', background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', color: 'white', border: 'none', padding: '16px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 20px rgba(59,130,246,0.3)' }}
                         >
-                          Generuj Leady <ArrowRight size={20} />
+                          Generuj Leady B2B <ArrowRight size={20} />
                         </button>
                       </div>
 
@@ -3597,7 +3597,7 @@ export default function Dashboard() {
                   <button 
                     onClick={handleSendLeadEmail}
                     disabled={isSendingEmail}
-                    style={{ background: 'var(--primary)', color: 'var(--background)', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: isSendingEmail ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
+                    style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: isSendingEmail ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
                     {isSendingEmail ? <><RefreshCw size={16} className="animate-spin" /> Wysyłam...</> : <><Send size={16} /> Wyślij</>}
                   </button>

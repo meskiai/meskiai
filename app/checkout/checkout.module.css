@@ -159,6 +159,6 @@
 
 .btnPrimary:hover {
   background: var(--primary);
-  color: var(--background);
+  color: #fff;
   border-color: var(--primary);
 }
