@@ -271,7 +271,7 @@ export default function Home() {
         </h1>
         
         <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`} style={{ fontSize: '1.15rem', maxWidth: '640px' }}>
-          Zostaw maile nam. Zajmij się biznesem. Pierwszy w pełni autonomiczny asystent AI, który analizuje, pisze i wysyła odpowiedzi do Twoich klientów.
+          Zostaw maile nam. Zajmij się biznesem. Pierwszy w pełni autonomiczny Pracownik AI, który nie tylko odpisuje, ale myśli, bada Twoją konkurencję i dostarcza wskazówki dla Twojej firmy.
         </h2>
         
         <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`} style={{ marginTop: '10px' }}>
@@ -539,7 +539,7 @@ export default function Home() {
           <details className={styles.faqItem}>
             <summary className={styles.faqSummary}>Czy MESKIAI samodzielnie wysyła wiadomości do klientów?</summary>
             <div className={styles.faqContent}>
-              To zależy od Ciebie! Możesz ustawić Pracownika w tryb "Asystenta" (tworzy gotowe do wysłania wiadomości i czeka na Twoją akceptację) lub w tryb "Autonomiczny" (samodzielnie zamyka sprawy klientów zgodnie z wytycznymi Twojej firmy).
+              To zależy od Ciebie! Możesz ustawić Pracownika w tryb "Wsparcia" (tworzy gotowe do wysłania wiadomości i czeka na Twoją akceptację) lub w tryb "Autonomiczny" (samodzielnie zamyka sprawy klientów zgodnie z wytycznymi Twojej firmy).
             </div>
           </details>
           <details className={styles.faqItem}>
