@@ -111,7 +111,24 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
+    const hiddenElements = document.querySelectorAll('.reveal-on-scroll');
+    hiddenElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      hiddenElements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -292,8 +309,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Live AI Demo Section */}
-      <section style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
+      {/* Testimonial / Social Proof */}
+      <section className="reveal-on-scroll" style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Zaprojektowany, by działać w tle.</h2>
@@ -370,7 +387,7 @@ export default function Home() {
       </section>
 
       {/* Features Bento Section */}
-      <section style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
+      <section className="reveal-on-scroll" style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Jeden system. Wiele możliwości.
@@ -524,7 +541,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+      <section className="reveal-on-scroll" style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Masz pytania? Mamy odpowiedzi.
