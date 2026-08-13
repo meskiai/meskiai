@@ -324,9 +324,9 @@ export default function Home() {
                   <div className={styles.lindyCardIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}>
                     <Mail size={18} />
                   </div>
-                  <h4 className={styles.lindyCardTitle}>Szkice odpowiedzi</h4>
+                  <h4 className={styles.lindyCardTitle}>Automatyczne odpowiedzi</h4>
                   <div className={styles.lindyCardBadge}>
-                    <Zap size={12} /> Błyskawiczna reakcja
+                    <Zap size={12} /> Pisze i wysyła maile
                   </div>
                 </div>
                 {/* Card 2 */}
@@ -520,6 +520,45 @@ export default function Home() {
               {loadingPriceId === PRICE_MAX ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
+            Masz pytania? Mamy odpowiedzi.
+          </h2>
+          <p style={{ color: 'var(--subtext)', fontSize: '1.1rem', marginTop: '12px' }}>
+            Wszystko, co musisz wiedzieć o wdrożeniu MESKIAI w swojej firmie.
+          </p>
+        </div>
+        
+        <div className={styles.faqList}>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>Czy MESKIAI samodzielnie wysyła wiadomości do klientów?</summary>
+            <div className={styles.faqContent}>
+              To zależy od Ciebie! Możesz ustawić Agenta w tryb "Asystenta" (tworzy gotowe do wysłania wiadomości i czeka na Twoją akceptację) lub w tryb "Autonomiczny" (samodzielnie zamyka sprawy klientów zgodnie z wytycznymi Twojej firmy).
+            </div>
+          </details>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>Jak długo trwa wdrożenie systemu?</summary>
+            <div className={styles.faqContent}>
+              Integracja zajmuje zaledwie kilka minut. Wystarczy autoryzować system do czytania Twojej skrzynki (np. przez bezpieczne hasło aplikacji Gmail) i zdefiniować podstawowe wytyczne dla Agenta. System uczy się z każdym dniem.
+            </div>
+          </details>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>Czy mogę podłączyć więcej niż jedną skrzynkę e-mail?</summary>
+            <div className={styles.faqContent}>
+              Oczywiście! MESKIAI doskonale radzi sobie z zarządzaniem wieloma skrzynkami (np. biuro@, kontakt@, sprzedaz@) w jednym centralnym systemie, sortując maile według ich priorytetów.
+            </div>
+          </details>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>Czy dane moich klientów są bezpieczne?</summary>
+            <div className={styles.faqContent}>
+              Bezpieczeństwo to nasz priorytet. Korzystamy z szyfrowanych połączeń (SSL/TLS), a dane są przetwarzane zgodnie z najwyższymi standardami bezpieczeństwa i przepisami RODO. Żadne wrażliwe dane nie są udostępniane podmiotom trzecim.
+            </div>
+          </details>
         </div>
       </section>
 
