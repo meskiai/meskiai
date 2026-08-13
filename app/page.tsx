@@ -98,7 +98,43 @@ export default function Home() {
   const [currentPriceId, setCurrentPriceId] = useState<string | null>(null);
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [hasTriggeredExit, setHasTriggeredExit] = useState(false);
+
+  useEffect(() => {
+    if (status === 'authenticated') return;
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !hasTriggeredExit) {
+        setShowExitPopup(true);
+        setHasTriggeredExit(true);
+      }
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      if (!hasTriggeredExit) {
+        timeoutId = setTimeout(() => {
+          setShowExitPopup(true);
+          setHasTriggeredExit(true);
+        }, 15000);
+      }
+    };
+
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("touchstart", resetTimer, { passive: true });
+    document.addEventListener("scroll", resetTimer, { passive: true });
+    resetTimer();
+
+    return () => {
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("touchstart", resetTimer);
+      document.removeEventListener("scroll", resetTimer);
+      clearTimeout(timeoutId);
+    };
+  }, [hasTriggeredExit, status]);
 
   const handleCheckout = async (priceId: string) => {
     setLoadingPriceId(priceId);
@@ -622,6 +658,30 @@ export default function Home() {
           Wypróbuj za darmo <ArrowRight size={18} style={{ marginLeft: '8px' }} />
         </button>
       </div>
+
+      {/* Exit Intent Popup */}
+      {showExitPopup && (
+        <div className={styles.exitOverlay} onClick={() => setShowExitPopup(false)}>
+          <div className={styles.exitPopup} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '12px' }}>Zaczekaj chwileczkę! 👋</h3>
+            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px' }}>
+              Zanim pójdziesz – odbierz <strong>14 dni darmowych testów</strong> Pracownika AI. Zobacz jak obsługuje e-maile na własne oczy, bez żadnego ryzyka.
+            </p>
+            <button 
+              style={{ width: '100%', padding: '14px', borderRadius: '12px', background: 'var(--foreground)', color: 'var(--background)', fontWeight: 600, fontSize: '1.05rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            >
+              Odbieram 14 dni za darmo <ArrowRight size={18} />
+            </button>
+            <button 
+              style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'transparent', color: 'var(--subtext)', fontWeight: 500, fontSize: '0.9rem', border: '1px solid transparent', cursor: 'pointer' }}
+              onClick={() => setShowExitPopup(false)}
+            >
+              Nie, dziękuję
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
