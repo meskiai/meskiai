@@ -301,7 +301,7 @@
 
 /* Premium Pricing Section (Apple Style) */
 .pricingSection {
-  padding: 120px 5% 140px 5%;
+  padding: 40px 5% 60px 5%;
   max-width: 1260px;
   margin: 0 auto;
   text-align: center;
@@ -2204,7 +2204,7 @@
 
 /* --- LINDY STYLE PANEL --- */
 .lindySection {
-  padding: 80px 20px;
+  padding: 40px 20px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;

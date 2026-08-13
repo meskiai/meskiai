@@ -290,11 +290,11 @@ export default function Home() {
       </section>
 
       {/* Testimonial / Social Proof */}
-      <section className="animate-fade-in" style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+      <section className="animate-fade-in" style={{ padding: '20px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Zaprojektowany, by działać w tle.</h2>
-            <p style={{ color: 'var(--subtext)', marginTop: '12px', fontSize: '1.05rem' }}>Zobacz, jak system samodzielnie obsługuje zapytania Twoich klientów.</p>
+            <p style={{ color: 'var(--subtext)', marginTop: '12px', fontSize: '1.05rem' }}>Zobacz, jak Pracownik AI samodzielnie obsługuje zapytania Twoich klientów.</p>
           </div>
           
           <div style={{ position: 'relative' }}>
@@ -367,7 +367,7 @@ export default function Home() {
       </section>
 
       {/* Features Bento Section */}
-      <section className="animate-fade-in" style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
+      <section className="animate-fade-in" style={{ padding: '20px 20px 40px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Jeden system. Wiele możliwości.
@@ -386,7 +386,7 @@ export default function Home() {
             </div>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Inteligentna skrzynka odbiorcza</h3>
             <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
-              Asystent AI automatycznie odczytuje wiadomości, przygotowuje wersje robocze odpowiedzi i kategoryzuje wątki, przenosząc kluczowe sprawy do zakładki „Ważne”.
+              Pracownik AI nie tylko odpisuje. On analizuje wiadomości, przygotowuje odpowiedzi, bada ruchy konkurencji i podsuwa Ci cenne wskazówki dla rozwoju firmy.
             </p>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Podłącz własne skrzynki POP3/SMTP</li>
@@ -433,7 +433,7 @@ export default function Home() {
             <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
+              <li><CheckCircle size={18} /> Osobisty Pracownik AI</li>
               <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
               <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
               <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
@@ -465,7 +465,7 @@ export default function Home() {
             </div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Agent AI do poczty</li>
+              <li><CheckCircle size={18} /> Osobisty Pracownik AI</li>
               <li><CheckCircle size={18} /> Do 1000 automatycznych e-maili miesięcznie</li>
               <li><CheckCircle size={18} /> Do 100 wyszukań konkurencji miesięcznie</li>
               <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
@@ -495,7 +495,7 @@ export default function Home() {
             <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Pełny dostęp do Agenta AI</li>
+              <li><CheckCircle size={18} /> Pełny dostęp do Pracownika AI</li>
               <li><CheckCircle size={18} /> Nielimitowane e-maile</li>
               <li><CheckCircle size={18} /> Nielimitowane wyszukiwania konkurencji</li>
               <li><CheckCircle size={18} /> Nielimitowane propozycje klientów</li>
@@ -521,7 +521,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="animate-fade-in" style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+      <section className="animate-fade-in" style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Masz pytania? Mamy odpowiedzi.
@@ -535,13 +535,13 @@ export default function Home() {
           <details className={styles.faqItem}>
             <summary className={styles.faqSummary}>Czy MESKIAI samodzielnie wysyła wiadomości do klientów?</summary>
             <div className={styles.faqContent}>
-              To zależy od Ciebie! Możesz ustawić Agenta w tryb "Asystenta" (tworzy gotowe do wysłania wiadomości i czeka na Twoją akceptację) lub w tryb "Autonomiczny" (samodzielnie zamyka sprawy klientów zgodnie z wytycznymi Twojej firmy).
+              To zależy od Ciebie! Możesz ustawić Pracownika w tryb "Asystenta" (tworzy gotowe do wysłania wiadomości i czeka na Twoją akceptację) lub w tryb "Autonomiczny" (samodzielnie zamyka sprawy klientów zgodnie z wytycznymi Twojej firmy).
             </div>
           </details>
           <details className={styles.faqItem}>
             <summary className={styles.faqSummary}>Jak długo trwa wdrożenie systemu?</summary>
             <div className={styles.faqContent}>
-              Integracja zajmuje zaledwie kilka minut. Wystarczy autoryzować system do czytania Twojej skrzynki (np. przez bezpieczne hasło aplikacji Gmail) i zdefiniować podstawowe wytyczne dla Agenta. System uczy się z każdym dniem.
+              Integracja zajmuje zaledwie kilka minut. Wystarczy autoryzować system do czytania Twojej skrzynki (np. przez bezpieczne hasło aplikacji Gmail) i zdefiniować podstawowe wytyczne dla Pracownika. System uczy się z każdym dniem.
             </div>
           </details>
           <details className={styles.faqItem}>
