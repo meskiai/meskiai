@@ -108,6 +108,10 @@ export default function Home() {
     if (!isAutoPlaying) return;
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < 4 ? prev + 1 : 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
