@@ -2202,228 +2202,182 @@
   }
 }
 
-/* Animated Terminal Panel (Premium Lindy/Google Style) */
-.terminalWrapper {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
+/* --- LINDY STYLE PANEL --- */
+.lindySection {
+  padding: 80px 20px;
+  max-width: 1200px;
   margin: 0 auto;
-  perspective: 1200px;
+  position: relative;
+  z-index: 10;
 }
 
-.terminalGlow {
-  position: absolute;
-  top: -20px;
-  left: -20px;
-  right: -20px;
-  bottom: -20px;
-  background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.15), transparent 70%);
-  filter: blur(50px);
-  z-index: -1;
-  animation: pulseGlow 6s infinite alternate;
+.lindyContainer {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  align-items: center;
 }
 
-@keyframes pulseGlow {
-  0% { opacity: 0.5; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1.05); }
-}
-
-.animatedPanel {
-  background: #09090b; /* True deep dark */
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  overflow: hidden;
+.lindyTextCol {
   display: flex;
   flex-direction: column;
-  transform: rotateX(2deg) translateY(0);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  align-items: flex-start;
 }
 
-.animatedPanel:hover {
-  transform: rotateX(0deg) translateY(-8px);
-  box-shadow: 0 50px 120px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+.lindyNumber {
+  color: #d97706;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
 }
 
-.panelHeader {
-  height: 52px;
-  background: #18181b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
+.lindyTitle {
+  font-size: clamp(2rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.lindyDesc {
+  color: var(--subtext);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.lindyVisualCol {
   position: relative;
 }
 
-.panelDots {
-  display: flex;
-  gap: 8px;
+.lindyVisualBox {
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 40px;
+  position: relative;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.02), inset 0 0 0 1px rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.lindyVisualBox::after {
+  content: '';
   position: absolute;
-  left: 20px;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
 }
 
-.panelDots span {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
+.lindyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
 }
 
-.panelTitle {
-  flex: 1;
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #a1a1aa;
-  letter-spacing: 0.5px;
-  font-family: monospace;
+.lindyCard {
+  background: var(--background);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
 }
 
-.panelActions {
-  color: #a1a1aa;
+[data-theme="dark"] .lindyCard {
+  background: rgba(255,255,255,0.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.lindyCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] .lindyCard:hover {
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.lindyCardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6;
-  position: absolute;
-  right: 20px;
-  cursor: pointer;
-  transition: opacity 0.3s;
+  margin-bottom: 16px;
 }
 
-.panelActions:hover {
-  opacity: 1;
-  color: #fff;
+.lindyCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0 0 12px 0;
 }
 
-.panelBody {
-  display: flex;
-  height: 380px;
+.lindyCardBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.03);
+  padding: 6px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--subtext);
 }
 
-.taskSidebar {
-  width: 260px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: #000000;
+[data-theme="dark"] .lindyCardBadge {
+  background: rgba(255,255,255,0.05);
 }
 
-.taskItem {
-  padding: 14px 18px;
-  border-radius: 12px;
+.lindyBottomBadge {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #71717a;
-  cursor: default;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid transparent;
+  gap: 12px;
+  margin-top: 30px;
+  justify-content: center;
 }
 
-.taskItem.activeTask {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+.lindyBadgePill {
+  background: var(--background);
+  border: 1px solid var(--glass-border);
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--foreground);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-.taskItem svg {
-  color: #3b82f6;
-  transition: color 0.3s;
-}
-
-.taskItem.activeTask svg {
-  color: #60a5fa;
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
-}
-
-.taskContent {
-  flex: 1;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  background: #09090b;
-  overflow: hidden;
-}
-
-.logLine {
-  font-size: 0.95rem;
-  line-height: 1.8;
-  opacity: 0;
-  color: #e4e4e7;
-  animation: logSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.logTime {
-  color: #52525b;
-  margin-right: 16px;
+.lindyBadgeText {
   font-size: 0.85rem;
+  color: var(--subtext);
+  font-weight: 500;
 }
 
-.logInfo {
-  color: #3b82f6;
-  font-weight: 600;
-  margin-right: 12px;
-}
-
-.logAction {
-  color: #8b5cf6;
-  font-weight: 600;
-  margin-right: 12px;
-}
-
-.logSuccess {
-  color: #10b981;
-  font-weight: 600;
-  margin-right: 12px;
-}
-
-.blinkingCursor {
-  display: inline-block;
-  width: 8px;
-  height: 16px;
-  background: #10b981;
-  margin-left: 8px;
-  vertical-align: middle;
-  animation: blink 1s step-end infinite;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
-}
-
-@keyframes logSlideIn {
-  0% { opacity: 0; transform: translateY(10px) scale(0.99); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@media (max-width: 768px) {
-  .panelBody {
-    flex-direction: column;
-    height: auto;
+@media (max-width: 900px) {
+  .lindyContainer {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
-  .taskSidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 16px;
+}
+
+@media (max-width: 600px) {
+  .lindyGrid {
+    grid-template-columns: 1fr;
   }
-  .taskItem {
-    white-space: nowrap;
-    padding: 10px 14px;
-  }
-  .taskContent {
-    padding: 24px 16px;
-    min-height: 280px;
+  .lindyVisualBox {
+    padding: 24px;
   }
 }

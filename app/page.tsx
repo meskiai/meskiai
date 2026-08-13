@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Mail, Zap, FileText, Settings, ArrowRight, CheckCircle, Sparkles, Shield, Clock, Users, BookOpen, LogOut, Home as HomeIcon, Globe, Inbox, Sliders, BarChart2, ChevronDown, Target, ShoppingBag } from "lucide-react";
+import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart } from 'lucide-react';
 import { useEffect, useState, useRef } from "react";
 
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
@@ -318,78 +318,67 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Active Tasks Animation Panel */}
-      <section style={{ padding: '60px 20px', maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
-            Pracuje dla Ciebie. Zawsze.
-          </h2>
-          <p style={{ color: 'var(--subtext)', fontSize: '1.1rem', marginTop: '12px' }}>
-            System automatycznie analizuje zapytania, tworzy szkice i zarządza kontaktami.
-          </p>
-        </div>
-
-        <div className={styles.terminalWrapper}>
-          <div className={styles.terminalGlow}></div>
-          <div className={styles.animatedPanel}>
-            <div className={styles.panelHeader}>
-              <div className={styles.panelDots}>
-                <span style={{background: '#ff5f56', boxShadow: '0 0 10px rgba(255,95,86,0.5)'}}></span>
-                <span style={{background: '#ffbd2e', boxShadow: '0 0 10px rgba(255,189,46,0.5)'}}></span>
-                <span style={{background: '#27c93f', boxShadow: '0 0 10px rgba(39,201,63,0.5)'}}></span>
-              </div>
-              <div className={styles.panelTitle}>bash — root@meskiai:~</div>
-              <div className={styles.panelActions}>
-                <Settings size={14} />
-              </div>
-            </div>
-            <div className={styles.panelBody}>
-            <div className={styles.taskSidebar}>
-              <div className={`${styles.taskItem} ${activeFeature === 'agent' ? styles.activeTask : ''}`}>
-                <Mail size={16} /> Analiza skrzynki
-              </div>
-              <div className={`${styles.taskItem} ${activeFeature === 'cold' ? styles.activeTask : ''}`}>
-                <Target size={16} /> Pozyskiwanie leadów
-              </div>
-              <div className={`${styles.taskItem} ${activeFeature === 'security' ? styles.activeTask : ''}`}>
-                <Shield size={16} /> Ochrona spamu
-              </div>
-            </div>
-            <div className={styles.taskContent}>
-              {activeFeature === 'agent' && (
-                <div key="agent" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
-                  <div className={styles.logLine}><span className={styles.logTime}>10:42:01</span> <span className={styles.logInfo}>[INBOX]</span> Nowe zapytanie ofertowe od biuro@klient.pl</div>
-                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>10:42:02</span> <span className={styles.logAction}>[AI]</span> Kategoryzacja intencji: <span style={{color: '#10b981'}}>Zainteresowanie usługą</span></div>
-                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>10:42:03</span> <span className={styles.logAction}>[AI]</span> Generowanie spersonalizowanej odpowiedzi...</div>
-                  <div className={styles.logLine} style={{ animationDelay: '3s' }}><span className={styles.logTime}>10:42:05</span> <span className={styles.logSuccess}>[SUCCESS]</span> Szkic zapisany w zakładce "Gotowe do wysyłki".<span className={styles.blinkingCursor}></span></div>
+      {/* Active Tasks Animation Panel -> NEW Lindy Style Panel */}
+      <section className={styles.lindySection}>
+        <div className={styles.lindyContainer}>
+          <div className={styles.lindyTextCol}>
+            <span className={styles.lindyNumber}>03</span>
+            <h2 className={styles.lindyTitle}>Pracuje na okrągło.</h2>
+            <p className={styles.lindyDesc}>
+              Cokolwiek robisz powtarzalnie, przekaż to MESKIAI na harmonogram. Poranny briefing, poniedziałkowy raport, czy powiadomienie o nowych leadach. Wszystko działa automatycznie.
+            </p>
+          </div>
+          <div className={styles.lindyVisualCol}>
+            <div className={styles.lindyVisualBox}>
+              <div className={styles.lindyGrid}>
+                {/* Card 1 */}
+                <div className={`${styles.lindyCard} animate-fade-in`}>
+                  <div className={styles.lindyCardIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}>
+                    <MessageSquare size={18} />
+                  </div>
+                  <h4 className={styles.lindyCardTitle}>Codzienne podsumowanie</h4>
+                  <div className={styles.lindyCardBadge}>
+                    <Clock size={12} /> Codziennie · 8:00 AM
+                  </div>
                 </div>
-              )}
-              {activeFeature === 'cold' && (
-                <div key="cold" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
-                  <div className={styles.logLine}><span className={styles.logTime}>11:15:00</span> <span className={styles.logAction}>[SCRAPER]</span> Rozpoczęto wyszukiwanie: "Agencje marketingowe, Warszawa"</div>
-                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>11:15:04</span> <span className={styles.logInfo}>[DATA]</span> Znaleziono 42 potencjalnych klientów.</div>
-                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>11:15:07</span> <span className={styles.logAction}>[AI]</span> Personalizacja treści dla CEO (Jan Kowalski)...</div>
-                  <div className={styles.logLine} style={{ animationDelay: '3s' }}><span className={styles.logTime}>11:15:10</span> <span className={styles.logSuccess}>[SUCCESS]</span> Kampania gotowa do uruchomienia.<span className={styles.blinkingCursor}></span></div>
+                {/* Card 2 */}
+                <div className={`${styles.lindyCard} animate-fade-in animate-delay-1`}>
+                  <div className={styles.lindyCardIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
+                    <Mail size={18} />
+                  </div>
+                  <h4 className={styles.lindyCardTitle}>Szkice maili</h4>
+                  <div className={styles.lindyCardBadge}>
+                    <Zap size={12} /> Kiedy wymaga odpowiedzi
+                  </div>
                 </div>
-              )}
-              {activeFeature === 'swot' && (
-                <div key="swot" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
-                  <div className={styles.logLine}><span className={styles.logTime}>13:30:12</span> <span className={styles.logAction}>[SYNC]</span> Pobieranie danych z bazy wiedzy...</div>
-                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>13:30:15</span> <span className={styles.logInfo}>[AI]</span> Optymalizacja modelu odpowiedzi.</div>
-                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>13:30:17</span> <span className={styles.logSuccess}>[SUCCESS]</span> Baza wiedzy zaktualizowana i gotowa do użycia.<span className={styles.blinkingCursor}></span></div>
+                {/* Card 3 */}
+                <div className={`${styles.lindyCard} animate-fade-in animate-delay-2`}>
+                  <div className={styles.lindyCardIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                    <Video size={18} />
+                  </div>
+                  <h4 className={styles.lindyCardTitle}>Notatki ze spotkań</h4>
+                  <div className={styles.lindyCardBadge}>
+                    <Calendar size={12} /> Po każdym spotkaniu
+                  </div>
                 </div>
-              )}
-              {activeFeature === 'security' && (
-                <div key="security" className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'monospace', width: '100%' }}>
-                  <div className={styles.logLine}><span className={styles.logTime}>12:01:22</span> <span className={styles.logInfo}>[FIREWALL]</span> Wykryto podejrzaną wiadomość e-mail.</div>
-                  <div className={styles.logLine} style={{ animationDelay: '1s' }}><span className={styles.logTime}>12:01:23</span> <span className={styles.logAction}>[AI]</span> Analiza nadawcy i linków (Phishing Score: 98%)</div>
-                  <div className={styles.logLine} style={{ animationDelay: '2s' }}><span className={styles.logTime}>12:01:24</span> <span className={styles.logSuccess}>[BLOCKED]</span> Wiadomość przeniesiona do kwarantanny. Skrzynka bezpieczna.<span className={styles.blinkingCursor}></span></div>
+                {/* Card 4 */}
+                <div className={`${styles.lindyCard} animate-fade-in animate-delay-3`}>
+                  <div className={styles.lindyCardIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>
+                    <BarChart size={18} />
+                  </div>
+                  <h4 className={styles.lindyCardTitle}>Raport marketingowy</h4>
+                  <div className={styles.lindyCardBadge}>
+                    <Clock size={12} /> Piątki · 12:00 PM
+                  </div>
                 </div>
-              )}
+              </div>
+              <div className={styles.lindyBottomBadge}>
+                <span className={styles.lindyBadgePill}>+ Nowa rutyna</span>
+                <span className={styles.lindyBadgeText}>wystarczy jedno zdanie</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </section>
 
       {/* Features Bento Section */}
