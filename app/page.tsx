@@ -311,10 +311,9 @@ export default function Home() {
       <section className={styles.lindySection}>
         <div className={styles.lindyContainer}>
           <div className={styles.lindyTextCol}>
-            <span className={styles.lindyNumber}>03</span>
-            <h2 className={styles.lindyTitle}>Pracuje na okrągło.</h2>
+            <h2 className={styles.lindyTitle}>Zautomatyzuj swój e-mail.</h2>
             <p className={styles.lindyDesc}>
-              Cokolwiek robisz powtarzalnie, przekaż to MESKIAI na harmonogram. Poranny briefing, poniedziałkowy raport, czy powiadomienie o nowych leadach. Wszystko działa automatycznie.
+              Przekaż powtarzalne zadania MESKIAI. Odpowiadanie na najczęstsze pytania, kategoryzacja zapytań ofertowych, automatyczna organizacja priorytetów. Wszystko dzieje się samo, uwalniając Twój czas.
             </p>
           </div>
           <div className={styles.lindyVisualCol}>
@@ -323,41 +322,41 @@ export default function Home() {
                 {/* Card 1 */}
                 <div className={`${styles.lindyCard} animate-fade-in`}>
                   <div className={styles.lindyCardIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}>
-                    <MessageSquare size={18} />
+                    <Mail size={18} />
                   </div>
-                  <h4 className={styles.lindyCardTitle}>Codzienne podsumowanie</h4>
+                  <h4 className={styles.lindyCardTitle}>Szkice odpowiedzi</h4>
                   <div className={styles.lindyCardBadge}>
-                    <Clock size={12} /> Codziennie · 8:00 AM
+                    <Zap size={12} /> Błyskawiczna reakcja
                   </div>
                 </div>
                 {/* Card 2 */}
                 <div className={`${styles.lindyCard} animate-fade-in animate-delay-1`}>
                   <div className={styles.lindyCardIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-                    <Mail size={18} />
+                    <Shield size={18} />
                   </div>
-                  <h4 className={styles.lindyCardTitle}>Szkice maili</h4>
+                  <h4 className={styles.lindyCardTitle}>Ochrona przed spamem</h4>
                   <div className={styles.lindyCardBadge}>
-                    <Zap size={12} /> Kiedy wymaga odpowiedzi
+                    <CheckCircle size={12} /> Zawsze aktywna
                   </div>
                 </div>
                 {/* Card 3 */}
                 <div className={`${styles.lindyCard} animate-fade-in animate-delay-2`}>
                   <div className={styles.lindyCardIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-                    <Video size={18} />
+                    <Users size={18} />
                   </div>
-                  <h4 className={styles.lindyCardTitle}>Notatki ze spotkań</h4>
+                  <h4 className={styles.lindyCardTitle}>Baza wiedzy z zapytań</h4>
                   <div className={styles.lindyCardBadge}>
-                    <Calendar size={12} /> Po każdym spotkaniu
+                    <BrainCircuit size={12} /> Analiza intencji
                   </div>
                 </div>
                 {/* Card 4 */}
                 <div className={`${styles.lindyCard} animate-fade-in animate-delay-3`}>
                   <div className={styles.lindyCardIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>
-                    <BarChart size={18} />
+                    <Target size={18} />
                   </div>
-                  <h4 className={styles.lindyCardTitle}>Raport marketingowy</h4>
+                  <h4 className={styles.lindyCardTitle}>Wydobywanie kontaktów</h4>
                   <div className={styles.lindyCardBadge}>
-                    <Clock size={12} /> Piątki · 12:00 PM
+                    <TrendingUp size={12} /> Rozwój bazy B2B
                   </div>
                 </div>
               </div>
