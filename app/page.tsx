@@ -437,12 +437,9 @@ export default function Home() {
             <div className={styles.pricingPrice}>299 <span>zł / mies.</span></div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Pracownik AI</li>
-              <li><CheckCircle size={18} /> Do 50 automatycznych e-maili miesięcznie</li>
-              <li><CheckCircle size={18} /> Do 10 wyszukań konkurencji miesięcznie</li>
-              <li><CheckCircle size={18} /> Podstawowe podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 10)</li>
-              <li><CheckCircle size={18} /> Zintegrowana baza wiedzy</li>
+              <li><CheckCircle size={18} /> <strong>50 e-maili</strong> automatycznych / mies.</li>
+              <li><CheckCircle size={18} /> <strong>Badanie rynku i B2B</strong> (limit 10)</li>
+              <li><CheckCircle size={18} /> Osobisty Pracownik AI + Baza Wiedzy</li>
             </ul>
             
             <button 
@@ -469,13 +466,10 @@ export default function Home() {
             </div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Osobisty Pracownik AI</li>
-              <li><CheckCircle size={18} /> Do 1000 automatycznych e-maili miesięcznie</li>
-              <li><CheckCircle size={18} /> Do 100 wyszukań konkurencji miesięcznie</li>
-              <li><CheckCircle size={18} /> Zaawansowane podpowiedzi biznesowe</li>
-              <li><CheckCircle size={18} /> Propozycje klientów (limit 200)</li>
-              <li><CheckCircle size={18} /> Cold Email (Generowanie AI)</li>
-              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
+              <li><CheckCircle size={18} /> <strong>1000 e-maili</strong> automatycznych / mies.</li>
+              <li><CheckCircle size={18} /> <strong>Badanie rynku i B2B</strong> (limit 100)</li>
+              <li><CheckCircle size={18} /> Zaawansowany Cold Email i wskazówki</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania</li>
             </ul>
             
             <button 
@@ -499,13 +493,10 @@ export default function Home() {
             <div className={styles.pricingPrice}>899 <span>zł / mies.</span></div>
             
             <ul className={styles.pricingFeatures}>
-              <li><CheckCircle size={18} /> Pełny dostęp do Pracownika AI</li>
-              <li><CheckCircle size={18} /> Nielimitowane e-maile</li>
-              <li><CheckCircle size={18} /> Nielimitowane wyszukiwania konkurencji</li>
-              <li><CheckCircle size={18} /> Nielimitowane propozycje klientów</li>
-              <li><CheckCircle size={18} /> Nielimitowany Cold Email</li>
-              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania Agenta</li>
-              <li><CheckCircle size={18} /> Dedykowany Account Manager</li>
+              <li><CheckCircle size={18} /> <strong>Brak limitów:</strong> E-maile, Badania, Klienci</li>
+              <li><CheckCircle size={18} /> Pełna automatyzacja Cold Email</li>
+              <li><CheckCircle size={18} /> Zmiana tonu i stylu pisania</li>
+              <li><CheckCircle size={18} /> <strong>Dedykowany Account Manager</strong></li>
             </ul>
             
             <button 
