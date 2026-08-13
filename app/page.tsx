@@ -284,28 +284,38 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
 
+        <div className={`${styles.badge} animate-fade-in`} style={{ marginBottom: '24px' }}>
+          <Sparkles size={14} className={styles.badgeHighlight} style={{ color: '#3b82f6' }} /> MESKIAI 2.0 jest już dostępny
+        </div>
+
         <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
-          Zatrudnij AI. <br />Uwolnij swój czas.
+          Autopilot dla Twojej <br />skrzynki odbiorczej.
         </h1>
         
-        <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`}>
-          Pierwszy w pełni autonomiczny asystent e-mail. System zdejmuje z Ciebie ciężar rutynowej komunikacji, gwarantując błyskawiczne i bezpieczne odpowiedzi 24/7.
+        <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`} style={{ fontSize: '1.15rem', maxWidth: '640px' }}>
+          Zostaw maile nam. Zajmij się biznesem. Pierwszy w pełni autonomiczny asystent AI, który analizuje, pisze i wysyła odpowiedzi do Twoich klientów.
         </h2>
         
-        <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`}>
+        <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`} style={{ marginTop: '10px' }}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{textDecoration: 'none'}}>
-              Przejdź do Panelu <ArrowRight size={18} />
+            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{textDecoration: 'none', padding: '16px 40px', fontSize: '1.1rem'}}>
+              Przejdź do Panelu <ArrowRight size={20} />
             </Link>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <button className={styles.ctaBtnPrimary} onClick={() => signIn("google", { callbackUrl: "/dashboard" })} style={{ padding: '16px 32px', fontSize: '1.05rem' }}>
-                  Rozpocznij 7-dniowy okres próbny
-                </button>
-              </div>
+              <button
+                className={styles.ctaBtnPrimary}
+                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                style={{ padding: '16px 40px', fontSize: '1.1rem' }}
+              >
+                Rozpocznij 7-dniowy okres próbny <ArrowRight size={20} />
+              </button>
             </div>
           )}
+        </div>
+
+        <div className="animate-fade-in animate-delay-4" style={{ marginTop: '24px', fontSize: '0.85rem', color: 'var(--subtext)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <CheckCircle size={14} style={{ color: '#10b981' }}/> Nie wymaga karty kredytowej
         </div>
       </section>
 
