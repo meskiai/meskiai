@@ -78,6 +78,20 @@ const TypingEmail = () => {
   );
 };
 
+const TrustBadges = () => (
+  <section className="animate-fade-in animate-delay-4" style={{ padding: '0 20px 40px', maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', opacity: 0.8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
+      <Shield size={16} /> 100% Zgodność z RODO
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
+      <Lock size={16} /> Szyfrowanie SSL/TLS
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
+      <BrainCircuit size={16} /> Powered by OpenAI
+    </div>
+  </section>
+);
+
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -293,7 +307,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonial / Social Proof */}
+      <TrustBadges />
+
+      {/* Advanced Social Proof Layer */}
       <section className="animate-fade-in" style={{ padding: '20px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
@@ -388,14 +404,11 @@ export default function Home() {
             <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Mail size={24} />
             </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Inteligentna skrzynka odbiorcza</h3>
-            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
-              Pracownik AI nie tylko odpisuje. On analizuje wiadomości, przygotowuje odpowiedzi, bada ruchy konkurencji i podsuwa Ci cenne wskazówki dla rozwoju firmy.
-            </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Podłącz własne skrzynki POP3/SMTP</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Automatyczne katalogowanie wątków</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Błyskawiczne szkice odpowiedzi</li>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Inteligentna skrzynka</h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Oszczędność czasu</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Filtracja spamu</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Automatyczne szkice</li>
             </ul>
           </div>
 
@@ -405,14 +418,11 @@ export default function Home() {
             <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Target size={24} />
             </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Pozyskiwanie nowych klientów</h3>
-            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
-              Wyszukaj firmy z dowolnej branży w wybranym mieście, utwórz bazę zweryfikowanych kontaktów i uruchom spersonalizowane kampanie cold-mailowe.
-            </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Wyszukiwarka firm i decydentów</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Nielimitowane bazy kontaktów</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: 'var(--accent)' }}/> Personalizacja ofert przez AI</li>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Pozyskiwanie klientów</h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Bazy B2B</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Personalizacja</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Automatyczne spotkania</li>
             </ul>
           </div>
 
@@ -509,9 +519,15 @@ export default function Home() {
                 handlePlanSelection(priceId);
               }}
             >
-              {loadingPriceId === PRICE_MAX ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Kupuję Pakiet Max")}
+              {loadingPriceId === PRICE_MAX ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Wybieram MAX")}
             </button>
           </div>
+        </div>
+
+        {/* Risk Reversal under Pricing */}
+        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--subtext)' }}>
+          <CheckCircle size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', color: '#10b981', marginRight: '6px' }}/> 
+          Anuluj w dowolnym momencie. Brak długoterminowych umów i ukrytych opłat.
         </div>
       </section>
 
@@ -527,6 +543,12 @@ export default function Home() {
         </div>
         
         <div className={styles.faqList}>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>A co jeśli Pracownik AI nie poradzi sobie w mojej firmie?</summary>
+            <div className={styles.faqContent}>
+              <strong>Masz 14 dni na testy bez ryzyka.</strong> Jeśli w tym czasie uznasz, że system nie oszczędza Twojego czasu, możesz anulować subskrypcję jednym kliknięciem z panelu.
+            </div>
+          </details>
           <details className={styles.faqItem}>
             <summary className={styles.faqSummary}>Czy MESKIAI samodzielnie wysyła wiadomości do klientów?</summary>
             <div className={styles.faqContent}>
