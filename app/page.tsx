@@ -108,28 +108,6 @@ export default function Home() {
     if (!isAutoPlaying) return;
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < 4 ? prev + 1 : 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-    const hiddenElements = document.querySelectorAll('.reveal-on-scroll');
-    hiddenElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      hiddenElements.forEach((el) => observer.unobserve(el));
-      observer.disconnect();
-    };
-  }, []);
-
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -284,10 +262,6 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
 
-        <div className={`${styles.badge} animate-fade-in`} style={{ marginBottom: '24px' }}>
-          <Sparkles size={14} className={styles.badgeHighlight} style={{ color: '#3b82f6' }} /> MESKIAI 2.0 jest już dostępny
-        </div>
-
         <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
           Autopilot dla Twojej <br />skrzynki odbiorczej.
         </h1>
@@ -313,14 +287,10 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        <div className="animate-fade-in animate-delay-4" style={{ marginTop: '24px', fontSize: '0.85rem', color: 'var(--subtext)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <CheckCircle size={14} style={{ color: '#10b981' }}/> Nie wymaga karty kredytowej
-        </div>
       </section>
 
       {/* Testimonial / Social Proof */}
-      <section className="reveal-on-scroll" style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+      <section className="animate-fade-in" style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Zaprojektowany, by działać w tle.</h2>
@@ -397,7 +367,7 @@ export default function Home() {
       </section>
 
       {/* Features Bento Section */}
-      <section className="reveal-on-scroll" style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
+      <section className="animate-fade-in" style={{ padding: '20px 20px 100px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Jeden system. Wiele możliwości.
@@ -448,7 +418,7 @@ export default function Home() {
 
 
       {/* Pricing Section (Apple Style) */}
-      <section className={styles.pricingSection} id="cennik">
+      <section className={`${styles.pricingSection} animate-fade-in`} id="cennik">
         <div className={styles.pricingHeader}>
           <h2 className="animate-fade-in-up">Moc obliczeniowa.<br/>Zamiast listy płac.</h2>
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
@@ -551,7 +521,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="reveal-on-scroll" style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+      <section className="animate-fade-in" style={{ padding: '80px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Masz pytania? Mamy odpowiedzi.
