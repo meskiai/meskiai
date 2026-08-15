@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart, Sparkles, Home as HomeIcon, LogOut } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart, Sparkles, Home as HomeIcon, LogOut, Database } from 'lucide-react';
 import { useEffect, useState, useRef } from "react";
 
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
@@ -78,6 +78,55 @@ const TypingEmail = () => {
   );
 };
 
+const FadeInWhenVisible = ({ children, delay = 0, className, style, id, scale = false, tilt = false }: { children: React.ReactNode, delay?: number, className?: string, style?: React.CSSProperties, id?: string, scale?: boolean, tilt?: boolean }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    if (domRef.current) observer.observe(domRef.current);
+    
+    return () => {
+      if (domRef.current) observer.unobserve(domRef.current);
+    };
+  }, []);
+  
+  const getTransform = () => {
+    if (!isVisible) {
+      if (tilt) return 'perspective(1200px) rotateX(16deg) translateY(60px) scale(0.92)';
+      if (scale) return 'translateY(40px) scale(0.94)';
+      return 'translateY(40px)';
+    }
+    if (tilt) return 'perspective(1200px) rotateX(0deg) translateY(0) scale(1)';
+    return 'translateY(0) scale(1)';
+  };
+  
+  return (
+    <section 
+      id={id}
+      ref={domRef} 
+      className={className}
+      style={{ 
+        ...style,
+        opacity: isVisible ? 1 : 0,
+        transform: getTransform(),
+        transition: `opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+        willChange: 'transform, opacity'
+      }}
+    >
+      {children}
+    </section>
+  );
+};
+
 const TrustBadges = () => (
   <section className="animate-fade-in animate-delay-4" style={{ padding: '0 20px 40px', maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', opacity: 0.8 }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
@@ -98,43 +147,14 @@ export default function Home() {
   const [currentPriceId, setCurrentPriceId] = useState<string | null>(null);
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const [showExitPopup, setShowExitPopup] = useState(false);
-  const [hasTriggeredExit, setHasTriggeredExit] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (status === 'authenticated') return;
-
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasTriggeredExit) {
-        setShowExitPopup(true);
-        setHasTriggeredExit(true);
-      }
-    };
-
-    let timeoutId: NodeJS.Timeout;
-    const resetTimer = () => {
-      clearTimeout(timeoutId);
-      if (!hasTriggeredExit) {
-        timeoutId = setTimeout(() => {
-          setShowExitPopup(true);
-          setHasTriggeredExit(true);
-        }, 15000);
-      }
-    };
-
-    document.addEventListener("mouseleave", handleMouseLeave);
-    document.addEventListener("touchstart", resetTimer, { passive: true });
-    document.addEventListener("scroll", resetTimer, { passive: true });
-    resetTimer();
-
-    return () => {
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      document.removeEventListener("touchstart", resetTimer);
-      document.removeEventListener("scroll", resetTimer);
-      clearTimeout(timeoutId);
-    };
-  }, [hasTriggeredExit, status]);
+  const handleLogin = async () => {
+    if (isLoggingIn) return;
+    setIsLoggingIn(true);
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
 
   const handleCheckout = async (priceId: string) => {
     setLoadingPriceId(priceId);
@@ -147,7 +167,7 @@ export default function Home() {
       await handleCheckout(priceId);
     } else {
       localStorage.setItem('selectedPlan', JSON.stringify({ id: priceId, time: Date.now() }));
-      signIn("google", { callbackUrl: "/dashboard" });
+      await handleLogin();
     }
   };
   const [activeFeature, setActiveFeature] = useState('agent');
@@ -211,6 +231,8 @@ export default function Home() {
             <img
               src="/logo.png"
               alt="MESKIAI logo"
+              fetchPriority="high"
+              decoding="async"
               style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }}
             />
             <span>MESKIAI</span>
@@ -293,19 +315,22 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div className={styles.authButtons}>
                 <button
-                  className={styles.ctaBtnSecondary}
-                  style={{ padding: '8px 16px', fontSize: '0.9rem' }}
-                  onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                  className={styles.navLoginBtn}
+                  style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
+                  onClick={handleLogin}
+                  disabled={isLoggingIn}
                 >
-                  Zaloguj się
+                  {isLoggingIn ? 'Logowanie...' : 'Zaloguj się'}
                 </button>
                 <button
-                  className={styles.loginBtn}
-                  onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                  className={styles.navTryBtn}
+                  onClick={handleLogin}
+                  disabled={isLoggingIn}
+                  style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
                 >
-                  Załóż darmowe konto
+                  {isLoggingIn ? 'Logowanie...' : 'Wypróbuj'}
                 </button>
               </div>
             )}
@@ -313,56 +338,74 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
+      {/* Hero Section - Lindy.ai Style */}
+      <section className={styles.hero} style={{ position: 'relative', overflow: 'hidden', padding: '100px 20px 70px', textAlign: 'center' }}>
 
-        <h1 className={`${styles.heroTitle} animate-fade-in animate-delay-1`}>
-          Twój nowy pracownik to AI.
+        <h1 className={styles.heroTitle} style={{ margin: '0 auto', maxWidth: '850px', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.15, color: '#0F172A' }}>
+          Pracownik AI, który <br />
+          <span style={{ color: '#D97706', WebkitTextFillColor: '#D97706', background: 'none' }}>
+            pozwala robić więcej.
+          </span>
         </h1>
         
-        <h2 className={`${styles.heroSubtitle} animate-fade-in animate-delay-2`} style={{ fontSize: '1.15rem', maxWidth: '640px' }}>
-          Zostaw maile nam, a my zajmiemy się resztą. Pierwszy w pełni autonomiczny Pracownik AI, który wspiera cały Twój zespół – myśli, bada konkurencję i dostarcza Wam gotowe rozwiązania.
+        <h2 className={styles.heroSubtitle} style={{ fontSize: '1.15rem', maxWidth: '620px', margin: '20px auto 36px', color: '#64748B', fontWeight: 450, lineHeight: 1.6 }}>
+          MESKIAI łączy się ze wszystkimi Twoimi narzędziami, wie wszystko o Twojej firmie i wykonuje prawdziwą pracę za cały zespół.
         </h2>
         
-        <div className={`${styles.ctaWrapper} animate-fade-in animate-delay-3`} style={{ marginTop: '10px' }}>
+        <div className={styles.ctaWrapper} style={{ marginTop: '0px' }}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{textDecoration: 'none', padding: '16px 40px', fontSize: '1.1rem'}}>
+            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
               Przejdź do Panelu <ArrowRight size={20} />
             </Link>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <>
               <button
                 className={styles.ctaBtnPrimary}
-                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-                style={{ padding: '16px 40px', fontSize: '1.1rem' }}
+                onClick={handleLogin}
+                disabled={isLoggingIn}
+                style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
               >
-                Rozpocznij 7-dniowy okres próbny <ArrowRight size={20} />
+                {isLoggingIn ? 'Logowanie...' : 'Wypróbuj za darmo'}
               </button>
-            </div>
+              
+              <p style={{ fontSize: '0.88rem', color: '#64748B', marginTop: '10px', marginBottom: '12px', fontWeight: 450 }}>
+                3-dniowy okres próbny • Anuluj w dowolnym momencie
+              </p>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.9rem', color: '#0F172A', fontWeight: 600 }}>
+                <div style={{ display: 'flex', color: '#F59E0B', gap: '3px', fontSize: '0.95rem' }}>
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+                <span style={{ color: '#475569', fontWeight: 600, marginLeft: '2px' }}>4.9</span>
+              </div>
+            </>
           )}
         </div>
       </section>
 
       <TrustBadges />
 
-      {/* Advanced Social Proof Layer */}
-      <section className="animate-fade-in" style={{ padding: '20px 20px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-        <div style={{ maxWidth: '800px', width: '100%', position: 'relative' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Zaprojektowany, by działać w tle.</h2>
-            <p style={{ color: 'var(--subtext)', marginTop: '12px', fontSize: '1.05rem' }}>Zobacz, jak Pracownik AI samodzielnie obsługuje zapytania Twoich klientów.</p>
+      {/* Advanced Social Proof & Live Mockup Layer with 3D Tilt Scroll */}
+      <FadeInWhenVisible tilt style={{ padding: '40px 20px 60px', maxWidth: '900px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '900px', width: '100%', position: 'relative' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0F172A' }}>
+              Zaprojektowany, by działać autonomicznie.
+            </h2>
+            <p style={{ color: '#64748B', marginTop: '10px', fontSize: '1.08rem' }}>
+              Zobacz, jak MESKIAI samodzielnie obsługuje zapytania klientów i tworzy szkice odpowiedzi.
+            </p>
           </div>
           
           <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 60%)', zIndex: -1, pointerEvents: 'none' }}></div>
             <TypingEmail />
           </div>
         </div>
-      </section>
+      </FadeInWhenVisible>
 
       {/* Active Tasks Animation Panel -> NEW Lindy Style Panel */}
-      <section className={styles.lindySection}>
-        <div className={styles.lindyContainer}>
+      <FadeInWhenVisible className={styles.lindySection}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div className={styles.lindyTextCol}>
             <h2 className={styles.lindyTitle}>Zautomatyzuj swój e-mail.</h2>
             <p className={styles.lindyDesc}>
@@ -420,57 +463,59 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </FadeInWhenVisible>
 
-      {/* Features Bento Section */}
-      <section className="animate-fade-in" style={{ padding: '20px 20px 40px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
+      {/* Features Section - Lindy.ai Toolkit Style */}
+      <FadeInWhenVisible className="animate-fade-in" style={{ padding: '60px 20px 80px', maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 10 }} id="how-it-works">
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
-            Jeden system. Wiele możliwości.
+          <div style={{ fontSize: '0.8rem', letterSpacing: '0.12em', fontWeight: 700, color: '#D97706', textTransform: 'uppercase', marginBottom: '12px' }}>
+            ZESTAW NARZĘDZI MESKIAI
+          </div>
+          <h2 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+            Dlaczego MESKIAI działa jak <br />
+            <span style={{ color: '#D97706' }}>prawdziwy członek zespołu.</span>
           </h2>
-          <p style={{ color: 'var(--subtext)', fontSize: '1.1rem', marginTop: '12px' }}>
-            Poznaj potężne narzędzia ukryte pod maską MESKIAI.
+          <p style={{ color: '#64748B', fontSize: '1.15rem', maxWidth: '640px', margin: '16px auto 0', fontWeight: 450, lineHeight: 1.6 }}>
+            Od odpowiadania na maile po analizę rynku i pozyskiwanie leadów, MESKIAI pomaga wykonywać pracę we wszystkich narzędziach, na których polega Twój zespół.
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
           
           {/* Feature 1 */}
-          <div style={{ padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
-            <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Mail size={24} />
-            </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Inteligentna skrzynka</h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Oszczędność czasu</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Filtracja spamu</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Automatyczne szkice</li>
+          <div style={{ padding: '32px', borderRadius: '20px', background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#D97706', marginBottom: '12px' }}>01</div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0F172A', marginBottom: '12px', letterSpacing: '-0.02em' }}>Połączony ze wszystkim.</h3>
+            <p style={{ color: '#64748B', fontSize: '0.98rem', lineHeight: 1.6, marginBottom: '20px' }}>
+              Gmail, Outlook, baza klientów i Twoje narzędzia. MESKIAI obsługuje pocztę i zapytania automatycznie 24/7.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#0F172A', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: '#2563EB', flexShrink: 0 }}/> Oszczędność godzin dziennie</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#0F172A', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: '#2563EB', flexShrink: 0 }}/> Wymaga zgody przed wysyłką</li>
             </ul>
           </div>
 
           {/* Feature 2 */}
-          <div style={{ padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
-            <div style={{ marginBottom: '24px', background: 'var(--foreground)', color: 'var(--background)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Target size={24} />
-            </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '12px' }}>Pozyskiwanie klientów</h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Bazy B2B</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Personalizacja</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--foreground)', fontSize: '0.95rem', fontWeight: 500 }}><CheckCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0 }}/> Automatyczne spotkania</li>
+          <div style={{ padding: '32px', borderRadius: '20px', background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#D97706', marginBottom: '12px' }}>02</div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0F172A', marginBottom: '12px', letterSpacing: '-0.02em' }}>Samodzielna obsługa i leady.</h3>
+            <p style={{ color: '#64748B', fontSize: '0.98rem', lineHeight: 1.6, marginBottom: '20px' }}>
+              Wyszukuj idealnych klientów B2B, twórz oferty i odpowiadaj na zapytania bez konieczności ciągłego nadzoru.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#0F172A', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: '#2563EB', flexShrink: 0 }}/> Codzienne świeże kontakty</li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#0F172A', fontSize: '0.9rem', fontWeight: 500 }}><CheckCircle size={16} style={{ color: '#2563EB', flexShrink: 0 }}/> Automatyczna kategoryzacja</li>
             </ul>
           </div>
 
         </div>
-      </section>
+      </FadeInWhenVisible>
 
 
 
       {/* Pricing Section (Apple Style) */}
-      <section className={`${styles.pricingSection} animate-fade-in`} id="cennik">
+      <FadeInWhenVisible className={`${styles.pricingSection} animate-fade-in`} id="cennik">
         <div className={styles.pricingHeader}>
-          <h2 className="animate-fade-in-up">Moc obliczeniowa.<br/>Zamiast listy płac.</h2>
+          <h2 className="animate-fade-in-up"><span style={{ color: '#3b82f6' }}>Moc obliczeniowa.</span><br/>Zamiast listy płac.</h2>
           <p className="animate-fade-in-up animate-delay-1">Wybierz pakiet idealnie dopasowany do skali Twojej firmy.</p>
         </div>
         
@@ -491,7 +536,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn} 
               disabled={userTier >= 1 || loadingPriceId !== null}
-              style={{ opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
+              style={{ background: '#3b82f6', color: 'white', border: 'none', boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 1) return;
                 const priceId = PRICE_BASIC;
@@ -521,7 +566,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn} 
               disabled={userTier >= 2 || loadingPriceId !== null}
-              style={{ opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
+              style={{ background: '#3b82f6', color: 'white', border: 'none', boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 2) return;
                 const priceId = PRICE_PRO;
@@ -548,7 +593,7 @@ export default function Home() {
             <button 
               className={styles.pricingBtn} 
               disabled={userTier >= 3 || loadingPriceId !== null}
-              style={{ opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
+              style={{ background: '#3b82f6', color: 'white', border: 'none', boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer' }}
               onClick={() => {
                 if (userTier >= 3) return;
                 const priceId = PRICE_MAX;
@@ -565,10 +610,10 @@ export default function Home() {
           <CheckCircle size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', color: '#10b981', marginRight: '6px' }}/> 
           Anuluj w dowolnym momencie. Brak długoterminowych umów i ukrytych opłat.
         </div>
-      </section>
+      </FadeInWhenVisible>
 
       {/* FAQ Section */}
-      <section className="animate-fade-in" style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+      <FadeInWhenVisible className="animate-fade-in" style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.03em' }}>
             Masz pytania? Mamy odpowiedzi.
@@ -579,6 +624,12 @@ export default function Home() {
         </div>
         
         <div className={styles.faqList}>
+          <details className={styles.faqItem}>
+            <summary className={styles.faqSummary}>Czy system integruje się z Shopify, WooCommerce lub innymi platformami?</summary>
+            <div className={styles.faqContent}>
+              Tak! MESKIAI potrafi łączyć się i czytać kontekst z popularnych platform e-commerce takich jak <strong>Shopify</strong> oraz <strong>WooCommerce</strong>. Dzięki temu Twój Pracownik AI dokładnie wie, jakie zamówienie złożył klient, zanim wygeneruje dla niego odpowiedź.
+            </div>
+          </details>
           <details className={styles.faqItem}>
             <summary className={styles.faqSummary}>A co jeśli Pracownik AI nie poradzi sobie w mojej firmie?</summary>
             <div className={styles.faqContent}>
@@ -610,7 +661,42 @@ export default function Home() {
             </div>
           </details>
         </div>
-      </section>
+      </FadeInWhenVisible>
+
+      {/* Bottom CTA Section */}
+      <FadeInWhenVisible style={{ position: 'relative', overflow: 'hidden', padding: '100px 20px 80px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h2 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0F172A', marginBottom: '16px' }}>
+          Gotowy, by zautomatyzować swoją pocztę?
+        </h2>
+        <p style={{ color: '#64748B', fontSize: '1.15rem', marginBottom: '32px', maxWidth: '540px' }}>
+          Skonfiguruj swojego Pracownika AI w mniej niż 2 minuty i uwolnij czas od powtarzalnych zadań.
+        </p>
+        <div style={{ display: 'flex', gap: '14px', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+          {status === "authenticated" ? (
+            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none' }}>
+              Przejdź do Panelu <ArrowRight size={20} />
+            </Link>
+          ) : (
+            <button
+              className={styles.ctaBtnPrimary}
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
+            >
+              {isLoggingIn ? 'Logowanie...' : 'Wypróbuj za darmo'}
+            </button>
+          )}
+        </div>
+        <p style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '12px', fontWeight: 450 }}>
+          3-dniowy okres próbny • Anuluj w dowolnym momencie
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.9rem', color: '#0F172A', fontWeight: 600 }}>
+          <div style={{ display: 'flex', color: '#F59E0B', gap: '3px', fontSize: '0.95rem' }}>
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <span style={{ color: '#475569', fontWeight: 600, marginLeft: '2px' }}>4.9</span>
+        </div>
+      </FadeInWhenVisible>
 
       <footer className={styles.advancedFooter}>
         <div className={styles.footerGrid}>
@@ -652,36 +738,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Sticky Mobile CTA */}
-      <div className={styles.stickyCta}>
-        <button onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
-          Wypróbuj za darmo <ArrowRight size={18} style={{ marginLeft: '8px' }} />
-        </button>
-      </div>
-
-      {/* Exit Intent Popup */}
-      {showExitPopup && (
-        <div className={styles.exitOverlay} onClick={() => setShowExitPopup(false)}>
-          <div className={styles.exitPopup} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '12px' }}>Zaczekaj chwileczkę! 👋</h3>
-            <p style={{ color: 'var(--subtext)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '24px' }}>
-              Zanim pójdziesz – odbierz <strong>14 dni darmowych testów</strong> Pracownika AI. Zobacz jak obsługuje e-maile na własne oczy, bez żadnego ryzyka.
-            </p>
-            <button 
-              style={{ width: '100%', padding: '14px', borderRadius: '12px', background: 'var(--foreground)', color: 'var(--background)', fontWeight: 600, fontSize: '1.05rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              Odbieram 14 dni za darmo <ArrowRight size={18} />
-            </button>
-            <button 
-              style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'transparent', color: 'var(--subtext)', fontWeight: 500, fontSize: '0.9rem', border: '1px solid transparent', cursor: 'pointer' }}
-              onClick={() => setShowExitPopup(false)}
-            >
-              Nie, dziękuję
-            </button>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

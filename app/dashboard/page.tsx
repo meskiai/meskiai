@@ -8,10 +8,10 @@ import {
   Sparkles, User, LogOut, Inbox, Archive, AlertTriangle, Trash2, Bot, Home, HelpCircle, LayoutGrid,
   ArrowUpRight, ArrowDownLeft, ArrowDown, FileText, Building, Search, ArrowRight, ChevronRight, Users,
   Target, Zap, TrendingUp, ShieldAlert, Plus, BarChart2, Activity, Lightbulb, PieChart, ExternalLink, Settings,
-  X, DollarSign, CheckSquare, ArrowDownRight, Info, Star
+  X, DollarSign, CheckSquare, ArrowDownRight, Info, Star, Loader2
 } from "lucide-react";
-import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
-import { ThemeToggle } from "../components/ThemeToggle";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
+
 import styles from "./page.module.css";
 const getCleanDraftReply = (draft: string | null): string => {
   if (!draft) return "";
@@ -161,18 +161,16 @@ export default function Dashboard() {
   const userTier = getTier(subscriptionData?.stripePriceId);
 
   const pid = subscriptionData?.stripePriceId;
-  const isBasic = pid === PRICE_BASIC;
-  const isPro = pid === PRICE_PRO;
-  const isMax = pid === PRICE_MAX;
-  const isUnlimited = isMax;
+  const limits = getPlanLimits(pid);
+  const isUnlimited = limits.emails === Infinity;
   
   const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
   const searchesUsed = subscriptionData?.competitorSearchesThisMonth || 0;
   const leadsUsed = subscriptionData?.leadSearchesThisMonth || 0;
-  // Fallback to basic limits if price ID is unknown (e.g. grandfathered plan)
-  const emailLimit = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 50;
-  const searchLimit = isBasic ? 10 : isPro ? 100 : isMax ? Infinity : 10;
-  const leadLimit = isBasic ? 20 : isPro ? 200 : isMax ? Infinity : 20;
+  
+  const emailLimit = limits.emails;
+  const searchLimit = limits.searches;
+  const leadLimit = limits.leads;
 
   const isEmailLimitReached = !isUnlimited && emailsUsed >= emailLimit && emailLimit > 0;
   const isSearchLimitReached = !isUnlimited && searchesUsed >= searchLimit && searchLimit > 0;
@@ -298,7 +296,8 @@ export default function Dashboard() {
           }
           
           if (!isCheckingOut) {
-            if (!data.subscriptionData || !['active', 'trialing', 'incomplete'].includes(data.subscriptionData.subscriptionStatus)) {
+            const isTrialActive = data.subscriptionData?.trialState?.isTrialActive;
+            if (!isTrialActive && (!data.subscriptionData || !['active', 'trialing', 'incomplete'].includes(data.subscriptionData.subscriptionStatus))) {
               router.push("/?error=no_subscription#cennik");
               return;
             }
@@ -967,7 +966,8 @@ export default function Dashboard() {
     );
   }
 
-  if (subscriptionStatus && !['active', 'trialing', 'incomplete'].includes(subscriptionStatus)) {
+  const isTrialActive = subscriptionData?.trialState?.isTrialActive;
+  if (!isTrialActive && subscriptionStatus && !['active', 'trialing', 'incomplete'].includes(subscriptionStatus)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--background)' }}>
         <ShieldAlert size={48} style={{ color: '#ff3b30', marginBottom: '24px' }} />
@@ -1048,7 +1048,7 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative' }}>
-            <ThemeToggle />
+            
             
             <div 
               style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #3b82f6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', cursor: 'pointer', userSelect: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: '2px solid var(--glass-border)', transition: 'transform 0.2s' }}
@@ -1817,7 +1817,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 
             <div style={{ position: 'relative' }}>
-              <ThemeToggle />
+              
             </div>
             <button className="btn btn-secondary" style={{ padding: '6px 16px', fontSize: '0.85rem' }} onClick={() => handleSync(false)} disabled={syncing}>
               <RefreshCw size={14} className={syncing ? styles['animate-spin'] : ""} style={{ marginRight: '6px' }} />

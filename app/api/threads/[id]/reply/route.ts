@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { sendReplySMTP } from "../../../../../lib/mail";
-import { PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 
 export async function POST(
   req: Request,
@@ -50,23 +50,31 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
+
     const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
-      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji lub wygasł okres próbny. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
     
     const userSettings = user?.settings;
+    const emailsCount = userSettings?.emailsSentThisMonth || 0;
 
-    if (userSettings) {
-      const emailsCount = userSettings.emailsSentThisMonth || 0;
-
-      // Use the same limit logic as lib/cron.ts getMonthlyLimit()
-      const priceId = user?.stripePriceId ?? null;
-      
-      const monthlyLimit =
-        priceId === PRICE_MAX ? Infinity :
-        priceId === PRICE_PRO ? 1000 :
-        50; // Basic or any active subscription without a known price ID
+    if (trialState.isTrialActive) {
+      if (emailsCount >= TRIAL_LIMITS.emails) {
+        return NextResponse.json({
+          error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.emails} wysłanych e-maili). Zrób upgrade pakietu, aby kontynuować.`
+        }, { status: 403 });
+      }
+    } else {
+      const limits = getPlanLimits(user.stripePriceId);
+      const monthlyLimit = limits.emails; // Basic or any active subscription without a known price ID
 
       if (monthlyLimit !== Infinity && emailsCount >= monthlyLimit) {
         return NextResponse.json({

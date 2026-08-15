@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
 import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
-import { PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
+import { PRICE_MAX, PRICE_PRO, getPlanLimits } from './pricing';
 import { generateText } from 'ai';
 import { google as googleAI } from '@ai-sdk/google';
 
@@ -26,13 +26,6 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): 
     }
   }
   throw new Error('Wyczerpano próby połączenia z bazą danych.');
-}
-
-// ─── Price limits ──────────────────────────────────────────────────────────────
-function getMonthlyLimit(stripePriceId: string | null): number {
-  if (stripePriceId === PRICE_MAX) return Infinity;
-  if (stripePriceId === PRICE_PRO) return 1000;
-  return 50; // Basic (default for any active subscription)
 }
 
 // ─── Fetch & strip company website content (for AI context) ────────────────────
@@ -78,7 +71,6 @@ export async function runSync() {
       prisma.user.findMany({
         where: {
           email: { not: null },
-          subscriptionStatus: { in: ['active', 'trialing'] },
           settings: {
             appPassword: { not: null },
             autoReply: true,   // Only process users who have auto-reply enabled
@@ -190,17 +182,30 @@ async function processUser(user: any) {
   }
 
   // Guard: subscription must be active (double-check in case DB was stale)
-  if (user.subscriptionStatus !== 'active' && user.subscriptionStatus !== 'trialing') {
-    console.log(`[Agent AI] ${user.email}: brak aktywnej subskrypcji (${user.subscriptionStatus}) — pomijam.`);
+  const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+  const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, settings || undefined);
+
+  if (user.subscriptionStatus !== 'active' && user.subscriptionStatus !== 'trialing' && !trialState.isTrialActive) {
+    console.log(`[Agent AI] ${user.email}: brak aktywnej subskrypcji (${user.subscriptionStatus}) lub wygasł trial — pomijam.`);
     return;
   }
 
-  // Guard: monthly limit
-  const monthlyLimit = getMonthlyLimit(user.stripePriceId);
-  const emailsSent   = settings.emailsSentThisMonth ?? 0;
-  if (emailsSent >= monthlyLimit) {
-    console.log(`[Agent AI] ${user.email}: limit ${emailsSent}/${monthlyLimit} wyczerpany — pomijam.`);
+  // Guard: monthly limit or trial limit
+  const emailsSent = settings.emailsSentThisMonth ?? 0;
+  
+  if (trialState.isTrialActive && emailsSent >= TRIAL_LIMITS.emails) {
+    console.log(`[Agent AI] ${user.email}: limit trialu (${TRIAL_LIMITS.emails} wysłanych) wyczerpany — pomijam.`);
     return;
+  }
+
+  const limits = getPlanLimits(user.stripePriceId);
+  const monthlyLimit = limits.emails;
+
+  if (!trialState.isTrialActive) {
+    if (emailsSent >= monthlyLimit) {
+      console.log(`[Agent AI] ${user.email}: limit ${emailsSent}/${monthlyLimit} wyczerpany — pomijam.`);
+      return;
+    }
   }
 
   // Fetch known UIDs so POP3 can skip already-processed emails
@@ -253,7 +258,8 @@ async function processUser(user: any) {
       .findUnique({ where: { userId }, select: { emailsSentThisMonth: true } })
       .catch(() => null);
     const currentSent = fresh?.emailsSentThisMonth ?? emailsSent + replied;
-    if (currentSent >= monthlyLimit) {
+    const activeLimit = trialState.isTrialActive ? 5 : monthlyLimit;
+    if (currentSent >= activeLimit) {
       console.log(`[Agent AI] ${user.email}: limit osiągnięty w trakcie — zatrzymuję.`);
       break;
     }

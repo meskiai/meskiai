@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
-import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 import { sendReplySMTP } from "../../../../lib/mail";
 
 export async function POST(req: Request) {
@@ -36,9 +36,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus });
+
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
-      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji lub wygasł okres próbny. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
     
     const userSettings = user?.settings;
@@ -49,15 +56,18 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const isBasic = user?.stripePriceId === PRICE_BASIC;
-    const isPro = user?.stripePriceId === PRICE_PRO;
+    const limits = getPlanLimits(user?.stripePriceId);
     const emailsCount = userSettings.emailsSentThisMonth || 0;
 
-    if (isBasic && emailsCount >= 50) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (50) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
-    }
-    if (isPro && emailsCount >= 1000) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit wysłanych e-maili (1000) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+    if (trialState.isTrialActive) {
+      if (emailsCount >= TRIAL_LIMITS.emails) {
+        return NextResponse.json({ error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.emails} wysłanych e-maili). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
+    } else {
+      const emailsMonthlyLimit = limits.emails;
+      if (emailsCount >= emailsMonthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit wysłanych e-maili (${emailsMonthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
     }
 
     // Send via SMTP using Gmail App Password

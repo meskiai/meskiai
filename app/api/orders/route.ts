@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { prisma } from "../../../lib/prisma";
+import { getTrialState } from "@/lib/trial";
 
 // GET: Pobierz wszystkie zamówienia użytkownika
 export async function GET() {
@@ -34,15 +35,22 @@ export async function POST(req: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: session.user.id },
+      include: { settings: true }
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
+    
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
@@ -92,15 +100,22 @@ export async function DELETE(req: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: session.user.id },
+      include: { settings: true }
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
+    
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
     const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 

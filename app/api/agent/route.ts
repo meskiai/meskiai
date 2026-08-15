@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { prisma } from '../../../lib/prisma';
+import { getTrialState, TRIAL_LIMITS } from '@/lib/trial';
+import { PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 
 export async function POST(req: Request) {
   // Require authentication
@@ -13,11 +15,36 @@ export async function POST(req: Request) {
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, include: { settings: true } });
+    const trialState = getTrialState({ createdAt: user?.createdAt || new Date(), subscriptionStatus: user?.subscriptionStatus || null }, user?.settings || undefined);
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: 'Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji.' }, { status: 403 });
+    }
+
     const isSubscriptionActive = user?.subscriptionStatus === 'active' || user?.subscriptionStatus === 'trialing';
-    if (!isSubscriptionActive) {
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
       return NextResponse.json({ error: 'Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji.' }, { status: 403 });
     }
+
+    const aiGensCount = user?.settings?.aiGenerationsThisMonth || 0;
+    const limits = getPlanLimits(user?.stripePriceId);
+    const monthlyLimit = limits.aiGenerations;
+
+    if (trialState.isTrialActive) {
+      if (aiGensCount >= TRIAL_LIMITS.aiGenerations) {
+        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla AI (${TRIAL_LIMITS.aiGenerations} zapytań). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+      }
+    } else {
+      if (aiGensCount >= monthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit zapytań AI (${monthlyLimit}). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+      }
+    }
+
+    // Increment usage
+    await prisma.userSettings.update({
+      where: { userId: session.user.id },
+      data: { aiGenerationsThisMonth: { increment: 1 } }
+    });
 
     const { prompt } = await req.json();
 

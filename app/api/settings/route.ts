@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { prisma } from '../../../lib/prisma';
 import { PRICE_PRO, PRICE_MAX } from '@/lib/pricing';
+import { getTrialState } from '@/lib/trial';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,10 +83,15 @@ export async function GET(req: Request) {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
+    const trialState = getTrialState({
+      createdAt: user?.createdAt || new Date(),
+      subscriptionStatus: user?.subscriptionStatus
+    }, user?.settings || undefined);
+
     const leadSearchesThisMonth = await prisma.lead.count({
       where: {
         userId: session.user.id,
-        createdAt: { gte: startOfMonth }
+        ...(trialState.isTrialActive ? {} : { createdAt: { gte: startOfMonth } })
       }
     });
 
@@ -95,11 +101,13 @@ export async function GET(req: Request) {
       // Mask API secret — return boolean only for security
       storeApiSecret: user?.settings?.storeApiSecret ? "__SET__" : null,
     };
+
     const subscriptionData = {
       subscriptionStatus: user?.subscriptionStatus || "inactive",
       stripePriceId: user?.stripePriceId || null,
       stripeCurrentPeriodEnd: user?.stripeCurrentPeriodEnd || null,
       createdAt: user?.createdAt || null,
+      trialState,
       feedbackSubmitted: user?.feedbackSubmitted ?? false,
       // Usage counters for limits display
       emailsSentThisMonth: user?.settings?.emailsSentThisMonth ?? 0,

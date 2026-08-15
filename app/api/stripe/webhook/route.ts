@@ -65,6 +65,7 @@ export async function POST(req: Request) {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
                 leadSearchesThisMonth: 0,
+                aiGenerationsThisMonth: 0,
                 autoReply: true,   // ← automatically ON after purchase
               },
               create: {
@@ -72,6 +73,7 @@ export async function POST(req: Request) {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
                 leadSearchesThisMonth: 0,
+                aiGenerationsThisMonth: 0,
                 autoReply: true,   // ← automatically ON after purchase
                 onboardingDone: false,
                 replyTone: 'PROFESJONALNY',
@@ -154,6 +156,7 @@ export async function POST(req: Request) {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
                 leadSearchesThisMonth: 0,
+                aiGenerationsThisMonth: 0,
                 autoReply: true,
               },
               create: {
@@ -161,6 +164,7 @@ export async function POST(req: Request) {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
                 leadSearchesThisMonth: 0,
+                aiGenerationsThisMonth: 0,
                 autoReply: true,
                 onboardingDone: false,
                 replyTone: 'PROFESJONALNY',
@@ -249,6 +253,7 @@ export async function POST(req: Request) {
                 emailsSentThisMonth: 0,
                 competitorSearchesThisMonth: 0,
                 leadSearchesThisMonth: 0,
+                aiGenerationsThisMonth: 0,
               }
             });
           }

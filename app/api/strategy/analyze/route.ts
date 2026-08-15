@@ -4,7 +4,7 @@ import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 import { prisma } from "../../../../lib/prisma";
 
 export const maxDuration = 60;
@@ -28,20 +28,30 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "Brak użytkownika" }, { status: 404 });
 
-    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
-      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
+
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z analizy strategii." }, { status: 403 });
     }
 
-    const isBasic = user.stripePriceId === PRICE_BASIC;
-    const isPro = user.stripePriceId === PRICE_PRO;
+    const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji lub wygasł okres próbny. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
+    const limits = getPlanLimits(user.stripePriceId);
     const searchesCount = user.settings?.competitorSearchesThisMonth || 0;
 
-    if (isBasic && searchesCount >= 10) {
-      return NextResponse.json({ error: "Wykorzystałeś limit analiz (10) dla pakietu BASIC. Zrób upgrade, aby kontynuować." }, { status: 403 });
-    }
-    if (isPro && searchesCount >= 100) {
-      return NextResponse.json({ error: "Wykorzystałeś limit analiz (100) dla pakietu PRO. Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+    if (trialState.isTrialActive) {
+      if (searchesCount >= TRIAL_LIMITS.searches) {
+        return NextResponse.json({ error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.searches} analiza). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
+    } else {
+      const searchesMonthlyLimit = limits.searches;
+      if (searchesCount >= searchesMonthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit analiz (${searchesMonthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
     }
 
     let pageText = "";

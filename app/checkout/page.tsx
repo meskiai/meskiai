@@ -99,7 +99,7 @@ function CheckoutPageContent() {
           if (data.error) {
             setError(data.error);
           } else if (data.clientSecret) {
-            setClientSecret(data.clientSecret);
+            if (data.requirePayment === false) { window.location.href = '/dashboard?checkout=success'; return; } setClientSecret(data.clientSecret);
           }
         })
         .catch(() => setError("Wystąpił błąd podczas połączenia z serwerem."));

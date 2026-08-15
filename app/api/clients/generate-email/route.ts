@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
+import { PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
 import { generateObject } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
 import { z } from "zod";
@@ -43,9 +44,39 @@ export async function POST(req: Request) {
       where: { id: session.user.id }
     });
 
-    if (!user || !['active', 'trialing'].includes(user.subscriptionStatus || '')) {
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, userSettings || undefined);
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
+    }
+
+    if (!['active', 'trialing'].includes(user.subscriptionStatus || '') && !trialState.isTrialActive) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Zrób upgrade, aby wygenerować wiadomość." }, { status: 403 });
     }
+
+    const aiGensCount = userSettings?.aiGenerationsThisMonth || 0;
+    const isProOrMax = user.stripePriceId === PRICE_PRO || user.stripePriceId === PRICE_MAX;
+    const monthlyLimit = isProOrMax ? Infinity : 500;
+
+    if (trialState.isTrialActive) {
+      if (aiGensCount >= TRIAL_LIMITS.aiGenerations) {
+        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla AI (${TRIAL_LIMITS.aiGenerations} zapytań). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+      }
+    } else {
+      if (aiGensCount >= monthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit zapytań AI (${monthlyLimit}). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+      }
+    }
+
+    // Increment usage
+    await prisma.userSettings.update({
+      where: { userId: session.user.id },
+      data: { aiGenerationsThisMonth: { increment: 1 } }
+    });
 
     let parsedObject: any = null;
     const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];

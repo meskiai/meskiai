@@ -20,6 +20,18 @@ export async function GET(req: Request) {
         emails: {
           orderBy: { receivedAt: 'desc' },
           take: 1, // Only the latest email per thread — enough for preview, avoids loading thousands of records
+          select: {
+            id: true,
+            threadId: true,
+            messageId: true,
+            from: true,
+            to: true,
+            subject: true,
+            snippet: true,
+            receivedAt: true,
+            isFromAgent: true
+            // purposely omitting 'body' to save megabytes of data on the dashboard
+          }
         }
       },
       orderBy: { updatedAt: 'desc' }

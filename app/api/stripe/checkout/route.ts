@@ -97,49 +97,73 @@ export async function POST(req: Request) {
       metadata.oldSubscriptionId = oldSubscriptionId;
     }
 
-    const origin = req.headers.get("origin") || "https://meskiai.com";
     
-    // Zamiast checkoutSession, tworzymy Subskrypcję bezpośrednio dla Stripe Elements
-    const subscription = await stripe.subscriptions.create({
-      customer: customerId,
-      items: [
-        {
-          price: priceId,
-        },
-      ],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-      metadata,
-    });
+    const origin = req.headers.get('origin') || 'https://meskiai.com';
+    
+    let subscription;
+    let requirePayment = true;
+
+    if (oldSubscriptionId) {
+      // Upgrade logic (Proration)
+      const oldSub = await stripe.subscriptions.retrieve(oldSubscriptionId);
+      const oldItemId = oldSub.items.data[0].id;
+      
+      subscription = await stripe.subscriptions.update(oldSubscriptionId, {
+        items: [
+          {
+            id: oldItemId,
+            price: priceId,
+          }
+        ],
+        payment_behavior: 'pending_if_incomplete',
+        proration_behavior: 'create_prorations',
+        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+        metadata
+      });
+    } else {
+      // New subscription logic
+      subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [
+          {
+            price: priceId,
+          },
+        ],
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+        metadata,
+      });
+    }
 
     const invoice = subscription.latest_invoice as any;
-    const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
-    const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
+    const paymentIntent = invoice?.payment_intent as any;
+    const setupIntent = subscription.pending_setup_intent as any;
 
     let clientSecret = null;
     
-    if (paymentIntent && paymentIntent.client_secret) {
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      requirePayment = false;
+    } else if (paymentIntent && paymentIntent.client_secret) {
       clientSecret = paymentIntent.client_secret;
     } else if (setupIntent && setupIntent.client_secret) {
       clientSecret = setupIntent.client_secret;
+    } else if (!invoice || invoice.total === 0 || invoice.amount_due === 0) {
+      // Free or prorated to 0
+      requirePayment = false;
     }
 
-    if (!clientSecret) {
-      console.error("DEBUG: Missing client_secret. Subscription:", JSON.stringify({
-         status: subscription.status,
-         latest_invoice: typeof subscription.latest_invoice === 'string' ? 'string ID' : invoice?.id,
-         payment_intent: typeof (invoice as any)?.payment_intent === 'string' ? 'string ID' : paymentIntent?.id,
-         has_client_secret: !!paymentIntent?.client_secret,
-         setup_intent: typeof subscription.pending_setup_intent,
-      }));
-      throw new Error(`Nie udało się zainicjować intencji płatności. DEBUG Info: invoice=${invoice?.id ? 'yes' : 'no'}, pi=${paymentIntent?.id ? 'yes' : 'no'}, pi_cs=${paymentIntent?.client_secret ? 'yes' : 'no'}`);
+    if (requirePayment && !clientSecret) {
+      console.error('DEBUG: Missing client_secret.');
+      throw new Error('Nie udało się zainicjować intencji płatności.');
     }
 
     return NextResponse.json({ 
       clientSecret,
-      subscriptionId: subscription.id
+      subscriptionId: subscription.id,
+      requirePayment
     });
+
   } catch (error: any) {
     console.error("Stripe Subscription Creation Error:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });

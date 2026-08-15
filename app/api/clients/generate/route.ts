@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
-import { PRICE_BASIC, PRICE_PRO } from "@/lib/pricing";
+import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 import { generateObject, generateText } from "ai";
 import { google as googleAI } from "@ai-sdk/google";
 import { z } from "zod";
@@ -22,12 +22,19 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Nie znaleziono użytkownika." }, { status: 404 });
+    }
+
+    const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
+
+    if (trialState.isTrialExpired) {
+      return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby wygenerować więcej leadów." }, { status: 403 });
     }
 
     const isSubscriptionActive = user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing";
-    if (!isSubscriptionActive) {
-      return NextResponse.json({ error: "Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
+    if (!isSubscriptionActive && !trialState.isTrialActive) {
+      return NextResponse.json({ error: "Brak aktywnej subskrypcji lub wygasł okres próbny. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
     const businessContext = user?.settings?.businessContext;
@@ -36,25 +43,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No business context found. Please fill your company knowledge base first." }, { status: 400 });
     }
 
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
+    const leadsCount = user?.settings?.leadSearchesThisMonth || 0;
+    const limits = getPlanLimits(user.stripePriceId);
 
-    const leadsCount = await prisma.lead.count({
-      where: {
-        userId: session.user.id,
-        createdAt: { gte: startOfMonth }
+    if (trialState.isTrialActive) {
+      if (leadsCount >= TRIAL_LIMITS.leads) {
+        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla leadów (${TRIAL_LIMITS.leads}). Zrób upgrade pakietu, aby generować ich więcej.` }, { status: 403 });
       }
-    });
-
-    const isBasic = user.stripePriceId === PRICE_BASIC;
-    const isPro = user.stripePriceId === PRICE_PRO;
-
-    if (isBasic && leadsCount >= 20) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu BASIC (20). Zrób upgrade pakietu, aby kontynuować." }, { status: 403 });
-    }
-    if (isPro && leadsCount >= 200) {
-      return NextResponse.json({ error: "Wykorzystałeś miesięczny limit generowania leadów dla pakietu PRO (200). Zrób upgrade do MAX, aby zyskać brak limitów." }, { status: 403 });
+    } else {
+      const monthlyLimit = limits.leads;
+      if (leadsCount >= monthlyLimit) {
+        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit generowania leadów (${monthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
+      }
     }
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
@@ -145,6 +145,13 @@ ${searchResultText}`,
         }
       });
       savedLeads.push(saved);
+    }
+
+    if (savedLeads.length > 0) {
+      await prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { leadSearchesThisMonth: { increment: savedLeads.length } }
+      });
     }
 
     return NextResponse.json({ leads: savedLeads });
