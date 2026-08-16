@@ -1,15 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans } from "next/font/google";
 import "./globals.css";
-
-const dmSans = DM_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-dm",
-  display: 'swap'
-});
-
-const jakarta = dmSans; // alias so rest of code still compiles
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -56,8 +46,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" suppressHydrationWarning className={dmSans.variable}>
-      <body className={dmSans.className}>
+    <html lang="pl" suppressHydrationWarning>
+      <body>
         <Providers>
           <MetaPixel />
           {children}
