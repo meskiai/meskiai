@@ -12,7 +12,7 @@ import styles from "./page.module.css";
 const TypingEmail = () => {
   const [text, setText] = useState('');
   const fullText = "Dzień dobry, na czym właściwie polega MESKIAI i jak może pomóc mojej firmie?";
-  const aiText = "Dzień dobry. MESKIAI to Twój nowy pracownik AI. Przejmujemy obsługę zapytań klientów w trybie 24/7 oraz automatyzujemy pozyskiwanie kontaktów biznesowych. Wszystko odbywa się bezobsługowo, uwalniając Twój czas.";
+  const aiText = "Dzień dobry. MESKIAI to Twój autonomiczny pracownik AI. Przejmujemy obsługę zapytań klientów w trybie 24/7 oraz automatyzujemy pozyskiwanie kontaktów biznesowych. Wszystko odbywa się bezobsługowo, uwalniając Twój czas.";
   const [showAi, setShowAi] = useState(false);
   const [aiTyped, setAiTyped] = useState('');
 
@@ -42,34 +42,40 @@ const TypingEmail = () => {
   }, [showAi]);
 
   return (
-    <div className={styles.mockMailApp} style={{ textAlign: 'left', flexDirection: 'column', padding: '0', height: 'auto', minHeight: '300px', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--mac-shadow)', backdropFilter: 'blur(20px)' }}>
+    <div className={styles.mockMailApp}>
       {/* Window Header */}
-      <div style={{ padding: '12px 20px', display: 'flex', gap: '12px', borderBottom: '1px solid var(--border)', background: 'var(--card-bg)', alignItems: 'center' }}>
+      <div style={{ padding: '14px 20px', display: 'flex', gap: '12px', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--subtext)', opacity: 0.5 }}></div>
+          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#FF5F56' }}></div>
+          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#FFBD2E' }}></div>
+          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#27C93F' }}></div>
+        </div>
+        <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Bot size={14} color="#2563EB" /> MESKIAI Neural Console v3.4
+        </div>
+        <div style={{ fontSize: '0.75rem', background: '#DCFCE7', color: '#16A34A', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
+          LIVE DEMO
         </div>
       </div>
       
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'center' }}>
+      <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--subtext)', fontWeight: 600, display: 'flex', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            <span>Klient</span>
-            <span style={{ opacity: 0.5 }}>[INBOUND]</span>
+          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <span>Zapytanie Klienta</span>
+            <span style={{ opacity: 0.7, color: '#3B82F6' }}>[INBOUND GMAIL]</span>
           </div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', lineHeight: 1.6 }}>
-            {text}{!showAi && <span className={styles.typingCursor} style={{ background: 'var(--foreground)' }}>|</span>}
+          <div style={{ fontSize: '0.95rem', color: '#1E293B', lineHeight: 1.6, fontWeight: 450 }}>
+            {text}{!showAi && <span className={styles.typingCursor} style={{ background: '#0F172A' }}>|</span>}
           </div>
         </div>
         
         {showAi && (
-          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', marginTop: '12px', borderLeft: '2px solid var(--accent)', paddingLeft: '16px' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              MESKIAI <span style={{ opacity: 0.5, color: 'var(--subtext)', fontWeight: 400 }}>[GENERATING]</span>
+          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', borderLeft: '3px solid #DF9E21', paddingLeft: '18px', background: 'rgba(253, 230, 138, 0.1)', padding: '16px 20px', borderRadius: '0 12px 12px 0' }}>
+            <div style={{ fontSize: '0.72rem', color: '#D97706', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <Sparkles size={14} /> MESKIAI AUTOPILOT <span style={{ opacity: 0.6, color: '#64748B', fontWeight: 500 }}>[99.8% PEWNOŚĆ]</span>
             </div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--foreground)', lineHeight: 1.6 }}>
-              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: 'var(--accent)' }}>|</span> : ''}
+            <div style={{ fontSize: '0.95rem', color: '#0F172A', lineHeight: 1.65, fontWeight: 450 }}>
+              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: '#DF9E21' }}>|</span> : ''}
             </div>
           </div>
         )}
@@ -101,9 +107,9 @@ const FadeInWhenVisible = ({ children, delay = 0, className, style, id, scale = 
   
   const getTransform = () => {
     if (!isVisible) {
-      if (tilt) return 'perspective(1200px) rotateX(16deg) translateY(60px) scale(0.92)';
-      if (scale) return 'translateY(40px) scale(0.94)';
-      return 'translateY(40px)';
+      if (tilt) return 'perspective(1200px) rotateX(12deg) translateY(50px) scale(0.95)';
+      if (scale) return 'translateY(30px) scale(0.95)';
+      return 'translateY(30px)';
     }
     if (tilt) return 'perspective(1200px) rotateX(0deg) translateY(0) scale(1)';
     return 'translateY(0) scale(1)';
@@ -118,7 +124,7 @@ const FadeInWhenVisible = ({ children, delay = 0, className, style, id, scale = 
         ...style,
         opacity: isVisible ? 1 : 0,
         transform: getTransform(),
-        transition: `opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+        transition: `opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
         willChange: 'transform, opacity'
       }}
     >
@@ -130,17 +136,17 @@ const FadeInWhenVisible = ({ children, delay = 0, className, style, id, scale = 
 const FaqAccordionItem = ({ question, answer }: { question: string, answer: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className={styles.faqItem} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+    <div className={styles.faqItem}>
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className={styles.faqSummary}
-        style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', padding: '24px 0', fontSize: '1.15rem', fontWeight: 700, color: 'var(--foreground)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'inherit', letterSpacing: '-0.02em' }}
+        style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', padding: '22px 0', fontSize: '1.08rem', fontWeight: 600, color: '#0F172A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'var(--font-heading) !important' }}
       >
         {question}
+        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#64748B' }} />
       </button>
       <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease-out, opacity 0.3s ease-out', opacity: isOpen ? 1 : 0 }}>
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ paddingBottom: '24px', fontSize: '1rem', lineHeight: 1.6, color: 'var(--subtext)' }}>
+          <div style={{ paddingBottom: '22px', fontSize: '0.98rem', lineHeight: 1.65, color: '#475569' }}>
             {answer}
           </div>
         </div>
@@ -150,15 +156,15 @@ const FaqAccordionItem = ({ question, answer }: { question: string, answer: Reac
 };
 
 const TrustBadges = () => (
-  <section className="animate-fade-in animate-delay-4" style={{ padding: '0 20px 40px', maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', opacity: 0.8 }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
-      <Shield size={16} /> 100% Zgodność z RODO
+  <section style={{ padding: '0 20px 40px', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '32px', opacity: 0.85 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
+      <Shield size={16} color="#16A34A" /> 100% Zgodność z RODO
     </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
-      <Lock size={16} /> Szyfrowanie SSL/TLS
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
+      <Lock size={16} color="#2563EB" /> Szyfrowanie SSL/TLS
     </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 600 }}>
-      <BrainCircuit size={16} /> Powered by OpenAI
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
+      <BrainCircuit size={16} color="#DF9E21" /> Powered by OpenAI
     </div>
   </section>
 );
@@ -180,7 +186,6 @@ export default function Home() {
 
   const handleCheckout = async (priceId: string) => {
     setLoadingPriceId(priceId);
-    // Przekierowanie na customową stronę płatności Stripe Elements
     router.push(`/checkout?priceId=${priceId}`);
   };
 
@@ -192,17 +197,6 @@ export default function Home() {
       await handleLogin();
     }
   };
-  const [activeFeature, setActiveFeature] = useState('agent');
-  const [activeStep, setActiveStep] = useState<number>(1);
-  const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(() => {
-      setActiveStep((prev) => (prev < 4 ? prev + 1 : 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -246,34 +240,39 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.ambientBackground}></div>
       
-      {/* Navigation - Apple Style */}
-      <nav className={`${styles.nav} animate-fade-in`}>
+      {/* Floating Glass Navbar */}
+      <nav className={styles.nav}>
         <div className={styles.navContent}>
-          <div className={styles.logo}>
+          <Link href="/" className={styles.logo}>
             <img
               src="/logo.png"
               alt="MESKIAI logo"
               fetchPriority="high"
               decoding="async"
-              style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }}
+              style={{ width: '28px', height: '28px', objectFit: 'contain' }}
             />
-            <span>MESKIAI</span>
-          </div>
+            <span className={styles.logoText}>MESKIAI</span>
+          </Link>
+
+          <ul className={styles.navLinks}>
+            <li><a href="#mozliwosci" className={styles.navLink}>Możliwości</a></li>
+            <li><a href="#jak-dziala" className={styles.navLink}>Jak działa</a></li>
+            <li><a href="#cennik" className={styles.navLink}>Cennik</a></li>
+            <li><a href="#faq" className={styles.navLink}>FAQ</a></li>
+          </ul>
           
           <div className={styles.navActions}>
-
             {status === "authenticated" ? (
               <div ref={menuRef} style={{ position: 'relative' }}>
                 <button
                   onClick={() => setShowUserMenu(v => !v)}
                   className={styles.avatarBtn}
-                  style={{ outline: showUserMenu ? '2px solid var(--primary)' : 'none', outlineOffset: '2px' }}
                 >
                   {session?.user?.image ? (
                     <img src={session.user.image} alt="Avatar" />
                   ) : (
                     <div className={styles.avatarPlaceholder}>
-                      <span style={{ color: 'white', fontWeight: 700, fontSize: '1rem' }}>
+                      <span style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>
                         {session?.user?.email?.[0]?.toUpperCase() || 'U'}
                       </span>
                     </div>
@@ -282,54 +281,44 @@ export default function Home() {
 
                 {showUserMenu && (
                   <div
-                    className="animate-fade-in"
                     style={{
                       position: 'absolute', top: 'calc(100% + 12px)', right: 0,
-                      background: 'var(--card-bg)', backdropFilter: 'saturate(200%) blur(40px)',
-                      WebkitBackdropFilter: 'saturate(200%) blur(40px)',
-                      border: '1px solid var(--glass-border)', borderRadius: '20px',
+                      background: '#FFFFFF',
+                      border: '1px solid #E2E8F0', borderRadius: '18px',
                       padding: '8px', width: '240px',
-                      boxShadow: '0 20px 50px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
                       zIndex: 100
                     }}
                   >
-                    {/* User info */}
-                    <div style={{ padding: '12px 16px 12px', borderBottom: '1px solid var(--glass-border)', marginBottom: '4px' }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--foreground)', marginBottom: '2px' }}>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid #F1F5F9', marginBottom: '4px' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>
                         {session?.user?.name || session?.user?.email?.split('@')[0]}
                       </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--subtext)', wordBreak: 'break-all' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#64748B', wordBreak: 'break-all' }}>
                         {session?.user?.email}
                       </div>
                     </div>
 
-                    {/* Menu items */}
                     <Link
                       href="/dashboard"
                       onClick={() => setShowUserMenu(false)}
-                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s', textDecoration: 'none' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      style={{ width: '100%', padding: '10px 16px', borderRadius: '12px', color: '#0F172A', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem', textDecoration: 'none' }}
                     >
-                      <HomeIcon size={16} style={{ color: 'var(--subtext)' }} /> Panel
+                      <HomeIcon size={16} color="#64748B" /> Panel
                     </Link>
                     <Link
                       href="/dashboard?tab=account"
                       onClick={() => setShowUserMenu(false)}
-                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s', textDecoration: 'none' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      style={{ width: '100%', padding: '10px 16px', borderRadius: '12px', color: '#0F172A', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem', textDecoration: 'none' }}
                     >
-                      <Settings size={16} style={{ color: 'var(--subtext)' }} /> Ustawienia Konta
+                      <Settings size={16} color="#64748B" /> Ustawienia Konta
                     </Link>
 
-                    <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
+                    <div style={{ height: '1px', background: '#F1F5F9', margin: '4px 0' }} />
 
                     <button
                       onClick={() => signOut({ callbackUrl: '/' })}
-                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: '#ef4444', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', transition: 'background 0.15s' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: '12px', color: '#EF4444', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}
                     >
                       <LogOut size={16} /> Wyloguj się
                     </button>
@@ -337,22 +326,20 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div className={styles.authButtons}>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   className={styles.navLoginBtn}
-                  style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
                   onClick={handleLogin}
                   disabled={isLoggingIn}
                 >
-                  {isLoggingIn ? 'Logowanie...' : 'Zaloguj się'}
+                  {isLoggingIn ? '...' : 'Zaloguj się'}
                 </button>
                 <button
                   className={styles.navTryBtn}
                   onClick={handleLogin}
                   disabled={isLoggingIn}
-                  style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1 }}
                 >
-                  {isLoggingIn ? 'Logowanie...' : 'Wypróbuj'}
+                  {isLoggingIn ? '...' : 'Wypróbuj'}
                 </button>
               </div>
             )}
@@ -362,46 +349,66 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className={styles.hero}>
+        <div className={styles.heroBadgePill}>
+          <div className={styles.pulseDot}></div>
+          <Sparkles size={14} color="#DF9E21" /> SYSTEM AUTONOMICZNY NV-AI v3.4
+        </div>
 
-        <h1 className={`${styles.heroTitle} animate-fade-in`}>
-          Pracownik AI, <br/>
-          który <span className={styles.heroHighlight}>pozwala na więcej.</span>
+        <h1 className={styles.heroTitle}>
+          Autonomiczny Pracownik AI, <br/>
+          który <span className={styles.goldGlowText}>rozwiązuje Twoje maile.</span>
         </h1>
         
-        <h2 className={`${styles.heroSubtitle} animate-fade-in`} style={{ animationDelay: '0.15s' }}>
-          MESKIAI łączy się ze wszystkimi Twoimi narzędziami, wie wszystko o Twojej firmie i wykonuje prawdziwą pracę za cały zespół.
-        </h2>
+        <p className={styles.heroSubtitle}>
+          MESKIAI integruje się z Twoją skrzynką, analizuje intencje klientów i samodzielnie prowadzi komunikację 24/7 z chirurgiczną precyzją.
+        </p>
         
-        <div className={`${styles.ctaWrapper} animate-fade-in`} style={{ marginTop: '10px', flexDirection: 'column', alignItems: 'center', animationDelay: '0.3s' }}>
+        <div className={styles.ctaWrapper}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{textDecoration: 'none'}}>
-              Przejdź do Panelu
+            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
+              Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
             <button
               className={styles.ctaBtnLindy}
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
             >
-              Wypróbuj za darmo
+              Wypróbuj za darmo <ArrowRight size={18} />
             </button>
           )}
           <div className={styles.heroTrialText}>
-            3-dniowy okres próbny • Anuluj w dowolnym momencie
+            3-dniowy okres próbny • Brak kart kredytowych na start • Anuluj w 1 kliknięcie
+          </div>
+        </div>
+
+        {/* Real-time Stats Grid */}
+        <div className={styles.statsBarGrid}>
+          <div className={styles.statCard}>
+            <div className={`${styles.statVal} ${styles.statValGold}`}>99.8%</div>
+            <div className={styles.statLbl}>Trafność odpowiedzi AI</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statVal}>&lt; 3 sek</div>
+            <div className={styles.statLbl}>Czas reakcji 24/7/365</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={`${styles.statVal} ${styles.statValGold}`}>100%</div>
+            <div className={styles.statLbl}>Bezpieczeństwo & RODO</div>
           </div>
         </div>
       </section>
 
       <TrustBadges />
 
-      {/* Advanced Social Proof & Live Mockup Layer with 3D Tilt Scroll */}
-      <FadeInWhenVisible tilt style={{ padding: '40px 20px 60px', maxWidth: '900px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-        <div style={{ maxWidth: '900px', width: '100%', position: 'relative' }}>
+      {/* Live AI Terminal & Typing Mockup */}
+      <FadeInWhenVisible tilt id="jak-dziala" style={{ padding: '20px 20px 60px', maxWidth: '960px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '960px', width: '100%', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0F172A' }}>
+            <h2 className={styles.lindyTitle}>
               Zaprojektowany, by działać autonomicznie.
             </h2>
             <p style={{ color: '#64748B', marginTop: '10px', fontSize: '1.08rem' }}>
-              Zobacz, jak MESKIAI samodzielnie obsługuje zapytania klientów i tworzy szkice odpowiedzi.
+              Zobacz na żywo, jak MESKIAI samodzielnie przetwarza zapytania klientów i tworzy rekomendowane odpowiedzi.
             </p>
           </div>
           
@@ -411,10 +418,10 @@ export default function Home() {
         </div>
       </FadeInWhenVisible>
 
-      {/* SECTION 01 - Active Tasks Animation Panel -> NEW Lindy Style Panel */}
-      <FadeInWhenVisible className={styles.lindySection}>
+      {/* SECTION 01 - Skill Matrix */}
+      <FadeInWhenVisible id="mozliwosci" className={styles.lindySection}>
         <div className={styles.lindyContainer}>
-          <div className={styles.lindyTextCol}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className={styles.lindyNumber}>01</div>
             <h2 className={styles.lindyTitle}>Przejmuje Twoje obowiązki.</h2>
             <p className={styles.lindyDesc}>
@@ -423,66 +430,60 @@ export default function Home() {
           </div>
           <div className={styles.lindyVisualCol}>
             <div className={styles.lindyVisualBox}>
-              <div className={styles.lindySkillHeader} style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'space-between' }}>
+              <div className={styles.lindySkillHeader}>
                 <span className={styles.lindySkillTitle}>Umiejętności</span>
-                <span className={styles.lindySkillMeta} style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>12 aktywnych • system dobiera właściwe</span>
+                <span className={styles.lindySkillMeta}>12 aktywnych • system dobiera właściwe</span>
               </div>
               <div className={styles.lindyGrid}>
-                {/* Skill 1 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}><Mail size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563EB' }}><Mail size={16} /></div>
                     Obsługa zapytań
                   </div>
                   <div className={styles.lindySkillToggle}>Wł.</div>
                 </div>
-                {/* Skill 2 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in animate-delay-1`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><Target size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#16A34A' }}><Target size={16} /></div>
                     Generowanie leadów
                   </div>
                   <div className={styles.lindySkillToggle}>Wł.</div>
                 </div>
-                {/* Skill 3 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in animate-delay-2`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><TrendingUp size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#D97706' }}><TrendingUp size={16} /></div>
                     Analiza ofert
                   </div>
                   <div className={styles.lindySkillToggle}>Wł.</div>
                 </div>
-                {/* Skill 4 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in animate-delay-3`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><Calendar size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}><Calendar size={16} /></div>
                     Terminarz
                   </div>
                   <div className={styles.lindySkillToggle}>Wł.</div>
                 </div>
-                {/* Skill 5 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in animate-delay-4`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><BrainCircuit size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#9333EA' }}><BrainCircuit size={16} /></div>
                     Research firm
                   </div>
                   <div className={styles.lindySkillToggle}>Wł.</div>
                 </div>
-                {/* Skill 6 */}
-                <div className={`${styles.lindySkillPill} animate-fade-in animate-delay-5`}>
+                <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(226, 232, 240, 0.8)', color: '#64748b' }}><BarChart size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: '#F1F5F9', color: '#64748B' }}><BarChart size={16} /></div>
                     Raportowanie
                   </div>
                   <div className={styles.lindySkillToggleInstall}>Zainstaluj</div>
                 </div>
               </div>
               
-              <div className={`${styles.lindyDashedBox} animate-fade-in animate-delay-6`}>
+              <div className={styles.lindyDashedBox}>
                 <div className={styles.lindyDashedIcon}>+</div>
                 <div className={styles.lindyDashedText}>
-                  <h4>Stwórz własną</h4>
-                  <p>Pokaż MESKIAI jak wykonujesz zadanie. Zostanie zapisane dla całego zespołu.</p>
+                  <h4>Stwórz własną procedurę</h4>
+                  <p>Pokaż MESKIAI jak wykonujesz zadanie. Zostanie zapamiętana dla całego zespołu.</p>
                 </div>
               </div>
             </div>
@@ -490,43 +491,40 @@ export default function Home() {
         </div>
       </FadeInWhenVisible>
 
-      {/* SECTION 02 */}
-      <FadeInWhenVisible className={styles.lindySection} style={{ marginTop: '20px' }}>
+      {/* SECTION 02 - 24/7 Operation */}
+      <FadeInWhenVisible className={styles.lindySection}>
         <div className={styles.lindyContainer}>
           <div className={styles.lindyVisualColLeft}>
-            <div className={styles.lindyVisualBox} style={{ background: '#f8fafc' }}>
-               {/* Messages Mockup */}
+            <div className={styles.lindyVisualBox}>
                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative', zIndex: 2 }}>
-                 <div className="animate-fade-in" style={{ background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #e2e8f0' }}>
+                 <div style={{ background: '#F8FAFC', padding: '18px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>Pytanie o usługi</span>
-                     <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Teraz</span>
+                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Pytanie o wycenę wdrożenia</span>
+                     <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>Teraz</span>
                    </div>
-                   <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Jesteśmy zainteresowani Waszą ofertą usług. Możemy prosić o szczegóły?</p>
-                   <div style={{ marginTop: '12px', padding: '10px', background: '#eff6ff', borderRadius: '8px', borderLeft: '3px solid #3b82f6' }}>
+                   <p style={{ fontSize: '0.85rem', color: '#64748B', margin: 0 }}>Dzień dobry, interesuje nas wdrożenie agenta AI dla naszej sieci 12 sklepów. Czy posiadają Państwo gotowe integracje?</p>
+                   <div style={{ marginTop: '12px', padding: '12px', background: '#EFF6FF', borderRadius: '12px', borderLeft: '3px solid #2563EB' }}>
                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                       <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1d4ed8' }}>MESKIAI odpowiedział</span>
+                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1D4ED8' }}>MESKIAI odpowiedział (0.4s)</span>
                      </div>
-                     <p style={{ fontSize: '0.8rem', color: '#1e3a8a', margin: 0, lineHeight: 1.4 }}>Dzień dobry! Z przyjemnością przedstawiam naszą ofertę. Załączyłem cennik do tej wiadomości...</p>
+                     <p style={{ fontSize: '0.82rem', color: '#1E3A8A', margin: 0, lineHeight: 1.5 }}>Dzień dobry! Tak, posiadamy dedykowany moduł integracyjny. Załączam specyfikację techniczną...</p>
                    </div>
                  </div>
                  
-                 <div className="animate-fade-in animate-delay-2" style={{ background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #e2e8f0' }}>
+                 <div style={{ background: '#F8FAFC', padding: '18px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>Termin dostawy</span>
-                     <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>15 min temu</span>
+                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Potwierdzenie wysyłki zamówienia</span>
+                     <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>12 min temu</span>
                    </div>
-                   <div style={{ marginTop: '8px', padding: '10px', background: '#eff6ff', borderRadius: '8px', borderLeft: '3px solid #3b82f6' }}>
-                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                       <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1d4ed8' }}>Wysłano numer listu przewozowego</span>
-                     </div>
+                   <div style={{ padding: '10px 12px', background: '#DCFCE7', borderRadius: '10px', color: '#16A34A', fontSize: '0.8rem', fontWeight: 600 }}>
+                     Auto-odpowiedź wysłana • Numer listu przewozowego dodany
                    </div>
                  </div>
                </div>
             </div>
           </div>
           
-          <div className={styles.lindyTextCol}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className={styles.lindyNumber}>02</div>
             <h2 className={styles.lindyTitle}>Działa 24/7 bez przerw.</h2>
             <p className={styles.lindyDesc}>
@@ -536,10 +534,10 @@ export default function Home() {
         </div>
       </FadeInWhenVisible>
 
-      {/* SECTION 03 */}
-      <FadeInWhenVisible className={styles.lindySection} style={{ marginTop: '20px', marginBottom: '40px' }}>
+      {/* SECTION 03 - Cold Prospecting */}
+      <FadeInWhenVisible className={styles.lindySection}>
         <div className={styles.lindyContainer}>
-          <div className={styles.lindyTextCol}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className={styles.lindyNumber}>03</div>
             <h2 className={styles.lindyTitle}>Poszukiwanie klientów i pisanie ofert.</h2>
             <p className={styles.lindyDesc}>
@@ -547,210 +545,100 @@ export default function Home() {
             </p>
           </div>
           <div className={styles.lindyVisualCol}>
-            <div className={styles.lindyVisualBox} style={{ background: '#f8fafc' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-                <span style={{ fontWeight: 700, fontSize: '1rem', color: '#0f172a' }}>Aktywne poszukiwania</span>
-                <span style={{ background: '#dcfce7', color: '#16a34a', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>+42 dziś</span>
+            <div className={styles.lindyVisualBox}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '18px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: '1rem', color: '#0F172A' }}>Aktywne poszukiwania B2B</span>
+                <span style={{ background: '#DCFCE7', color: '#16A34A', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>+42 dziś</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 2 }}>
-                
-                <div className="animate-fade-in" style={{ background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ background: '#F8FAFC', padding: '14px 18px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>KS</div>
+                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>KS</div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>Kamil Stępień</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Dyrektor ds. Sprzedaży</div>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Kamil Stępień</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Dyrektor ds. Sprzedaży</div>
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.75rem', background: '#fef3c7', color: '#d97706', padding: '4px 8px', borderRadius: '6px', fontWeight: 600 }}>Wysłano ofertę</span>
+                  <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#D97706', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Wysłano ofertę</span>
                 </div>
 
-                <div className="animate-fade-in animate-delay-2" style={{ background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ background: '#F8FAFC', padding: '14px 18px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>JK</div>
+                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>JK</div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>Julia Kamińska</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Operations Manager</div>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Julia Kamińska</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Operations Manager</div>
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.75rem', background: '#dcfce7', color: '#16a34a', padding: '4px 8px', borderRadius: '6px', fontWeight: 600 }}>Umówione spotkanie</span>
+                  <span style={{ fontSize: '0.75rem', background: '#DCFCE7', color: '#16A34A', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Umówione spotkanie</span>
                 </div>
-
-                <div className="animate-fade-in animate-delay-4" style={{ background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>PW</div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>Piotr Włodarczyk</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Head of Growth</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#64748b', padding: '4px 8px', borderRadius: '6px', fontWeight: 600 }}>Kwalifikacja</span>
-                </div>
-
               </div>
             </div>
           </div>
         </div>
       </FadeInWhenVisible>
-
-      {/* Email Interaction Panel */}
-      {/* Email Interaction Panel */}
-      <FadeInWhenVisible className="animate-fade-in" style={{ padding: 'clamp(40px, 10vw, 60px) 20px clamp(40px, 10vw, 80px)', maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ textAlign: 'center', marginBottom: 'clamp(30px, 8vw, 50px)' }}>
-          <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
-            Twój asystent <span style={{ color: '#3b82f6' }}>przy pracy.</span>
-          </h2>
-          <p style={{ color: '#64748B', fontSize: 'clamp(1rem, 3vw, 1.15rem)', maxWidth: '540px', margin: '16px auto 0', fontWeight: 450, lineHeight: 1.6 }}>
-            Zobacz jak MESKIAI samodzielnie rozwiązuje problemy i asystuje Twoim klientom.
-          </p>
-        </div>
-        
-        {/* Modern Minimalist Email/Chat Thread */}
-        <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.05)', overflow: 'hidden', maxWidth: '750px', margin: '0 auto' }}>
-          
-          <div style={{ padding: '0' }}>
-            
-            {/* Customer Message (Received) */}
-            <div className="animate-fade-in" style={{ padding: '32px 32px 24px' }}>
-              {/* Message Header */}
-              <div style={{ marginBottom: '20px' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: '1.25rem', fontWeight: 600, color: '#0F172A' }}>Nawiązanie współpracy – zapytanie ofertowe</h3>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, color: '#475569', fontSize: '0.9rem' }}>
-                      MR
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>Marcin Rudzki</div>
-                      <div style={{ color: '#64748B', fontSize: '0.85rem' }}>
-                        m.rudzki@agencja-pro.pl
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ color: '#94A3B8', fontSize: '0.85rem' }}>
-                    Dziś, 09:20
-                  </div>
-                </div>
-              </div>
-
-              {/* Message Body */}
-              <div style={{ color: '#334155', fontSize: '0.95rem', lineHeight: 1.6, paddingLeft: '48px' }}>
-                Dzień dobry,
-                <br/><br/>
-                Bardzo dziękuję za wczorajszą wiadomość. Przeanalizowałem Państwa wstępną ofertę i idealnie wpisuje się to w nasze potrzeby. 
-                Czy moglibyśmy umówić się na krótką rozmowę telefoniczną w tym tygodniu, aby dogadać szczegóły? Pasuje mi środa po 13:00.
-                <br/><br/>
-                Pozdrawiam,<br/>
-                Marcin Rudzki
-              </div>
-            </div>
-
-            <div style={{ borderTop: '1px solid #F1F5F9', margin: '0 32px' }}></div>
-
-            {/* AI Response (Sent) */}
-            <div className="animate-fade-in animate-delay-2" style={{ padding: '24px 32px 32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#EFF6FF', border: '1px solid #BFDBFE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, color: '#2563EB', fontSize: '0.9rem' }}>
-                      AI
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>MESKIAI</span>
-                        <span style={{ color: '#2563EB', fontSize: '0.7rem', fontWeight: 600, background: '#DBEAFE', padding: '2px 8px', borderRadius: '12px' }}>Autoodpowiedź</span>
-                      </div>
-                      <div style={{ color: '#64748B', fontSize: '0.85rem' }}>
-                        Do: Marcin Rudzki
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ color: '#94A3B8', fontSize: '0.85rem' }}>
-                    Dziś, 09:21
-                  </div>
-              </div>
-
-              {/* Response Body */}
-              <div style={{ color: '#334155', fontSize: '0.95rem', lineHeight: 1.6, paddingLeft: '48px' }}>
-                Dzień dobry Panie Marcinie!
-                <br/><br/>
-                Cieszę się, że oferta spotkała się z zainteresowaniem. Środa po 13:00 jak najbardziej nam pasuje. 
-                Zarezerwowałem wstępnie spotkanie w kalendarzu na <strong>środę o 13:30</strong>.
-                <br/><br/>
-                Wysłałem na Pana adres e-mail oficjalne zaproszenie z linkiem do Google Meet. Do usłyszenia!
-              </div>
-            </div>
-            
-          </div>
-        </div>
-      </FadeInWhenVisible>
-
-
 
       {/* Premium Minimalist Pricing */}
-      <FadeInWhenVisible className="animate-fade-in" id="cennik" style={{ padding: '100px 20px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+      <FadeInWhenVisible id="cennik" style={{ padding: '90px 20px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <div style={{ color: '#D97706', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em', marginBottom: '16px', textTransform: 'uppercase' }}>Cennik</div>
-          <h2 className="animate-fade-in-up" style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--foreground)' }}>
+          <div style={{ color: '#DF9E21', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '14px', textTransform: 'uppercase', fontFamily: 'var(--font-heading) !important' }}>Cennik</div>
+          <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)' }}>
             Zatrudnij pracownika, który <br/>
-            <span style={{ color: '#D97706' }}>dostarcza więcej, niż kosztuje.</span>
+            <span className={styles.goldGlowText}>dostarcza więcej, niż kosztuje.</span>
           </h2>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px', alignItems: 'center' }}>
-          
           {/* Pakiet 1 */}
-          <div className={`animate-fade-in-up animate-delay-2 ${styles.lindyPricingCard}`} style={{ padding: '40px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>MESKIAI</div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', marginBottom: '32px' }}>Podstawowa moc automatyzacji dla małych firm.</div>
+          <div className={styles.lindyPricingCard} style={{ padding: '40px', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI</div>
+            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Podstawowa moc automatyzacji dla małych firm.</div>
             
             <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.04em', lineHeight: 1 }}>299</span>
-              <span style={{ fontSize: '1rem', color: 'var(--subtext)', fontWeight: 500 }}>zł / mies.</span>
+              <span style={{ fontSize: '3.5rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>299</span>
+              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
             </div>
             
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div><strong>50 e-maili</strong> automatycznych / mies.</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div><strong>10 leadów</strong> potencjalnych klientów</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div>Osobisty Pracownik AI + Baza Wiedzy</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>50 e-maili</strong> automatycznych / mies.</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>10 leadów</strong> do poszukiwań B2B</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Osobisty Pracownik AI + Baza Wiedzy</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 1 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: 'var(--foreground)', fontWeight: 600, fontSize: '1rem', border: '1px solid var(--glass-border)', cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
+              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '1rem', border: '1px solid #E2E8F0', cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
               onClick={() => {
                 if (userTier >= 1) return;
                 handlePlanSelection(PRICE_BASIC);
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = 'var(--glass-border)'}
-              onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
             >
               {loadingPriceId === PRICE_BASIC ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Downgrade") : "Wybieram ten pakiet")}
             </button>
           </div>
- 
-          {/* Pakiet 2 (PRO) - Rekomendowany - Glowing Premium Yellow Accent */}
-          <div className={`animate-fade-in-up animate-delay-3 ${styles.lindyPricingCard}`} style={{ padding: '48px 40px', background: 'var(--card-bg)', border: '1px solid #D97706', borderRadius: '24px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 0 40px rgba(217, 119, 6, 0.15), inset 0 1px 0 rgba(255,255,255,0.1)' }}>
-            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(90deg, #D97706, #F59E0B)', color: '#FFF', padding: '6px 16px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', boxShadow: '0 4px 12px rgba(217,119,6,0.3)' }}>REKOMENDOWANY</div>
+
+          {/* Pakiet 2 (PRO) - Rekomendowany */}
+          <div className={styles.lindyPricingCard} style={{ padding: '48px 40px', background: '#FFFFFF', border: '2px solid #DF9E21', borderRadius: '24px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 0 40px rgba(223, 158, 33, 0.15)' }}>
+            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(90deg, #DF9E21, #F59E0B)', color: '#FFF', padding: '6px 18px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', boxShadow: '0 4px 12px rgba(223, 158, 33, 0.3)' }}><Sparkles size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}/> REKOMENDOWANY</div>
             
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>MESKIAI PRO</div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', marginBottom: '32px' }}>Prawdziwy pracownik w chmurze dla skalujących się firm.</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI PRO</div>
+            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Prawdziwy pracownik w chmurze dla skalujących się firm.</div>
             
             <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '4rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.04em', lineHeight: 1 }}>699</span>
-              <span style={{ fontSize: '1rem', color: 'var(--subtext)', fontWeight: 500 }}>zł / mies.</span>
+              <span style={{ fontSize: '4rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>699</span>
+              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
             </div>
             
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#D97706" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#D97706" /> <div><strong>100 leadów</strong> potencjalnych klientów</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#D97706" /> <div>Zaawansowany Cold Email i wskazówki</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#D97706" /> <div>Pełna zmiana tonu i stylu pisania</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>100 leadów</strong> do poszukiwań B2B</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Zaawansowany Cold Email i wskazówki</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Pełna zmiana tonu i stylu pisania</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 2 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: '#D97706', color: '#FFF', fontWeight: 600, fontSize: '1rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 8px 20px -6px rgba(217, 119, 6, 0.4)' }}
+              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: '#DF9E21', color: '#FFF', fontWeight: 600, fontSize: '1rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 8px 20px -6px rgba(223, 158, 33, 0.4)' }}
               onClick={() => {
                 if (userTier >= 2) return;
                 handlePlanSelection(PRICE_PRO);
@@ -759,49 +647,46 @@ export default function Home() {
               {loadingPriceId === PRICE_PRO ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Downgrade") : "Zaczynamy z PRO")}
             </button>
           </div>
- 
+
           {/* Pakiet 3 (MAX) */}
-          <div className={`animate-fade-in-up animate-delay-4 ${styles.lindyPricingCard}`} style={{ padding: '40px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>MESKIAI MAX</div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--subtext)', marginBottom: '32px' }}>Dla przedsiębiorstw pragnących absolutnej dominacji.</div>
+          <div className={styles.lindyPricingCard} style={{ padding: '40px', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI MAX</div>
+            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Dla przedsiębiorstw pragnących absolutnej dominacji.</div>
             
             <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.04em', lineHeight: 1 }}>899</span>
-              <span style={{ fontSize: '1rem', color: 'var(--subtext)', fontWeight: 500 }}>zł / mies.</span>
+              <span style={{ fontSize: '3.5rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>899</span>
+              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
             </div>
             
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div><strong>Brak limitów</strong> e-maili i zapytań</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div>Pełna automatyzacja Cold Email</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: 'var(--subtext)', fontSize: '0.95rem' }}><CheckCircle size={20} color="#3B82F6" /> <div><strong>Dedykowany Account Manager</strong></div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>Brak limitów</strong> e-maili i zapytań</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Pełna automatyzacja Cold Email</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>Dedykowany Account Manager</strong></div></li>
             </ul>
             
             <button 
               disabled={userTier >= 3 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: 'var(--foreground)', fontWeight: 600, fontSize: '1rem', border: '1px solid var(--glass-border)', cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
+              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '1rem', border: '1px solid #E2E8F0', cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
               onClick={() => {
                 if (userTier >= 3) return;
                 handlePlanSelection(PRICE_MAX);
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = 'var(--glass-border)'}
-              onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
             >
               {loadingPriceId === PRICE_MAX ? "Przekierowywanie..." : (userTier >= 3 ? "Twój obecny plan" : "Wybieram MAX")}
             </button>
           </div>
         </div>
 
-        {/* Risk Reversal under Pricing */}
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--subtext)' }}>
-          <CheckCircle size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', color: '#10b981', marginRight: '6px' }}/> 
+        <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.9rem', color: '#64748B' }}>
+          <CheckCircle size={15} style={{ display: 'inline', verticalAlign: 'text-bottom', color: '#16A34A', marginRight: '6px' }}/> 
           Anuluj w dowolnym momencie. Brak długoterminowych umów i ukrytych opłat.
         </div>
       </FadeInWhenVisible>
 
       {/* FAQ Section */}
-      <FadeInWhenVisible className="animate-fade-in" style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
+      <FadeInWhenVisible id="faq" style={{ padding: '50px 20px', maxWidth: '840px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '44px' }}>
+          <h2 className={styles.lindyTitle} style={{ margin: 0 }}>
             FAQ
           </h2>
         </div>
@@ -847,72 +732,71 @@ export default function Home() {
       </FadeInWhenVisible>
 
       {/* Bottom CTA Section */}
-      {/* Bottom CTA Section */}
       <FadeInWhenVisible style={{ 
         position: 'relative', 
         overflow: 'hidden', 
-        padding: 'clamp(60px, 15vw, 140px) 20px clamp(60px, 15vw, 120px)', 
+        padding: 'clamp(70px, 12vw, 130px) 20px', 
         textAlign: 'center', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
-        background: 'radial-gradient(ellipse 100% 100% at bottom center, rgba(250, 204, 21, 0.2) 0%, rgba(254, 240, 138, 0.05) 50%, transparent 100%)'
+        background: 'radial-gradient(ellipse 100% 100% at bottom center, rgba(223, 158, 33, 0.12) 0%, rgba(254, 240, 138, 0.03) 50%, transparent 100%)'
       }}>
-        <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#0F172A', marginBottom: '16px' }}>
+        <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)', marginBottom: '18px' }}>
           Gotowy, kiedy i Ty jesteś.
         </h2>
-        <p style={{ color: '#475569', fontSize: '1.2rem', marginBottom: '36px', maxWidth: '600px', fontWeight: 500 }}>
+        <p style={{ color: '#475569', fontSize: '1.15rem', marginBottom: '36px', maxWidth: '600px', fontWeight: 450 }}>
           Rozpocznij automatyzację w kilka minut. Zobacz różnicę od pierwszego dnia.
         </p>
         <div style={{ display: 'flex', gap: '14px', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnPrimary} style={{ textDecoration: 'none', background: '#3b82f6', color: '#fff', borderRadius: '30px', padding: '14px 32px', fontWeight: 600, boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)' }}>
-              Przejdź do Panelu <ArrowRight size={20} />
+            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
+              Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
             <button
-              className={styles.ctaBtnPrimary}
+              className={styles.ctaBtnLindy}
               onClick={handleLogin}
               disabled={isLoggingIn}
-              style={{ cursor: isLoggingIn ? 'wait' : 'pointer', opacity: isLoggingIn ? 0.7 : 1, background: '#3b82f6', color: '#fff', borderRadius: '30px', padding: '14px 32px', fontWeight: 600, border: 'none', fontSize: '1.05rem', boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)' }}
             >
-              {isLoggingIn ? 'Logowanie...' : 'Wypróbuj za darmo'}
+              {isLoggingIn ? 'Logowanie...' : 'Wypróbuj za darmo'} <ArrowRight size={18} />
             </button>
           )}
         </div>
-        <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '0', fontWeight: 500 }}>
+        <p style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 500 }}>
           3-dniowy okres próbny • Anuluj w dowolnym momencie
         </p>
       </FadeInWhenVisible>
 
       <footer className={styles.advancedFooter}>
         <div className={styles.footerGrid}>
-          <div className={styles.footerCol}>
+          <div>
             <div className={styles.footerLogo}>
-              <img src="/logo.png" alt="MESKIAI" style={{ width: '24px', height: '24px', filter: 'var(--logo-filter)', mixBlendMode: 'var(--logo-blend-mode)' as any }} />
+              <img src="/logo.png" alt="MESKIAI" style={{ width: '24px', height: '24px' }} />
               MESKIAI
             </div>
             <p className={styles.footerDesc}>
               Zautomatyzuj swój biznes w 5 minut. Uwolnij czas swojego zespołu i przyspiesz wzrost dzięki potędze sztucznej inteligencji.
             </p>
           </div>
-          <div className={styles.footerCol}>
+          <div>
             <div className={styles.footerHeading}>Produkt</div>
             <ul className={styles.footerLinks}>
-              <li><a href="#how-it-works">Jak to działa</a></li>
+              <li><a href="#mozliwosci">Możliwości</a></li>
+              <li><a href="#jak-dziala">Jak działa</a></li>
               <li><a href="#cennik">Cennik</a></li>
               <li><Link href="/bezpieczenstwo">Bezpieczeństwo</Link></li>
               <li><Link href="/integracje">Integracje</Link></li>
             </ul>
           </div>
-          <div className={styles.footerCol}>
+          <div>
             <div className={styles.footerHeading}>Firma</div>
             <ul className={styles.footerLinks}>
               <li><Link href="/o-nas">O nas</Link></li>
               <li><Link href="/kontakt">Kontakt</Link></li>
             </ul>
           </div>
-          <div className={styles.footerCol}>
+          <div>
             <div className={styles.footerHeading}>Legal</div>
             <ul className={styles.footerLinks}>
               <li><Link href="/regulamin">Regulamin</Link></li>
@@ -924,7 +808,6 @@ export default function Home() {
           <div>&copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.</div>
         </div>
       </footer>
-
     </main>
   );
 }

@@ -10,8 +10,5 @@
   package = "@netlify/plugin-nextjs"
 
 [functions]
-  node_bundler = "esbuild"
   directory = "netlify/functions"
 
-[functions.sync-cron]
-  schedule = "*/2 * * * *"
