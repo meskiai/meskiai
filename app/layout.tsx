@@ -1,9 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: 'swap' });
-const manrope = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-manrope", display: 'swap' });
+const dmSans = DM_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-dm",
+  display: 'swap'
+});
+
+const jakarta = dmSans; // alias so rest of code still compiles
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -40,8 +46,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://meskiai.com"),
 };
 
-
-
 import { Providers } from "./providers";
 import CookieBanner from "./components/CookieBanner";
 import { MetaPixel } from "./components/MetaPixel";
@@ -52,8 +56,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" suppressHydrationWarning className={`${inter.variable} ${manrope.variable}`}>
-      <body className={inter.className}>
+    <html lang="pl" suppressHydrationWarning className={dmSans.variable}>
+      <body className={dmSans.className}>
         <Providers>
           <MetaPixel />
           {children}

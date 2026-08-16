@@ -21,12 +21,8 @@ export function getTrialState(user: { createdAt: Date; subscriptionStatus?: stri
 
   const isTrialLimitsReached = isEmailLimitReached || isLeadLimitReached || isSearchLimitReached;
 
-  // Trial is expired if they are not subscribed AND the 3 days have passed.
-  const isTrialExpired = !isSubscribed && !isTrialTimeActive;
-  
-  // Trial is active if they are not subscribed AND the 3 days have NOT passed.
-  // (We check limits separately in the API routes to give specific error messages)
-  const isTrialActive = !isSubscribed && isTrialTimeActive;
+  const isTrialExpired = !isSubscribed && (!isTrialTimeActive || isTrialLimitsReached);
+  const isTrialActive = !isSubscribed && isTrialTimeActive && !isTrialLimitsReached;
 
   return {
     isSubscribed,
