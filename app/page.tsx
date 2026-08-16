@@ -51,9 +51,9 @@ const TypingEmail = () => {
           <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#10B981' }}></div>
         </div>
         <div style={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Bot size={14} color="#DF9E21" /> MESKIAI Neural Console v3.4
+          <Bot size={14} color="#2563EB" /> MESKIAI Neural Console v3.4
         </div>
-        <div style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
+        <div style={{ fontSize: '0.75rem', background: 'rgba(37, 99, 235, 0.15)', color: '#60A5FA', border: '1px solid rgba(37, 99, 235, 0.3)', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
           SYSTEM ACTIVE
         </div>
       </div>
@@ -70,12 +70,12 @@ const TypingEmail = () => {
         </div>
         
         {showAi && (
-          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', borderLeft: '3px solid #DF9E21', background: 'rgba(223, 158, 33, 0.08)', padding: '18px 22px', borderRadius: '0 16px 16px 0' }}>
-            <div style={{ fontSize: '0.72rem', color: '#F59E0B', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', borderLeft: '3px solid #2563EB', background: 'rgba(37, 99, 235, 0.1)', padding: '18px 22px', borderRadius: '0 16px 16px 0' }}>
+            <div style={{ fontSize: '0.72rem', color: '#60A5FA', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
               <Sparkles size={14} /> MESKIAI AUTOPILOT <span style={{ opacity: 0.7, color: '#94A3B8', fontWeight: 500 }}>[99.8% CONFIDENCE]</span>
             </div>
             <div style={{ fontSize: '0.95rem', color: '#F8FAFC', lineHeight: 1.65, fontWeight: 400 }}>
-              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: '#DF9E21' }}>|</span> : ''}
+              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: '#2563EB' }}>|</span> : ''}
             </div>
           </div>
         )}
@@ -142,7 +142,7 @@ const FaqAccordionItem = ({ question, answer }: { question: string, answer: Reac
         style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', padding: '22px 0', fontSize: '1.08rem', fontWeight: 600, color: '#0F172A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'var(--font-heading) !important' }}
       >
         {question}
-        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#DF9E21' }} />
+        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#2563EB' }} />
       </button>
       <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease-out, opacity 0.3s ease-out', opacity: isOpen ? 1 : 0 }}>
         <div style={{ overflow: 'hidden' }}>
@@ -164,7 +164,7 @@ const TrustBadges = () => (
       <Lock size={16} color="#2563EB" /> Szyfrowanie SSL/TLS
     </div>
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
-      <BrainCircuit size={16} color="#DF9E21" /> Powered by OpenAI
+      <BrainCircuit size={16} color="#2563EB" /> Powered by OpenAI
     </div>
   </section>
 );
@@ -341,16 +341,16 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Apple x Lindy Aesthetics */}
+      {/* Hero Section - Electric Blue Aesthetics */}
       <section className={styles.hero}>
-        <div className={styles.appleBadgePill}>
+        <div className={styles.blueBadgePill}>
           <div className={styles.pulseDot}></div>
-          <Sparkles size={14} color="#DF9E21" /> SYSTEM AUTONOMICZNY NV-AI v3.4 ACTIVE
+          <Sparkles size={14} color="#2563EB" /> SYSTEM AUTONOMICZNY NV-AI v3.4 ACTIVE
         </div>
 
         <h1 className={styles.lindyHeroTitle}>
           Pracownik AI, który rozwiązuje <br/>
-          Twoje maile <span className={styles.goldGlowText}>zanim zdążysz je przeczytać.</span>
+          Twoje maile <span className={styles.blueGlowText}>zanim zdążysz je przeczytać.</span>
         </h1>
         
         <p className={styles.heroSubtitle}>
@@ -359,12 +359,12 @@ export default function Home() {
         
         <div className={styles.ctaWrapper}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
+            <Link href="/dashboard" className={styles.ctaBtnBlue} style={{ textDecoration: 'none' }}>
               Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
             <button
-              className={styles.ctaBtnLindy}
+              className={styles.ctaBtnBlue}
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
             >
               Rozpocznij 3-dniowy Test Bez Opłat <ArrowRight size={18} />
@@ -378,7 +378,7 @@ export default function Home() {
         {/* Real-Time Stats Counter Cards */}
         <div className={styles.statsBarGrid}>
           <div className={styles.statCard}>
-            <div className={`${styles.statVal} ${styles.statValGold}`}>99.8%</div>
+            <div className={`${styles.statVal} ${styles.statValBlue}`}>99.8%</div>
             <div className={styles.statLbl}>Trafność klasyfikacji zapytań</div>
           </div>
           <div className={styles.statCard}>
@@ -386,7 +386,7 @@ export default function Home() {
             <div className={styles.statLbl}>Czas reakcji w trybie 24/7</div>
           </div>
           <div className={styles.statCard}>
-            <div className={`${styles.statVal} ${styles.statValGold}`}>100%</div>
+            <div className={`${styles.statVal} ${styles.statValBlue}`}>100%</div>
             <div className={styles.statLbl}>Zgodność z RODO i szyfrowanie</div>
           </div>
         </div>
@@ -445,7 +445,7 @@ export default function Home() {
                 </div>
                 <div className={styles.lindySkillPill}>
                   <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: '#FEF3C7', color: '#D97706' }}><TrendingUp size={16} /></div>
+                    <div className={styles.lindySkillIcon} style={{ background: '#EFF6FF', color: '#2563EB' }}><TrendingUp size={16} /></div>
                     Analiza ofert
                   </div>
                   <div className={styles.lindySkillToggle}>WŁ</div>
@@ -553,7 +553,7 @@ export default function Home() {
                       <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Dyrektor ds. Sprzedaży</div>
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#D97706', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Wysłano ofertę</span>
+                  <span style={{ fontSize: '0.75rem', background: '#EFF6FF', color: '#2563EB', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Wysłano ofertę</span>
                 </div>
 
                 <div style={{ background: '#F8FAFC', padding: '14px 18px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -575,10 +575,10 @@ export default function Home() {
       {/* Luxury Pricing Grid */}
       <FadeInWhenVisible id="cennik" style={{ padding: '90px 20px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <div style={{ color: '#DF9E21', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '14px', textTransform: 'uppercase', fontFamily: 'var(--font-heading) !important' }}>PRZEJRZYSTA SUBSKRYPCJA</div>
+          <div style={{ color: '#2563EB', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '14px', textTransform: 'uppercase', fontFamily: 'var(--font-heading) !important' }}>PRZEJRZYSTA SUBSKRYPCJA</div>
           <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)' }}>
             Zatrudnij pracownika, który <br/>
-            <span className={styles.goldGlowText}>dostarcza więcej, niż kosztuje.</span>
+            <span className={styles.blueGlowText}>dostarcza więcej, niż kosztuje.</span>
           </h2>
         </div>
 
@@ -611,9 +611,9 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Pakiet 2 (PRO) - Rekomendowany */}
-          <div className={`${styles.lindyPricingCard} ${styles.proGoldPricingCard}`} style={{ padding: '48px 40px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(90deg, #F59E0B, #DF9E21)', color: '#FFFFFF', padding: '6px 20px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)' }}><Sparkles size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}/> REKOMENDOWANY</div>
+          {/* Pakiet 2 (PRO) - Rekomendowany Electric Blue */}
+          <div className={`${styles.lindyPricingCard} ${styles.proBluePricingCard}`} style={{ padding: '48px 40px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: '#2563EB', color: '#FFFFFF', padding: '6px 20px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', boxShadow: '0 4px 15px rgba(37, 99, 235, 0.35)' }}><Sparkles size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}/> REKOMENDOWANY</div>
             
             <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI PRO</div>
             <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Prawdziwy pracownik w chmurze dla skalujących się firm.</div>
@@ -624,15 +624,15 @@ export default function Home() {
             </div>
             
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>100 leadów</strong> do poszukiwań B2B</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Zaawansowany Cold Email i wskazówki</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Pełna zmiana tonu i stylu pisania</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>100 leadów</strong> do poszukiwań B2B</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Zaawansowany Cold Email i wskazówki</div></li>
+              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Pełna zmiana tonu i stylu pisania</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 2 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'linear-gradient(135deg, #DF9E21 0%, #D97706 100%)', color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 10px 25px rgba(223, 158, 33, 0.4)' }}
+              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: '#2563EB', color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 10px 25px rgba(37, 99, 235, 0.4)' }}
               onClick={() => {
                 if (userTier >= 2) return;
                 handlePlanSelection(PRICE_PRO);
@@ -734,7 +734,7 @@ export default function Home() {
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
-        background: 'radial-gradient(ellipse 100% 100% at bottom center, rgba(223, 158, 33, 0.12) 0%, rgba(254, 240, 138, 0.03) 50%, transparent 100%)'
+        background: 'radial-gradient(ellipse 100% 100% at bottom center, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.03) 50%, transparent 100%)'
       }}>
         <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)', marginBottom: '18px' }}>
           Gotowy, kiedy i Ty jesteś.
@@ -744,12 +744,12 @@ export default function Home() {
         </p>
         <div style={{ display: 'flex', gap: '14px', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
+            <Link href="/dashboard" className={styles.ctaBtnBlue} style={{ textDecoration: 'none' }}>
               Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
             <button
-              className={styles.ctaBtnLindy}
+              className={styles.ctaBtnBlue}
               onClick={handleLogin}
               disabled={isLoggingIn}
             >

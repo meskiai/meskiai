@@ -10,7 +10,7 @@
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Ambient Apple Aura Canvas */
+/* Ambient Electric Blue Aura Canvas */
 .ambientBackground {
   position: fixed;
   top: 0;
@@ -27,13 +27,13 @@
   content: '';
   position: absolute;
   top: -15%; left: 15%; right: 15%; height: 700px;
-  background: radial-gradient(ellipse at top, rgba(223, 158, 33, 0.08) 0%, rgba(37, 99, 235, 0.06) 45%, rgba(139, 92, 246, 0.03) 70%, transparent 85%);
+  background: radial-gradient(ellipse at top, rgba(37, 99, 235, 0.12) 0%, rgba(59, 130, 246, 0.08) 45%, rgba(139, 92, 246, 0.03) 70%, transparent 85%);
   filter: blur(90px);
-  animation: pulseAppleAura 12s ease-in-out infinite alternate;
+  animation: pulseBlueAura 12s ease-in-out infinite alternate;
 }
 
-@keyframes pulseAppleAura {
-  0% { transform: scale(1) translateY(0); opacity: 0.8; }
+@keyframes pulseBlueAura {
+  0% { transform: scale(1) translateY(0); opacity: 0.85; }
   100% { transform: scale(1.08) translateY(-20px); opacity: 1; }
 }
 
@@ -185,7 +185,7 @@
   justify-content: center;
 }
 
-/* HERO SECTION - APPLE & LINDY HYBRID */
+/* HERO SECTION - ELECTRIC BLUE PALETTE */
 .hero {
   padding-top: clamp(140px, 16vh, 190px);
   padding-left: 20px;
@@ -202,29 +202,29 @@
   z-index: 10;
 }
 
-.appleBadgePill {
+.blueBadgePill {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 7px 20px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(37, 99, 235, 0.08);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(223, 158, 33, 0.4);
-  color: #D97706;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #2563EB;
   font-size: 0.84rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   margin-bottom: 28px;
-  box-shadow: 0 4px 15px rgba(223, 158, 33, 0.12);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.12);
 }
 
 .pulseDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 8px #10B981;
+  background: #2563EB;
+  box-shadow: 0 0 10px #2563EB;
   animation: blinkDot 1.8s infinite;
 }
 
@@ -244,9 +244,10 @@
   max-width: 1060px;
 }
 
-.goldGlowText {
-  color: #DF9E21;
+.blueGlowText {
+  color: #2563EB;
   display: inline-block;
+  position: relative;
 }
 
 .heroSubtitle {
@@ -267,9 +268,9 @@
   gap: 14px;
 }
 
-.ctaBtnLindy {
+.ctaBtnBlue {
   font-family: var(--font-inter);
-  background: linear-gradient(135deg, #DF9E21 0%, #D97706 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: #FFFFFF;
   border: none;
   padding: 18px 42px;
@@ -278,15 +279,15 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 30px rgba(223, 158, 33, 0.4);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
 
-.ctaBtnLindy:hover {
+.ctaBtnBlue:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 15px 40px rgba(223, 158, 33, 0.55);
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.55);
 }
 
 .heroTrialText {
@@ -325,9 +326,9 @@
 }
 
 .statCard:hover {
-  border-color: rgba(223, 158, 33, 0.4);
+  border-color: rgba(37, 99, 235, 0.4);
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
 }
 
 .statVal {
@@ -338,8 +339,8 @@
   margin-bottom: 4px;
 }
 
-.statValGold {
-  color: #DF9E21;
+.statValBlue {
+  color: #2563EB;
 }
 
 .statLbl {
@@ -403,7 +404,7 @@
   font-family: var(--font-heading) !important;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #DF9E21;
+  color: #2563EB;
   margin-bottom: 12px;
   letter-spacing: 0.08em;
 }
@@ -482,8 +483,8 @@
 
 .lindySkillPill:hover {
   transform: translateY(-2px);
-  border-color: #DF9E21;
-  box-shadow: 0 6px 15px rgba(15, 23, 42, 0.04);
+  border-color: #2563EB;
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.1);
 }
 
 .lindySkillLeft {
@@ -535,21 +536,21 @@
 }
 
 .lindyDashedBox:hover {
-  border-color: #DF9E21;
-  background: #FFFBEB;
+  border-color: #2563EB;
+  background: #EFF6FF;
 }
 
 .lindyDashedIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #FEF3C7;
-  border: 1px solid #FDE68A;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
-  color: #D97706;
+  color: #2563EB;
   font-weight: 600;
 }
 
@@ -566,7 +567,7 @@
   color: #64748B;
 }
 
-/* PRICING CARDS - LUXURY WHITE & GOLD */
+/* PRICING CARDS - ELECTRIC BLUE THEME */
 .lindyPricingCard {
   background: #FFFFFF;
   border-radius: 24px;
@@ -579,14 +580,14 @@
 .lindyPricingCard:hover {
   transform: translateY(-6px) scale(1.02) !important;
   z-index: 20 !important;
-  border-color: #DF9E21;
-  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08), 0 0 25px rgba(223, 158, 33, 0.15) !important;
+  border-color: #2563EB;
+  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08), 0 0 25px rgba(37, 99, 235, 0.15) !important;
 }
 
-.proGoldPricingCard {
+.proBluePricingCard {
   background: #FFFFFF;
-  border: 2px solid #DF9E21 !important;
-  box-shadow: 0 20px 45px rgba(223, 158, 33, 0.2) !important;
+  border: 2px solid #2563EB !important;
+  box-shadow: 0 20px 45px rgba(37, 99, 235, 0.2) !important;
 }
 
 /* FAQ STYLING */
@@ -701,8 +702,8 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(223, 158, 33, 0.2);
-  border-top-color: #DF9E21;
+  border: 3px solid rgba(37, 99, 235, 0.2);
+  border-top-color: #2563EB;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
