@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart, Sparkles, Home as HomeIcon, LogOut, Database, ChevronDown } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle, BrainCircuit, Shield, Zap, Target, Bot, Activity, ArrowUpRight, TrendingUp, Users, Cpu, FileText, Lock, Globe, MessageSquare, Play, Settings, Clock, Calendar, Video, BarChart, Sparkles, Home as HomeIcon, LogOut, Database, ChevronDown, Check, Layers, Inbox } from 'lucide-react';
 import { useEffect, useState, useRef } from "react";
 
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX } from "@/lib/pricing";
@@ -11,8 +11,8 @@ import styles from "./page.module.css";
 
 const TypingEmail = () => {
   const [text, setText] = useState('');
-  const fullText = "Dzień dobry, na czym właściwie polega MESKIAI i jak może pomóc mojej firmie?";
-  const aiText = "Dzień dobry. MESKIAI to Twój autonomiczny pracownik AI. Przejmujemy obsługę zapytań klientów w trybie 24/7 oraz automatyzujemy pozyskiwanie kontaktów biznesowych. Wszystko odbywa się bezobsługowo, uwalniając Twój czas.";
+  const fullText = "Dzień dobry, czy MESKIAI potrafi sam odpowiadać na powtarzalne pytania moich klientów?";
+  const aiText = "Dzień dobry. Tak! MESKIAI uczy się bazy wiedzy Twojej firmy, analizuje intencje klienta i w kilka sekund tworzy profesjonalną, bezbłędną odpowiedź.";
   const [showAi, setShowAi] = useState(false);
   const [aiTyped, setAiTyped] = useState('');
 
@@ -43,39 +43,38 @@ const TypingEmail = () => {
 
   return (
     <div className={styles.mockMailApp}>
-      {/* Window Header */}
-      <div style={{ padding: '14px 20px', display: 'flex', gap: '12px', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#FF5F56' }}></div>
-          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#FFBD2E' }}></div>
-          <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#27C93F' }}></div>
+      <div style={{ padding: '14px 20px', display: 'flex', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#CBD5E1' }}></div>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#CBD5E1' }}></div>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#CBD5E1' }}></div>
         </div>
         <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Bot size={14} color="#2563EB" /> MESKIAI Neural Console v3.4
+          <Bot size={14} color="#2563EB" /> MESKIAI Live Agent Console
         </div>
         <div style={{ fontSize: '0.75rem', background: '#DCFCE7', color: '#16A34A', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
-          LIVE DEMO
+          ONLINE
         </div>
       </div>
       
-      <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '1px' }}>
             <span>Zapytanie Klienta</span>
-            <span style={{ opacity: 0.7, color: '#3B82F6' }}>[INBOUND GMAIL]</span>
+            <span style={{ color: '#2563EB' }}>[INBOUND E-MAIL]</span>
           </div>
-          <div style={{ fontSize: '0.95rem', color: '#1E293B', lineHeight: 1.6, fontWeight: 450 }}>
+          <div style={{ fontSize: '0.92rem', color: '#0F172A', lineHeight: 1.6, fontWeight: 450 }}>
             {text}{!showAi && <span className={styles.typingCursor} style={{ background: '#0F172A' }}>|</span>}
           </div>
         </div>
         
         {showAi && (
-          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', borderLeft: '3px solid #DF9E21', paddingLeft: '18px', background: 'rgba(253, 230, 138, 0.1)', padding: '16px 20px', borderRadius: '0 12px 12px 0' }}>
-            <div style={{ fontSize: '0.72rem', color: '#D97706', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              <Sparkles size={14} /> MESKIAI AUTOPILOT <span style={{ opacity: 0.6, color: '#64748B', fontWeight: 500 }}>[99.8% PEWNOŚĆ]</span>
+          <div className="animate-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', borderLeft: '3px solid #2563EB', background: '#EFF6FF', padding: '14px 18px', borderRadius: '0 12px 12px 0' }}>
+            <div style={{ fontSize: '0.72rem', color: '#1D4ED8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <Sparkles size={14} /> MESKIAI AI AGENT <span style={{ opacity: 0.6, color: '#64748B', fontWeight: 500 }}>[WYGENEROWANO W 0.3s]</span>
             </div>
-            <div style={{ fontSize: '0.95rem', color: '#0F172A', lineHeight: 1.65, fontWeight: 450 }}>
-              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: '#DF9E21' }}>|</span> : ''}
+            <div style={{ fontSize: '0.92rem', color: '#1E3A8A', lineHeight: 1.6, fontWeight: 450 }}>
+              {aiTyped}{aiTyped.length < aiText.length ? <span className={styles.typingCursor} style={{ background: '#2563EB' }}>|</span> : ''}
             </div>
           </div>
         )}
@@ -107,8 +106,8 @@ const FadeInWhenVisible = ({ children, delay = 0, className, style, id, scale = 
   
   const getTransform = () => {
     if (!isVisible) {
-      if (tilt) return 'perspective(1200px) rotateX(12deg) translateY(50px) scale(0.95)';
-      if (scale) return 'translateY(30px) scale(0.95)';
+      if (tilt) return 'perspective(1200px) rotateX(10deg) translateY(40px) scale(0.96)';
+      if (scale) return 'translateY(30px) scale(0.96)';
       return 'translateY(30px)';
     }
     if (tilt) return 'perspective(1200px) rotateX(0deg) translateY(0) scale(1)';
@@ -142,7 +141,7 @@ const FaqAccordionItem = ({ question, answer }: { question: string, answer: Reac
         style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', padding: '22px 0', fontSize: '1.08rem', fontWeight: 600, color: '#0F172A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'var(--font-heading) !important' }}
       >
         {question}
-        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#64748B' }} />
+        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#2563EB' }} />
       </button>
       <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease-out, opacity 0.3s ease-out', opacity: isOpen ? 1 : 0 }}>
         <div style={{ overflow: 'hidden' }}>
@@ -156,7 +155,7 @@ const FaqAccordionItem = ({ question, answer }: { question: string, answer: Reac
 };
 
 const TrustBadges = () => (
-  <section style={{ padding: '0 20px 40px', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '32px', opacity: 0.85 }}>
+  <section style={{ padding: '0 24px 50px', maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '36px', opacity: 0.85 }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
       <Shield size={16} color="#16A34A" /> 100% Zgodność z RODO
     </div>
@@ -164,7 +163,7 @@ const TrustBadges = () => (
       <Lock size={16} color="#2563EB" /> Szyfrowanie SSL/TLS
     </div>
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
-      <BrainCircuit size={16} color="#DF9E21" /> Powered by OpenAI
+      <BrainCircuit size={16} color="#D97706" /> Powered by OpenAI
     </div>
   </section>
 );
@@ -240,23 +239,19 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.ambientBackground}></div>
       
-      {/* Floating Glass Navbar */}
+      {/* Floating Bento Pill Navbar */}
       <nav className={styles.nav}>
         <div className={styles.navContent}>
           <Link href="/" className={styles.logo}>
-            <img
-              src="/logo.png"
-              alt="MESKIAI logo"
-              fetchPriority="high"
-              decoding="async"
-              style={{ width: '28px', height: '28px', objectFit: 'contain' }}
-            />
+            <div className={styles.logoIcon}>
+              <Bot size={20} />
+            </div>
             <span className={styles.logoText}>MESKIAI</span>
           </Link>
 
           <ul className={styles.navLinks}>
-            <li><a href="#mozliwosci" className={styles.navLink}>Możliwości</a></li>
-            <li><a href="#jak-dziala" className={styles.navLink}>Jak działa</a></li>
+            <li><a href="#filary" className={styles.navLink}>Filary Systemu</a></li>
+            <li><a href="#demo" className={styles.navLink}>Konsola AI</a></li>
             <li><a href="#cennik" className={styles.navLink}>Cennik</a></li>
             <li><a href="#faq" className={styles.navLink}>FAQ</a></li>
           </ul>
@@ -347,326 +342,277 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles.heroBadgePill}>
-          <div className={styles.pulseDot}></div>
-          <Sparkles size={14} color="#DF9E21" /> SYSTEM AUTONOMICZNY NV-AI v3.4
-        </div>
+      {/* Hero Section - Split Bento Layout */}
+      <section className={styles.heroSection}>
+        <div className={styles.heroGrid}>
+          {/* Left Column: Hero Text */}
+          <div>
+            <div className={styles.newBadge}>
+              <Sparkles size={14} /> AUTONOMICZNA PLATFORMA AI 2026
+            </div>
 
-        <h1 className={styles.heroTitle}>
-          Autonomiczny Pracownik AI, <br/>
-          który <span className={styles.goldGlowText}>rozwiązuje Twoje maile.</span>
-        </h1>
-        
-        <p className={styles.heroSubtitle}>
-          MESKIAI integruje się z Twoją skrzynką, analizuje intencje klientów i samodzielnie prowadzi komunikację 24/7 z chirurgiczną precyzją.
-        </p>
-        
-        <div className={styles.ctaWrapper}>
-          {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
-              Przejdź do Panelu <ArrowRight size={18} />
-            </Link>
-          ) : (
-            <button
-              className={styles.ctaBtnLindy}
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            >
-              Wypróbuj za darmo <ArrowRight size={18} />
-            </button>
-          )}
-          <div className={styles.heroTrialText}>
-            3-dniowy okres próbny • Brak kart kredytowych na start • Anuluj w 1 kliknięcie
-          </div>
-        </div>
+            <h1 className={styles.bentoTitle}>
+              Twój osobisty <br/>
+              <span className={styles.blueGradientText}>Dyrektor E-mail.</span>
+            </h1>
 
-        {/* Real-time Stats Grid */}
-        <div className={styles.statsBarGrid}>
-          <div className={styles.statCard}>
-            <div className={`${styles.statVal} ${styles.statValGold}`}>99.8%</div>
-            <div className={styles.statLbl}>Trafność odpowiedzi AI</div>
+            <p className={styles.bentoSubtitle}>
+              MESKIAI automatycznie przejmuje 95% powtarzalnej korespondencji firmowej, kwalifikuje klientów i organizuje Twój dzień.
+            </p>
+
+            <div>
+              {status === "authenticated" ? (
+                <Link href="/dashboard" className={styles.ctaBtnBento} style={{ textDecoration: 'none' }}>
+                  Przejdź do Panelu <ArrowRight size={18} />
+                </Link>
+              ) : (
+                <button
+                  className={styles.ctaBtnBento}
+                  onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                >
+                  Zacznij 3-dniowy Test <ArrowRight size={18} />
+                </button>
+              )}
+            </div>
+
+            <div style={{ marginTop: '14px', color: '#64748B', fontSize: '0.86rem', fontWeight: 500 }}>
+              ✓ Aktywacja w 2 minuty • Bez podawania karty na start
+            </div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statVal}>&lt; 3 sek</div>
-            <div className={styles.statLbl}>Czas reakcji 24/7/365</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={`${styles.statVal} ${styles.statValGold}`}>100%</div>
-            <div className={styles.statLbl}>Bezpieczeństwo & RODO</div>
+
+          {/* Right Column: Live Interactive Bento Dashboard Widget */}
+          <div className={styles.bentoWidgetCard}>
+            <div className={styles.bentoWidgetHeader}>
+              <div className={styles.bentoWidgetTitle}>
+                <Activity size={18} color="#2563EB" /> MESKIAI Control Center
+              </div>
+              <div className={styles.bentoStatusBadge}>
+                ● AUTOPILOT ON
+              </div>
+            </div>
+
+            <div className={styles.bentoStatRow}>
+              <div className={styles.bentoMiniStat}>
+                <div className={styles.bentoMiniVal} style={{ color: '#2563EB' }}>142</div>
+                <div className={styles.bentoMiniLbl}>E-maile dzisiaj</div>
+              </div>
+              <div className={styles.bentoMiniStat}>
+                <div className={styles.bentoMiniVal} style={{ color: '#16A34A' }}>4.8h</div>
+                <div className={styles.bentoMiniLbl}>Zaoszczędzone</div>
+              </div>
+              <div className={styles.bentoMiniStat}>
+                <div className={styles.bentoMiniVal} style={{ color: '#D97706' }}>99.4%</div>
+                <div className={styles.bentoMiniLbl}>Pewność AI</div>
+              </div>
+            </div>
+
+            {/* Simulated Activity Stream */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px', border: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Inbox size={16} color="#2563EB" />
+                  <div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0F172A' }}>Zapytanie o cennik b2b</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Automatycznie odpowiedziano (0.2s)</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.72rem', background: '#DCFCE7', color: '#16A34A', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>ZAMKNIĘTE</span>
+              </div>
+
+              <div style={{ background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px', border: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Users size={16} color="#D97706" />
+                  <div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0F172A' }}>Nowy Prospect B2B</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Weryfikacja danych RODO OK</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.72rem', background: '#FEF3C7', color: '#D97706', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>WYSŁANO</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <TrustBadges />
 
-      {/* Live AI Terminal & Typing Mockup */}
-      <FadeInWhenVisible tilt id="jak-dziala" style={{ padding: '20px 20px 60px', maxWidth: '960px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-        <div style={{ maxWidth: '960px', width: '100%', position: 'relative' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 className={styles.lindyTitle}>
-              Zaprojektowany, by działać autonomicznie.
-            </h2>
-            <p style={{ color: '#64748B', marginTop: '10px', fontSize: '1.08rem' }}>
-              Zobacz na żywo, jak MESKIAI samodzielnie przetwarza zapytania klientów i tworzy rekomendowane odpowiedzi.
-            </p>
-          </div>
-          
-          <div style={{ position: 'relative' }}>
-            <TypingEmail />
-          </div>
-        </div>
-      </FadeInWhenVisible>
-
-      {/* SECTION 01 - Skill Matrix */}
-      <FadeInWhenVisible id="mozliwosci" className={styles.lindySection}>
-        <div className={styles.lindyContainer}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className={styles.lindyNumber}>01</div>
-            <h2 className={styles.lindyTitle}>Przejmuje Twoje obowiązki.</h2>
-            <p className={styles.lindyDesc}>
-              Posiada dziesiątki wbudowanych umiejętności: obsługa zapytań, generowanie leadów, tworzenie raportów, kategoryzacja wiadomości. Zrób coś raz, zapisz jako procedurę, a cały zespół będzie mógł z tego korzystać bez dodatkowej pracy.
-            </p>
-          </div>
-          <div className={styles.lindyVisualCol}>
-            <div className={styles.lindyVisualBox}>
-              <div className={styles.lindySkillHeader}>
-                <span className={styles.lindySkillTitle}>Umiejętności</span>
-                <span className={styles.lindySkillMeta}>12 aktywnych • system dobiera właściwe</span>
-              </div>
-              <div className={styles.lindyGrid}>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563EB' }}><Mail size={16} /></div>
-                    Obsługa zapytań
-                  </div>
-                  <div className={styles.lindySkillToggle}>Wł.</div>
-                </div>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#16A34A' }}><Target size={16} /></div>
-                    Generowanie leadów
-                  </div>
-                  <div className={styles.lindySkillToggle}>Wł.</div>
-                </div>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#D97706' }}><TrendingUp size={16} /></div>
-                    Analiza ofert
-                  </div>
-                  <div className={styles.lindySkillToggle}>Wł.</div>
-                </div>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}><Calendar size={16} /></div>
-                    Terminarz
-                  </div>
-                  <div className={styles.lindySkillToggle}>Wł.</div>
-                </div>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#9333EA' }}><BrainCircuit size={16} /></div>
-                    Research firm
-                  </div>
-                  <div className={styles.lindySkillToggle}>Wł.</div>
-                </div>
-                <div className={styles.lindySkillPill}>
-                  <div className={styles.lindySkillLeft}>
-                    <div className={styles.lindySkillIcon} style={{ background: '#F1F5F9', color: '#64748B' }}><BarChart size={16} /></div>
-                    Raportowanie
-                  </div>
-                  <div className={styles.lindySkillToggleInstall}>Zainstaluj</div>
-                </div>
-              </div>
-              
-              <div className={styles.lindyDashedBox}>
-                <div className={styles.lindyDashedIcon}>+</div>
-                <div className={styles.lindyDashedText}>
-                  <h4>Stwórz własną procedurę</h4>
-                  <p>Pokaż MESKIAI jak wykonujesz zadanie. Zostanie zapamiętana dla całego zespołu.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeInWhenVisible>
-
-      {/* SECTION 02 - 24/7 Operation */}
-      <FadeInWhenVisible className={styles.lindySection}>
-        <div className={styles.lindyContainer}>
-          <div className={styles.lindyVisualColLeft}>
-            <div className={styles.lindyVisualBox}>
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative', zIndex: 2 }}>
-                 <div style={{ background: '#F8FAFC', padding: '18px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Pytanie o wycenę wdrożenia</span>
-                     <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>Teraz</span>
-                   </div>
-                   <p style={{ fontSize: '0.85rem', color: '#64748B', margin: 0 }}>Dzień dobry, interesuje nas wdrożenie agenta AI dla naszej sieci 12 sklepów. Czy posiadają Państwo gotowe integracje?</p>
-                   <div style={{ marginTop: '12px', padding: '12px', background: '#EFF6FF', borderRadius: '12px', borderLeft: '3px solid #2563EB' }}>
-                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1D4ED8' }}>MESKIAI odpowiedział (0.4s)</span>
-                     </div>
-                     <p style={{ fontSize: '0.82rem', color: '#1E3A8A', margin: 0, lineHeight: 1.5 }}>Dzień dobry! Tak, posiadamy dedykowany moduł integracyjny. Załączam specyfikację techniczną...</p>
-                   </div>
-                 </div>
-                 
-                 <div style={{ background: '#F8FAFC', padding: '18px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Potwierdzenie wysyłki zamówienia</span>
-                     <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>12 min temu</span>
-                   </div>
-                   <div style={{ padding: '10px 12px', background: '#DCFCE7', borderRadius: '10px', color: '#16A34A', fontSize: '0.8rem', fontWeight: 600 }}>
-                     Auto-odpowiedź wysłana • Numer listu przewozowego dodany
-                   </div>
-                 </div>
-               </div>
-            </div>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className={styles.lindyNumber}>02</div>
-            <h2 className={styles.lindyTitle}>Działa 24/7 bez przerw.</h2>
-            <p className={styles.lindyDesc}>
-              Twoi klienci nie muszą już czekać na odpowiedź do poniedziałku. MESKIAI odpisuje na wiadomości w ułamku sekundy, nawet w środku nocy lub podczas świąt. Zwiększ konwersję dzięki natychmiastowej reakcji i podnieś jakość obsługi.
-            </p>
-          </div>
-        </div>
-      </FadeInWhenVisible>
-
-      {/* SECTION 03 - Cold Prospecting */}
-      <FadeInWhenVisible className={styles.lindySection}>
-        <div className={styles.lindyContainer}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className={styles.lindyNumber}>03</div>
-            <h2 className={styles.lindyTitle}>Poszukiwanie klientów i pisanie ofert.</h2>
-            <p className={styles.lindyDesc}>
-              Skonfiguruj kryteria, a MESKIAI samodzielnie przeszuka sieć, zidentyfikuje potencjalnych klientów, zweryfikuje ich dane kontaktowe i wyśle im w pełni spersonalizowaną ofertę. Ty otrzymujesz tylko gotowe leady, które chcą rozmawiać.
-            </p>
-          </div>
-          <div className={styles.lindyVisualCol}>
-            <div className={styles.lindyVisualBox}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '18px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 700, fontSize: '1rem', color: '#0F172A' }}>Aktywne poszukiwania B2B</span>
-                <span style={{ background: '#DCFCE7', color: '#16A34A', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>+42 dziś</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ background: '#F8FAFC', padding: '14px 18px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>KS</div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Kamil Stępień</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Dyrektor ds. Sprzedaży</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#D97706', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Wysłano ofertę</span>
-                </div>
-
-                <div style={{ background: '#F8FAFC', padding: '14px 18px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem', color: '#475569' }}>JK</div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0F172A' }}>Julia Kamińska</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Operations Manager</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', background: '#DCFCE7', color: '#16A34A', padding: '4px 10px', borderRadius: '8px', fontWeight: 600 }}>Umówione spotkanie</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeInWhenVisible>
-
-      {/* Premium Minimalist Pricing */}
-      <FadeInWhenVisible id="cennik" style={{ padding: '90px 20px', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <div style={{ color: '#DF9E21', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '14px', textTransform: 'uppercase', fontFamily: 'var(--font-heading) !important' }}>Cennik</div>
-          <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)' }}>
-            Zatrudnij pracownika, który <br/>
-            <span className={styles.goldGlowText}>dostarcza więcej, niż kosztuje.</span>
+      {/* Interactive Console Sandbox */}
+      <FadeInWhenVisible tilt id="demo" style={{ padding: '20px 24px 60px', maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h2 className={styles.bentoSectionTitle}>
+            Zobacz, jak działa w praktyce.
           </h2>
+          <p style={{ color: '#64748B', marginTop: '8px', fontSize: '1.05rem' }}>
+            Wypróbuj autonomiczny proces odczytywania intencji wiadomości.
+          </p>
+        </div>
+        <TypingEmail />
+      </FadeInWhenVisible>
+
+      {/* SYSTEM 4 FILARÓW - BENTO GRID */}
+      <FadeInWhenVisible id="filary" className={styles.bentoGridSection}>
+        <div className={styles.bentoSectionHeader}>
+          <div className={styles.bentoTagline}>ARCHITEKTURA SYSTEMU</div>
+          <h2 className={styles.bentoSectionTitle}>4 Filary Pełnej Automatyzacji</h2>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px', alignItems: 'center' }}>
+        <div className={styles.bentoCardsGrid}>
+          {/* Bento Card 1 (Col 8) */}
+          <div className={`${styles.bentoCard} ${styles.bentoCardCol8}`}>
+            <div>
+              <div className={styles.bentoCardIcon}>
+                <Bot size={24} />
+              </div>
+              <h3 className={styles.bentoCardHeading}>1. Inteligentny Asystent E-mail</h3>
+              <p className={styles.bentoCardText}>
+                MESKIAI czyta ze zrozumieniem Twoje wiadomości, klasyfikuje je według priorytetu i generuje bezbłędne odpowiedzi zgodnie z wytycznymi Twojej firmy.
+              </p>
+            </div>
+            <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '16px', border: '1px solid #F1F5F9', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <CheckCircle size={20} color="#16A34A" />
+              <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0F172A' }}>Pełne wsparcie dla języka polskiego i ponad 40 innych języków.</span>
+            </div>
+          </div>
+
+          {/* Bento Card 2 (Col 4) */}
+          <div className={`${styles.bentoCard} ${styles.bentoCardCol4}`}>
+            <div>
+              <div className={styles.bentoCardIcon} style={{ background: '#FEF3C7', color: '#D97706' }}>
+                <Target size={24} />
+              </div>
+              <h3 className={styles.bentoCardHeading}>2. Radar Prospectingu</h3>
+              <p className={styles.bentoCardText}>
+                Samodzielne wyszukiwanie wartościowych leadów B2B i automatyczne wysyłanie spersonalizowanych ofert.
+              </p>
+            </div>
+            <div style={{ background: '#FEF3C7', color: '#D97706', padding: '8px 14px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' }}>
+              +100 LEADÓW MIESIĘCZNIE
+            </div>
+          </div>
+
+          {/* Bento Card 3 (Col 4) */}
+          <div className={`${styles.bentoCard} ${styles.bentoCardCol4}`}>
+            <div>
+              <div className={styles.bentoCardIcon} style={{ background: '#DCFCE7', color: '#16A34A' }}>
+                <Calendar size={24} />
+              </div>
+              <h3 className={styles.bentoCardHeading}>3. Terminarz & Kalendarz</h3>
+              <p className={styles.bentoCardText}>
+                Automatyczne umawianie rozmów z klientami w pasujących terminach bez wymieniania 10 maili.
+              </p>
+            </div>
+            <div style={{ background: '#DCFCE7', color: '#16A34A', padding: '8px 14px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' }}>
+              INTEGRACJA GOOGLE MEET
+            </div>
+          </div>
+
+          {/* Bento Card 4 (Col 8) */}
+          <div className={`${styles.bentoCard} ${styles.bentoCardCol8}`}>
+            <div>
+              <div className={styles.bentoCardIcon} style={{ background: '#F3E8FF', color: '#9333EA' }}>
+                <Shield size={24} />
+              </div>
+              <h3 className={styles.bentoCardHeading}>4. Kategoryzacja & Bezpieczeństwo RODO</h3>
+              <p className={styles.bentoCardText}>
+                Gwarancja najwyższego poziomu ochrony danych. Szyfrowanie połączeń i bezwzględna ochrona tajemnic firmy.
+              </p>
+            </div>
+            <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '16px', border: '1px solid #F1F5F9', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Lock size={20} color="#9333EA" />
+              <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0F172A' }}>Szyfrowane połączenia TLS/SSL i serwery w Unii Europejskiej.</span>
+            </div>
+          </div>
+        </div>
+      </FadeInWhenVisible>
+
+      {/* BENTO PRICING CARDS */}
+      <FadeInWhenVisible id="cennik" style={{ padding: '80px 24px', maxWidth: '1180px', margin: '0 auto' }}>
+        <div className={styles.bentoSectionHeader}>
+          <div className={styles.bentoTagline}>CENNIK PLATFORMY</div>
+          <h2 className={styles.bentoSectionTitle}>Inwestycja, która zwraca się pierwszego dnia</h2>
+        </div>
+
+        <div className={styles.bentoPricingGrid}>
           {/* Pakiet 1 */}
-          <div className={styles.lindyPricingCard} style={{ padding: '40px', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI</div>
-            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Podstawowa moc automatyzacji dla małych firm.</div>
+          <div className={styles.bentoPriceCard}>
+            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px', fontFamily: 'var(--font-heading) !important' }}>MESKIAI BASIC</div>
+            <div style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '28px' }}>Podstawowy pakiet automatyzacji e-mail.</div>
             
-            <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '3.5rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>299</span>
-              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
+            <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span style={{ fontSize: '3.4rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em' }}>299</span>
+              <span style={{ fontSize: '0.95rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
             </div>
             
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>50 e-maili</strong> automatycznych / mies.</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>10 leadów</strong> do poszukiwań B2B</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Osobisty Pracownik AI + Baza Wiedzy</div></li>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div><strong>50 e-maili</strong> automatycznych / mies.</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div><strong>10 leadów</strong> do poszukiwań B2B</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div>Dostęp do Konsoli AI</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 1 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '1rem', border: '1px solid #E2E8F0', cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
+              style={{ width: '100%', padding: '15px', borderRadius: '14px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '0.95rem', border: '1px solid #E2E8F0', cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
               onClick={() => {
                 if (userTier >= 1) return;
                 handlePlanSelection(PRICE_BASIC);
               }}
             >
-              {loadingPriceId === PRICE_BASIC ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Downgrade") : "Wybieram ten pakiet")}
+              {loadingPriceId === PRICE_BASIC ? "Przekierowywanie..." : (userTier >= 1 ? (userTier === 1 ? "Twój obecny plan" : "Downgrade") : "Wybieram BASIC")}
             </button>
           </div>
 
-          {/* Pakiet 2 (PRO) - Rekomendowany */}
-          <div className={styles.lindyPricingCard} style={{ padding: '48px 40px', background: '#FFFFFF', border: '2px solid #DF9E21', borderRadius: '24px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 0 40px rgba(223, 158, 33, 0.15)' }}>
-            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(90deg, #DF9E21, #F59E0B)', color: '#FFF', padding: '6px 18px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', boxShadow: '0 4px 12px rgba(223, 158, 33, 0.3)' }}><Sparkles size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}/> REKOMENDOWANY</div>
-            
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI PRO</div>
-            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Prawdziwy pracownik w chmurze dla skalujących się firm.</div>
-            
-            <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '4rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>699</span>
-              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
+          {/* Pakiet 2 (PRO) */}
+          <div className={`${styles.bentoPriceCard} ${styles.bentoPriceCardFeatured}`}>
+            <div style={{ background: '#2563EB', color: '#FFFFFF', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, alignSelf: 'flex-start', marginBottom: '14px' }}>
+              REKOMENDOWANY
             </div>
             
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div><strong>100 leadów</strong> do poszukiwań B2B</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Zaawansowany Cold Email i wskazówki</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#DF9E21" /> <div>Pełna zmiana tonu i stylu pisania</div></li>
+            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px', fontFamily: 'var(--font-heading) !important' }}>MESKIAI PRO</div>
+            <div style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '28px' }}>Prawdziwy cyfrowy dyrektor dla rozwijających się firm.</div>
+            
+            <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span style={{ fontSize: '3.8rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em' }}>699</span>
+              <span style={{ fontSize: '0.95rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
+            </div>
+            
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div><strong>1000 e-maili</strong> automatycznych / mies.</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div><strong>100 leadów</strong> do poszukiwań B2B</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div>Zaawansowany Cold Emailing</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div>Dostosowanie tonu wypowiedzi</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 2 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: '#DF9E21', color: '#FFF', fontWeight: 600, fontSize: '1rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 8px 20px -6px rgba(223, 158, 33, 0.4)' }}
+              style={{ width: '100%', padding: '15px', borderRadius: '14px', background: '#2563EB', color: '#FFFFFF', fontWeight: 600, fontSize: '0.95rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto', boxShadow: '0 6px 18px rgba(37, 99, 235, 0.35)' }}
               onClick={() => {
                 if (userTier >= 2) return;
                 handlePlanSelection(PRICE_PRO);
               }}
             >
-              {loadingPriceId === PRICE_PRO ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Downgrade") : "Zaczynamy z PRO")}
+              {loadingPriceId === PRICE_PRO ? "Przekierowywanie..." : (userTier >= 2 ? (userTier === 2 ? "Twój obecny plan" : "Downgrade") : "Zaczynam z PRO")}
             </button>
           </div>
 
           {/* Pakiet 3 (MAX) */}
-          <div className={styles.lindyPricingCard} style={{ padding: '40px', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>MESKIAI MAX</div>
-            <div style={{ fontSize: '0.9rem', color: '#64748B', marginBottom: '32px' }}>Dla przedsiębiorstw pragnących absolutnej dominacji.</div>
+          <div className={styles.bentoPriceCard}>
+            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0F172A', marginBottom: '8px', fontFamily: 'var(--font-heading) !important' }}>MESKIAI MAX</div>
+            <div style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '28px' }}>Bezkompromisowa wydajność bez limitów.</div>
             
-            <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '3.5rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>899</span>
-              <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
+            <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span style={{ fontSize: '3.4rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.04em' }}>899</span>
+              <span style={{ fontSize: '0.95rem', color: '#64748B', fontWeight: 500 }}>zł / mies.</span>
             </div>
             
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>Brak limitów</strong> e-maili i zapytań</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div>Pełna automatyzacja Cold Email</div></li>
-              <li style={{ display: 'flex', gap: '12px', color: '#475569', fontSize: '0.95rem' }}><CheckCircle size={20} color="#2563EB" /> <div><strong>Dedykowany Account Manager</strong></div></li>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div><strong>Brak limitów</strong> e-maili i zapytań</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div>Pełna automatyzacja Cold Email</div></li>
+              <li style={{ display: 'flex', gap: '10px', color: '#475569', fontSize: '0.92rem' }}><Check size={18} color="#2563EB" /> <div>Dedykowany opiekun konta</div></li>
             </ul>
             
             <button 
               disabled={userTier >= 3 || loadingPriceId !== null}
-              style={{ width: '100%', padding: '16px', borderRadius: '99px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '1rem', border: '1px solid #E2E8F0', cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
+              style={{ width: '100%', padding: '15px', borderRadius: '14px', background: 'transparent', color: '#0F172A', fontWeight: 600, fontSize: '0.95rem', border: '1px solid #E2E8F0', cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }}
               onClick={() => {
                 if (userTier >= 3) return;
                 handlePlanSelection(PRICE_MAX);
@@ -676,19 +622,12 @@ export default function Home() {
             </button>
           </div>
         </div>
-
-        <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.9rem', color: '#64748B' }}>
-          <CheckCircle size={15} style={{ display: 'inline', verticalAlign: 'text-bottom', color: '#16A34A', marginRight: '6px' }}/> 
-          Anuluj w dowolnym momencie. Brak długoterminowych umów i ukrytych opłat.
-        </div>
       </FadeInWhenVisible>
 
-      {/* FAQ Section */}
-      <FadeInWhenVisible id="faq" style={{ padding: '50px 20px', maxWidth: '840px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ textAlign: 'center', marginBottom: '44px' }}>
-          <h2 className={styles.lindyTitle} style={{ margin: 0 }}>
-            FAQ
-          </h2>
+      {/* FAQ SECTION */}
+      <FadeInWhenVisible id="faq" style={{ padding: '60px 24px', maxWidth: '860px', margin: '0 auto' }}>
+        <div className={styles.bentoSectionHeader}>
+          <h2 className={styles.bentoSectionTitle}>Najczęściej zadawane pytania</h2>
         </div>
         
         <div className={styles.faqList}>
@@ -719,7 +658,7 @@ export default function Home() {
           <FaqAccordionItem 
             question="Czy mogę podłączyć więcej niż jedną skrzynkę e-mail?" 
             answer={
-              <>Oczywiście! MESKIAI doskonale radzi sobie z zarządzaniem wieloma skrzynkami (np. biuro@, kontakt@, sprzedaz@) w jednym centralnym systemie, sortując maile według ich priorytetów.</>
+              <>Owiście! MESKIAI doskonale radzi sobie z zarządzaniem wieloma skrzynkami (np. biuro@, kontakt@, sprzedaz@) w jednym centralnym systemie, sortując maile według ich priorytetów.</>
             } 
           />
           <FaqAccordionItem 
@@ -731,59 +670,59 @@ export default function Home() {
         </div>
       </FadeInWhenVisible>
 
-      {/* Bottom CTA Section */}
+      {/* BOTTOM CTA BANNER */}
       <FadeInWhenVisible style={{ 
-        position: 'relative', 
-        overflow: 'hidden', 
-        padding: 'clamp(70px, 12vw, 130px) 20px', 
-        textAlign: 'center', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center',
-        background: 'radial-gradient(ellipse 100% 100% at bottom center, rgba(223, 158, 33, 0.12) 0%, rgba(254, 240, 138, 0.03) 50%, transparent 100%)'
+        padding: '80px 24px', 
+        maxWidth: '1180px', 
+        margin: '0 auto 80px auto', 
+        textAlign: 'center',
+        background: '#FFFFFF',
+        borderRadius: '32px',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 20px 50px rgba(15, 23, 42, 0.04)'
       }}>
-        <h2 className={styles.lindyTitle} style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)', marginBottom: '18px' }}>
-          Gotowy, kiedy i Ty jesteś.
+        <h2 className={styles.bentoSectionTitle} style={{ marginBottom: '16px' }}>
+          Oszczędź ponad 20 godzin tygodniowo.
         </h2>
-        <p style={{ color: '#475569', fontSize: '1.15rem', marginBottom: '36px', maxWidth: '600px', fontWeight: 450 }}>
-          Rozpocznij automatyzację w kilka minut. Zobacz różnicę od pierwszego dnia.
+        <p style={{ color: '#64748B', fontSize: '1.1rem', marginBottom: '32px', maxWidth: '560px', margin: '0 auto 32px auto' }}>
+          Zacznij 3-dniowy bezpłatny okres próbny. Przekonaj się jak automatyzacja uwalnia czas Twojego zespołu.
         </p>
-        <div style={{ display: 'flex', gap: '14px', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
+        <div>
           {status === "authenticated" ? (
-            <Link href="/dashboard" className={styles.ctaBtnLindy} style={{ textDecoration: 'none' }}>
+            <Link href="/dashboard" className={styles.ctaBtnBento} style={{ textDecoration: 'none' }}>
               Przejdź do Panelu <ArrowRight size={18} />
             </Link>
           ) : (
             <button
-              className={styles.ctaBtnLindy}
+              className={styles.ctaBtnBento}
               onClick={handleLogin}
               disabled={isLoggingIn}
             >
-              {isLoggingIn ? 'Logowanie...' : 'Wypróbuj za darmo'} <ArrowRight size={18} />
+              {isLoggingIn ? '...' : 'Uruchom 3-dniowy Test'} <ArrowRight size={18} />
             </button>
           )}
         </div>
-        <p style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 500 }}>
-          3-dniowy okres próbny • Anuluj w dowolnym momencie
-        </p>
       </FadeInWhenVisible>
 
+      {/* FOOTER */}
       <footer className={styles.advancedFooter}>
         <div className={styles.footerGrid}>
           <div>
             <div className={styles.footerLogo}>
-              <img src="/logo.png" alt="MESKIAI" style={{ width: '24px', height: '24px' }} />
+              <div className={styles.logoIcon}>
+                <Bot size={18} />
+              </div>
               MESKIAI
             </div>
             <p className={styles.footerDesc}>
-              Zautomatyzuj swój biznes w 5 minut. Uwolnij czas swojego zespołu i przyspiesz wzrost dzięki potędze sztucznej inteligencji.
+              Zautomatyzuj obsługę wiadomości w swojej firmie. Uwolnij czas zespołu i buduj przewagę dzięki AI.
             </p>
           </div>
           <div>
             <div className={styles.footerHeading}>Produkt</div>
             <ul className={styles.footerLinks}>
-              <li><a href="#mozliwosci">Możliwości</a></li>
-              <li><a href="#jak-dziala">Jak działa</a></li>
+              <li><a href="#filary">Filary Systemu</a></li>
+              <li><a href="#demo">Konsola AI</a></li>
               <li><a href="#cennik">Cennik</a></li>
               <li><Link href="/bezpieczenstwo">Bezpieczeństwo</Link></li>
               <li><Link href="/integracje">Integracje</Link></li>
