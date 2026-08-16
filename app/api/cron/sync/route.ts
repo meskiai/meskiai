@@ -4,20 +4,15 @@ import { authOptions } from '../../auth/[...nextauth]/route';
 
 export const maxDuration = 300;
 
+import { runSync } from '../../../../lib/cron';
+
 async function triggerBackgroundSync() {
-  const siteUrl = process.env.URL || 'https://meskiai.com';
-  const cronSecret = process.env.CRON_SECRET || '';
-  
+  console.log('[Cron] Rozpoczynam synchronizację bezpośrednio...');
   try {
-    // Await the fetch so the request is actually sent before Lambda suspends.
-    // Netlify Background Functions return 202 Accepted instantly, so this will NOT time out.
-    const res = await fetch(`${siteUrl}/.netlify/functions/sync-background`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${cronSecret}` }
-    });
-    console.log(`[Cron] Background trigger response status: ${res.status}`);
+    await runSync();
+    console.log('[Cron] Synchronizacja zakończona.');
   } catch (err) {
-    console.error("Fetch throw:", err);
+    console.error('[Cron] Błąd synchronizacji:', err);
   }
 }
 

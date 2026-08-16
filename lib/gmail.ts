@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+import { gmail, auth } from "@googleapis/gmail";
 import { prisma } from "./prisma";
 
 export async function getGmailClient(userId: string) {
@@ -13,7 +13,7 @@ export async function getGmailClient(userId: string) {
     throw new Error("Brak dostępu do konta Google lub brak odpowiednich tokenów. Zaloguj się ponownie.");
   }
 
-  const oauth2Client = new google.auth.OAuth2(
+  const oauth2Client = new auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET
   );
@@ -46,8 +46,8 @@ export async function getGmailClient(userId: string) {
     }
   });
 
-  const gmail = google.gmail({ version: "v1", auth: oauth2Client });
-  return gmail;
+  const gmailClient = gmail({ version: "v1", auth: oauth2Client });
+  return gmailClient;
 }
 
 export async function sendEmail(
