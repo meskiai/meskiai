@@ -12,7 +12,6 @@ const nextConfig: NextConfig = {
     '*': [
       'node_modules/pdf-parse/test/**/*',
       'node_modules/.prisma/client/libquery_engine-darwin*',
-      'node_modules/.prisma/client/libquery_engine-debian*',
       'node_modules/.prisma/client/libquery_engine-windows*',
       'node_modules/.prisma/client/query_engine-*',
       'node_modules/@prisma/engines/**/*',
