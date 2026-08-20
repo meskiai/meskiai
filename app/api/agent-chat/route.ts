@@ -140,7 +140,7 @@ ZASADY BEZPIECZEŃSTWA (KATEGORYCZNE):
           }
         })
       },
-      maxToolRoundtrips: 3,
+      maxSteps: 3,
     });
 
     return result.toTextStreamResponse();
