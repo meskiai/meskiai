@@ -7,12 +7,22 @@ export const maxDuration = 300;
 import { runSync } from '../../../../lib/cron';
 
 async function triggerBackgroundSync() {
-  console.log('[Cron] Rozpoczynam synchronizację bezpośrednio...');
+  console.log('[Cron] Rozpoczynam synchronizację w tle...');
   try {
-    await runSync();
-    console.log('[Cron] Synchronizacja zakończona.');
+    const siteUrl = process.env.URL || process.env.NEXTAUTH_URL || 'https://meskiai.com';
+    const cronSecret = process.env.CRON_SECRET || '';
+    
+    // Przekazanie zadania do Netlify Background Functions (15 min limit)
+    fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cronSecret}`
+      }
+    }).catch(() => {});
+    
+    console.log('[Cron] Przekazano do Background Function.');
   } catch (err) {
-    console.error('[Cron] Błąd synchronizacji:', err);
+    console.error('[Cron] Błąd przekazywania do tła:', err);
   }
 }
 

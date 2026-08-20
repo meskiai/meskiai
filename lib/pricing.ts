@@ -4,9 +4,9 @@ import { TRIAL_LIMITS } from "./trial";
 // We use string concatenation to bypass Netlify's aggressive secret masking
 // which replaces literal matches of environment variables with asterisks (e.g., ****************KUnC).
 
-export const PRICE_BASIC = ['price_1Tw', 'OpKFzXC0AYLvX', 'RN5NkhvC'].join('');
-export const PRICE_PRO = ['price_1Tw', 'OrBFzXC0AYLvX', 'lm7peRuB'].join('');
-export const PRICE_MAX = ['price_1Tw', 'OruFzXC0AYLvX', 'QUYUXyT4'].join('');
+export const PRICE_BASIC = ['price_1U6', 'HaMFzXC0AYLvX', '7W3GTfaJ'].join('');
+export const PRICE_PRO = ['price_1U6', 'HcLFzXC0AYLvX', 'HR4Xd88X'].join('');
+export const PRICE_MAX = ['price_1U6', 'HdhFzXC0AYLvX', 'gFWJBLcq'].join('');
 
 export const getPlanTier = (priceId: string | null | undefined): number => {
   if (priceId === PRICE_MAX) return 3;
@@ -16,9 +16,9 @@ export const getPlanTier = (priceId: string | null | undefined): number => {
 };
 
 export const PLAN_LIMITS = {
-  BASIC: { emails: 50, searches: 10, leads: 20, aiGenerations: 100 },
-  PRO: { emails: 1000, searches: 100, leads: 200, aiGenerations: Infinity },
-  MAX: { emails: Infinity, searches: Infinity, leads: Infinity, aiGenerations: Infinity },
+  BASIC: { credits: 500 },
+  PRO: { credits: 5000 },
+  MAX: { credits: Infinity },
 };
 
 export const getPlanLimits = (priceId: string | null | undefined) => {

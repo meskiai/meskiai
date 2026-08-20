@@ -26,25 +26,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Brak aktywnej subskrypcji. Wykup abonament, aby korzystać z tej funkcji.' }, { status: 403 });
     }
 
-    const aiGensCount = user?.settings?.aiGenerationsThisMonth || 0;
-    const limits = getPlanLimits(user?.stripePriceId);
-    const monthlyLimit = limits.aiGenerations;
+    const expectedCost = 5;
+    const aiCredits = user?.settings?.aiCredits ?? 0;
+    
+    if (user?.stripePriceId !== PRICE_MAX) {
+      if (aiCredits < expectedCost) {
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
+      }
 
-    if (trialState.isTrialActive) {
-      if (aiGensCount >= TRIAL_LIMITS.aiGenerations) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla AI (${TRIAL_LIMITS.aiGenerations} zapytań). Zrób upgrade, aby kontynuować.` }, { status: 403 });
-      }
-    } else {
-      if (aiGensCount >= monthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit zapytań AI (${monthlyLimit}). Zrób upgrade, aby kontynuować.` }, { status: 403 });
-      }
+      await prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { aiCredits: { decrement: expectedCost } }
+      });
     }
-
-    // Increment usage
-    await prisma.userSettings.update({
-      where: { userId: session.user.id },
-      data: { aiGenerationsThisMonth: { increment: 1 } }
-    });
 
     const { prompt } = await req.json();
 

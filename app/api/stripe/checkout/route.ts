@@ -32,6 +32,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Price ID is required" }, { status: 400 });
     }
 
+    if (![PRICE_BASIC, PRICE_PRO, PRICE_MAX].includes(priceId)) {
+      return NextResponse.json({ error: "Nieprawidłowy pakiet" }, { status: 400 });
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -97,44 +101,21 @@ export async function POST(req: Request) {
       metadata.oldSubscriptionId = oldSubscriptionId;
     }
 
-    
     const origin = req.headers.get('origin') || 'https://meskiai.com';
     
-    let subscription;
     let requirePayment = true;
 
-    if (oldSubscriptionId) {
-      // Upgrade logic (Proration)
-      const oldSub = await stripe.subscriptions.retrieve(oldSubscriptionId);
-      const oldItemId = oldSub.items.data[0].id;
-      
-      subscription = await stripe.subscriptions.update(oldSubscriptionId, {
-        items: [
-          {
-            id: oldItemId,
-            price: priceId,
-          }
-        ],
-        payment_behavior: 'pending_if_incomplete',
-        proration_behavior: 'create_prorations',
-        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-        metadata
-      });
-    } else {
-      // New subscription logic
-      subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [
-          {
-            price: priceId,
-          },
-        ],
-        payment_behavior: 'default_incomplete',
-        payment_settings: { save_default_payment_method: 'on_subscription' },
-        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-        metadata,
-      });
-    }
+    // Zawsze tworzymy NOWĄ subskrypcję jako 'incomplete'. 
+    // Webhook po opłaceniu (gdy przejdzie w 'active') zajmie się anulowaniem starej subskrypcji.
+    // Unikamy w ten sposób problemu, gdzie 'subscriptions.update' daje klientowi plan przed opłaceniem.
+    const subscription = await stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+      metadata,
+    });
 
     const invoice = subscription.latest_invoice as any;
     const paymentIntent = invoice?.payment_intent as any;

@@ -85,31 +85,7 @@ export async function runSync() {
       return;
     }
 
-    // ── Monthly limit auto-reset ────────────────────────────────────────────────
-    // Stripe webhook also resets on invoice.payment_succeeded, this is a safety net
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    for (const user of users) {
-      const s = user.settings;
-      if (!s) continue;
-      const lastReset = s.lastMonthlyReset ? new Date(s.lastMonthlyReset) : null;
-      const needsReset =
-        !lastReset ||
-        lastReset.getMonth() !== currentMonth ||
-        lastReset.getFullYear() !== currentYear;
-      if (needsReset) {
-        await prisma.userSettings
-          .update({
-            where: { userId: user.id },
-            data: { emailsSentThisMonth: 0, competitorSearchesThisMonth: 0, leadSearchesThisMonth: 0, lastMonthlyReset: new Date() },
-          })
-          .catch(() => {});
-        user.settings!.emailsSentThisMonth = 0;
-        user.settings!.competitorSearchesThisMonth = 0;
-        user.settings!.leadSearchesThisMonth = 0;
-        console.log(`[Agent AI] ↺ Reset licznika miesięcznego dla ${user.email}`);
-      }
-    }
+    // Miesięczny reset został usunięty, ponieważ zastąpiły go Kredyty AI.
 
     // Shuffle for fair round-robin (avoids starvation when time is limited)
     users.sort(() => Math.random() - 0.5);
@@ -122,26 +98,22 @@ export async function runSync() {
       const chunk = users.slice(i, i + chunkSize);
       await Promise.allSettled(
         chunk.map(async (user) => {
-          // Attempt to lock this user for 10 minutes to prevent concurrent serverless executions
-          const settings = await prisma.userSettings.findUnique({
-            where: { userId: user.id },
-            select: { runLockedUntil: true }
-          }).catch(() => null);
-
           const now = new Date();
-          if (settings?.runLockedUntil && settings.runLockedUntil > now) {
-            console.log(`[Agent AI] 🔒 Użytkownik ${user.email} jest zablokowany przez inną instancję, pomijam.`);
-            return;
-          }
-
-          // Write the lock
-          const locked = await prisma.userSettings.update({
-            where: { userId: user.id },
+          
+          // Write the lock atomically: only if it's currently null or expired
+          const lockResult = await prisma.userSettings.updateMany({
+            where: { 
+              userId: user.id,
+              OR: [
+                { runLockedUntil: null },
+                { runLockedUntil: { lte: now } }
+              ]
+            },
             data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) }
-          }).catch(() => null);
+          }).catch(() => ({ count: 0 }));
 
-          if (!locked) {
-            console.log(`[Agent AI] 🔒 Błąd zapisu blokady dla ${user.email}, pomijam.`);
+          if (lockResult.count === 0) {
+            console.log(`[Agent AI] 🔒 Użytkownik ${user.email} jest zablokowany przez inną instancję (lub błąd), pomijam.`);
             return;
           }
 
@@ -190,22 +162,13 @@ async function processUser(user: any) {
     return;
   }
 
-  // Guard: monthly limit or trial limit
-  const emailsSent = settings.emailsSentThisMonth ?? 0;
+  // Guard: Check AI credits
+  const aiCredits = settings.aiCredits ?? 0;
+  const expectedCost = 10;
   
-  if (trialState.isTrialActive && emailsSent >= TRIAL_LIMITS.emails) {
-    console.log(`[Agent AI] ${user.email}: limit trialu (${TRIAL_LIMITS.emails} wysłanych) wyczerpany — pomijam.`);
+  if (aiCredits < expectedCost) {
+    console.log(`[Agent AI] ${user.email}: brak wystarczającej liczby kredytów (${aiCredits} < ${expectedCost}) — pomijam.`);
     return;
-  }
-
-  const limits = getPlanLimits(user.stripePriceId);
-  const monthlyLimit = limits.emails;
-
-  if (!trialState.isTrialActive) {
-    if (emailsSent >= monthlyLimit) {
-      console.log(`[Agent AI] ${user.email}: limit ${emailsSent}/${monthlyLimit} wyczerpany — pomijam.`);
-      return;
-    }
   }
 
   // Fetch known UIDs so POP3 can skip already-processed emails
@@ -253,18 +216,17 @@ async function processUser(user: any) {
 
   let replied = 0;
   for (const msg of messages) {
-    // Re-check limit before each message (it may have been incremented by another parallel user)
+    // Re-check limit before each message
     const fresh = await prisma.userSettings
-      .findUnique({ where: { userId }, select: { emailsSentThisMonth: true } })
+      .findUnique({ where: { userId }, select: { aiCredits: true } })
       .catch(() => null);
-    const currentSent = fresh?.emailsSentThisMonth ?? emailsSent + replied;
-    const activeLimit = trialState.isTrialActive ? 5 : monthlyLimit;
-    if (currentSent >= activeLimit) {
-      console.log(`[Agent AI] ${user.email}: limit osiągnięty w trakcie — zatrzymuję.`);
+    const currentCredits = fresh?.aiCredits ?? (aiCredits - (replied * expectedCost));
+    if (currentCredits < expectedCost) {
+      console.log(`[Agent AI] ${user.email}: kredyty wyczerpane w trakcie — zatrzymuję.`);
       break;
     }
 
-    const wasReplied = await processMessage({ userId, user, settings, msg, websiteContent }).catch(err => {
+    const wasReplied = await processMessage({ userId, user, settings, msg, websiteContent, expectedCost }).catch(err => {
       console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err?.message ?? err);
       return false;
     });
@@ -285,13 +247,15 @@ async function processMessage({
   user,
   settings,
   msg,
-  websiteContent = '',
+  websiteContent,
+  expectedCost = 10,
 }: {
   userId: string;
   user: any;
   settings: any;
   msg: FetchedEmail;
-  websiteContent?: string;
+  websiteContent: string;
+  expectedCost?: number;
 }): Promise<boolean> {
   // Sanitize null bytes (PostgreSQL does not support 0x00 bytes in text/varchar fields)
   msg.from = cleanString(msg.from);
@@ -542,6 +506,13 @@ async function processMessage({
       throw new Error("Wszystkie modele AI dla automatycznej odpowiedzi zawiodły.");
     }
 
+    // Deduct AI credits immediately after successful generation (so it costs even if it's SPAM or REQUIRES_ATTENTION)
+    await prisma.userSettings.update({
+      where: { userId: user.id },
+      data: { aiCredits: { decrement: expectedCost } },
+    }).catch(() => {});
+
+
     const cleanedAiText = cleanString(generatedReplyText.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
     const firstLines = cleanedAiText.split('\n').slice(0, 3).join('\n').toUpperCase();
     const isSpam = firstLines.includes('SPAM') || firstLines.includes('BOT') || firstLines.includes('IGNORE');
@@ -658,10 +629,6 @@ async function processMessage({
         where: { id: dbThread.id },
         data: { status: 'AUTO_REPLIED', draftReply: null },
       }),
-      prisma.userSettings.update({
-        where: { userId: user.id },
-        data: { emailsSentThisMonth: { increment: 1 } },
-      }).catch(() => {}),
       prisma.email.create({
         data: {
           threadId:    dbThread.id,
@@ -756,9 +723,9 @@ REQUIRES_ATTENTION
 [POTWIERDZENIE DLA KLIENTA: Uprzejme potwierdzenie dla klienta, że sprawa została zarejestrowana i przekazana do właściciela/zarządu, oraz że wrócimy z odpowiedzią najszybciej jak to możliwe. Ton: ${tone}. Podpis: Asystent firmy.]
 
 ═══ ŚCIEŻKA 3 — SAMODZIELNA STANDARDOWA ODPOWIEDŹ (Wątek zamyka się) ═══
-Kiedy: standardowe proste pytanie klienta o produkt/usługę/cennik/godziny/lokalizację, na które odpowiedź w 100% znajduje się w "TREŚCI STRONY FIRMOWEJ" lub "Kontekście firmy".
+Kiedy: proste pytanie klienta o produkt/usługę/cennik/godziny/lokalizację LUB pytanie na które potrafisz logicznie i z pełnym przekonaniem odpowiedzieć.
 ZASADY BEZPIECZEŃSTWA: 
-1. Kategoryczny zakaz zmyślania (halucynowania) cen, usług, terminów lub danych kontaktowych. Używaj wyłącznie podanych faktów.
+1. OPIERAJ SIĘ NA FAKTACH I LOGICE. Udzielaj odpowiedzi, jeśli wynikają one bezpośrednio z "TREŚCI STRONY", "Kontekstu firmy" LUB jeśli są w pełni logiczne, bezpieczne i naturalne w profesjonalnej obsłudze. Masz wolną rękę, by pisać logicznie i samodzielnie! ZABRANIA SIĘ jedynie wymyślania (halucynowania) twardych danych (np. nieistniejących cenników, fałszywych rabatów, zmyślonych terminów kuriera). Jeśli sprawa dotyczy specyficznej procedury, której nie znasz i nie możesz logicznie wywnioskować - dopiero wtedy użyj ŚCIEŻKI 2B.
 2. Pisz kompletną, gotową treść e-maila w wybranym tonie (Ton: ${tone}). Podpisz się jako "Asystent [nazwa firmy]". NIE używaj słów "AI", "bot", "sztuczna inteligencja". Odpowiadaj w tym samym języku co nadawca.
 3. WYŁĄCZNIE czysta treść maila — zero komentarzy pobocznych.
 4. ZAKAZ formatowania Markdown: nie używaj **pogrubienia**, *kursywy*, # nagłówków, ani list z - lub *. Pisz zwykłym tekstem jak w normalnym e-mailu.

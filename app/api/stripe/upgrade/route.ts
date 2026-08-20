@@ -88,6 +88,15 @@ export async function POST(req: Request) {
           subscriptionStatus: updatedSubscription.status,
         }
       });
+
+      const { getPlanLimits } = await import("@/lib/pricing");
+      const limits = getPlanLimits(newPriceId);
+      await prisma.userSettings.update({
+        where: { userId: user.id },
+        data: {
+          aiCredits: limits.credits === Infinity ? 99999999 : limits.credits,
+        }
+      });
     }
 
     return NextResponse.json({ success: true, message: "Subscription upgraded successfully" });

@@ -83,10 +83,7 @@ model UserSettings {
   defaultVatRate     String?  @default("23%")
   replyTone          String?  @default("PROFESJONALNY")
 
-  emailsSentThisMonth         Int      @default(0)
-  competitorSearchesThisMonth Int      @default(0)
-  leadSearchesThisMonth       Int      @default(0)
-  aiGenerationsThisMonth      Int      @default(0)
+  aiCredits                   Int      @default(50)
   
   trialStartedAt              DateTime? @default(now())
 

@@ -64,6 +64,20 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async createUser({ user }) {
+      try {
+        await prisma.userSettings.create({
+          data: {
+            userId: user.id,
+            aiCredits: 50,
+          }
+        });
+      } catch (e) {
+        console.error('Failed to create default UserSettings:', e);
+      }
+    }
+  },
   pages: {
     signIn: '/login',
   },

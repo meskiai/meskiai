@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     }
 
     const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
-    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus });
+    const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, user.settings || undefined);
 
     if (trialState.isTrialExpired) {
       return NextResponse.json({ error: "Twój 3-dniowy okres próbny wygasł. Opłać subskrypcję, aby korzystać z tej funkcji." }, { status: 403 });
@@ -56,18 +56,11 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const limits = getPlanLimits(user?.stripePriceId);
-    const emailsCount = userSettings.emailsSentThisMonth || 0;
+    const aiCredits = userSettings.aiCredits ?? 0;
+    const expectedCost = 10;
 
-    if (trialState.isTrialActive) {
-      if (emailsCount >= TRIAL_LIMITS.emails) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.emails} wysłanych e-maili). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
-      }
-    } else {
-      const emailsMonthlyLimit = limits.emails;
-      if (emailsCount >= emailsMonthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit wysłanych e-maili (${emailsMonthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
-      }
+    if (aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby wysłać wiadomość.` }, { status: 403 });
     }
 
     // Send via SMTP using Gmail App Password
@@ -85,10 +78,10 @@ export async function POST(req: Request) {
       data: { status: "CONTACTED" }
     });
 
-    // Inkrementuj licznik e-maili
+    // Odejmij kredyty
     await prisma.userSettings.update({
       where: { userId: session.user.id },
-      data: { emailsSentThisMonth: { increment: 1 } }
+      data: { aiCredits: { decrement: expectedCost } }
     });
 
     return NextResponse.json({ success: true });

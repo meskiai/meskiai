@@ -88,18 +88,27 @@ export async function GET(req: Request) {
       subscriptionStatus: user?.subscriptionStatus
     }, user?.settings || undefined);
 
-    const leadSearchesThisMonth = await prisma.lead.count({
-      where: {
-        userId: session.user.id,
-        ...(trialState.isTrialActive ? {} : { createdAt: { gte: startOfMonth } })
-      }
-    });
+
+
+    // Fallback: If UserSettings doesn't exist (e.g. legacy user), create it
+    let finalSettings = user?.settings;
+    if (!finalSettings) {
+      finalSettings = await prisma.userSettings.upsert({
+        where: { userId: session.user.id },
+        update: {},
+        create: {
+          userId: session.user.id,
+          aiCredits: 50,
+          autoReply: false,
+        }
+      });
+    }
 
     const settings = {
-      ...(user?.settings || { autoReply: false }),
-      hasAppPassword: !!user?.settings?.appPassword,
+      ...finalSettings,
+      hasAppPassword: !!finalSettings?.appPassword,
       // Mask API secret — return boolean only for security
-      storeApiSecret: user?.settings?.storeApiSecret ? "__SET__" : null,
+      storeApiSecret: finalSettings?.storeApiSecret ? "__SET__" : null,
     };
 
     const subscriptionData = {
@@ -110,12 +119,10 @@ export async function GET(req: Request) {
       trialState,
       feedbackSubmitted: user?.feedbackSubmitted ?? false,
       // Usage counters for limits display
-      emailsSentThisMonth: user?.settings?.emailsSentThisMonth ?? 0,
-      competitorSearchesThisMonth: user?.settings?.competitorSearchesThisMonth ?? 0,
-      leadSearchesThisMonth,
+      aiCredits: finalSettings?.aiCredits ?? 50,
       // Agent 24/7 status
-      lastAgentRunAt: user?.settings?.lastAgentRunAt ?? null,
-      agentEmailsProcessed: user?.settings?.agentEmailsProcessed ?? 0,
+      lastAgentRunAt: finalSettings?.lastAgentRunAt ?? null,
+      agentEmailsProcessed: finalSettings?.agentEmailsProcessed ?? 0,
     };
 
     return NextResponse.json({ settings, subscriptionData });

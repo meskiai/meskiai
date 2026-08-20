@@ -39,7 +39,7 @@ export async function GET(req: Request) {
       subscriptionStatus: u.subscriptionStatus,
       stripePriceId: u.stripePriceId ?? null,
       lastAgentRunAt: u.settings?.lastAgentRunAt ?? null,
-      emailsSentThisMonth: u.settings?.emailsSentThisMonth ?? 0,
+      aiCredits: u.settings?.aiCredits ?? 0,
     }));
 
     return NextResponse.json({

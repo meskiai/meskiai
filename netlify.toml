@@ -1,13 +1,24 @@
 [build]
   command = "npx prisma generate && npm run build"
+  publish = ".next"
 
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_STRIPE_PRICE_MAX,NEXT_PUBLIC_STRIPE_PRICE_PRO,NEXT_PUBLIC_STRIPE_PRICE_BASIC,STRIPE_WEBHOOK_SECRET,NEXTAUTH_URL"
   NODE_VERSION = "20"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
 [functions]
   directory = "netlify/functions"
-
+  node_bundler = "esbuild"
+  included_files = [
+    "!node_modules/.prisma/client/libquery_engine-darwin*",
+    "!node_modules/.prisma/client/libquery_engine-debian*",
+    "!node_modules/.prisma/client/libquery_engine-windows*",
+    "!node_modules/.prisma/client/query_engine*",
+    "!node_modules/@prisma/engines/**",
+    "!node_modules/pdf-parse/test/**",
+    "!node_modules/typescript/**",
+    "!node_modules/@prisma/client/runtime/*.wasm-base64.js",
+    "!node_modules/@prisma/client/runtime/*.wasm-base64.mjs",
+    "!node_modules/.prisma/client/*.wasm-base64.js",
+    "!node_modules/.prisma/client/*.wasm"
+  ]

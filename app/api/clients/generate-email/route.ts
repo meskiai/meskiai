@@ -58,25 +58,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji. Zrób upgrade, aby wygenerować wiadomość." }, { status: 403 });
     }
 
-    const aiGensCount = userSettings?.aiGenerationsThisMonth || 0;
-    const isProOrMax = user.stripePriceId === PRICE_PRO || user.stripePriceId === PRICE_MAX;
-    const monthlyLimit = isProOrMax ? Infinity : 500;
-
-    if (trialState.isTrialActive) {
-      if (aiGensCount >= TRIAL_LIMITS.aiGenerations) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla AI (${TRIAL_LIMITS.aiGenerations} zapytań). Zrób upgrade, aby kontynuować.` }, { status: 403 });
-      }
-    } else {
-      if (aiGensCount >= monthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit zapytań AI (${monthlyLimit}). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+    const expectedCost = 5;
+    const aiCredits = userSettings?.aiCredits ?? 0;
+    
+    if (user.stripePriceId !== PRICE_MAX) {
+      if (aiCredits < expectedCost) {
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować cold maile.` }, { status: 403 });
       }
     }
-
-    // Increment usage
-    await prisma.userSettings.update({
-      where: { userId: session.user.id },
-      data: { aiGenerationsThisMonth: { increment: 1 } }
-    });
 
     let parsedObject: any = null;
     const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
@@ -117,6 +106,13 @@ Dodatkowo, przeanalizuj uważnie profil klienta i wyodrębnij z niego jego adres
 
     if (!parsedObject) {
        throw new Error("Wszystkie modele generowania maila dla klienta zawiodły.");
+    }
+
+    if (user.stripePriceId !== PRICE_MAX) {
+      await prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { aiCredits: { decrement: expectedCost } }
+      });
     }
 
     return NextResponse.json({ 

@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy", {
 
 import { prisma } from "../../../../lib/prisma";
 import { sendSystemWelcomeEmail } from "../../../../lib/mail";
+import { getPlanLimits } from "../../../../lib/pricing";
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
@@ -62,18 +63,12 @@ export async function POST(req: Request) {
             await prisma.userSettings.upsert({
               where: { userId },
               update: {
-                emailsSentThisMonth: 0,
-                competitorSearchesThisMonth: 0,
-                leadSearchesThisMonth: 0,
-                aiGenerationsThisMonth: 0,
+                aiCredits: getPlanLimits(priceId).credits === Infinity ? 99999999 : getPlanLimits(priceId).credits,
                 autoReply: true,   // ← automatically ON after purchase
               },
               create: {
                 userId,
-                emailsSentThisMonth: 0,
-                competitorSearchesThisMonth: 0,
-                leadSearchesThisMonth: 0,
-                aiGenerationsThisMonth: 0,
+                aiCredits: getPlanLimits(priceId).credits === Infinity ? 99999999 : getPlanLimits(priceId).credits,
                 autoReply: true,   // ← automatically ON after purchase
                 onboardingDone: false,
                 replyTone: 'PROFESJONALNY',
@@ -117,6 +112,12 @@ export async function POST(req: Request) {
           const newStatus = (subscription as any).status as string;
           const isActive = newStatus === 'active' || newStatus === 'trialing';
 
+          // Ignoruj tworzenie 'incomplete' na etapie samego wygenerowania koszyka, zanim uzytkownik zaplaci
+          if (newStatus === 'incomplete') {
+            console.log(`[Stripe] Ignorowanie aktualizacji subskrypcji ${subscription.id} - status incomplete (koszyk nieoplacony).`);
+            break;
+          }
+
           // Ochrona przed zjawiskiem wyścigu (race condition) przy upgrade planów
           if (user.stripeSubscriptionId && user.stripeSubscriptionId !== subscription.id) {
             if (!isActive && (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing')) {
@@ -144,6 +145,22 @@ export async function POST(req: Request) {
             },
           });
 
+          // If the user changed their plan (e.g. upgraded/downgraded via billing portal or API)
+          const previousPriceId = previousAttributes?.items?.data?.[0]?.price?.id;
+          const currentPriceId = (subscription as any).items?.data?.[0]?.price?.id;
+          const isPlanChange = previousPriceId && currentPriceId && previousPriceId !== currentPriceId;
+
+          if (isPlanChange && isActive) {
+            const newLimits = getPlanLimits(currentPriceId);
+            await prisma.userSettings.update({
+              where: { userId: user.id },
+              data: {
+                aiCredits: newLimits.credits === Infinity ? 99999999 : newLimits.credits,
+              },
+            }).catch(() => {});
+            console.log(`[Stripe] Plan zmieniony dla userId=${user.id} z ${previousPriceId} na ${currentPriceId}. Zresetowano kredyty.`);
+          }
+
           // NEW SUBSCRIPTION SETUP (from Elements)
           if (isNewlyActivated) {
             const userId = user.id;
@@ -153,18 +170,12 @@ export async function POST(req: Request) {
             await prisma.userSettings.upsert({
               where: { userId },
               update: {
-                emailsSentThisMonth: 0,
-                competitorSearchesThisMonth: 0,
-                leadSearchesThisMonth: 0,
-                aiGenerationsThisMonth: 0,
+                aiCredits: getPlanLimits((subscription as any).items?.data?.[0]?.price?.id).credits === Infinity ? 99999999 : getPlanLimits((subscription as any).items?.data?.[0]?.price?.id).credits,
                 autoReply: true,
               },
               create: {
                 userId,
-                emailsSentThisMonth: 0,
-                competitorSearchesThisMonth: 0,
-                leadSearchesThisMonth: 0,
-                aiGenerationsThisMonth: 0,
+                aiCredits: getPlanLimits((subscription as any).items?.data?.[0]?.price?.id).credits === Infinity ? 99999999 : getPlanLimits((subscription as any).items?.data?.[0]?.price?.id).credits,
                 autoReply: true,
                 onboardingDone: false,
                 replyTone: 'PROFESJONALNY',
@@ -247,13 +258,11 @@ export async function POST(req: Request) {
           
           if (user) {
             // Reset monthly quotas
+            const priceId = (subscription as any).items?.data?.[0]?.price?.id;
             await prisma.userSettings.update({
               where: { userId: user.id },
               data: {
-                emailsSentThisMonth: 0,
-                competitorSearchesThisMonth: 0,
-                leadSearchesThisMonth: 0,
-                aiGenerationsThisMonth: 0,
+                aiCredits: getPlanLimits(priceId).credits === Infinity ? 99999999 : getPlanLimits(priceId).credits,
               }
             });
           }

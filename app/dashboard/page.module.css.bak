@@ -273,12 +273,6 @@ input:checked + .slider:before { transform: translateX(16px); }
   background: var(--card-bg);
 }
 
-.mobileMailFolderTabs {
-  display: none;
-}
-.hasSelection {}
-.noSelection {}
-
 .threadList {
   flex: 1;
   overflow-y: auto;
@@ -434,64 +428,6 @@ input:checked + .slider:before { transform: translateX(16px); }
   padding: 24px;
   border-top: 1px solid var(--border);
   background: var(--background);
-}
-
-/* Baza Leadów Base Styles */
-.leadHeaderRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
-  border-bottom: 1px solid #E6EBF1;
-  padding-bottom: 24px;
-}
-.leadToolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-.leadSearchBtn {
-  background: #635BFF;
-  color: #FFFFFF;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.25);
-}
-.leadSearchBtn:hover {
-  background: #5249E0;
-  transform: translateY(-1px);
-}
-.leadCard {
-  background: #FFFFFF;
-  border: 1px solid #E6EBF1;
-  border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 4px 20px rgba(10, 37, 64, 0.04);
-  transition: all 0.2s ease;
-}
-.leadCard:hover {
-  border-color: #CBD5E1;
-  box-shadow: 0 8px 30px rgba(10, 37, 64, 0.08);
-}
-.leadBtnRow {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 4px;
-  padding-top: 16px;
-  border-top: 1px solid #E6EBF1;
 }
 
 .textarea {
@@ -1243,29 +1179,26 @@ input:checked + .slider:before { transform: translateX(16px); }
     overflow: hidden;
   }
 
-  /* Native App Bottom Dock Navigation Bar */
+  /* Bottom navigation bar */
   .sidebar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    height: calc(66px + env(safe-area-inset-bottom, 0px));
     flex-direction: row;
-    padding: 6px 8px;
+    padding: 6px 12px;
     padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
     border-radius: 20px 20px 0 0;
-    align-items: center;
-    justify-content: space-around;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: 4px;
-    background: rgba(255, 255, 255, 0.96) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    z-index: 900;
-    border-top: 1px solid #E6EBF1 !important;
+    background: var(--card-bg);
+    z-index: 100;
+    border-top: 1px solid var(--border);
     border-left: none;
     border-right: none;
     border-bottom: none;
-    box-shadow: 0 -4px 20px rgba(10, 37, 64, 0.05) !important;
   }
   .logo {
     display: none;
@@ -1274,54 +1207,38 @@ input:checked + .slider:before { transform: translateX(16px); }
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-around;
-    width: 100%;
+    width: auto;
     flex: 1;
-    gap: 4px;
-    overflow: visible;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   .nav::-webkit-scrollbar { display: none; }
 
   .navItem {
-    flex: 1;
-    min-width: 0;
-    min-height: 48px;
-    padding: 6px 2px;
-    border-radius: 12px;
+    width: auto;
+    min-width: 52px;
+    min-height: 50px;
+    padding: 6px 10px;
+    border-radius: 14px;
     background: transparent;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    font-size: 0.68rem;
+    gap: 3px;
+    font-size: 0.62rem;
     font-weight: 600;
-    color: #64748B !important;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
-  }
-  .navItem:active {
-    transform: scale(0.93) !important;
-    opacity: 0.85;
   }
   .navItem span {
-    display: block !important;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.65rem !important;
-    font-weight: 600;
-    line-height: 1;
+    max-width: 64px;
   }
   .navItem.active {
     box-shadow: none;
-    background: #F5F3FF !important;
-    color: #635BFF !important;
-  }
-  .navItem.active span {
-    font-weight: 700 !important;
-    color: #635BFF !important;
+    background: var(--sidebar-active);
   }
 
   .userSection {
@@ -1339,283 +1256,111 @@ input:checked + .slider:before { transform: translateX(16px); }
   }
   .avatarRow {
     padding: 4px;
-    margin-left: 2px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+    margin-left: 4px;
   }
   .avatarRow span {
     display: none;
   }
   .profileDropdown {
     bottom: 100%;
-    margin-bottom: 12px;
-    right: 12px;
+    margin-bottom: 10px;
+    right: 10px;
     left: auto;
-    width: 240px;
-    background: #FFFFFF !important;
-    border: 1px solid #E6EBF1 !important;
-    box-shadow: 0 12px 32px rgba(10, 37, 64, 0.12) !important;
-    border-radius: 18px !important;
+    width: 220px;
   }
 
   /* Main content area */
   .mainContent {
-    height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - 66px - env(safe-area-inset-bottom, 0px));
     min-height: auto;
     border-radius: 0;
     overflow: clip;
-    background: #F8FAFC !important;
   }
   .topbar {
     padding: 0 16px;
-    height: 52px;
+    height: 54px;
     gap: 8px;
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.96) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border-bottom: 1px solid #E6EBF1 !important;
-    box-shadow: 0 2px 10px rgba(10, 37, 64, 0.03) !important;
+    border-bottom: 1px solid var(--border);
   }
   .topbarTitle {
     font-size: 1rem !important;
     font-weight: 700;
-    color: #0A2540 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Mail workspace & iMessage mobile layout */
-  .mobileMailFolderTabs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #E6EBF1 !important;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    flex-shrink: 0;
-  }
-  .mobileMailFolderTabs::-webkit-scrollbar {
-    display: none;
-  }
-  .mobileFolderTab {
-    padding: 8px 14px;
-    border-radius: 20px;
-    background: #F1F5F9 !important;
-    color: #475569 !important;
-    border: 1px solid #E2E8F0 !important;
-    font-size: 0.82rem;
-    font-weight: 600;
-    white-space: nowrap;
-    cursor: pointer;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: all 0.15s ease;
-  }
-  .mobileFolderTab:active {
-    transform: scale(0.95);
-  }
-  .activeFolderTab {
-    background: #635BFF !important;
-    color: #FFFFFF !important;
-    border-color: #635BFF !important;
-    box-shadow: 0 2px 8px rgba(99, 91, 255, 0.25) !important;
-  }
-
+  /* Mail workspace */
   .workspace {
     flex-direction: column;
-    overflow: hidden;
-    height: calc(100dvh - 52px - 64px - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
   }
   .threadListPanel {
     width: 100%;
     border-right: none;
-    border-bottom: none;
-    max-height: none;
-    height: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #FFFFFF !important;
-  }
-  .threadListPanel.hasSelection {
-    display: none !important;
+    border-bottom: 1px solid var(--border);
+    max-height: 38vh;
+    min-height: 160px;
+    flex-shrink: 0;
   }
   .threadList {
     padding: 10px;
     gap: 8px;
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
   .threadItem {
-    padding: 14px 16px;
-    border-radius: 16px;
-    background: #FFFFFF !important;
-    border: 1px solid #E6EBF1 !important;
-    box-shadow: 0 2px 10px rgba(10, 37, 64, 0.03) !important;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
-  }
-  .threadItem:active {
-    transform: scale(0.98) !important;
-    background: #FAF8FF !important;
-    border-color: #635BFF !important;
+    padding: 12px 14px;
+    border-radius: 14px;
   }
   .sender {
-    font-size: 0.92rem;
-    color: #0A2540 !important;
-    font-weight: 700;
+    font-size: 0.88rem;
   }
   .subject {
-    font-size: 0.82rem;
-    color: #475569 !important;
+    font-size: 0.78rem;
   }
   .threadViewPanel {
     width: 100%;
     border-radius: 0;
     flex: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: #FFFFFF !important;
-  }
-  .threadViewPanel.noSelection {
-    display: none !important;
+    min-height: 0;
   }
   .threadViewHeader {
     padding: 12px 16px;
-    border-bottom: 1px solid #E6EBF1 !important;
-    background: rgba(255, 255, 255, 0.98) !important;
   }
   .mobileBackButton {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background: #EEF2FF !important;
-    border: 1px solid #E0E7FF !important;
-    color: #635BFF !important;
-    font-size: 0.85rem;
-    font-weight: 700;
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 20px;
-    margin-right: 6px;
-    flex-shrink: 0;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.12s ease;
-  }
-  .mobileBackButton:active {
-    transform: scale(0.94) !important;
-    opacity: 0.85;
+    padding: 4px 8px;
+    margin-right: -4px;
   }
   .hideOnMobile {
     display: none !important;
   }
   .conversationHistory {
-    padding: 14px 16px;
-    gap: 14px;
-    background: #F8FAFC !important;
+    padding: 14px;
+    gap: 16px;
   }
   .emailBubble {
-    max-width: 88% !important;
-    margin-bottom: 8px;
+    max-width: 96%;
   }
-  .fromClient {
-    align-self: flex-start !important;
-  }
-  .fromClient .emailBodyCard {
-    background: #FFFFFF !important;
-    color: #0A2540 !important;
-    border-radius: 18px 18px 18px 4px !important;
-    border: 1px solid #E2E8F0 !important;
-    padding: 12px 16px !important;
-    font-size: 0.9rem !important;
-    line-height: 1.5 !important;
-    box-shadow: 0 2px 8px rgba(10, 37, 64, 0.04) !important;
-  }
-  .fromAgent {
-    align-self: flex-end !important;
-  }
-  .fromAgent .emailBodyCard {
-    background: linear-gradient(135deg, #635BFF, #4F46E5) !important;
-    color: #FFFFFF !important;
-    border-radius: 18px 18px 4px 18px !important;
-    border: none !important;
-    padding: 12px 16px !important;
-    font-size: 0.9rem !important;
-    line-height: 1.5 !important;
-    box-shadow: 0 4px 14px rgba(99, 91, 255, 0.25) !important;
+  .emailBodyCard {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    border-radius: 16px;
   }
   .approvalSection {
-    padding: 12px 16px !important;
-    background: #FFFFFF !important;
-    border-top: 1px solid #E6EBF1 !important;
-    box-shadow: 0 -4px 20px rgba(10, 37, 64, 0.04) !important;
+    padding: 12px 14px;
   }
   .approvalSection .textarea {
     resize: none;
-    font-size: 0.92rem !important;
-    min-height: 70px !important;
-    border-radius: 16px !important;
-    border: 1px solid #E2E8F0 !important;
-    background: #F8FAFC !important;
-    color: #0A2540 !important;
-    padding: 10px 14px !important;
-    transition: all 0.2s ease;
-  }
-  /* Gmail Setup Prompt Mobile Responsiveness */
-  .gmailStepCard {
-    display: flex;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 14px !important;
-  }
-  .gmailStepBtn {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 12px !important;
-    font-size: 0.9rem !important;
-  }
-  .gmailInputRow {
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
-  /* Baza Leadów Mobile Responsiveness */
-  .leadHeaderRow {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 16px !important;
-    border-bottom: none !important;
-    padding-bottom: 0 !important;
-  }
-  .leadToolbar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 12px !important;
-  }
-  .leadSearchBtn {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 14px !important;
-    font-size: 0.95rem !important;
-  }
-  .leadCard {
-    padding: 18px 16px !important;
-    border-radius: 16px !important;
-  }
-  .leadBtnRow {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-  .leadBtnRow button {
-    width: 100% !important;
-    padding: 12px !important;
+    font-size: 1rem;
+    min-height: 80px;
   }
 
   /* Module selection screen */
@@ -1624,47 +1369,30 @@ input:checked + .slider:before { transform: translateX(16px); }
     overflow-x: hidden;
   }
   .selectionNavbar {
-    top: 10px !important;
-    width: calc(100% - 20px) !important;
-    height: 52px !important;
+    top: 12px !important;
+    width: calc(100% - 24px) !important;
+    height: 54px !important;
     padding: 0 14px !important;
-    border-radius: 16px !important;
-    background: rgba(255, 255, 255, 0.96) !important;
-    border: 1px solid #E6EBF1 !important;
-    box-shadow: 0 4px 16px rgba(10, 37, 64, 0.06) !important;
+    border-radius: 18px !important;
   }
   .horizontalModuleCard {
     border-radius: 18px !important;
-    padding: 18px 16px !important;
+    padding: 16px !important;
     gap: 14px !important;
     flex-direction: row !important;
     align-items: center !important;
-    background: #FFFFFF !important;
-    border: 1px solid #E6EBF1 !important;
-    box-shadow: 0 4px 16px rgba(10, 37, 64, 0.04) !important;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    transition: transform 0.12s ease, border-color 0.15s ease !important;
-  }
-  .horizontalModuleCard:active {
-    transform: scale(0.97) !important;
-    border-color: #635BFF !important;
-    background: #FAF8FF !important;
   }
   .moduleCardIcon {
-    width: 50px !important;
-    height: 50px !important;
+    width: 54px !important;
+    height: 54px !important;
     border-radius: 14px !important;
   }
   .horizontalModuleCard h2 {
-    font-size: 1.05rem !important;
+    font-size: 1rem !important;
     margin-bottom: 3px !important;
-    color: #0A2540 !important;
   }
   .horizontalModuleCard p {
-    font-size: 0.82rem !important;
-    color: #425466 !important;
+    font-size: 0.8rem !important;
     display: -webkit-box !important;
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
@@ -1672,11 +1400,8 @@ input:checked + .slider:before { transform: translateX(16px); }
     line-height: 1.4 !important;
   }
   .moduleArrow {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    background: #F5F3FF !important;
-    border: 1px solid #E0E7FF !important;
+    width: 32px !important;
+    height: 32px !important;
     opacity: 1 !important;
     transform: none !important;
   }
@@ -1689,65 +1414,91 @@ input:checked + .slider:before { transform: translateX(16px); }
   .infoValue {
     text-align: left;
     font-size: 0.95rem;
-    color: #0A2540;
   }
   .infoLabel {
     font-size: 0.8rem;
-    color: #64748B;
+    color: var(--subtext);
   }
   .accountBtnRow {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     padding: 12px 16px;
   }
   .accountBtnSecondary,
   .accountBtnPrimary {
     width: 100%;
     padding: 14px;
-    border-radius: 12px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
   }
   .accountBtnCancel {
-    width: 100% !important;
+    width: calc(100% - 32px) !important;
     padding: 14px;
-    border-radius: 12px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
   }
   .settingsContainer {
     padding: 16px 12px !important;
   }
   .strategySearchCard {
-    padding: 14px 16px !important;
+    padding: 12px 14px !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 12px;
-    background: #FFFFFF !important;
-    border: 1px solid #E6EBF1 !important;
-    border-radius: 16px !important;
   }
   .strategySearchCard > div:last-child {
     align-self: flex-end;
+  }
+
+  /* Guide modal — clamp() in the base class handles most scaling */
+  .guideCard {
+    max-height: calc(100dvh - 80px);
+    width: calc(100vw - 24px);
+    margin: 0 12px;
+  }
+  .guideCard h2 {
+    font-size: 1.4rem !important;
+  }
+  /* Module selection content — reduce top padding to fit fixed navbar */
+  .moduleSelectionContent {
+    padding-top: 70px;
+    padding-bottom: 80px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* Inner panels */
+  .selectionGlassPanel {
+    padding: 14px 12px;
+    width: 95%;
+    border-radius: 18px;
+  }
+  .selectionGlassPanel h1 {
+    font-size: 1.5rem !important;
+    text-align: center;
+  }
+  .selectionGlassPanel p {
+    font-size: 0.88rem !important;
+    text-align: center;
   }
 }
 
 /* ── Small phones 480–599px ────────────────────────── */
 @media (max-width: 599px) {
+  .navItem span {
+    display: none;
+  }
   .navItem {
-    min-width: 0;
-    padding: 5px 2px;
-    border-radius: 10px;
+    min-width: 44px;
+    padding: 8px;
+    gap: 0;
+    border-radius: 12px;
   }
   .horizontalModuleCard h2 {
-    font-size: 0.98rem !important;
+    font-size: 0.95rem !important;
   }
   .horizontalModuleCard p {
-    font-size: 0.8rem !important;
+    font-size: 0.78rem !important;
   }
   .moduleCardIcon {
-    width: 46px !important;
-    height: 46px !important;
+    width: 48px !important;
+    height: 48px !important;
     border-radius: 12px !important;
   }
   .topbar {
@@ -1757,6 +1508,7 @@ input:checked + .slider:before { transform: translateX(16px); }
   .topbarTitle {
     font-size: 0.95rem !important;
   }
+  /* Account info grid stacked */
   .accountInfoGrid {
     grid-template-columns: 1fr;
   }
@@ -1792,8 +1544,7 @@ input:checked + .slider:before { transform: translateX(16px); }
     font-size: 0.88rem !important;
   }
   .horizontalModuleCard p {
-    font-size: 0.76rem !important;
-    color: #425466 !important;
+    display: none !important;
   }
   .topbar {
     height: 48px;

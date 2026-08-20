@@ -39,17 +39,12 @@ export async function POST(
 
     const userSettings = user.settings;
 
-    const aiGensCount = userSettings?.aiGenerationsThisMonth || 0;
-    const limits = getPlanLimits(user?.stripePriceId);
-    const monthlyLimit = limits.aiGenerations;
-
-    if (trialState.isTrialActive) {
-      if (aiGensCount >= TRIAL_LIMITS.aiGenerations) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla AI (${TRIAL_LIMITS.aiGenerations} zapytań). Zrób upgrade, aby kontynuować.` }, { status: 403 });
-      }
-    } else {
-      if (aiGensCount >= monthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit zapytań AI (${monthlyLimit}). Zrób upgrade, aby kontynuować.` }, { status: 403 });
+    const expectedCost = 5;
+    const aiCredits = userSettings?.aiCredits ?? 0;
+    
+    if (user?.stripePriceId !== PRICE_MAX) {
+      if (aiCredits < expectedCost) {
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
       }
     }
 
@@ -165,10 +160,10 @@ ZASADY:
       data: { draftReply: generatedTextResult.trim() }
     });
 
-    if (generatedTextResult) {
+    if (generatedTextResult && user?.stripePriceId !== PRICE_MAX) {
       await prisma.userSettings.update({
         where: { userId: session.user.id },
-        data: { aiGenerationsThisMonth: { increment: 1 } }
+        data: { aiCredits: { decrement: 5 } }
       });
     }
 

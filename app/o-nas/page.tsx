@@ -1,46 +1,67 @@
+"use client";
+
 import Link from 'next/link';
+import styles from '../page.module.css';
 
 export default function AboutPage() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', color: '#0A2540', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
       
-      {/* Navbar (Minimal) */}
-      <nav style={{ width: '100%', height: '64px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '0 24px' }}>
-        <Link href="/" style={{ color: 'var(--foreground)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          &larr; Wróć na stronę główną
-        </Link>
+      {/* Stripe Navbar */}
+      <nav className={styles.nav}>
+        <div className={styles.navInner}>
+          <a href="/" className={styles.navBrand}>
+            <img src="/logo.png" alt="MESKIAI" className={styles.navBrandImg} />
+            MESKIAI
+          </a>
+          <div className={styles.navActions} style={{ marginLeft: 'auto' }}>
+            <Link href="/" className={styles.navLink}>
+              ‹ Wróć na stronę główną
+            </Link>
+          </div>
+        </div>
       </nav>
 
       {/* Content */}
-      <main style={{ flex: 1, padding: '80px 24px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, marginBottom: '24px', letterSpacing: '-0.02em' }}>
-          O Nas: Tworzymy przyszłość.
+      <main style={{ flex: 1, padding: '120px 24px 80px', maxWidth: '960px', margin: '0 auto', width: '100%' }}>
+        <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#635BFF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px' }}>
+          O NAS &amp; MISJA
+        </div>
+        <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.2rem)', fontWeight: 700, color: '#0A2540', letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: '20px' }}>
+          Tworzymy przyszłość automatyzacji biznesowej.
         </h1>
         
-        <p style={{ fontSize: '1.1rem', color: 'var(--subtext)', lineHeight: 1.6, marginBottom: '40px' }}>
-          Jesteśmy zespołem inżynierów i specjalistów od sprzedaży, którzy zauważyli jeden fundamentalny problem: polskie (i zagraniczne) firmy tracą tysiące godzin rocznie na odpisywanie na powtarzalne e-maile. Zamiast budować relacje, zespoły handlowe pełnią rolę żywych filtrów antyspamowych.
+        <p style={{ fontSize: '1.15rem', color: '#425466', lineHeight: 1.65, marginBottom: '48px', maxWidth: '780px' }}>
+          Jesteśmy zespołem inżynierów i specjalistów od sprzedaży, którzy zauważyli jeden fundamentalny problem: firmy tracą tysiące godzin rocznie na odczytywanie i odpisywanie na powtarzalne e-maile. Wierzymy, że sztuczna inteligencja ma wykonywać tę pracę szybciej, dokładniej i 24/7.
         </p>
 
-        <div style={{ display: 'grid', gap: '32px' }}>
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>Nasza Misja</h2>
-            <p style={{ color: 'var(--subtext)', lineHeight: 1.6 }}>
-              Naszą misją w MESKIAI jest całkowite zautomatyzowanie pierwszego kontaktu biznesowego. Chcemy, aby sprzedawcy rozmawiali tylko z osobami, które są już zainteresowane zakupem i mają gotową wycenę. AI ma przejąć całą "czarną robotę".
+        <div style={{ display: 'grid', gap: '28px' }}>
+          <section style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '16px', padding: '36px', boxShadow: '0 4px 20px rgba(10, 37, 64, 0.04)' }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0A2540', marginBottom: '12px' }}>Nasza Misja</h2>
+            <p style={{ color: '#425466', lineHeight: 1.7, margin: 0, fontSize: '0.98rem' }}>
+              Naszą misją w MESKIAI jest całkowite zautomatyzowanie pierwszego kontaktu biznesowego. Chcemy, aby sprzedawcy i zespoły obsługi rozmawiały tylko z osobami, które są już zainteresowane zakupem i mają gotową wycenę. AI przejmuje całą rutynową obsługę.
             </p>
           </section>
           
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>Podejście Premium</h2>
-            <p style={{ color: 'var(--subtext)', lineHeight: 1.6 }}>
-              Nie jesteśmy kolejnym chatbotem. Jesteśmy agentem asynchronicznym. Nasz system pisze maile tak dobrze, że odbiorcy nie są w stanie rozróżnić ich od wiadomości napisanej przez doświadczonego handlowca. Stawiamy na jakość, bezbłędność i dyskrecję.
+          <section style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '16px', padding: '36px', boxShadow: '0 4px 20px rgba(10, 37, 64, 0.04)' }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0A2540', marginBottom: '12px' }}>Podejście Premium &amp; Bezpieczeństwo</h2>
+            <p style={{ color: '#425466', lineHeight: 1.7, margin: 0, fontSize: '0.98rem' }}>
+              Nie jesteśmy prostym botem z regułkami. Nasz system pisze wiadomości płynnie naśladując unikalny ton Twojej marki, korzystając ze ścisłej bazy wiedzy. Stawiamy na 100% precyzję, bezbłędność i ochronę danych klientów.
             </p>
           </section>
         </div>
       </main>
       
-      {/* Footer (Minimal) */}
-      <footer style={{ borderTop: '1px solid var(--border)', padding: '40px 24px', textAlign: 'center', color: 'var(--subtext)', fontSize: '0.9rem' }}>
-        &copy; {new Date().getFullYear()} MESKIAI. Zaprojektowano w Polsce.
+      {/* Stripe White Footer */}
+      <footer className={styles.advancedFooter}>
+        <div className={styles.footerBottom} style={{ margin: 0, paddingTop: 0, borderTop: 'none' }}>
+          <div>&copy; {new Date().getFullYear()} MESKIAI. Wszelkie prawa zastrzeżone.</div>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Link href="/regulamin">Regulamin</Link>
+            <Link href="/polityka-prywatnosci">Prywatność</Link>
+            <Link href="/kontakt">Kontakt</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

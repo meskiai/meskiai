@@ -43,18 +43,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No business context found. Please fill your company knowledge base first." }, { status: 400 });
     }
 
-    const leadsCount = user?.settings?.leadSearchesThisMonth || 0;
-    const limits = getPlanLimits(user.stripePriceId);
+    const aiCredits = user?.settings?.aiCredits ?? 0;
+    const expectedCost = 30; // 3 leads * 10 credits
 
-    if (trialState.isTrialActive) {
-      if (leadsCount >= TRIAL_LIMITS.leads) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu dla leadów (${TRIAL_LIMITS.leads}). Zrób upgrade pakietu, aby generować ich więcej.` }, { status: 403 });
-      }
-    } else {
-      const monthlyLimit = limits.leads;
-      if (leadsCount >= monthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit generowania leadów (${monthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
-      }
+    if (aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować leady.` }, { status: 403 });
     }
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
@@ -148,9 +141,10 @@ ${searchResultText}`,
     }
 
     if (savedLeads.length > 0) {
+      const totalCost = savedLeads.length * 10;
       await prisma.userSettings.update({
         where: { userId: session.user.id },
-        data: { leadSearchesThisMonth: { increment: savedLeads.length } }
+        data: { aiCredits: { decrement: totalCost } }
       });
     }
 

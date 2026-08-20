@@ -40,18 +40,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Brak aktywnej subskrypcji lub wygasł okres próbny. Wykup abonament, aby korzystać z tej funkcji." }, { status: 403 });
     }
 
-    const limits = getPlanLimits(user.stripePriceId);
-    const searchesCount = user.settings?.competitorSearchesThisMonth || 0;
+    const aiCredits = user.settings?.aiCredits ?? 0;
+    const expectedCost = 20;
 
-    if (trialState.isTrialActive) {
-      if (searchesCount >= TRIAL_LIMITS.searches) {
-        return NextResponse.json({ error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.searches} analiza). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
-      }
-    } else {
-      const searchesMonthlyLimit = limits.searches;
-      if (searchesCount >= searchesMonthlyLimit) {
-        return NextResponse.json({ error: `Wykorzystałeś miesięczny limit analiz (${searchesMonthlyLimit}). Zrób upgrade pakietu, aby kontynuować.` }, { status: 403 });
-      }
+    if (aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby przeprowadzić analizę.` }, { status: 403 });
     }
 
     let pageText = "";
@@ -185,11 +178,11 @@ ${researchReportText}`,
 
     await prisma.userSettings.upsert({
       where: { userId: user.id },
-      update: { competitorSearchesThisMonth: { increment: 1 } },
+      update: { aiCredits: { decrement: expectedCost } },
       create: { 
         userId: user.id, 
-        competitorSearchesThisMonth: 1,
-        autoReply: false, // Never enable auto-reply without explicit user consent
+        aiCredits: 50 - expectedCost,
+        autoReply: false,
         onboardingDone: false,
         businessContext: ""
       }

@@ -64,23 +64,13 @@ export async function POST(
     }
     
     const userSettings = user?.settings;
-    const emailsCount = userSettings?.emailsSentThisMonth || 0;
+    const aiCredits = userSettings?.aiCredits ?? 0;
+    const cost = 10;
 
-    if (trialState.isTrialActive) {
-      if (emailsCount >= TRIAL_LIMITS.emails) {
-        return NextResponse.json({
-          error: `Wykorzystałeś limit trialu (${TRIAL_LIMITS.emails} wysłanych e-maili). Zrób upgrade pakietu, aby kontynuować.`
-        }, { status: 403 });
-      }
-    } else {
-      const limits = getPlanLimits(user.stripePriceId);
-      const monthlyLimit = limits.emails; // Basic or any active subscription without a known price ID
-
-      if (monthlyLimit !== Infinity && emailsCount >= monthlyLimit) {
-        return NextResponse.json({
-          error: `Wykorzystałeś miesięczny limit wysłanych e-maili (${monthlyLimit}). Zrób upgrade pakietu, aby kontynuować.`
-        }, { status: 403 });
-      }
+    if (aiCredits < cost) {
+      return NextResponse.json({
+        error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${cost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby kontynuować.`
+      }, { status: 403 });
     }
 
     if (!userSettings?.appPassword) {
@@ -150,10 +140,10 @@ export async function POST(
       }
     });
 
-    // Update email sent counter
+    // Update aiCredits
     await prisma.userSettings.update({
       where: { userId: session.user.id },
-      data: { emailsSentThisMonth: { increment: 1 } }
+      data: { aiCredits: { decrement: cost } }
     }).catch(() => {});
 
     return NextResponse.json({ message: "Reply sent successfully" });
