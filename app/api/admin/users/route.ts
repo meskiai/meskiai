@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { prisma } from "../../../../../lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     }
 
     // Pobierz wszystkich użytkowników wraz ze szczegółami ustawień i wątkami
-    const users = await prisma.user.findMany({
+    const rawUsers = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
@@ -23,17 +23,28 @@ export async function GET(req: Request) {
         createdAt: true,
         subscriptionStatus: true,
         stripePriceId: true,
+        stripeCurrentPeriodEnd: true,
         settings: {
           select: {
             aiCredits: true,
             onboardingDone: true,
             agentEmailsProcessed: true,
-            storeType: true
+            storeType: true,
+            storeUrl: true,
+            autoReply: true,
+            lastAgentRunAt: true,
+            businessContext: true,
+            companyName: true,
+            appPassword: true,
+          }
+        },
+        threads: {
+          select: {
+            status: true
           }
         },
         _count: {
           select: {
-            threads: true,
             invoices: true,
             orders: true
           }
@@ -42,6 +53,27 @@ export async function GET(req: Request) {
       orderBy: {
         createdAt: 'desc'
       }
+    });
+
+    // Przetwarzanie i agregacja statystyk wątków na serwerze
+    const users = rawUsers.map(user => {
+      const threadsCount = user.threads.length;
+      const threadsAutoReplied = user.threads.filter(t => t.status === 'AUTO_REPLIED').length;
+      const threadsPending = user.threads.filter(t => t.status === 'PENDING_APPROVAL').length;
+      const threadsRequiresAttention = user.threads.filter(t => t.status === 'REQUIRES_ATTENTION').length;
+      
+      const { threads, ...userWithoutThreads } = user;
+      
+      return {
+        ...userWithoutThreads,
+        hasAppPassword: !!user.settings?.appPassword,
+        threadStats: {
+          total: threadsCount,
+          autoReplied: threadsAutoReplied,
+          pending: threadsPending,
+          requiresAttention: threadsRequiresAttention
+        }
+      };
     });
 
     return NextResponse.json({ users });

@@ -117,7 +117,7 @@ export default function AgentChat({ aiCredits, isUnlimited }: { aiCredits?: numb
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.botAvatar}>
-            <img src="/logo.png" alt="meskiai" width={20} height={20} style={{ objectFit: 'contain' }} />
+            <img src="/logo.png" alt="meskiai" style={{ width: '30px', height: '30px', objectFit: 'contain', filter: 'var(--logo-filter)', display: 'block' }} />
           </div>
           <div>
             <h3 className={styles.headerTitle}>
@@ -156,7 +156,7 @@ export default function AgentChat({ aiCredits, isUnlimited }: { aiCredits?: numb
               <div className={`${styles.msgAvatar} ${m.role === 'user' ? styles.msgAvatarUser : styles.msgAvatarBot}`}>
                 {m.role === 'user'
                   ? <User size={16} />
-                  : <img src="/logo.png" alt="meskiai" width={16} height={16} style={{ objectFit: 'contain' }} />
+                  : <img src="/logo.png" alt="meskiai" style={{ width: '24px', height: '24px', objectFit: 'contain', filter: 'var(--logo-filter)', display: 'block' }} />
                 }
               </div>
               <div className={`${styles.msgBubble} ${m.role === 'user' ? styles.msgBubbleUser : styles.msgBubbleBot}`}>

@@ -2165,6 +2165,16 @@ export default function Dashboard() {
                       <span className={styles.accountUserEmail}>{session?.user?.email}</span>
                     </div>
                     <div className={styles.accountQuickBtns}>
+                      {session?.user?.email === 'miloszmeskisim@gmail.com' && (
+                        <button
+                          className={styles.accountIconBtn}
+                          style={{ color: '#eab308', background: 'rgba(234,179,8,0.1)' }}
+                          onClick={() => router.push("/admin")}
+                          title="Panel Administratora"
+                        >
+                          <ShieldAlert size={16} />
+                        </button>
+                      )}
                       <button
                         className={styles.accountIconBtn}
                         onClick={() => router.push("/")}

@@ -34,15 +34,15 @@ export const metadata: Metadata = {
     google: "8vBRb58Hy261nwNRfWy_qTdnez3reAy6dGjoMhfUGqU",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.png?v=2",
+    shortcut: "/logo.png?v=2",
+    apple: "/logo.png?v=2",
   },
 
   openGraph: {
     title: "meskiai",
     description: "Inteligentny asystent e-mail dla Twojej firmy.",
-    images: [{ url: "/logo.png" }],
+    images: [{ url: "/logo.png?v=2" }],
     url: "https://meskiai.com",
     siteName: "meskiai",
     type: "website",
