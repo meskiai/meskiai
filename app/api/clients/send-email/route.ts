@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 import { sendReplySMTP } from "../../../../lib/mail";
+import { decrypt } from "../../../../lib/crypto";
 
 export async function POST(req: Request) {
   try {
@@ -56,17 +57,22 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    const appPassword = decrypt(userSettings.appPassword);
+    if (!appPassword) {
+       return NextResponse.json({ error: "Błąd odszyfrowywania hasła. Skonfiguruj je ponownie." }, { status: 400 });
+    }
+
     const aiCredits = userSettings.aiCredits ?? 0;
     const expectedCost = 10;
 
-    if (aiCredits < expectedCost) {
-      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby wysłać wiadomość.` }, { status: 403 });
+    if (user.stripePriceId !== PRICE_MAX && aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby wysłać wiadomość.` }, { status: 403 });
     }
 
     // Send via SMTP using Gmail App Password
     await sendReplySMTP(
       session.user.email!,
-      userSettings.appPassword,
+      appPassword,
       toEmail,
       subject,
       body
@@ -78,11 +84,13 @@ export async function POST(req: Request) {
       data: { status: "CONTACTED" }
     });
 
-    // Odejmij kredyty
-    await prisma.userSettings.update({
-      where: { userId: session.user.id },
-      data: { aiCredits: { decrement: expectedCost } }
-    });
+    // Odejmij kredyty (MAX plan = unlimited, pomijamy)
+    if (user.stripePriceId !== PRICE_MAX) {
+      await prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { aiCredits: { decrement: expectedCost } }
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -1803,10 +1803,10 @@ input:checked + .slider:before { transform: translateX(16px); }
     font-size: 0.85rem !important;
   }
   .moduleSelectionContent {
-    padding-top: 64px;
+    padding-top: 130px !important;
     padding-bottom: 70px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
   .moduleSelectionTitle {
     font-size: 1.3rem !important;

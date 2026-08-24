@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -46,12 +47,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Uzytkownik nie istnieje" }, { status: 404 });
     }
 
+    // Fetch user settings to get Webhook Secret
+    const userSettings = await withRetry(() =>
+      prisma.userSettings.findUnique({
+        where: { userId },
+        select: { storeApiSecret: true },
+      })
+    );
+
+    const rawBody = await req.text();
     let body: any;
     try {
-      body = await req.json();
+      body = JSON.parse(rawBody);
     } catch (parseErr) {
       console.warn("[Webhook Order] Invalid JSON payload received");
       return NextResponse.json({ error: "Niepoprawny format JSON" }, { status: 400 });
+    }
+
+    // HMAC Signature verification
+    const webhookSecret = userSettings?.storeApiSecret;
+    if (webhookSecret) {
+      const signatureHeader = req.headers.get("x-shopify-hmac-sha256") || req.headers.get("x-wc-webhook-signature");
+      
+      if (signatureHeader) {
+        const hmac = crypto.createHmac("sha256", webhookSecret);
+        const digest = hmac.update(rawBody, "utf8").digest("base64");
+        
+        if (digest !== signatureHeader) {
+           console.warn(`[Webhook Order] Zły podpis HMAC (User: ${userId})`);
+           return NextResponse.json({ error: "Nieautoryzowany webhook (zły podpis)" }, { status: 401 });
+        }
+      } else {
+        console.warn(`[Webhook Order] Webhook dostarczony bez podpisu, mimo że sklep go wymaga (User: ${userId})`);
+        // We can optionally reject here if we strictly require signatures when secret is provided:
+        return NextResponse.json({ error: "Brak podpisu webhooka (Signature Header missing)" }, { status: 401 });
+      }
     }
 
     console.log(`[Webhook Order] Otrzymano zdarzenie dla uzytkownika ${userId}`);

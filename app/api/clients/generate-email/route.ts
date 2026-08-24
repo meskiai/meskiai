@@ -63,12 +63,12 @@ export async function POST(req: Request) {
     
     if (user.stripePriceId !== PRICE_MAX) {
       if (aiCredits < expectedCost) {
-        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować cold maile.` }, { status: 403 });
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować cold maile.` }, { status: 403 });
       }
     }
 
     let parsedObject: any = null;
-    const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const generateModels = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.1-pro-preview", "gemini-2.5-pro", "gemini-2.5-flash"];
 
     for (const modelName of generateModels) {
        try {

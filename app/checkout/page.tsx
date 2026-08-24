@@ -28,7 +28,7 @@ const PLAN_DETAILS: Record<string, any> = {
     desc: "Zacznij automatyzować proste procesy e-mail i generować zapytania ofertowe bez kiwnięcia palcem.",
     features: [
       "Osobisty Agent AI do poczty",
-      "500 Kredytów AI / miesięcznie",
+      "500 Kredytów / miesięcznie",
       "Podstawowe podpowiedzi biznesowe"
     ]
   },
@@ -38,7 +38,7 @@ const PLAN_DETAILS: Record<string, any> = {
     desc: "Zbudowany dla skalujących się biznesów. Prawdziwy pracownik w chmurze.",
     features: [
       "Osobisty Agent AI do poczty",
-      "5000 Kredytów AI / miesięcznie",
+      "5000 Kredytów / miesięcznie",
       "Integracja API (Shopify, WooCommerce, BaseLinker)",
       "Cold Email (Generowanie AI)",
       "Zmiana tonu i stylu pisania Agenta"
@@ -50,7 +50,7 @@ const PLAN_DETAILS: Record<string, any> = {
     desc: "Bez limitów. Dla przedsiębiorstw pragnących absolutnej dominacji operacyjnej.",
     features: [
       "Pełny dostęp do Agenta AI",
-      "Nielimitowane Kredyty AI",
+      "Nielimitowane Kredyty",
       "Nielimitowany Cold Email",
       "Zmiana tonu i stylu pisania Agenta",
       "Dedykowany Account Manager"

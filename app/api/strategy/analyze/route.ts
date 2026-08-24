@@ -43,8 +43,8 @@ export async function POST(req: Request) {
     const aiCredits = user.settings?.aiCredits ?? 0;
     const expectedCost = 20;
 
-    if (aiCredits < expectedCost) {
-      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby przeprowadzić analizę.` }, { status: 403 });
+    if (user.stripePriceId !== PRICE_MAX && aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby przeprowadzić analizę.` }, { status: 403 });
     }
 
     let pageText = "";
@@ -74,7 +74,13 @@ export async function POST(req: Request) {
     // Krok 1: Głębokie badanie rynku za pomocą Google Search Grounding
     // Próbujemy najpierw gemini-3.5-flash-lite dla maksymalnej prędkości i braku timeoutu
     let researchReportText = "";
-    const groundingModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const groundingModels = [
+        "models/gemini-3.5-flash-lite",
+        "models/gemini-3.1-flash-lite",
+        "models/gemini-2.5-flash-lite",
+        "models/gemini-3.6-flash",
+        "models/gemini-2.5-flash"
+    ];
 
     for (const modelName of groundingModels) {
       try {
@@ -108,25 +114,60 @@ ${pageText}`,
     if (!researchReportText) {
       // Fallback: analiza bez Google Search (na podstawie samej treści strony)
       console.log(`[Strategy] Krok 1 Fallback: Analiza bez Google Search Grounding`);
-      try {
-        const fallbackResponse = await generateText({
-          model: google("gemini-3.5-flash-lite"),
-          system: `Jesteś elitarnym doradcą biznesowym. Przeprowadź analizę rynkową firmy na podstawie dostępnych danych.`,
-          prompt: `Przeprowadź analizę strategiczną dla: ${targetUrl}
-Treść strony: ${pageText}
+      const fallbackModels = [
+        "models/gemini-3.5-flash-lite",
+        "models/gemini-3.1-flash-lite",
+        "models/gemini-2.5-flash-lite",
+        "models/gemini-3.6-flash",
+        "models/gemini-2.5-flash"
+      ];
+      let success = false;
+      let lastError = "";
 
-Uwzględnij: analizę SWOT, potencjalnych konkurentów w branży, metryki SEO/CPC oraz plan działania.`,
-        });
-        researchReportText = fallbackResponse.text;
-      } catch (err: any) {
-        console.error("[Strategy] Fallback direct analysis failed:", err.message);
-        throw new Error("All analysis attempts failed.");
+      for (const model of fallbackModels) {
+        try {
+          const fallbackResponse = await generateText({
+            model: google(model),
+            system: `Jesteś elitarnym doradcą biznesowym. Przeprowadź analizę rynkową firmy na podstawie dostępnych danych.`,
+            prompt: `Przeprowadź analizę strategiczną dla: ${targetUrl}\nTreść strony: ${pageText}\n\nUwzględnij: analizę SWOT, potencjalnych konkurentów w branży, metryki SEO/CPC oraz plan działania.`,
+          });
+          researchReportText = fallbackResponse.text;
+          success = true;
+          break; // Udało się wygenerować odpowiedź
+        } catch (err: any) {
+          lastError = err.message;
+          console.warn(`[Strategy] Fallback z ${model} nie powiódł się:`, err.message);
+        }
+      }
+
+      if (!success) {
+        let modelsList = "Nie udało się pobrać listy modeli (brak dostępu/uprawnień do v1beta).";
+        try {
+          const key = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+          const data = await res.json();
+          if (data && data.models) {
+             const names = data.models.filter((m: any) => m.supportedGenerationMethods?.includes("generateContent")).map((m: any) => m.name).join(", ");
+             modelsList = names ? names : "Twój klucz nie obsługuje żadnych modeli do generowania tekstu (generateContent).";
+          } else if (data.error) {
+             modelsList = `Błąd chmury dla klucza: ${data.error.message}`;
+          }
+        } catch (e) {
+          modelsList = "Błąd diagnostyki API.";
+        }
+        throw new Error(`All analysis attempts failed. Z tego konkretnego klucza (AQ...) Twoje środowisko autoryzuje połączenie, ale Cloud raportuje brak modeli. Dostępne u Ciebie modele to: [${modelsList}]. Ostatni powód SDK: ${lastError}`);
       }
     }
 
     // Krok 2: Ustrukturyzowanie raportu do formatu JSON z fallbackami modelowymi
     let parsedObject: any = null;
-    const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const modelsToTry = [
+        "models/gemini-3.5-flash-lite",
+        "models/gemini-3.1-flash-lite",
+        "models/gemini-2.5-flash-lite",
+        "models/gemini-3.6-flash",
+        "models/gemini-2.5-flash"
+    ];
     
     for (const modelName of modelsToTry) {
       try {
@@ -176,17 +217,20 @@ ${researchReportText}`,
       throw new Error("Wszystkie modele AI zawiodły podczas strukturyzacji danych analizy.");
     }
 
-    await prisma.userSettings.upsert({
-      where: { userId: user.id },
-      update: { aiCredits: { decrement: expectedCost } },
-      create: { 
-        userId: user.id, 
-        aiCredits: 50 - expectedCost,
-        autoReply: false,
-        onboardingDone: false,
-        businessContext: ""
-      }
-    });
+    if (user.stripePriceId !== PRICE_MAX) {
+      const planCredits = getPlanLimits(user.stripePriceId).credits;
+      await prisma.userSettings.upsert({
+        where: { userId: user.id },
+        update: { aiCredits: { decrement: expectedCost } },
+        create: { 
+          userId: user.id, 
+          aiCredits: (planCredits === Infinity ? 99999999 : planCredits) - expectedCost,
+          autoReply: false,
+          onboardingDone: false,
+          businessContext: ""
+        }
+      });
+    }
 
     return NextResponse.json(parsedObject);
   } catch (error: any) {

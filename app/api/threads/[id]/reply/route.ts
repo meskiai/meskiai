@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { sendReplySMTP } from "../../../../../lib/mail";
+import { decrypt } from "../../../../../lib/crypto";
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
 
 export async function POST(
@@ -69,7 +70,7 @@ export async function POST(
 
     if (aiCredits < cost) {
       return NextResponse.json({
-        error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${cost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby kontynuować.`
+        error: `Brak wystarczającej liczby kredytów (Wymagane: ${cost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby kontynuować.`
       }, { status: 403 });
     }
 
@@ -77,6 +78,11 @@ export async function POST(
       return NextResponse.json({ 
         error: "Brak skonfigurowanego Hasła Aplikacji Google. Przejdź do zakładki Konfiguracja i wpisz hasło aplikacji." 
       }, { status: 400 });
+    }
+
+    const appPassword = decrypt(userSettings.appPassword);
+    if (!appPassword) {
+      return NextResponse.json({ error: "Błąd odszyfrowywania hasła. Skonfiguruj je ponownie." }, { status: 400 });
     }
 
     // Get the original email to reply to
@@ -103,7 +109,7 @@ export async function POST(
     // Send via SMTP using Gmail App Password — capture real SMTP Message-ID
     const smtpInfo = await sendReplySMTP(
       session.user.email!,
-      userSettings.appPassword,
+      appPassword,
       toEmail,
       replySubject,
       replyContent,
@@ -140,11 +146,13 @@ export async function POST(
       }
     });
 
-    // Update aiCredits
-    await prisma.userSettings.update({
-      where: { userId: session.user.id },
-      data: { aiCredits: { decrement: cost } }
-    }).catch(() => {});
+    // Update aiCredits (MAX plan has unlimited credits — skip deduction)
+    if (user.stripePriceId !== PRICE_MAX) {
+      await prisma.userSettings.update({
+        where: { userId: session.user.id },
+        data: { aiCredits: { decrement: cost } }
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ message: "Reply sent successfully" });
   } catch (error: any) {

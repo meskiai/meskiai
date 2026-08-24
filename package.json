@@ -51,6 +51,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.15.13",
     "@types/imap-simple": "^4.2.10",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.5",

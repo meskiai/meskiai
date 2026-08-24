@@ -1,9 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from "next/server";
+
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "../../../../lib/prisma";
+import { ThreadStatus } from "@prisma/client";
 
 // GET: fetch a single thread with all its emails (for the detail / conversation view)
 export async function GET(
@@ -55,6 +57,10 @@ export async function PATCH(
     const resolvedParams = await params;
     const threadId = resolvedParams.id;
     const { status } = await req.json();
+
+    if (status && !Object.values(ThreadStatus).includes(status)) {
+       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+    }
 
     // Verify ownership
     const thread = await prisma.thread.findUnique({

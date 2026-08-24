@@ -4,8 +4,7 @@ import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "../../../../../lib/prisma";
 import { getTrialState, TRIAL_LIMITS } from "@/lib/trial";
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
-import { generateText } from "ai";
-import { google as googleAI } from "@ai-sdk/google";
+import { getOrderContextForEmail } from "@/lib/orders";
 
 export async function POST(
   req: Request,
@@ -44,7 +43,7 @@ export async function POST(
     
     if (user?.stripePriceId !== PRICE_MAX) {
       if (aiCredits < expectedCost) {
-        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
       }
     }
 
@@ -101,7 +100,6 @@ export async function POST(
     }
 
     // Wyszukaj powiązane zamówienie klienta w bazie danych
-    const { getOrderContextForEmail } = await import("../../../../../lib/orders");
     const orderContext = await getOrderContextForEmail(
       session.user.id,
       latestEmail.body || latestEmail.snippet || "",
@@ -117,11 +115,13 @@ export async function POST(
         : 'Pisz profesjonalnie i oficjalnie, używaj form grzecznościowych typu Szanowny Panie / Szanowna Pani, Z poważaniem.';
 
     let generatedTextResult = "";
-    const generateModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const generateModels = ["models/gemini-3.5-flash-lite", "models/gemini-3.1-flash-lite", "models/gemini-2.5-flash-lite", "models/gemini-3.6-flash", "models/gemini-2.5-flash"];
 
     for (const modelName of generateModels) {
       try {
         console.log(`[Manual Draft] Próba generowania odpowiedzi za pomocą modelu: ${modelName}`);
+        const { generateText } = await import('ai');
+        const { google: googleAI } = await import('@ai-sdk/google');
         const { text } = await generateText({
           model: googleAI(modelName),
           system: `Jesteś profesjonalnym pracownikiem obsługi klienta i asystentem e-mail.

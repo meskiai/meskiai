@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import Pop3Command from 'node-pop3';
 // @ts-ignore
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+import { ImapFlow } from 'imapflow';
 
 export interface FetchedEmail {
   pop3Uid: string;
@@ -21,6 +22,69 @@ export interface FetchedEmail {
  * - Already known UIDs (already in DB)
  * - Emails sent BY the account itself (to prevent reply loops)
  */
+export async function fetchUnreadEmailsIMAP(
+  email: string,
+  appPassword: string,
+  knownUids: string[]
+): Promise<FetchedEmail[]> {
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: {
+      user: email,
+      pass: appPassword
+    },
+    logger: false as any
+  });
+
+  const fetchedEmails: FetchedEmail[] = [];
+  try {
+    await client.connect();
+    const lock = await client.getMailboxLock('INBOX');
+    try {
+      const knownSet = new Set(knownUids);
+      const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+      const searchResult = await client.search({ since: twoDaysAgo });
+      
+      if (searchResult && searchResult.length > 0) {
+        const seqRange = searchResult.join(',');
+        for await (const message of client.fetch(seqRange, { source: true, uid: true, envelope: true }, { changedSince: 0 })) {
+          const uid = message.uid.toString();
+          if (knownSet.has(uid)) continue;
+          if (fetchedEmails.length >= 10) {
+            console.log(`[IMAP] Limit 10 nowych wiadomości. Zabezpieczam przed pętlą...`);
+            break;
+          }
+          if (message.source) {
+            const parsed: any = await simpleParser(message.source);
+            if (parsed.from?.value?.[0]?.address?.toLowerCase() === email.toLowerCase()) continue;
+            
+            fetchedEmails.push({
+              pop3Uid: uid,
+              messageId: parsed.messageId || uid,
+              inReplyTo: parsed.inReplyTo,
+              references: parsed.references || [],
+              from: parsed.from?.value?.[0]?.address || 'unknown@example.com',
+              to: parsed.to?.value?.[0]?.address || email,
+              subject: parsed.subject || '(Brak tematu)',
+              text: parsed.text || parsed.html || '',
+              date: parsed.date || new Date()
+            });
+          }
+        }
+      }
+    } finally {
+      lock.release();
+    }
+    await client.logout();
+  } catch (error: any) {
+    console.error('[IMAP] Krytyczny błąd połączenia:', error?.message);
+    throw error;
+  }
+  return fetchedEmails;
+}
+
 export async function fetchUnreadEmailsPOP3(
   email: string,
   appPassword: string,
@@ -499,20 +563,23 @@ Zespół MESKIAI
 }
 
 /**
- * Validates POP3 credentials with detailed error reporting.
+ * Validates IMAP credentials with detailed error reporting.
  */
-export async function validatePop3CredentialsDetailed(
+export async function validateImapCredentialsDetailed(
   email: string,
   appPassword: string
 ): Promise<{ isValid: boolean; error?: string }> {
-  const pop3 = new Pop3Command({
-    user: email, password: appPassword,
-    host: 'pop.gmail.com', port: 995, tls: true
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user: email, pass: appPassword },
+    logger: false as any
   });
 
   try {
     let timeoutId: any;
-    const connectPromise = pop3.UIDL();
+    const connectPromise = client.connect();
     const timeoutPromise = new Promise<any>((_, reject) =>
       timeoutId = setTimeout(() =>
         reject(new Error('Przekroczono czas oczekiwania. Spróbuj ponownie.')), 12000)
@@ -520,28 +587,27 @@ export async function validatePop3CredentialsDetailed(
 
     await Promise.race([connectPromise, timeoutPromise]);
     clearTimeout(timeoutId);
-    try { await pop3.QUIT(); } catch (e) {}
+
+    const lock = await client.getMailboxLock('INBOX');
+    lock.release();
+    await client.logout();
+    
     return { isValid: true };
   } catch (error: any) {
-    try { pop3.QUIT(); } catch (e) {}
+    try { await client.logout(); } catch (e) {}
     let errMsg = error?.message || String(error);
+    
     if (
       errMsg.includes('Invalid credentials') ||
+      errMsg.includes('AUTHENTICATIONFAILED') ||
       errMsg.includes('login failed') ||
       errMsg.includes('Username and password not accepted') ||
-      errMsg.includes('Web login required') ||
-      errMsg.includes('AUTH')
+      errMsg.includes('Web login required')
     ) {
       errMsg = 'Nieprawidłowe hasło aplikacji lub błędny adres e-mail.';
-    } else if (errMsg.includes('POP access')) {
-      errMsg = 'POP3 nie jest włączony w ustawieniach Gmail. Włącz go w: Ustawienia → Przekazywanie i POP/IMAP.';
+    } else if (errMsg.includes('IMAP') || errMsg.includes('disabled') || errMsg.includes('not enabled')) {
+      errMsg = 'Protokół IMAP nie jest włączony w ustawieniach Gmail. Włącz go w: Ustawienia → Przekazywanie i POP/IMAP → Dostęp IMAP.';
     }
     return { isValid: false, error: errMsg };
   }
-}
-
-/** @deprecated Use validatePop3CredentialsDetailed instead */
-export async function validatePop3Credentials(email: string, appPassword: string): Promise<boolean> {
-  const result = await validatePop3CredentialsDetailed(email, appPassword);
-  return result.isValid;
 }

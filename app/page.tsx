@@ -777,7 +777,7 @@ export default function Home() {
               <span style={{ color: '#64748B', fontWeight: 500 }}>zł / mc</span>
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> 500 Kredytów AI / mc</li>
+              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> 500 Kredytów / mc</li>
               <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> Dostęp do bazy wiedzy</li>
             </ul>
             <button disabled={userTier >= 1 || loadingPriceId !== null} style={{ width: '100%', padding: '13px', borderRadius: '8px', background: 'transparent', border: '1px solid #E2E8F0', color: '#0A2540', fontWeight: 500, fontSize: '0.95rem', cursor: (userTier >= 1 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 1 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }} onClick={() => { if (userTier < 1) handlePlanSelection(PRICE_BASIC); }}>
@@ -795,7 +795,7 @@ export default function Home() {
               <span style={{ color: '#64748B', fontWeight: 500 }}>zł / mc</span>
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> 5000 Kredytów AI / mc</li>
+              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> 5000 Kredytów / mc</li>
               <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> Integracja API (Shopify, itd.)</li>
             </ul>
             <button disabled={userTier >= 2 || loadingPriceId !== null} style={{ width: '100%', padding: '13px', borderRadius: '8px', background: '#635BFF', color: '#FFFFFF', fontWeight: 500, fontSize: '0.95rem', border: 'none', cursor: (userTier >= 2 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 2 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }} onClick={() => { if (userTier < 2) handlePlanSelection(PRICE_PRO); }}>
@@ -812,7 +812,7 @@ export default function Home() {
               <span style={{ color: '#64748B', fontWeight: 500 }}>zł / mc</span>
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 36px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> Nielimitowane Kredyty AI</li>
+              <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> Nielimitowane Kredyty</li>
               <li style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#334155' }}><CheckCircle size={18} color="#635BFF" /> Dedykowany Account Manager</li>
             </ul>
             <button disabled={userTier >= 3 || loadingPriceId !== null} style={{ width: '100%', padding: '13px', borderRadius: '8px', background: 'transparent', border: '1px solid #E2E8F0', color: '#0A2540', fontWeight: 500, fontSize: '0.95rem', cursor: (userTier >= 3 || loadingPriceId !== null) ? 'not-allowed' : 'pointer', opacity: (userTier >= 3 || loadingPriceId !== null) ? 0.5 : 1, transition: 'all 0.2s', marginTop: 'auto' }} onClick={() => { if (userTier < 3) handlePlanSelection(PRICE_MAX); }}>

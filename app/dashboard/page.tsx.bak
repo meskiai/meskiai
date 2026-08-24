@@ -6,20 +6,13 @@ import { useEffect, useState } from "react";
 import { 
   Mail, Send, RefreshCw, AlertCircle, CheckCircle, 
   Sparkles, User, LogOut, Inbox, Archive, AlertTriangle, Trash2, Bot, Home, HelpCircle, LayoutGrid,
-  ArrowUpRight, ArrowDownLeft, ArrowDown, FileText, Building, Search, ArrowRight, ChevronRight, ChevronLeft, Users,
+  ArrowUpRight, ArrowDownLeft, ArrowDown, FileText, Building, Search, ArrowRight, ChevronRight, Users,
   Target, Zap, TrendingUp, ShieldAlert, Plus, BarChart2, Activity, Lightbulb, PieChart, ExternalLink, Settings,
-  X, DollarSign, CheckSquare, ArrowDownRight, Info, Star, Loader2, MessageSquare
+  X, DollarSign, CheckSquare, ArrowDownRight, Info, Star, Loader2
 } from "lucide-react";
 import { PRICE_BASIC, PRICE_PRO, PRICE_MAX, getPlanLimits } from "@/lib/pricing";
-import styles from "./page.module.css";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import { TopUpCheckoutForm } from "../components/TopUpCheckoutForm";
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-const cleanStripeKey = stripeKey ? stripeKey.replace(/[^a-zA-Z0-9_]/g, '') : "";
-const stripePromise = cleanStripeKey ? loadStripe(cleanStripeKey) : null;
-import AgentChat from "@/components/AgentChat";
+import styles from "./page.module.css";
 const getCleanDraftReply = (draft: string | null): string => {
   if (!draft) return "";
   if (draft.includes("[ANALIZA AGENTA]:")) {
@@ -70,7 +63,7 @@ export default function Dashboard() {
   const [showGuide, setShowGuide] = useState(false);
   const [guideIndex, setGuideIndex] = useState(0);
 
-  const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "STRATEGY" | "ACCOUNT" | "CHAT">("INBOX");
+  const [currentTab, setCurrentTab] = useState<"INBOX" | "IMPORTANT" | "SENT" | "SPAM" | "SETTINGS" | "STRATEGY" | "ACCOUNT">("INBOX");
   const [integrationMethod, setIntegrationMethod] = useState<'API' | 'WEBHOOK'>('API');
   const [showOverdueImportantAlert, setShowOverdueImportantAlert] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -154,11 +147,6 @@ export default function Dashboard() {
 
   // Toast Notification State
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
-
-  // Top Up Modal State
-  const [isTopupModalOpen, setIsTopupModalOpen] = useState(false);
-  const [topupClientSecret, setTopupClientSecret] = useState<string | null>(null);
-  const [isTopupLoading, setIsTopupLoading] = useState(false);
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
@@ -174,13 +162,19 @@ export default function Dashboard() {
 
   const pid = subscriptionData?.stripePriceId;
   const limits = getPlanLimits(pid);
-  const isUnlimited = limits.credits === Infinity;
+  const isUnlimited = limits.emails === Infinity;
   
-  const aiCredits = subscriptionData?.aiCredits ?? 0;
+  const emailsUsed = subscriptionData?.emailsSentThisMonth || 0;
+  const searchesUsed = subscriptionData?.competitorSearchesThisMonth || 0;
+  const leadsUsed = subscriptionData?.leadSearchesThisMonth || 0;
   
-  const isEmailLimitReached = !isUnlimited && aiCredits < 10;
-  const isSearchLimitReached = !isUnlimited && aiCredits < 20;
-  const isLeadLimitReached = !isUnlimited && aiCredits < 10;
+  const emailLimit = limits.emails;
+  const searchLimit = limits.searches;
+  const leadLimit = limits.leads;
+
+  const isEmailLimitReached = !isUnlimited && emailsUsed >= emailLimit && emailLimit > 0;
+  const isSearchLimitReached = !isUnlimited && searchesUsed >= searchLimit && searchLimit > 0;
+  const isLeadLimitReached = !isUnlimited && leadsUsed >= leadLimit && leadLimit > 0;
 
   const fetchSettings = async () => {
     try {
@@ -313,12 +307,9 @@ export default function Dashboard() {
           setShowGuide(true);
           setGuideIndex(0);
         }
-      } else {
-        setSubscriptionStatus("error");
       }
     } catch (e) {
       console.error(e);
-      setSubscriptionStatus("error");
     }
   };
 
@@ -1083,16 +1074,6 @@ export default function Dashboard() {
                 
                 <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '16px' }}></div>
                 
-                {session?.user?.email === 'miloszmeskisim@gmail.com' && (
-                  <button 
-                    onClick={() => router.push("/admin")}
-                    style={{ width: '100%', background: 'linear-gradient(135deg, rgba(234,179,8,0.1), rgba(202,138,4,0.1))', border: '1px solid rgba(234,179,8,0.2)', padding: '12px 24px', borderRadius: '12px', color: '#eab308', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', marginBottom: '8px' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'linear-gradient(135deg, #eab308, #ca8a04)'; e.currentTarget.style.color = 'white'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(234,179,8,0.1), rgba(202,138,4,0.1))'; e.currentTarget.style.color = '#eab308'; }}
-                  >
-                    👑 Panel Administratora
-                  </button>
-                )}
                 <button 
                   onClick={() => router.push("/")}
                   style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--glass-border)', padding: '12px 24px', borderRadius: '12px', color: 'var(--foreground)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s', marginBottom: '8px' }}
@@ -1115,307 +1096,201 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className={`animate-fade-in ${styles.moduleSelectionContent}`} style={{ width: '100%', maxWidth: '960px', padding: 'clamp(140px, 18vh, 180px) clamp(16px, 4vw, 32px) clamp(60px, 8vh, 100px)', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>
-          
-          {/* Header Section */}
-          <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px', paddingBottom: '16px', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: '12px' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--subtext)', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                WYBÓR MODUŁU
-              </span>
-              <h1 style={{ color: 'var(--foreground)', fontWeight: 800, letterSpacing: '-0.03em', fontSize: 'clamp(1.5rem, 3.5vw, 2.4rem)', margin: 0, lineHeight: 1.15 }}>
-                Wybierz moduł pracy
-              </h1>
-            </div>
+        {!showGuide ? (
+          <div className={`animate-fade-in ${styles.moduleSelectionContent}`}>
+            <h1 className={styles.moduleSelectionTitle}>
+              Wybierz moduł
+            </h1>
+            <p className={styles.moduleSelectionSubtitle}>
+              Twój asystent AI jest gotowy. Co automatyzujemy dzisiaj?
+            </p>
 
+            {/* Guide button - moved above cards */}
             <button 
               className={styles.guideBtn}
               onClick={() => { setShowGuide(true); setGuideIndex(0); }}
-              style={{ background: 'transparent', border: 'none', color: '#635BFF', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'opacity 0.2s ease', padding: 0, marginTop: '4px' }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--foreground)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--subtext)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
             >
-              <HelpCircle size={16} /> Instrukcja obsługi
+              <HelpCircle size={16} /> Jak zacząć?
             </button>
-          </div>
 
-          {/* 3 Minimalist Premium Product Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', width: '100%' }}>
-
-            {/* CARD 1: Agent Pocztowy */}
-            <div 
-              style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: '16px',
-                padding: '28px 24px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                justify: 'space-between',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
-              }}
-              onClick={() => { setDashboardMode("MAIL"); setCurrentTab("INBOX"); }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = '#635BFF';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.06)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.02)';
-              }}
-            >
-              <div>
-                <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(99, 91, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                  <Mail size={20} color="#635BFF" />
-                </div>
-
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
-                  Agent Pocztowy
-                </h2>
-
-                <p style={{ color: 'var(--subtext)', fontSize: '0.9rem', lineHeight: 1.55, margin: '0 0 24px 0' }}>
-                  Automatyczna obsługa skrzynek e-mail, analiza intencji klientów i generowanie odpowiedzi 24/7.
-                </p>
-              </div>
-
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#635BFF', fontWeight: 700, fontSize: '0.88rem' }}>
-                <span>Otwórz moduł</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-
-            {/* CARD 2: Agent Strategiczny */}
-            <div 
-              style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: '16px',
-                padding: '28px 24px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                justify: 'space-between',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
-              }}
-              onClick={() => { setDashboardMode("STRATEGY"); setCurrentTab("STRATEGY"); }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = '#9B51E0';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.06)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.02)';
-              }}
-            >
-              <div>
-                <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(155, 81, 224, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                  <Search size={20} color="#9B51E0" />
-                </div>
-
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
-                  Agent Strategiczny
-                </h2>
-
-                <p style={{ color: 'var(--subtext)', fontSize: '0.9rem', lineHeight: 1.55, margin: '0 0 24px 0' }}>
-                  Audyt stron internetowych konkurencji z adresu URL i automatyczne tworzenie planów akcji.
-                </p>
-              </div>
-
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#9B51E0', fontWeight: 700, fontSize: '0.88rem' }}>
-                <span>Otwórz moduł</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-
-            {/* CARD 3: Baza Leadów B2B */}
-            <div 
-              style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: '16px',
-                padding: '28px 24px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                justify: 'space-between',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
-              }}
-              onClick={() => { 
-                setDashboardMode("CLIENTS"); 
-                setCurrentTab("CLIENTS" as any);
-                if (leads.length === 0) handleGenerateLeads();
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = '#10B981';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.06)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.02)';
-              }}
-            >
-              <div>
-                <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                  <Users size={20} color="#10B981" />
-                </div>
-
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
-                  Baza Leadów B2B
-                </h2>
-
-                <p style={{ color: 'var(--subtext)', fontSize: '0.9rem', lineHeight: 1.55, margin: '0 0 24px 0' }}>
-                  Wyszukiwanie dopasowanych firm B2B i natychmiastowe generowanie spersonalizowanych e-maili.
-                </p>
-              </div>
-
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#10B981', fontWeight: 700, fontSize: '0.88rem' }}>
-                <span>Otwórz moduł</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Onboarding Guide Fixed Modal */}
-        {showGuide && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(10, 37, 64, 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-            <div className="animate-fade-in" style={{ 
-              background: '#FFFFFF', 
-              border: '1px solid #E6EBF1', 
-              padding: '36px 32px', 
-              borderRadius: '24px', 
-              maxWidth: '520px', 
-              width: '100%', 
-              textAlign: 'center', 
-              boxShadow: '0 20px 50px -10px rgba(10, 37, 64, 0.15), 0 10px 20px -5px rgba(10, 37, 64, 0.08)', 
-              position: 'relative' 
-            }}>
-              <button 
-                onClick={() => {
-                  setShowGuide(false);
-                  fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
-                }} 
-                style={{ position: 'absolute', top: '18px', right: '18px', background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#0A2540'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; }}
+            <div className={styles.moduleCardsList}>
+              
+              {/* Row 1: Poczta */}
+              <div 
+                className={styles.horizontalModuleCard}
+                style={{ background: 'var(--card-bg)', backdropFilter: 'saturate(200%) blur(80px)', WebkitBackdropFilter: 'saturate(200%) blur(80px)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '24px 28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', position: 'relative', overflow: 'hidden' }}
+                onClick={() => { setDashboardMode("MAIL"); setCurrentTab("INBOX"); }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(59,130,246,0.12)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.boxShadow = 'var(--mac-shadow), var(--glass-reflection)'; }}
               >
-                <X size={18} />
-              </button>
-
-              {/* Progress Indicator */}
-              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginBottom: '28px' }}>
-                {[0, 1, 2, 3].map(idx => (
-                  <div key={idx} style={{ height: '4px', width: idx === guideIndex ? '32px' : '10px', borderRadius: '2px', background: idx === guideIndex ? '#635BFF' : '#E2E8F0', transition: 'all 0.3s' }}></div>
-                ))}
-              </div>
-
-              {guideIndex === 0 && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#EEF2FF', border: '1px solid #E0E7FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                    <Bot size={28} />
-                  </div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 10px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Krok 1: Baza Wiedzy AI</h2>
-                  <p style={{ color: '#64748B', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
-                    Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong>. Opisz tam szczegółowo, czym zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów i odpisywania na wiadomości.
-                  </p>
-                </div>
-              )}
-
-              {guideIndex === 1 && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#EEF2FF', border: '1px solid #E0E7FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1 }}>
+                  <div style={{ width: '56px', height: '56px', flexShrink: 0, borderRadius: '16px', background: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.25)' }}>
                     <Mail size={28} />
                   </div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 10px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Krok 2: Agent Pocztowy AI</h2>
-                  <p style={{ color: '#64748B', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
-                    Wybierz <strong>Agent Pocztowy AI</strong>. Nowe maile trafiają tu bezpośrednio, a AI od razu pisze szkic odpowiedzi. Aby asystent odpisywał samoczynnie w trybie 24/7, po prostu włącz suwak <strong>Auto-Reply (AI)</strong> na dole ekranu.
-                  </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>Agent Pocztowy AI</h2>
+                    <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
+                      Inteligentna obsługa klienta — szkicowanie i auto-odpowiedzi 24/7.
+                    </p>
+                  </div>
                 </div>
-              )}
+                <div className={styles.moduleArrow} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--subtext)', flexShrink: 0 }}>
+                  <ArrowRight size={20} />
+                </div>
+              </div>
 
-              {guideIndex === 2 && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#EEF2FF', border: '1px solid #E0E7FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              {/* Row 2: Strategia */}
+              <div 
+                className={styles.horizontalModuleCard}
+                style={{ background: 'var(--card-bg)', backdropFilter: 'saturate(200%) blur(80px)', WebkitBackdropFilter: 'saturate(200%) blur(80px)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '24px 28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', position: 'relative', overflow: 'hidden' }}
+                onClick={() => { setDashboardMode("STRATEGY"); setCurrentTab("STRATEGY"); }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(16,185,129,0.12)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.boxShadow = 'var(--mac-shadow), var(--glass-reflection)'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1 }}>
+                  <div style={{ width: '56px', height: '56px', flexShrink: 0, borderRadius: '16px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(16,185,129,0.25)' }}>
                     <Search size={28} />
                   </div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 10px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Krok 3: Agent Strategiczny AI</h2>
-                  <p style={{ color: '#64748B', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
-                    Wejdź w <strong>Agent Strategiczny AI</strong>. Podaj adres strony internetowej, a system natychmiast wyciągnie model biznesowy, zmapuje rynek i wygeneruje konkretny Action Plan jak pokonać konkurencję.
-                  </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>Agent Strategiczny AI</h2>
+                    <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
+                      Analiza konkurencji, nowe funkcje i wskazówki sprzedażowe z URL.
+                    </p>
+                  </div>
                 </div>
-              )}
+                <div className={styles.moduleArrow} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--subtext)', flexShrink: 0 }}>
+                  <ArrowRight size={20} />
+                </div>
+              </div>
 
-              {guideIndex === 3 && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#EEF2FF', border: '1px solid #E0E7FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              {/* Row 3: Klienci */}
+              <div 
+                className={styles.horizontalModuleCard}
+                style={{ background: 'var(--card-bg)', backdropFilter: 'saturate(200%) blur(80px)', WebkitBackdropFilter: 'saturate(200%) blur(80px)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '24px 28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', position: 'relative', overflow: 'hidden' }}
+                onClick={() => { 
+                  setDashboardMode("CLIENTS"); 
+                  setCurrentTab("CLIENTS" as any);
+                  if (leads.length === 0) handleGenerateLeads();
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.4)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(139,92,246,0.12)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.boxShadow = 'var(--mac-shadow), var(--glass-reflection)'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1 }}>
+                  <div style={{ width: '56px', height: '56px', flexShrink: 0, borderRadius: '16px', background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05))', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(139,92,246,0.25)' }}>
                     <Users size={28} />
                   </div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 10px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Krok 4: Baza Leadów</h2>
-                  <p style={{ color: '#64748B', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
-                    Wybierz moduł <strong>Baza Leadów</strong>. AI samo znajdzie nowe firmy pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
-                  </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>Baza Leadów</h2>
+                    <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
+                      AI podsuwa codziennie idealnych klientów gotowych na współpracę.
+                    </p>
+                  </div>
                 </div>
+                <div className={styles.moduleArrow} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--subtext)', flexShrink: 0 }}>
+                  <ArrowRight size={20} />
+                </div>
+              </div>
+
+            </div>
+          </div>
+        ) : (
+          <div className={`animate-fade-in ${styles.guideCard}`}>
+            
+            {/* Progress Bar */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '40px' }}>
+              {[0, 1, 2, 3].map(idx => (
+                <div key={idx} style={{ height: '4px', width: '40px', borderRadius: '2px', background: idx === guideIndex ? 'var(--primary)' : 'var(--border)', transition: 'background 0.3s' }}></div>
+              ))}
+            </div>
+
+            {guideIndex === 0 && (
+              <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
+                  <Bot size={48} />
+                </div>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 1: Baza Wiedzy AI</h2>
+                <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
+                  Z bocznego menu wybierz zakładkę <strong>Baza Wiedzy</strong> (ikona zębatki). Opisz tam szczegółowo, czym dokładnie zajmuje się Twoja firma. To najważniejszy krok! AI użyje tej wiedzy do szukania idealnych klientów i odpisywania na wiadomości.
+                </p>
+              </div>
+            )}
+
+            {guideIndex === 1 && (
+              <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(59,130,246,0.2)', marginBottom: '16px' }}>
+                  <Mail size={48} />
+                </div>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 2: Agent Pocztowy AI</h2>
+                <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
+                  Na stronie głównej wejdź w <strong>Agent Pocztowy AI</strong>. Nowe maile trafiają tu bezpośrednio, a AI od razu pisze szkic idealnej odpowiedzi. Jeśli chcesz, aby asystent odpisywał samoczynnie w trybie 24/7, po prostu włącz suwak <strong>Auto-Reply (AI)</strong> na dole ekranu.
+                </p>
+              </div>
+            )}
+
+            {guideIndex === 2 && (
+              <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(16,185,129,0.2)', marginBottom: '16px' }}>
+                  <Search size={48} />
+                </div>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 3: Agent Strategiczny AI</h2>
+                <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
+                  Z poziomu ekranu powitalnego kliknij <strong>Agent Strategiczny AI</strong>. Podaj adres strony internetowej, a system natychmiast wyciągnie model biznesowy, zmapuje rynek i wyrzuci konkretne Action Plan'y jak pokonać konkurencję.
+                </p>
+              </div>
+            )}
+
+            {guideIndex === 3 && (
+              <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+                <div style={{ width: '96px', height: '96px', borderRadius: '32px', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(139,92,246,0.2)', marginBottom: '16px' }}>
+                  <Users size={48} />
+                </div>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Krok 4: Baza Leadów</h2>
+                <p style={{ color: 'var(--subtext)', fontSize: '1.2rem', lineHeight: 1.6, maxWidth: '600px' }}>
+                  Wybierz moduł <strong>Baza Leadów</strong>. Kliknij wyszukiwanie klientów — AI samo znajdzie nowe firmy pasujące do Twojej działalności. Kliknij dowolnego leada, a system jednym przyciskiem napisze za Ciebie fenomenalną wiadomość sprzedażową Cold Email.
+                </p>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '60px', borderTop: '1px solid var(--glass-border)', paddingTop: '32px' }}>
+              {guideIndex > 0 ? (
+                <button 
+                  onClick={() => setGuideIndex(guideIndex - 1)}
+                  style={{ background: 'transparent', color: 'var(--subtext)', border: 'none', padding: '12px 24px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  Wstecz
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setShowGuide(false);
+                    fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
+                  }}
+                  style={{ background: 'transparent', color: 'var(--subtext)', border: 'none', padding: '12px 24px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  Pomiń
+                </button>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #E6EBF1' }}>
-                {guideIndex > 0 ? (
-                  <button 
-                    onClick={() => setGuideIndex(guideIndex - 1)}
-                    style={{ padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#475569', cursor: 'pointer', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
-                  >
-                    Wstecz
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => {
-                      setShowGuide(false);
-                      fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
-                    }}
-                    style={{ padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#475569', cursor: 'pointer', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
-                  >
-                    Pomiń
-                  </button>
-                )}
-
-                {guideIndex < 3 ? (
-                  <button 
-                    onClick={() => setGuideIndex(guideIndex + 1)}
-                    style={{ padding: '11px 24px', fontWeight: 600, fontSize: '0.88rem', background: '#635BFF', border: 'none', borderRadius: '10px', color: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(99,91,255,0.25)', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
-                  >
-                    Dalej <ArrowRight size={16} />
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => {
-                      setShowGuide(false);
-                      fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
-                    }}
-                    style={{ padding: '11px 24px', fontWeight: 600, fontSize: '0.88rem', background: '#635BFF', border: 'none', borderRadius: '10px', color: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(99,91,255,0.25)', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
-                  >
-                    Zacznijmy! <CheckCircle size={16} />
-                  </button>
-                )}
-              </div>
+              {guideIndex < 3 ? (
+                <button 
+                  onClick={() => setGuideIndex(guideIndex + 1)}
+                  style={{ background: 'var(--foreground)', color: 'var(--background)', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  Dalej <ArrowRight size={18} />
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setShowGuide(false);
+                    fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ onboardingDone: true }) });
+                  }}
+                  style={{ background: 'var(--primary)', color: 'var(--background)', border: 'none', padding: '12px 32px', borderRadius: '32px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 16px rgba(59,130,246,0.4)' }}
+                >
+                  Zacznijmy! <CheckCircle size={18} />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -1426,64 +1301,49 @@ export default function Dashboard() {
   return (
     <>
       {showUpgradeReminder && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(10, 37, 64, 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-fade-in" style={{ 
-            background: '#FFFFFF', 
-            border: '1px solid #E6EBF1', 
-            padding: '36px 32px', 
-            borderRadius: '24px', 
-            maxWidth: '440px', 
-            width: '100%', 
+            background: 'var(--modal-bg)', 
+            border: '1px solid var(--border)', 
+            padding: '48px 40px', 
+            borderRadius: '28px', 
+            maxWidth: '460px', 
+            width: '90%', 
             textAlign: 'center', 
-            boxShadow: '0 20px 50px -10px rgba(10, 37, 64, 0.15), 0 10px 20px -5px rgba(10, 37, 64, 0.08)', 
+            boxShadow: 'var(--mac-shadow), var(--glass-reflection)', 
+            backdropFilter: 'saturate(190%) blur(50px)',
+            WebkitBackdropFilter: 'saturate(190%) blur(50px)',
             position: 'relative' 
           }}>
             <button 
               onClick={() => setShowUpgradeReminder(false)} 
-              style={{ position: 'absolute', top: '18px', right: '18px', background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#0A2540'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--sidebar-hover)'; e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--subtext)'; }}
             >
               <X size={18} />
             </button>
-
-            <div style={{ width: '60px', height: '60px', background: '#EEF2FF', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: '#635BFF', border: '1px solid #E0E7FF' }}>
-              <Zap size={28} style={{ fill: '#635BFF', color: '#635BFF' }} />
+            <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #a855f7, #6366f1)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(168, 85, 247, 0.3)' }}>
+              <Zap size={30} style={{ filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
             </div>
-
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
-            <p style={{ color: '#64748B', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '28px' }}>
-              Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać większe limity wysyłki e-maili, dodatkowe analizy leadów oraz pełną automatyzację.
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Odblokuj Pełen Potencjał</h2>
+            <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '32px' }}>
+              Twój obecny pakiet ma ograniczenia. Przejdź na wyższy plan subskrypcji, aby zyskać **większe limity wysyłki e-maili, dodatkowe analizy klientów (leadów) oraz zaawansowane analizy strategiczne**.
             </p>
-
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setShowUpgradeReminder(false)} 
-                style={{ padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#475569', cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                className="btn btn-secondary" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', borderRadius: '12px' }}
               >
                 Później
               </button>
               <button 
                 onClick={() => { setShowUpgradeReminder(false); window.location.href = '/#cennik'; }} 
-                style={{ 
-                  padding: '11px 24px', 
-                  fontWeight: 600, 
-                  fontSize: '0.88rem', 
-                  background: '#635BFF', 
-                  border: 'none', 
-                  borderRadius: '10px', 
-                  color: '#FFFFFF', 
-                  cursor: 'pointer', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  boxShadow: '0 4px 12px rgba(99, 91, 255, 0.25)', 
-                  transition: 'all 0.2s' 
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 600, fontSize: '0.85rem', background: 'linear-gradient(135deg, #a855f7, #6366f1)', border: 'none', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(168, 85, 247, 0.25)', transition: 'transform 0.2s, opacity 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
               >
                 Sprawdź Pakiety <ArrowRight size={16} />
               </button>
@@ -1493,53 +1353,68 @@ export default function Dashboard() {
       )}
 
       {showFeedbackModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(10, 37, 64, 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-fade-in" style={{ 
-            background: '#FFFFFF', 
-            border: '1px solid #E6EBF1', 
-            padding: '36px 32px', 
-            borderRadius: '24px', 
-            maxWidth: '440px', 
-            width: '100%', 
+            background: 'var(--modal-bg)', 
+            border: '1px solid var(--border)', 
+            padding: '48px 40px', 
+            borderRadius: '28px', 
+            maxWidth: '460px', 
+            width: '90%', 
             textAlign: 'center', 
-            boxShadow: '0 20px 50px -10px rgba(10, 37, 64, 0.15), 0 10px 20px -5px rgba(10, 37, 64, 0.08)', 
+            boxShadow: 'var(--mac-shadow), var(--glass-reflection)', 
+            backdropFilter: 'saturate(190%) blur(50px)',
+            WebkitBackdropFilter: 'saturate(190%) blur(50px)',
             position: 'relative' 
           }}>
+            {/* Soft Ambient Light behind modal */}
+            <div style={{
+              position: 'absolute',
+              top: '-10%',
+              left: '-10%',
+              width: '120%',
+              height: '120%',
+              background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 60%, transparent 100%)',
+              zIndex: -1,
+              filter: 'blur(40px)',
+              pointerEvents: 'none',
+              borderRadius: '40px'
+            }} />
+
             <button 
               onClick={() => setShowFeedbackModal(false)} 
-              style={{ position: 'absolute', top: '18px', right: '18px', background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#0A2540'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--subtext)', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s, color 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--sidebar-hover)'; e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--subtext)'; }}
             >
               <X size={18} />
             </button>
-
-            <div style={{ width: '60px', height: '60px', background: '#EEF2FF', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: '#635BFF', border: '1px solid #E0E7FF' }}>
-              <Star size={28} style={{ fill: '#635BFF', color: '#635BFF' }} />
+            <div style={{ width: '68px', height: '68px', background: 'linear-gradient(135deg, #10b981, #3b82f6)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: 'white', boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)' }}>
+              <Star size={30} style={{ fill: 'currentColor', filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }} />
             </div>
-
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0', color: '#0A2540', letterSpacing: '-0.02em' }}>Podziel się opinią</h2>
-            <p style={{ color: '#64748B', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '24px' }}>
-              Dziękujemy za korzystanie z MESKIAI! Twoja opinia pomaga nam ulepszać agenta dla Twojej firmy.
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0 0 12px 0', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Podziel się opinią</h2>
+            <p style={{ color: 'var(--subtext)', fontSize: '0.95rem', lineHeight: 1.55, marginBottom: '24px' }}>
+              Dziękujemy, że korzystasz z MESKIAI! Twoja opinia jest dla nas niezwykle ważna. Pomóż nam stawać się jeszcze lepszym.
             </p>
 
-            {/* Stars Selector */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '20px' }}>
+            {/* Stars Selector with rich gold glow */}
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}>
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => setFeedbackStars(num)}
                   style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', transition: 'transform 0.15s ease-out' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.25)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
                 >
                   <Star 
-                    size={32} 
+                    size={36} 
                     style={{ 
-                      color: num <= feedbackStars ? '#F59E0B' : '#CBD5E1', 
-                      fill: num <= feedbackStars ? '#F59E0B' : 'transparent',
-                      transition: 'color 0.2s, fill 0.2s'
+                      color: num <= feedbackStars ? '#fbbf24' : 'var(--subtext)', 
+                      fill: num <= feedbackStars ? '#fbbf24' : 'transparent',
+                      filter: num <= feedbackStars ? 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.6))' : 'none',
+                      transition: 'color 0.2s, fill 0.2s, filter 0.2s'
                     }} 
                   />
                 </button>
@@ -1550,15 +1425,15 @@ export default function Dashboard() {
             <textarea
               value={feedbackComment}
               onChange={(e) => setFeedbackComment(e.target.value)}
-              placeholder="Co możemy poprawić lub co najbardziej Ci się podoba? (opcjonalnie)..."
+              placeholder="Napisz swoją opinię (co możemy poprawić, co działa najlepiej)..."
               style={{
                 width: '100%',
-                height: '100px',
-                background: '#F8FAFC',
-                border: '1px solid #E2E8F0',
+                height: '110px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
-                padding: '12px 14px',
-                color: '#0A2540',
+                padding: '12px 16px',
+                color: 'var(--foreground)',
                 fontSize: '0.9rem',
                 lineHeight: 1.45,
                 resize: 'none',
@@ -1566,42 +1441,27 @@ export default function Dashboard() {
                 outline: 'none',
                 boxSizing: 'border-box',
                 fontFamily: 'inherit',
-                transition: 'all 0.2s'
+                transition: 'border-color 0.2s, background-color 0.2s'
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#635BFF'; e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99, 91, 255, 0.12)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.boxShadow = 'none'; }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)'; }}
             />
 
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setShowFeedbackModal(false)} 
-                style={{ padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#475569', cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                className="btn btn-secondary" 
+                style={{ padding: '12px 24px', fontWeight: 500, fontSize: '0.85rem', borderRadius: '12px' }}
               >
                 Pomiń
               </button>
               <button 
                 onClick={handleSubmitFeedback} 
                 disabled={submittingFeedback}
-                style={{ 
-                  padding: '11px 24px', 
-                  fontWeight: 600, 
-                  fontSize: '0.88rem', 
-                  background: '#635BFF', 
-                  border: 'none', 
-                  borderRadius: '10px', 
-                  color: '#FFFFFF', 
-                  cursor: submittingFeedback ? 'not-allowed' : 'pointer', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  boxShadow: '0 4px 12px rgba(99, 91, 255, 0.25)', 
-                  transition: 'all 0.2s', 
-                  opacity: submittingFeedback ? 0.6 : 1 
-                }}
-                onMouseEnter={(e) => { if (!submittingFeedback) { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
+                className="btn" 
+                style={{ padding: '12px 24px', fontWeight: 600, fontSize: '0.85rem', background: 'linear-gradient(135deg, #10b981, #3b82f6)', border: 'none', borderRadius: '12px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)', transition: 'transform 0.2s, opacity 0.2s', opacity: submittingFeedback ? 0.6 : 1 }}
+                onMouseEnter={(e) => { if (!submittingFeedback) e.currentTarget.style.transform = 'scale(1.02)'; }}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
               >
                 {submittingFeedback ? "Wysyłanie..." : "Wyślij opinię"} <ArrowRight size={16} />
               </button>
@@ -1825,12 +1685,6 @@ export default function Dashboard() {
               >
                 <AlertTriangle size={18} /> Spam / Boty
               </button>
-              <button 
-                className={`${styles.navItem} ${currentTab === "CHAT" ? styles.active : ""}`}
-                onClick={() => { setCurrentTab("CHAT"); setSelectedThread(null); }}
-              >
-                <MessageSquare size={18} /> Czat z Agentem
-              </button>
             </>
           )}
 
@@ -1957,7 +1811,6 @@ export default function Dashboard() {
             {currentTab === "SENT" && "Wysłane Wiadomości"}
             {currentTab === "SPAM" && "Pominięte i Zablokowane"}
             {currentTab === "SETTINGS" && "Ustawienia Agenta AI"}
-            {currentTab === "CHAT" && "Czat z Agentem AI"}
             {currentTab === "ACCOUNT" && "Ustawienia Konta"}
             {currentTab === "ORDERS" as any && "Baza Zamówień (E-commerce)"}
           </div>
@@ -2016,26 +1869,17 @@ export default function Dashboard() {
         <div className={styles.workspace}>
           
           {/* SETTINGS (KNOWLEDGE BASE) VIEW */}
-          {currentTab === "CHAT" && (
-            <AgentChat aiCredits={aiCredits} isUnlimited={isUnlimited} />
-          )}
-
           {currentTab === "SETTINGS" && (
             <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto" }}>
               <div style={{ maxWidth: "600px", width: "100%", margin: "0 auto" }}>
                 {/* BAZA WIEDZY */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h2 style={{ fontSize: "1.5rem", color: "var(--foreground)", margin: 0 }}>Baza Wiedzy Agenta AI</h2>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ background: 'rgba(99, 91, 255, 0.1)', color: '#635BFF', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {subscriptionData?.stripePriceId === PRICE_MAX ? "∞" : subscriptionData?.aiCredits?.toLocaleString("pl-PL") ?? 0} Kredytów
-                    </div>
-                    {!isEditingKnowledge && (
-                      <button className="btn btn-secondary" onClick={() => setIsEditingKnowledge(true)} style={{ padding: '6px 16px' }}>
-                        Edytuj
-                      </button>
-                    )}
-                  </div>
+                  {!isEditingKnowledge && (
+                    <button className="btn btn-secondary" onClick={() => setIsEditingKnowledge(true)} style={{ padding: '6px 16px' }}>
+                      ✏️ Edytuj
+                    </button>
+                  )}
                 </div>
                 
                 <p style={{ color: "var(--subtext)", marginBottom: "24px", lineHeight: 1.5 }}>
@@ -2185,6 +2029,7 @@ export default function Dashboard() {
                   {/* ── Row 2: Subscription info ── */}
                   <div className={styles.accountSectionCard}>
                     <div className={styles.accountSectionHeader}>
+                      <Zap size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
                       <span>Subskrypcja</span>
                       {cancelAtPeriodEnd ? (
                         <span className={`${styles.infoBadge} ${styles.infoBadgeDanger}`} style={{ marginLeft: "auto" }}>Anulowana</span>
@@ -2268,70 +2113,81 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  {/* ── Row 3: AI Credits ── */}
+                  {/* ── Row 3: Usage limits ── */}
                   {(() => {
                     const pid         = subscriptionData?.stripePriceId;
                     const isBasic     = pid === PRICE_BASIC;
                     const isPro       = pid === PRICE_PRO;
                     const isMax       = pid === PRICE_MAX;
                     const isUnlimited = isMax;
-                    const creditsRemaining = subscriptionData?.aiCredits ?? 0;
-                    const creditsLimit = pid === PRICE_PRO ? 5000 : (pid === PRICE_BASIC ? 500 : (isMax ? Infinity : 50));
-                    
-                    const pctRemaining = isUnlimited ? 100 : Math.min(100, Math.max(0, Math.round((creditsRemaining / creditsLimit) * 100)));
-                    const limitFmt     = (n: number) => n >= 90000000 ? "∞" : n.toLocaleString("pl-PL");
-                    const barColor     = (pct: number) => pct <= 10 ? "#ef4444" : pct <= 30 ? "#f59e0b" : "#635BFF";
+
+                    const emailsUsed:   number = subscriptionData?.emailsSentThisMonth ?? 0;
+                    const searchesUsed: number = subscriptionData?.competitorSearchesThisMonth ?? 0;
+                    const leadsUsed:    number = subscriptionData?.leadSearchesThisMonth ?? 0;
+                    const emailLimit   = isBasic ? 50 : isPro ? 1000 : isMax ? Infinity : 50;
+                    const searchLimit  = isBasic ? 10  : isPro ? 100  : isMax ? Infinity : 10;
+                    const leadsLimit   = isBasic ? 20  : isPro ? 200  : isMax ? Infinity : 20;
+                    const emailPct     = isUnlimited ? 0 : Math.min(100, Math.round((emailsUsed   / (emailLimit  || 1)) * 100));
+                    const searchPct    = isUnlimited ? 0 : Math.min(100, Math.round((searchesUsed / (searchLimit || 1)) * 100));
+                    const leadsPct     = isUnlimited ? 0 : Math.min(100, Math.round((leadsUsed    / (leadsLimit   || 1)) * 100));
+                    const limitFmt     = (n: number) => n === Infinity ? "∞" : n.toLocaleString("pl-PL");
+                    const barColor     = (pct: number) => pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#22c55e";
 
                     return (
                       <div className={styles.accountSectionCard}>
                         <div className={styles.accountSectionHeader}>
-                          <span>Kredyty</span>
+                          <BarChart2 size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                          <span>Limity tego miesiąca</span>
                           {isUnlimited && (
                             <span className={`${styles.infoBadge} ${styles.infoBadgeSuccess}`} style={{ marginLeft: "auto" }}>MAX — bez limitów</span>
                           )}
                         </div>
-                        <div className={styles.limitsGrid} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                          {/* Credits limit */}
+                        <div className={styles.limitsGrid}>
+                          {/* Email limit */}
                           <div className={styles.limitItem}>
                             <div className={styles.limitItemHeader}>
-                              <span className={styles.limitItemLabel}>Pozostałe Kredyty:</span>
-                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : pctRemaining <= 10 ? "#ef4444" : "var(--subtext)", fontWeight: 700, fontSize: "1.1rem" }}>
-                                {isUnlimited ? "∞" : `${limitFmt(creditsRemaining)}`}
+                              <Mail size={16} style={{ color: "#3b82f6", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>E-maile</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : emailPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${emailsUsed} / ${limitFmt(emailLimit)}`}
                               </span>
                             </div>
                             {!isUnlimited && (
-                              <div className={styles.limitBar} style={{ height: "10px", borderRadius: "10px", background: "var(--bg-secondary)" }}>
-                                <div className={styles.limitBarFill} style={{ width: `${pctRemaining}%`, background: `linear-gradient(90deg, ${barColor(pctRemaining)}cc, ${barColor(pctRemaining)})`, height: "100%", borderRadius: "10px", transition: "width 0.3s ease" }} />
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${emailPct}%`, background: `linear-gradient(90deg, ${barColor(emailPct)}, ${barColor(emailPct)}cc)` }} />
                               </div>
                             )}
                           </div>
-                          {subscriptionData?.subscriptionStatus === 'active' && !isUnlimited && (
-                            <button
-                              onClick={async (e) => {
-                                setIsTopupModalOpen(true);
-                                setIsTopupLoading(true);
-                                try {
-                                  const res = await fetch("/api/stripe/topup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: 20, credits: 100 }) });
-                                  const data = await res.json();
-                                  if (data.clientSecret) {
-                                    setTopupClientSecret(data.clientSecret);
-                                  } else {
-                                    alert(data.error || "Wystąpił błąd");
-                                    setIsTopupModalOpen(false);
-                                  }
-                                } catch (err) {
-                                  alert("Błąd połączenia ze Stripe.");
-                                  setIsTopupModalOpen(false);
-                                }
-                                setIsTopupLoading(false);
-                              }}
-                              style={{ marginTop: "12px", background: "rgba(99, 91, 255, 0.1)", color: "#635BFF", border: "1px solid rgba(99, 91, 255, 0.3)", padding: "10px 16px", borderRadius: "12px", fontSize: "0.95rem", fontWeight: 600, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = "#635BFF"; e.currentTarget.style.color = "#fff"; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(99, 91, 255, 0.1)"; e.currentTarget.style.color = "#635BFF"; }}
-                            >
-                              Dokup 100 Kredytów (20 PLN)
-                            </button>
-                          )}
+                          {/* Search limit */}
+                          <div className={styles.limitItem}>
+                            <div className={styles.limitItemHeader}>
+                              <Search size={16} style={{ color: "#10b981", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>Analizy URL</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : searchPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${searchesUsed} / ${limitFmt(searchLimit)}`}
+                              </span>
+                            </div>
+                            {!isUnlimited && (
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${searchPct}%`, background: `linear-gradient(90deg, ${barColor(searchPct)}, ${barColor(searchPct)}cc)` }} />
+                              </div>
+                            )}
+                          </div>
+                          {/* Leads limit */}
+                          <div className={styles.limitItem}>
+                            <div className={styles.limitItemHeader}>
+                              <Users size={16} style={{ color: "#a855f7", flexShrink: 0 }} />
+                              <span className={styles.limitItemLabel}>Analizy Klientów (Leady)</span>
+                              <span className={styles.limitItemCount} style={{ color: isUnlimited ? "#22c55e" : leadsPct >= 90 ? "#ef4444" : "var(--subtext)" }}>
+                                {isUnlimited ? "∞" : `${leadsUsed} / ${limitFmt(leadsLimit)}`}
+                              </span>
+                            </div>
+                            {!isUnlimited && (
+                              <div className={styles.limitBar}>
+                                <div className={styles.limitBarFill} style={{ width: `${leadsPct}%`, background: `linear-gradient(90deg, ${barColor(leadsPct)}, ${barColor(leadsPct)}cc)` }} />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -2340,6 +2196,7 @@ export default function Dashboard() {
                   {/* ── Row 4: Integracje ── */}
                   <div className={styles.accountSectionCard} style={{ marginTop: "8px" }}>
                     <div className={styles.accountSectionHeader}>
+                      <ShieldAlert size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
                       <span>Integracja E-mail</span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", padding: "20px 24px", gap: "16px" }}>
@@ -2388,56 +2245,57 @@ export default function Dashboard() {
             );
           })()}
 
-          {/* STRATEGIC AGENT VIEW */}
+
+
+          {/* STRATEGY VIEW */}
           {currentTab === "STRATEGY" && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "24px 16px", overflowY: "auto", background: 'var(--background)' }}>
-              <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '28px' }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto", background: 'var(--background)' }}>
+              <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 
-                {/* Header & Search Bar */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <h2 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#0A2540", margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>Agent Strategiczny (Raport Witryny)</h2>
-                  <p style={{ color: "#64748B", fontSize: "0.92rem", margin: 0, lineHeight: 1.5 }}>Wprowadź adres URL swojej firmy lub konkurenta, aby Agent AI wygenerował profesjonalny raport rynkowy i analizę SWOT.</p>
+                {/* Header & Search Bar (Minimalist iOS Settings style) */}
+                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '8px' }}>
+                  <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>Raport Witryny</h2>
+                  <p style={{ color: "var(--subtext)", fontSize: "1rem", margin: 0 }}>Wprowadź adres URL, aby pobrać informacje i wygenerować raport rynkowy.</p>
                   
-                  <div style={{ marginTop: '20px', background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(10,37,64,0.04)' }}>
+                  <div style={{ marginTop: '24px', background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', overflow: 'hidden', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', boxShadow: 'var(--mac-shadow), var(--glass-reflection)' }}>
                     {strategyResults && !isAnalyzingStrategy ? (
-                      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
-                          <div style={{ fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, marginBottom: '2px' }}>Adres strony</div>
-                          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0A2540' }}>{strategyUrl}</div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Adres strony</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--foreground)' }}>{strategyUrl}</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                          <span style={{ color: '#10B981', fontWeight: 700, fontSize: '0.88rem', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '4px 10px', borderRadius: '8px' }}>✓ Raport zapisany</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <span style={{ color: '#34c759', fontWeight: 500, fontSize: '0.9rem' }}>Raport zapisany</span>
                           <button
                             onClick={() => {
                               setStrategyResults(null);
                               localStorage.removeItem("meskiStrategyResults");
                             }}
-                            style={{ background: '#F1F5F9', color: '#0A2540', border: '1px solid #E2E8F0', padding: '8px 14px', borderRadius: '10px', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
+                            style={{ background: 'rgba(120,120,128,0.1)', color: 'var(--foreground)', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}
                           >
                             Zmień stronę
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className={styles.strategySearchRow} style={{ padding: '12px', display: 'flex', gap: '10px' }}>
-                        <div style={{ flex: 1, background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', display: 'flex', alignItems: 'center', padding: '0 14px' }}>
-                          <Search size={18} style={{ color: '#635BFF', flexShrink: 0 }} />
+                      <div style={{ padding: '12px', display: 'flex', gap: '12px' }}>
+                        <div style={{ flex: 1, background: 'rgba(120,120,128,0.12)', borderRadius: '10px', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
+                          <Search size={16} style={{ color: 'var(--subtext)' }} />
                           <input 
                             type="text"
                             value={strategyUrl}
                             onChange={(e) => setStrategyUrl(e.target.value)}
                             placeholder="np. twojastrona.pl"
-                            style={{ flex: 1, background: 'transparent', border: 'none', padding: '12px 10px', color: '#0A2540', fontSize: '0.95rem', outline: 'none' }}
+                            style={{ flex: 1, background: 'transparent', border: 'none', padding: '10px 12px', color: 'var(--foreground)', fontSize: '1rem', outline: 'none' }}
                           />
                         </div>
                         <button 
                           onClick={handleAnalyzeStrategy}
                           disabled={isAnalyzingStrategy || !strategyUrl}
-                          className={styles.strategyAnalyzeBtn}
-                          style={{ background: '#635BFF', color: '#FFFFFF', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 600, fontSize: '0.9rem', cursor: (isAnalyzingStrategy || !strategyUrl) ? 'not-allowed' : 'pointer', opacity: (isAnalyzingStrategy || !strategyUrl) ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(99, 91, 255, 0.25)', transition: 'all 0.2s' }}
+                          style={{ background: '#007aff', color: 'white', border: 'none', padding: '0 24px', borderRadius: '10px', fontWeight: 500, fontSize: '0.95rem', cursor: (isAnalyzingStrategy || !strategyUrl) ? 'not-allowed' : 'pointer', opacity: (isAnalyzingStrategy || !strategyUrl) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px' }}
                         >
                           {isAnalyzingStrategy && <RefreshCw className="animate-spin" size={16} />}
-                          {isAnalyzingStrategy ? 'Pobieranie...' : 'Zapisz i Analizuj (AI)'}
+                          {isAnalyzingStrategy ? 'Pobieranie...' : 'Zapisz i Analizuj'}
                         </button>
                       </div>
                     )}
@@ -2445,74 +2303,78 @@ export default function Dashboard() {
                 </div>
 
                 {isAnalyzingStrategy && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', color: '#64748B', background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '24px', boxShadow: '0 4px 20px rgba(10,37,64,0.04)' }}>
-                    <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
-                      <div className={styles.pulseRing} style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #635BFF', opacity: 0.2 }}></div>
-                      <div className={styles.pulseRing} style={{ position: 'absolute', inset: '10px', borderRadius: '50%', border: '2px solid #635BFF', opacity: 0.4, animationDelay: '0.5s' }}></div>
-                      <div style={{ background: '#EEF2FF', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E0E7FF', zIndex: 10 }}>
-                        <RefreshCw size={24} className="animate-spin" style={{ color: '#635BFF' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: 'var(--subtext)' }}>
+                    <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
+                      <div className={styles.pulseRing} style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid var(--primary)', opacity: 0.2 }}></div>
+                      <div className={styles.pulseRing} style={{ position: 'absolute', inset: '10px', borderRadius: '50%', border: '2px solid var(--primary)', opacity: 0.4, animationDelay: '0.5s' }}></div>
+                      <div className={styles.pulseRing} style={{ position: 'absolute', inset: '20px', borderRadius: '50%', border: '2px solid var(--primary)', opacity: 0.6, animationDelay: '1s' }}></div>
+                      <div style={{ background: 'var(--card-bg)', borderRadius: '50%', width: '64px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--mac-shadow)', zIndex: 10 }}>
+                        <RefreshCw size={28} className="animate-spin" style={{ color: 'var(--primary)' }} />
                       </div>
                     </div>
                     
-                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0A2540', marginBottom: '14px', textAlign: 'center' }}>
-                      {strategyLoadingStep === 0 && "Skanowanie struktury strony i oferty..."}
-                      {strategyLoadingStep === 1 && "Pobieranie szacunkowych danych rynkowych..."}
-                      {strategyLoadingStep === 2 && "Analiza słów kluczowych i pozycji SEO..."}
+                    <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '16px' }}>
+                      {strategyLoadingStep === 0 && "Skanowanie infrastruktury strony..."}
+                      {strategyLoadingStep === 1 && "Pobieranie danych rynkowych..."}
+                      {strategyLoadingStep === 2 && "Analiza słów kluczowych i CPC..."}
                       {strategyLoadingStep === 3 && "Modelowanie strategii konkurencji..."}
-                      {strategyLoadingStep === 4 && "Generowanie raportu wykonawczego przez AI..."}
+                      {strategyLoadingStep === 4 && "Generowanie raportu Big 4..."}
                       {strategyLoadingStep === 5 && "Zakończono analizę."}
                     </div>
                     
-                    <div style={{ display: 'flex', gap: '6px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       {[0, 1, 2, 3, 4].map((step) => (
-                        <div key={step} style={{ width: '36px', height: '4px', borderRadius: '2px', background: strategyLoadingStep >= step ? '#635BFF' : '#E2E8F0', transition: 'background 0.3s' }}></div>
+                        <div key={step} style={{ width: '40px', height: '4px', borderRadius: '2px', background: strategyLoadingStep >= step ? 'var(--primary)' : 'rgba(120,120,128,0.2)', transition: 'background 0.3s' }}></div>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {strategyResults && !isAnalyzingStrategy && (
-                  <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                  <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     
                     {/* KEY METRICS */}
-                    <div className={styles.strategyMetricsGrid}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
                       
-                      <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 4px 16px rgba(10,37,64,0.04)', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                          <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Trudność SEO</div>
-                          <TrendingUp size={20} style={{ color: '#635BFF' }} />
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(30px)', borderRadius: '50%' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Trudność SEO</div>
+                          <TrendingUp size={20} style={{ color: '#3b82f6' }} />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                          <span style={{ fontSize: '2.2rem', fontWeight: 700, color: '#0A2540', letterSpacing: '-1px' }}>{strategyResults.keyMetrics?.seoDifficulty || 0}</span>
-                          <span style={{ color: '#64748B', fontSize: '0.95rem', fontWeight: 600 }}>/ 100</span>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                          <span style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-1px' }}>{strategyResults.keyMetrics?.seoDifficulty || 0}</span>
+                          <span style={{ color: 'var(--subtext)', fontSize: '1rem', fontWeight: 500 }}>/ 100</span>
                         </div>
-                        <div style={{ marginTop: '12px', height: '6px', background: '#F1F5F9', borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${strategyResults.keyMetrics?.seoDifficulty || 0}%`, background: strategyResults.keyMetrics?.seoDifficulty > 70 ? '#EF4444' : strategyResults.keyMetrics?.seoDifficulty > 40 ? '#F59E0B' : '#10B981', borderRadius: '3px' }}></div>
+                        <div style={{ marginTop: '16px', height: '6px', background: 'rgba(120,120,128,0.15)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${strategyResults.keyMetrics?.seoDifficulty || 0}%`, background: strategyResults.keyMetrics?.seoDifficulty > 70 ? '#ff3b30' : strategyResults.keyMetrics?.seoDifficulty > 40 ? '#ff9500' : '#34c759', borderRadius: '3px' }}></div>
                         </div>
                       </div>
 
-                      <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 4px 16px rgba(10,37,64,0.04)', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                          <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Średni CPC</div>
-                          <DollarSign size={20} style={{ color: '#10B981' }} />
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: 'rgba(16, 185, 129, 0.1)', filter: 'blur(30px)', borderRadius: '50%' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Średni CPC</div>
+                          <DollarSign size={20} style={{ color: '#10b981' }} />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                          <span style={{ fontSize: '2.2rem', fontWeight: 700, color: '#0A2540', letterSpacing: '-1px' }}>{strategyResults.keyMetrics?.averageCpc || "N/A"}</span>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                          <span style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-1px' }}>{strategyResults.keyMetrics?.averageCpc || "N/A"}</span>
                         </div>
-                        <div style={{ marginTop: '12px', fontSize: '0.84rem', color: '#64748B' }}>
+                        <div style={{ marginTop: '16px', fontSize: '0.9rem', color: 'var(--subtext)' }}>
                           Szacowany koszt kliknięcia w Google Ads
                         </div>
                       </div>
 
-                      <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 4px 16px rgba(10,37,64,0.04)', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                          <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Trend Rynku</div>
-                          <Activity size={20} style={{ color: '#F59E0B' }} />
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: 'rgba(255, 149, 0, 0.1)', filter: 'blur(30px)', borderRadius: '50%' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Trend Rynku</div>
+                          <Activity size={20} style={{ color: '#ff9500' }} />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                          <span style={{ fontSize: '2.2rem', fontWeight: 700, color: '#0A2540', letterSpacing: '-1px' }}>{strategyResults.marketOverview?.estimatedGrowth || "Stabilny"}</span>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                          <span style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-1px' }}>{strategyResults.marketOverview?.estimatedGrowth || "Stabilny"}</span>
                         </div>
-                        <div style={{ marginTop: '12px', fontSize: '0.84rem', color: '#64748B' }}>
+                        <div style={{ marginTop: '16px', fontSize: '0.9rem', color: 'var(--subtext)' }}>
                           {strategyResults.marketOverview?.mainTrend || "Ogólny trend wzrostowy w branży"}
                         </div>
                       </div>
@@ -2520,67 +2382,67 @@ export default function Dashboard() {
                     </div>
 
                     {/* SWOT ANALYSIS */}
-                    <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '28px 24px', boxShadow: '0 4px 20px rgba(10,37,64,0.04)' }}>
-                      <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px', fontWeight: 700 }}>Podsumowanie Wykonawcze</div>
-                      <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0A2540', margin: '0 0 24px 0', letterSpacing: '-0.01em' }}>Analiza SWOT & Pozycja Rynkowa</h3>
+                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)' }}>
+                      <div style={{ fontSize: '0.95rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', fontWeight: 600 }}>Podsumowanie Wykonawcze</div>
+                      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 32px 0' }}>Analiza SWOT & Pozycja Rynkowa</h3>
                       
-                      <div className={styles.swotGrid}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                         
                         {/* Strengths */}
-                        <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '16px', padding: '20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#10B981' }}>
-                            <ArrowUpRight size={22} />
-                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Mocne Strony</h4>
+                        <div style={{ background: 'rgba(52, 199, 89, 0.05)', border: '1px solid rgba(52, 199, 89, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#34c759' }}>
+                            <ArrowUpRight size={24} />
+                            <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Mocne Strony</h4>
                           </div>
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {strategyResults.swotAnalysis?.strengths?.map((item: string, i: number) => (
-                              <li key={i} style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#0A2540', lineHeight: 1.5 }}>
-                                <div style={{ color: '#10B981', flexShrink: 0, fontWeight: 700 }}>•</div>{item}
+                              <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '1rem', color: 'var(--foreground)', lineHeight: 1.5 }}>
+                                <div style={{ color: '#34c759', flexShrink: 0 }}>•</div>{item}
                               </li>
                             ))}
                           </ul>
                         </div>
 
                         {/* Weaknesses */}
-                        <div style={{ background: '#FEF2F2', border: '1px solid #FEE2E2', borderRadius: '16px', padding: '20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#EF4444' }}>
-                            <ArrowDownRight size={22} />
-                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Słabe Strony</h4>
+                        <div style={{ background: 'rgba(255, 59, 48, 0.05)', border: '1px solid rgba(255, 59, 48, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#ff3b30' }}>
+                            <ArrowDownRight size={24} />
+                            <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Słabe Strony</h4>
                           </div>
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {strategyResults.swotAnalysis?.weaknesses?.map((item: string, i: number) => (
-                              <li key={i} style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#0A2540', lineHeight: 1.5 }}>
-                                <div style={{ color: '#EF4444', flexShrink: 0, fontWeight: 700 }}>•</div>{item}
+                              <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '1rem', color: 'var(--foreground)', lineHeight: 1.5 }}>
+                                <div style={{ color: '#ff3b30', flexShrink: 0 }}>•</div>{item}
                               </li>
                             ))}
                           </ul>
                         </div>
 
                         {/* Opportunities */}
-                        <div style={{ background: '#EEF2FF', border: '1px solid #E0E7FF', borderRadius: '16px', padding: '20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#635BFF' }}>
-                            <Zap size={22} />
-                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Szanse</h4>
+                        <div style={{ background: 'rgba(0, 122, 255, 0.05)', border: '1px solid rgba(0, 122, 255, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#007aff' }}>
+                            <Zap size={24} />
+                            <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Szanse</h4>
                           </div>
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {strategyResults.swotAnalysis?.opportunities?.map((item: string, i: number) => (
-                              <li key={i} style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#0A2540', lineHeight: 1.5 }}>
-                                <div style={{ color: '#635BFF', flexShrink: 0, fontWeight: 700 }}>•</div>{item}
+                              <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '1rem', color: 'var(--foreground)', lineHeight: 1.5 }}>
+                                <div style={{ color: '#007aff', flexShrink: 0 }}>•</div>{item}
                               </li>
                             ))}
                           </ul>
                         </div>
 
                         {/* Threats */}
-                        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '16px', padding: '20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#D97706' }}>
-                            <ShieldAlert size={22} />
-                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Zagrożenia</h4>
+                        <div style={{ background: 'rgba(255, 149, 0, 0.05)', border: '1px solid rgba(255, 149, 0, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#ff9500' }}>
+                            <ShieldAlert size={24} />
+                            <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Zagrożenia</h4>
                           </div>
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {strategyResults.swotAnalysis?.threats?.map((item: string, i: number) => (
-                              <li key={i} style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#0A2540', lineHeight: 1.5 }}>
-                                <div style={{ color: '#D97706', flexShrink: 0, fontWeight: 700 }}>•</div>{item}
+                              <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '1rem', color: 'var(--foreground)', lineHeight: 1.5 }}>
+                                <div style={{ color: '#ff9500', flexShrink: 0 }}>•</div>{item}
                               </li>
                             ))}
                           </ul>
@@ -2588,57 +2450,60 @@ export default function Dashboard() {
 
                       </div>
                       
-                      <div style={{ marginTop: '20px', padding: '16px 20px', background: '#F8FAFC', borderRadius: '14px', border: '1px solid #E2E8F0', fontSize: '0.95rem', lineHeight: 1.55, color: '#0A2540' }}>
-                        <strong style={{ color: '#635BFF' }}>Werdykt AI:</strong> {strategyResults.marketOverview?.summary}
+                      <div style={{ marginTop: '24px', padding: '16px 24px', background: 'var(--background)', borderRadius: '12px', border: '1px solid var(--border)', fontSize: '1.05rem', lineHeight: 1.6, color: 'var(--foreground)' }}>
+                        <strong style={{ color: 'var(--primary)' }}>Werdykt AI:</strong> {strategyResults.marketOverview?.summary}
                       </div>
                     </div>
 
                     {/* COMPETITORS & ACTION PLAN */}
-                    <div className={styles.competitorPlanGrid}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
                       
                       {/* Competitors Table/Cards */}
-                      <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '28px 24px', boxShadow: '0 4px 20px rgba(10,37,64,0.04)', flex: 2, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px', fontWeight: 700 }}>Mapa Rynku</div>
-                        <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0A2540', margin: '0 0 20px 0', letterSpacing: '-0.01em' }}>Główni Konkurenci</h3>
+                      <div className="glass" style={{ padding: '32px', flex: 2, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontWeight: 600 }}>Mapa Rynku</div>
+                        <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 24px 0', letterSpacing: '-0.02em' }}>Główni Konkurenci</h3>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                           {strategyResults.competitors?.map((comp: any, i: number) => (
                             <div 
                               key={i} 
-                              style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '16px 18px' }}
+                              className="apple-competitor-card"
+                              style={{ cursor: 'pointer' }}
                             >
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                  <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: '#EEF2FF', border: '1px solid #E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#635BFF', flexShrink: 0 }}>
-                                    <Target size={18} />
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'rgba(10, 132, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                                    <Target size={20} />
                                   </div>
                                   <div>
-                                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0A2540' }}>{comp.name}</div>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', letterSpacing: '-0.01em' }}>{comp.name}</div>
                                     <a 
                                       href={comp.url?.startsWith('http') ? comp.url : `https://${comp.url}`} 
                                       target="_blank" 
                                       rel="noopener noreferrer" 
-                                      style={{ fontSize: '0.82rem', color: '#635BFF', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                                      style={{ fontSize: '0.85rem', color: 'var(--subtext)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', transition: 'color 0.2s' }}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--subtext)'}
                                     >
-                                      {comp.url} <ArrowUpRight size={13} />
+                                      {comp.url} <ArrowUpRight size={14} />
                                     </a>
                                   </div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFFFFF', border: '1px solid #E2E8F0', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem' }}>
-                                  <Activity size={13} style={{ color: '#64748B' }} />
-                                  <span style={{ color: '#64748B' }}>Ruch:</span>
-                                  <strong style={{ color: '#0A2540', fontWeight: 700 }}>{comp.trafficEstimate}</strong>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(120, 120, 128, 0.08)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem' }}>
+                                  <Activity size={14} style={{ color: 'var(--subtext)' }} />
+                                  <span style={{ color: 'var(--subtext)' }}>Ruch:</span>
+                                  <strong style={{ color: 'var(--foreground)', fontWeight: 600 }}>{comp.trafficEstimate}</strong>
                                 </div>
                               </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.88rem', borderTop: '1px solid #E2E8F0', paddingTop: '12px' }}>
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                  <span style={{ color: '#64748B', fontWeight: 600, flexShrink: 0 }}>Przewaga:</span>
-                                  <span style={{ color: '#0A2540' }}>{comp.mainAdvantage}</span>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.95rem', borderTop: '1px solid rgba(120, 120, 128, 0.1)', paddingTop: '14px' }}>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <span style={{ color: 'var(--subtext)', flexShrink: 0, width: '75px' }}>Przewaga:</span>
+                                  <span style={{ color: 'var(--foreground)' }}>{comp.mainAdvantage}</span>
                                 </div>
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                  <span style={{ color: '#64748B', fontWeight: 600, flexShrink: 0 }}>Luka:</span>
-                                  <span style={{ color: '#0A2540', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                    <Sparkles size={13} style={{ color: '#F59E0B' }} />
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <span style={{ color: 'var(--subtext)', flexShrink: 0, width: '75px' }}>Luka:</span>
+                                  <span style={{ color: 'var(--foreground)', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                    <Sparkles size={14} style={{ color: '#ff9500' }} />
                                     {comp.strategyGap}
                                   </span>
                                 </div>
@@ -2649,19 +2514,19 @@ export default function Dashboard() {
                       </div>
 
                       {/* Action Plan */}
-                      <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '20px', padding: '28px 24px', boxShadow: '0 4px 20px rgba(10,37,64,0.04)', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontSize: '0.78rem', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px', fontWeight: 700 }}>Rekomendacje</div>
-                        <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0A2540', margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <CheckSquare size={22} style={{ color: '#10B981' }} /> Action Plan
+                      <div style={{ background: 'var(--card-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--mac-shadow), var(--glass-reflection)', backdropFilter: 'saturate(200%) blur(30px)', WebkitBackdropFilter: 'saturate(200%) blur(30px)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontSize: '0.95rem', color: 'var(--subtext)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', fontWeight: 600 }}>Rekomendacje</div>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', margin: '0 0 24px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <CheckSquare size={24} style={{ color: '#34c759' }} /> Action Plan
                         </h3>
                         
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
                           {strategyResults.actionPlan?.map((plan: string, i: number) => (
-                            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                              <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#ECFDF5', color: '#10B981', border: '1px solid #A7F3D0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0, marginTop: '2px' }}>
+                            <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(52, 199, 89, 0.1)', color: '#34c759', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem', flexShrink: 0, marginTop: '2px' }}>
                                 {i + 1}
                               </div>
-                              <div style={{ fontSize: '0.92rem', color: '#0A2540', lineHeight: 1.55 }}>
+                              <div style={{ fontSize: '1.05rem', color: 'var(--foreground)', lineHeight: 1.6 }}>
                                 {plan}
                               </div>
                             </div>
@@ -2670,11 +2535,9 @@ export default function Dashboard() {
                         
                         <button 
                           onClick={() => { setDashboardMode("CLIENTS"); setCurrentTab("CLIENTS" as any); }}
-                          style={{ marginTop: '28px', width: '100%', background: '#635BFF', color: '#FFFFFF', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '0.98rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(99, 91, 255, 0.25)', transition: 'all 0.2s' }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
+                          style={{ marginTop: '32px', width: '100%', background: 'linear-gradient(135deg, var(--primary), var(--ambient-2))', color: 'var(--background)', border: 'none', padding: '16px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 20px rgba(59,130,246,0.3)' }}
                         >
-                          Generuj Leady dla tej strategii <ArrowRight size={18} />
+                          Generuj Leady <ArrowRight size={20} />
                         </button>
                       </div>
 
@@ -2688,148 +2551,197 @@ export default function Dashboard() {
 
           {/* CLIENTS VIEW */}
           {currentTab === "CLIENTS" as any && (
-            <div className="animate-fade-in" style={{ flex: 1, padding: "24px 16px", overflowY: "auto" }}>
-              <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div className="animate-fade-in" style={{ flex: 1, padding: "32px 24px", overflowY: "auto" }}>
+              <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 
                 {/* 1. Header & Stats Panel */}
-                <div className={styles.leadHeaderRow}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
                   <div>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#0A2540", margin: 0, letterSpacing: '-0.02em' }}>Baza Leadów</h2>
-                    <p style={{ color: "#64748B", fontSize: "0.92rem", marginTop: '6px', maxWidth: '600px', lineHeight: 1.5 }}>
-                      Zarządzaj wygenerowanymi leadami i wysyłaj spersonalizowane oferty Cold Email przez AI.
+                    <h2 style={{ fontSize: "2rem", fontWeight: 600, color: "var(--foreground)", margin: 0, letterSpacing: '-0.5px' }}>Klienci</h2>
+                    <p style={{ color: "var(--subtext)", fontSize: "0.95rem", marginTop: '8px', maxWidth: '600px', lineHeight: 1.5 }}>
+                      Zarządzaj wygenerowanymi leadami i monitoruj szanse sprzedaży.
                     </p>
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '16px', background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '16px', padding: '12px 20px', boxShadow: '0 2px 10px rgba(10,37,64,0.03)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, color: '#64748B' }}>Wszystkie</span>
-                      <span style={{ fontSize: '1.3rem', fontWeight: 700, color: '#0A2540', marginTop: '2px' }}>{leads.length}</span>
+                  <div style={{ display: 'flex', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, color: 'var(--subtext)' }}>Wszystkie</span>
+                      <span style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--foreground)', marginTop: '2px' }}>{leads.length}</span>
                     </div>
-                    <div style={{ width: '1px', background: '#E6EBF1', margin: '0 4px' }}></div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, color: '#64748B' }}>Gorące</span>
-                      <span style={{ fontSize: '1.3rem', fontWeight: 700, color: '#10B981', marginTop: '2px' }}>{leads.filter(l => l.probability >= 80).length}</span>
+                    <div style={{ width: '1px', background: 'var(--border)', margin: '0 8px' }}></div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, color: 'var(--subtext)' }}>Gorące</span>
+                      <span style={{ fontSize: '1.4rem', fontWeight: 600, color: '#34c759', marginTop: '2px' }}>{leads.filter(l => l.probability >= 80).length}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* 2. Toolbar */}
-                <div className={styles.leadToolbar}>
-                  <div style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', padding: '8px 16px', borderRadius: '10px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
-                    Widok: Aktywne Lead'y
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.85rem', color: 'var(--subtext)', fontWeight: 500 }}>
+                      Widok: Aktywne
+                    </div>
                   </div>
                   <button 
                     onClick={handleGenerateLeads}
                     disabled={generatingLeads}
-                    className={styles.leadSearchBtn}
+                    style={{ 
+                      background: generatingLeads ? 'var(--card-bg)' : 'var(--foreground)', 
+                      color: generatingLeads ? 'var(--subtext)' : 'var(--background)',
+                      border: '1px solid ' + (generatingLeads ? 'var(--border)' : 'transparent'),
+                      padding: '8px 16px', 
+                      borderRadius: '8px',
+                      fontWeight: 500,
+                      fontSize: '0.9rem',
+                      cursor: generatingLeads ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s ease',
+                      boxShadow: generatingLeads ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                    onMouseEnter={(e) => { if(!generatingLeads) { e.currentTarget.style.opacity = '0.9'; } }}
+                    onMouseLeave={(e) => { if(!generatingLeads) { e.currentTarget.style.opacity = '1'; } }}
                   >
                     {generatingLeads ? (
-                      <><RefreshCw size={16} className="animate-spin" /> Analiza rynku...</>
+                      <><RefreshCw size={16} className="animate-spin" /> Analiza...</>
                     ) : (
-                      <><Search size={16} /> Szukaj nowych leadów (AI)</>
+                      <><Search size={16} /> Szukaj leadów</>
                     )}
                   </button>
                 </div>
 
                 {/* 3. Empty State */}
                 {leads.length === 0 && !generatingLeads && (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFFFFF', border: '1px dashed #CBD5E1', borderRadius: '24px' }}>
-                    <Users size={56} style={{ color: '#635BFF', opacity: 0.6, margin: '0 auto 20px' }} />
-                    <h3 style={{ color: '#0A2540', fontSize: '1.3rem', fontWeight: 700, marginBottom: '8px' }}>Brak leadów w systemie</h3>
-                    <p style={{ color: '#64748B', maxWidth: '400px', margin: '0 auto', lineHeight: 1.55, fontSize: '0.9rem' }}>Kliknij przycisk "Szukaj nowych leadów", aby sztuczna inteligencja rozpoczęła analizę rynku dla Twojej firmy.</p>
+                  <div style={{ textAlign: 'center', padding: '80px', background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '32px' }}>
+                    <Users size={64} style={{ color: 'var(--subtext)', opacity: 0.5, margin: '0 auto 24px' }} />
+                    <h3 style={{ color: 'var(--foreground)', fontSize: '1.5rem', marginBottom: '12px' }}>Brak leadów w systemie</h3>
+                    <p style={{ color: 'var(--subtext)', maxWidth: '400px', margin: '0 auto', lineHeight: 1.6 }}>Kliknij przycisk "Znajdź nowe Leady", aby sztuczna inteligencja rozpoczęła analizę rynku na podstawie profilu Twojej firmy.</p>
                   </div>
                 )}
 
                 {/* 4. New Leads Section */}
                 {leads.filter(l => l.status === "NEW").length > 0 && (
                   <div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {leads.filter(l => l.status === "NEW").map((lead) => (
-                        <div key={lead.id} className={styles.leadCard}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap' }}>
-                            <div style={{ flex: 1, minWidth: '240px' }}>
-                              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0A2540', margin: '0 0 6px 0' }}>{lead.name}</h3>
-                              <p style={{ color: '#64748B', lineHeight: 1.5, margin: 0, whiteSpace: 'pre-wrap', fontSize: '0.88rem' }}>{lead.description}</p>
+                        <div key={lead.id} style={{ 
+                          background: 'var(--card-bg)', 
+                          border: '1px solid var(--border)',
+                          borderRadius: '12px',
+                          padding: '20px 24px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '16px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                          transition: 'all 0.2s ease',
+                          position: 'relative',
+                        }}
+                        onMouseEnter={(e) => { 
+                          e.currentTarget.style.borderColor = 'rgba(139,92,246,0.3)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                        }}
+                        onMouseLeave={(e) => { 
+                          e.currentTarget.style.borderColor = 'var(--border)';
+                          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.02)';
+                        }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1, paddingRight: '24px' }}>
+                              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', margin: '0 0 8px 0' }}>{lead.name}</h3>
+                              <p style={{ color: 'var(--subtext)', lineHeight: 1.5, margin: 0, whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>{lead.description}</p>
                             </div>
                             
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                               <div style={{ 
-                                background: '#F1F5F9',
-                                border: '1px solid #E2E8F0',
-                                color: '#475569', 
-                                padding: '4px 10px', 
-                                borderRadius: '8px', 
-                                fontSize: '0.72rem', 
-                                fontWeight: 600,
+                                background: 'transparent',
+                                border: '1px solid var(--border)',
+                                color: 'var(--subtext)', 
+                                padding: '4px 8px', 
+                                borderRadius: '6px', 
+                                fontSize: '0.7rem', 
+                                fontWeight: 500,
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.04em'
+                                letterSpacing: '0.5px'
                               }}>
                                 {lead.source}
                               </div>
                               <div style={{ 
-                                background: lead.probability >= 80 ? '#ECFDF5' : lead.probability >= 60 ? '#FFFBEB' : '#FEF2F2', 
-                                border: `1px solid ${lead.probability >= 80 ? '#A7F3D0' : lead.probability >= 60 ? '#FDE68A' : '#FEE2E2'}`,
-                                color: lead.probability >= 80 ? '#10B981' : lead.probability >= 60 ? '#D97706' : '#EF4444', 
-                                padding: '4px 10px', 
-                                borderRadius: '8px', 
-                                fontSize: '0.72rem', 
-                                fontWeight: 700,
+                                background: lead.probability >= 80 ? 'rgba(52,199,89,0.1)' : lead.probability >= 60 ? 'rgba(255,149,0,0.1)' : 'rgba(255,59,48,0.1)', 
+                                border: `1px solid ${lead.probability >= 80 ? 'rgba(52,199,89,0.2)' : lead.probability >= 60 ? 'rgba(255,149,0,0.2)' : 'rgba(255,59,48,0.2)'}`,
+                                color: lead.probability >= 80 ? '#34c759' : lead.probability >= 60 ? '#ff9500' : '#ff3b30', 
+                                padding: '4px 8px', 
+                                borderRadius: '6px', 
+                                fontSize: '0.7rem', 
+                                fontWeight: 600,
                                 textTransform: 'uppercase',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '4px'
                               }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></div>
-                                {lead.probability}% dopasowania
+                                <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor' }}></div>
+                                {lead.probability}%
                               </div>
                             </div>
                           </div>
   
-                          <div className={styles.leadBtnRow}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                             <button 
                               onClick={() => handleOpenContactModal(lead)}
                               style={{ 
-                                background: '#635BFF', 
-                                color: '#FFFFFF', 
-                                border: 'none', 
-                                padding: '10px 18px', 
-                                borderRadius: '10px', 
-                                fontWeight: 600, 
-                                fontSize: '0.88rem',
+                                background: 'transparent', 
+                                color: 'var(--foreground)', 
+                                border: '1px solid var(--foreground)', 
+                                padding: '6px 12px', 
+                                borderRadius: '6px', 
+                                fontWeight: 500, 
+                                fontSize: '0.85rem',
                                 cursor: 'pointer', 
                                 transition: 'all 0.2s', 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                justifyContent: 'center',
-                                gap: '6px',
-                                boxShadow: '0 4px 12px rgba(99,91,255,0.25)'
+                                gap: '6px' 
                               }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
+                              onMouseEnter={(e) => { 
+                                e.currentTarget.style.background = 'var(--foreground)'; 
+                                e.currentTarget.style.color = 'var(--background)'; 
+                              }}
+                              onMouseLeave={(e) => { 
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = 'var(--foreground)';
+                              }}
                             >
-                              <Sparkles size={16} /> Napisz (AI Cold Email)
+                              <Sparkles size={14} /> Napisz (AI)
                             </button>
                             <button 
                               onClick={() => handleUpdateLeadStatus(lead.id, "CONTACTED")}
                               style={{ 
-                                background: '#F1F5F9', 
-                                color: '#475569', 
-                                border: '1px solid #E2E8F0', 
-                                padding: '10px 16px', 
-                                borderRadius: '10px', 
-                                fontWeight: 600, 
-                                fontSize: '0.88rem',
+                                background: 'transparent', 
+                                color: 'var(--subtext)', 
+                                border: '1px solid var(--border)', 
+                                padding: '6px 12px', 
+                                borderRadius: '6px', 
+                                fontWeight: 500, 
+                                fontSize: '0.85rem',
                                 cursor: 'pointer', 
                                 transition: 'all 0.2s', 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                justifyContent: 'center',
                                 gap: '6px' 
                               }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = '#E2E8F0'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = '#F1F5F9'; }}
+                              onMouseEnter={(e) => { 
+                                e.currentTarget.style.background = 'var(--foreground)'; 
+                                e.currentTarget.style.color = 'var(--background)'; 
+                                e.currentTarget.style.borderColor = 'var(--foreground)';
+                              }}
+                              onMouseLeave={(e) => { 
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = 'var(--subtext)';
+                                e.currentTarget.style.borderColor = 'var(--border)';
+                              }}
                             >
-                              <CheckCircle size={16} /> Oznacz jako kontakt
+                              <CheckCircle size={14} /> Oznacz jako kontakt
                             </button>
                           </div>
                         </div>
@@ -3096,75 +3008,76 @@ export default function Dashboard() {
 
           {/* APP PASSWORD PROMPT */}
           {!hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
-            <div className="animate-fade-in" style={{ padding: "24px 16px", display: "flex", justifyContent: "center", alignItems: "flex-start", height: "100%", flex: 1, width: "100%", overflowY: "auto" }}>
-              <div style={{ maxWidth: "600px", width: "100%", background: "#FFFFFF", borderRadius: "24px", padding: "32px 24px", border: "1px solid #E6EBF1", boxShadow: "0 10px 40px rgba(10, 37, 64, 0.08)", margin: "0 auto" }}>
-                <div style={{ textAlign: "center", marginBottom: "28px" }}>
-                  <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "#FEF2F2", color: "#EF4444", border: "1px solid #FEE2E2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                    <ShieldAlert size={32} />
+            <div className="animate-fade-in" style={{ padding: "40px 20px", display: "flex", justifyContent: "center", alignItems: "flex-start", height: "100%", flex: 1, width: "100%", overflowY: "auto" }}>
+              <div style={{ maxWidth: "600px", width: "100%", background: "var(--card-bg)", borderRadius: "16px", padding: "24px", border: "1px solid var(--border)", boxShadow: "var(--mac-shadow)", margin: "0 auto" }}>
+                <div style={{ textAlign: "center", marginBottom: "24px" }}>
+                  <div style={{ width: "64px", height: "64px", borderRadius: "32px", background: "rgba(255, 59, 48, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <ShieldAlert size={32} color="var(--danger)" />
                   </div>
-                  <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "#0A2540", marginBottom: "8px", letterSpacing: "-0.02em" }}>Wymagane Hasło Aplikacji Google</h2>
-                  <p style={{ color: "#64748B", fontSize: "0.92rem", lineHeight: 1.55 }}>
+                  <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "8px" }}>Wymagane Hasło Aplikacji Google</h2>
+                  <p style={{ color: "var(--subtext)", lineHeight: 1.5 }}>
                     Aby Agent AI mógł bezpiecznie czytać i odpowiadać na Twoje maile bez przerw, musisz wygenerować <strong>Hasło Aplikacji</strong> w swoim koncie Google.
                   </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
                   
                   {/* Step 1 */}
-                  <div className={styles.gmailStepCard} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '18px 20px', transition: 'all 0.2s' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#EEF2FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, flexShrink: 0, border: '1px solid #E0E7FF' }}>1</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 700, color: '#0A2540' }}>Włącz logowanie dwuetapowe (2FA)</h4>
-                      <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B', lineHeight: 1.45 }}>Jest to absolutnie wymagane przez Google, aby wygenerować Hasło Aplikacji.</p>
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>1</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz logowanie dwuetapowe (2FA)</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Jest to absolutnie wymagane przez Google, aby móc wygenerować Hasło Aplikacji.</p>
                     </div>
-                    <a href="https://myaccount.google.com/signinoptions/two-step-verification/enroll-welcome" target="_blank" rel="noreferrer" className={styles.gmailStepBtn} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0A2540', textDecoration: 'none', padding: '10px 16px', borderRadius: '10px', fontSize: '0.88rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
-                      Włącz 2FA <ExternalLink size={14} color="#635BFF" />
+                    <a href="https://myaccount.google.com/signinoptions/two-step-verification/enroll-welcome" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Włącz 2FA <ExternalLink size={14} style={{ marginLeft: '6px' }} />
                     </a>
                   </div>
 
                   {/* Step 2 */}
-                  <div className={styles.gmailStepCard} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '18px 20px', transition: 'all 0.2s' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#EEF2FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, flexShrink: 0, border: '1px solid #E0E7FF' }}>2</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 700, color: '#0A2540' }}>Włącz POP w Gmailu</h4>
-                      <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B', lineHeight: 1.45 }}>Zaznacz opcję <strong>"Włącz POP dla poczty otrzymywanej od tej chwili"</strong> i kliknij Zapisz Zmiany.</p>
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>2</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Włącz POP w Gmailu</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Zaznacz opcję <strong>"Włącz POP dla poczty otrzymywanej od tej chwili"</strong> i kliknij Zapisz Zmiany.</p>
                     </div>
-                    <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" rel="noreferrer" className={styles.gmailStepBtn} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0A2540', textDecoration: 'none', padding: '10px 16px', borderRadius: '10px', fontSize: '0.88rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
-                      Ustawienia POP <ExternalLink size={14} color="#635BFF" />
+                    <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Ustawienia POP <ExternalLink size={14} style={{ marginLeft: '6px' }} />
                     </a>
                   </div>
 
                   {/* Step 3 */}
-                  <div className={styles.gmailStepCard} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '18px 20px', transition: 'all 0.2s' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, flexShrink: 0, border: '1px solid #A7F3D0' }}>3</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 700, color: '#0A2540' }}>Utwórz Hasło Aplikacji</h4>
-                      <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B', lineHeight: 1.45 }}>Google poprosi Cię o podanie nazwy (np. "MESKIAI"). <br/><em style={{ opacity: 0.85 }}>Wymaga włączonego logowania dwuetapowego (2FA).</em></p>
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0 }}>3</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Utwórz Hasło Aplikacji</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Google poprosi Cię o podanie nazwy (np. "MESKIAI"). <br/><em style={{ opacity: 0.8 }}>Wymaga włączonego logowania dwuetapowego (2FA) na koncie Google.</em></p>
                     </div>
-                    <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className={styles.gmailStepBtn} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0A2540', textDecoration: 'none', padding: '10px 16px', borderRadius: '10px', fontSize: '0.88rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
-                      Utwórz Hasło <ExternalLink size={14} color="#635BFF" />
+                    <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', textDecoration: 'none', padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center' }}>
+                      Utwórz Hasło <ExternalLink size={14} style={{ marginLeft: '6px' }} />
                     </a>
                   </div>
 
                   {/* Step 4 */}
-                  <div className={styles.gmailStepCard} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px 20px', transition: 'all 0.2s' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F5F3FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, flexShrink: 0, border: '1px solid #E0E7FF' }}>4</div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+                  <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px 20px', display: 'flex', alignItems: 'flex-start', gap: '20px', transition: 'all 0.2s', cursor: 'default' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold', flexShrink: 0, marginTop: '4px' }}>4</div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       <div>
-                        <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 700, color: '#0A2540' }}>Wklej wygenerowane 16-literowe hasło</h4>
-                        <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B', lineHeight: 1.45 }}>Możesz wkleić je ze spacjami lub bez.</p>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--foreground)' }}>Wklej wygenerowane 16-literowe hasło</h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--subtext)', lineHeight: 1.4 }}>Możesz wkleić je ze spacjami lub bez.</p>
                       </div>
                       
-                      <div className={styles.gmailInputRow} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', width: '100%' }}>
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                         <input 
                           type="text" 
                           value={appPasswordInput}
                           onChange={e => { setAppPasswordInput(e.target.value); setAppPasswordError(""); }}
                           placeholder="xxxx xxxx xxxx xxxx"
                           className={styles.input}
-                          style={{ flex: '1 1 200px', padding: "12px 16px", borderRadius: "12px", border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0A2540", fontSize: "1.05rem", letterSpacing: '1px', minWidth: '0' }}
+                          style={{ flex: '1 1 270px', padding: "12px 16px", borderRadius: "10px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--foreground)", fontSize: "1.1rem", letterSpacing: '1px', minWidth: '0' }}
                         />
                         <button 
+                          className="btn btn-primary"
                           disabled={savingAppPassword || !appPasswordInput.trim()}
                           onClick={async () => {
                             setSavingAppPassword(true);
@@ -3191,7 +3104,7 @@ export default function Dashboard() {
                             }
                             setSavingAppPassword(false);
                           }}
-                          style={{ padding: "12px 24px", whiteSpace: "nowrap", flex: '1 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#635BFF', color: '#FFFFFF', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(99, 91, 255, 0.25)', cursor: 'pointer' }}
+                          style={{ padding: "12px 24px", whiteSpace: "nowrap", flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           {savingAppPassword ? <RefreshCw className={styles['animate-spin']} size={16} /> : <CheckCircle size={16} style={{ marginRight: '6px' }} />}
                           Połącz z AI
@@ -3200,17 +3113,17 @@ export default function Dashboard() {
                       
                       {/* App Password warning banner */}
                       <div style={{ 
-                        display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '12px 14px', borderRadius: '12px', 
-                        background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: '0.82rem', color: '#92400E', lineHeight: 1.45 
+                        display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px 16px', borderRadius: '12px', 
+                        background: 'rgba(255, 149, 0, 0.08)', border: '1px solid rgba(255, 149, 0, 0.2)', fontSize: '0.85rem', color: 'var(--warning)', lineHeight: 1.45 
                       }}>
-                        <Info size={16} style={{ marginTop: '2px', flexShrink: 0, color: '#D97706' }} />
+                        <Info size={16} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--warning)' }} />
                         <div>
-                          <strong>Ważne bezpieczeństwo:</strong> Wklej tutaj 16-literowe hasło aplikacji wygenerowane w ustawieniach Google. Zwykłe główne hasło do poczty Gmail <strong>nie zadziała</strong> ze względów bezpieczeństwa.
+                          <strong>Ważne bezpieczeństwo:</strong> Wklej tutaj 16-literowe hasło aplikacji wygenerowane w ustawieniach Google. Zwykłe główne hasło, którego używasz do logowania na pocztę Gmail, <strong>nie zadziała</strong> ze względów bezpieczeństwa Google.
                         </div>
                       </div>
 
                       {appPasswordError && (
-                        <div style={{ color: "#DC2626", fontSize: "0.85rem", background: "#FEF2F2", padding: "10px 14px", borderRadius: "10px", border: "1px solid #FEE2E2" }}>
+                        <div style={{ color: "var(--danger)", fontSize: "0.85rem", background: "rgba(255,59,48,0.1)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,59,48,0.2)" }}>
                           {appPasswordError}
                         </div>
                       )}
@@ -3222,39 +3135,9 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* MOBILE MAIL FOLDER TABS BAR */}
-          {hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && !selectedThread && (
-            <div className={styles.mobileMailFolderTabs}>
-              <button 
-                className={`${styles.mobileFolderTab} ${currentTab === 'INBOX' ? styles.activeFolderTab : ''}`}
-                onClick={() => { setCurrentTab('INBOX'); setSelectedThread(null); }}
-              >
-                Do Akceptacji ({(threads || []).filter(t => t.status === 'PENDING_APPROVAL').length})
-              </button>
-              <button 
-                className={`${styles.mobileFolderTab} ${currentTab === 'IMPORTANT' ? styles.activeFolderTab : ''}`}
-                onClick={() => { setCurrentTab('IMPORTANT'); setSelectedThread(null); }}
-              >
-                Ważne ({(threads || []).filter(t => t.status === 'REQUIRES_ATTENTION').length})
-              </button>
-              <button 
-                className={`${styles.mobileFolderTab} ${currentTab === 'SENT' ? styles.activeFolderTab : ''}`}
-                onClick={() => { setCurrentTab('SENT'); setSelectedThread(null); }}
-              >
-                Wysłane ({(threads || []).filter(t => t.status === 'REPLIED' || t.status === 'AUTO_REPLIED').length})
-              </button>
-              <button 
-                className={`${styles.mobileFolderTab} ${currentTab === 'SPAM' ? styles.activeFolderTab : ''}`}
-                onClick={() => { setCurrentTab('SPAM'); setSelectedThread(null); }}
-              >
-                Spam ({(threads || []).filter(t => t.status === 'IGNORED' && !t.threadId?.startsWith('HISTORY_')).length})
-              </button>
-            </div>
-          )}
-
           {/* THREADS LIST (INBOX, SENT, SPAM) */}
           {hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
-            <div className={`animate-fade-in ${styles.threadListPanel} ${selectedThread ? styles.hasSelection : ''}`}>
+            <div className={`animate-fade-in ${styles.threadListPanel}`}>
               <div className={styles.threadList}>
                 {filteredThreads.length === 0 && (
                   <div className={styles.emptyState}>Brak wiadomości.</div>
@@ -3342,40 +3225,21 @@ export default function Dashboard() {
 
           {/* THREAD VIEW */}
           {hasAppPassword && ["INBOX", "IMPORTANT", "SENT", "SPAM"].includes(currentTab) && (
-            <div className={`animate-fade-in animate-delay-1 ${styles.threadViewPanel} ${!selectedThread ? styles.noSelection : ''}`}>
+            <div className={`animate-fade-in animate-delay-1 ${styles.threadViewPanel}`}>
               {!selectedThread ? (
                 <div className={styles.emptyState}>Wybierz wiadomość z listy po lewej stronie.</div>
               ) : (
                 <>
                   <div className={styles.threadViewHeader}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                      <button 
-                        className={styles.mobileBackButton}
-                        onClick={() => setSelectedThread(null)}
-                      >
-                        <ChevronLeft size={20} color="#635BFF" /> Skrzynka
-                      </button>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#EEF2FF', color: '#635BFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.88rem', border: '1px solid #E0E7FF', flexShrink: 0 }}>
-                          {selectedThread.emails[0]?.from ? selectedThread.emails[0].from.charAt(0).toUpperCase() : 'M'}
-                        </div>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <h2 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#0A2540', margin: 0, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {selectedThread.emails[0]?.subject}
-                          </h2>
-                          <div style={{ fontSize: '0.78rem', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {selectedThread.emails[0]?.from.split('<')[0]}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)' }}>{selectedThread.emails[0]?.subject}</h2>
                     <button 
-                      style={{ background: 'transparent', color: '#EF4444', border: 'none', padding: '8px', cursor: 'pointer', borderRadius: '8px', flexShrink: 0 }}
+                      className="btn" 
+                      style={{ background: 'transparent', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '6px 12px' }}
                       onClick={() => handleDeleteThread(selectedThread.id)}
                       disabled={deleting}
-                      title="Usuń wątek"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} style={{ marginRight: '6px' }} />
+                      Usuń wątek
                     </button>
                   </div>
                   
@@ -3581,40 +3445,14 @@ export default function Dashboard() {
           )}
 
         </div>
-      {isTopupModalOpen && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", zIndex: 99999, display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }}>
-          <div style={{ background: "#fff", width: "100%", maxWidth: "450px", borderRadius: "16px", padding: "24px", position: "relative" }}>
-            <button onClick={() => { setIsTopupModalOpen(false); setTopupClientSecret(null); }} style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", cursor: "pointer", color: "#6b7280" }}>
-              <X size={24} />
-            </button>
-            {isTopupLoading && <div style={{ padding: "40px", textAlign: "center" }}><div className={styles.spinner} style={{ display: "inline-block" }}></div><p style={{marginTop: "12px", color:"#6b7280", fontWeight:500}}>Ładowanie kasy...</p></div>}
-            {!isTopupLoading && topupClientSecret && stripePromise && (
-              <Elements stripe={stripePromise} options={{ clientSecret: topupClientSecret, appearance: { theme: 'stripe' } }}>
-                <TopUpCheckoutForm amountText="100 Kredytów (20,00 zł)" />
-              </Elements>
-            )}
-          </div>
-        </div>
-      )}
       </main>
 
       {/* Contact Lead Modal (moved to root for proper fixed positioning) */}
       {contactingLead && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(10, 37, 64, 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <div className="animate-fade-in" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '24px', padding: '32px 24px', width: '100%', maxWidth: '580px', boxShadow: '0 20px 50px -10px rgba(10,37,64,0.15)', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
-            <button 
-              onClick={() => setContactingLead(null)} 
-              style={{ position: 'absolute', top: '18px', right: '18px', background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#0A2540'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; }}
-            >
-              <X size={18} />
-            </button>
-
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#0A2540', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', letterSpacing: '-0.02em' }}>
-              <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: '#EEF2FF', border: '1px solid #E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#635BFF' }}>
-                <Sparkles size={20} />
-              </div>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in-up" style={{ background: 'var(--modal-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '92%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={20} style={{ color: 'var(--primary)' }} />
               Napisz (Cold Email) do: {contactingLead.name}
             </h3>
             
@@ -3623,47 +3461,47 @@ export default function Dashboard() {
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'center', 
-                padding: '20px 0', 
-                color: '#64748B',
-                gap: '20px'
+                padding: '24px 0', 
+                color: 'var(--subtext)',
+                gap: '24px'
               }}>
                 {/* AI Pulse Scanner Graphic */}
                 <div style={{ 
                   position: 'relative', 
-                  width: '64px', 
-                  height: '64px', 
+                  width: '72px', 
+                  height: '72px', 
                   borderRadius: '50%', 
-                  background: '#EEF2FF', 
+                  background: 'rgba(139,92,246,0.08)', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  border: '1px solid #E0E7FF'
+                  border: '1px solid rgba(139,92,246,0.15)'
                 }}>
                   <div className="animate-spin" style={{
                     position: 'absolute',
                     inset: '-4px',
                     borderRadius: '50%',
-                    border: '1.5px dashed #635BFF',
-                    animationDuration: '8s'
+                    border: '1.5px dashed rgba(139,92,246,0.4)',
+                    animationDuration: '10s'
                   }}></div>
-                  <Sparkles size={26} style={{ color: '#635BFF', animation: 'pulse 2s infinite ease-in-out' }} />
+                  <Sparkles size={28} style={{ color: 'var(--primary)', animation: 'pulse 2s infinite ease-in-out' }} />
                 </div>
 
                 <div style={{ textAlign: 'center', width: '100%' }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', fontWeight: 700, color: '#0A2540', letterSpacing: '-0.01em' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', fontWeight: 600, color: 'var(--foreground)', letterSpacing: '-0.2px' }}>
                     Agent AI projektuje wiadomość
                   </h4>
-                  <p style={{ margin: 0, fontSize: '0.86rem', color: '#64748B' }}>
-                    Trwa dopasowywanie oferty do profilu firmy odbiorcy.
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--subtext)', opacity: 0.8 }}>
+                    Trwa dopasowywanie treści i tonu komunikacji do profilu firmy.
                   </p>
                 </div>
 
                 {/* Steps container */}
                 <div style={{ 
                   width: '100%', 
-                  background: '#F8FAFC', 
-                  border: '1px solid #E2E8F0', 
-                  borderRadius: '16px', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '12px', 
                   padding: '16px 20px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -3682,24 +3520,24 @@ export default function Dashboard() {
                         display: 'flex', 
                         alignItems: 'center', 
                         gap: '12px',
-                        opacity: isDone || isActive ? 1 : 0.4,
+                        opacity: isDone || isActive ? 1 : 0.35,
                         transition: 'opacity 0.3s ease'
                       }}>
                         {isDone ? (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '50%', background: '#ECFDF5', color: '#10B981', border: '1px solid #A7F3D0' }}>
-                            <CheckCircle size={12} />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(52,199,89,0.15)', color: '#34c759' }}>
+                            <CheckCircle size={11} />
                           </div>
                         ) : isActive ? (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px' }}>
-                            <RefreshCw size={13} className="animate-spin" style={{ color: '#635BFF' }} />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px' }}>
+                            <RefreshCw size={11} className="animate-spin" style={{ color: 'var(--primary)' }} />
                           </div>
                         ) : (
-                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1.5px solid #CBD5E1' }}></div>
+                          <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '1.5px solid var(--border)', opacity: 0.5 }}></div>
                         )}
                         <span style={{ 
-                          fontSize: '0.85rem', 
-                          fontWeight: isActive ? 700 : 500, 
-                          color: isActive ? '#0A2540' : '#64748B' 
+                          fontSize: '0.8rem', 
+                          fontWeight: isActive ? 600 : 500, 
+                          color: isActive ? 'var(--foreground)' : 'var(--subtext)' 
                         }}>
                           {stepText}
                         </span>
@@ -3709,12 +3547,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* Progress bar */}
-                <div style={{ width: '100%', height: '4px', background: '#E2E8F0', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '3px', background: 'var(--border)', borderRadius: '1.5px', overflow: 'hidden' }}>
                   <div style={{ 
                     height: '100%', 
                     width: `${(generationStep + 1) * 25}%`, 
-                    background: '#635BFF', 
-                    borderRadius: '2px',
+                    background: 'linear-gradient(90deg, var(--primary), #a855f7)', 
+                    borderRadius: '1.5px',
                     transition: 'width 0.4s ease-in-out' 
                   }}></div>
                 </div>
@@ -3722,54 +3560,44 @@ export default function Dashboard() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#0A2540', marginBottom: '6px' }}>E-mail Odbiorcy</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>E-mail Odbiorcy</label>
                   <input 
                     type="email"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="np. kontakt@firma.pl"
-                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#0A2540', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = '#635BFF'; e.currentTarget.style.background = '#FFFFFF'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = '#F8FAFC'; }}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#0A2540', marginBottom: '6px' }}>Temat Wiadomości</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Temat Wiadomości</label>
                   <input 
                     type="text"
                     value={contactSubject}
                     onChange={(e) => setContactSubject(e.target.value)}
-                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#0A2540', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = '#635BFF'; e.currentTarget.style.background = '#FFFFFF'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = '#F8FAFC'; }}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#0A2540', marginBottom: '6px' }}>Treść Wiadomości</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--subtext)', marginBottom: '8px' }}>Treść Wiadomości</label>
                   <textarea 
                     value={contactBody}
                     onChange={(e) => setContactBody(e.target.value)}
-                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC', color: '#0A2540', fontSize: '0.9rem', minHeight: '180px', resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = '#635BFF'; e.currentTarget.style.background = '#FFFFFF'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = '#F8FAFC'; }}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', minHeight: '200px', resize: 'vertical' }}
                   />
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
                   <button 
                     onClick={() => setContactingLead(null)}
-                    style={{ padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#475569', cursor: 'pointer', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#E2E8F0'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                    style={{ background: 'transparent', color: 'var(--subtext)', border: '1px solid var(--border)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}
                   >
                     Anuluj
                   </button>
                   <button 
                     onClick={handleSendLeadEmail}
                     disabled={isSendingEmail}
-                    style={{ padding: '11px 24px', fontWeight: 600, fontSize: '0.88rem', background: '#635BFF', border: 'none', borderRadius: '10px', color: '#FFFFFF', cursor: isSendingEmail ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(99, 91, 255, 0.25)', transition: 'all 0.2s', opacity: isSendingEmail ? 0.6 : 1 }}
-                    onMouseEnter={(e) => { if (!isSendingEmail) { e.currentTarget.style.background = '#5249E0'; e.currentTarget.style.transform = 'translateY(-1px)'; } }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = '#635BFF'; e.currentTarget.style.transform = 'none'; }}
+                    style={{ background: 'var(--primary)', color: 'var(--background)', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: isSendingEmail ? 'not-allowed' : 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
                     {isSendingEmail ? <><RefreshCw size={16} className="animate-spin" /> Wysyłam...</> : <><Send size={16} /> Wyślij</>}
                   </button>

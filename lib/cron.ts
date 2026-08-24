@@ -1,8 +1,9 @@
 import { prisma } from './prisma';
-import { fetchUnreadEmailsPOP3, sendReplySMTP, FetchedEmail } from './mail';
+import { fetchUnreadEmailsIMAP, sendReplySMTP, FetchedEmail } from './mail';
 import { PRICE_MAX, PRICE_PRO, getPlanLimits } from './pricing';
-import { generateText } from 'ai';
-import { google as googleAI } from '@ai-sdk/google';
+import { decrypt } from './crypto';
+import { getTrialState, TRIAL_LIMITS } from './trial';
+import { getOrderContextForEmail } from './orders';
 
 // ─── Retry helper ──────────────────────────────────────────────────────────────
 async function withRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 1500): Promise<T> {
@@ -101,21 +102,23 @@ export async function runSync() {
           const now = new Date();
           
           // Write the lock atomically: only if it's currently null or expired
-          const lockResult = await prisma.userSettings.updateMany({
-            where: { 
-              userId: user.id,
-              OR: [
-                { runLockedUntil: null },
-                { runLockedUntil: { lte: now } }
-              ]
-            },
-            data: { runLockedUntil: new Date(Date.now() + 10 * 60 * 1000) }
-          }).catch(() => ({ count: 0 }));
-
-          if (lockResult.count === 0) {
-            console.log(`[Agent AI] 🔒 Użytkownik ${user.email} jest zablokowany przez inną instancję (lub błąd), pomijam.`);
+          const settings = await prisma.userSettings.findUnique({ where: { userId: user.id } });
+          if (!settings) {
+            console.log(`[Agent AI] Użytkownik ${user.email} pominięty (brak profilu).`);
             return;
           }
+          if (settings.runLockedUntil && settings.runLockedUntil > now) {
+            console.log(`[Agent AI] 🔒 Użytkownik ${user.email} jest zablokowany do ${settings.runLockedUntil.toISOString()}, pomijam.`);
+            return;
+          }
+
+          // Lock for 2 minutes
+          await prisma.userSettings.update({
+            where: { userId: user.id },
+            data: { runLockedUntil: new Date(Date.now() + 2 * 60 * 1000) }
+          }).catch(err => console.error(`[Lock Error]`, err.message));
+
+          // Kod błędu lockResult usunięty
 
           try {
             await processUser(user);
@@ -146,6 +149,11 @@ async function processUser(user: any) {
     console.log(`[Agent AI] ${user.email}: brak hasła aplikacji — pomijam.`);
     return;
   }
+  const appPassword = decrypt(settings.appPassword);
+  if (!appPassword) {
+    console.log(`[Agent AI] ${user.email}: błąd odszyfrowywania hasła — pomijam.`);
+    return;
+  }
 
   // Guard: autoReply must be enabled
   if (!settings?.autoReply) {
@@ -154,7 +162,6 @@ async function processUser(user: any) {
   }
 
   // Guard: subscription must be active (double-check in case DB was stale)
-  const { getTrialState, TRIAL_LIMITS } = await import('@/lib/trial');
   const trialState = getTrialState({ createdAt: user.createdAt, subscriptionStatus: user.subscriptionStatus }, settings || undefined);
 
   if (user.subscriptionStatus !== 'active' && user.subscriptionStatus !== 'trialing' && !trialState.isTrialActive) {
@@ -162,11 +169,11 @@ async function processUser(user: any) {
     return;
   }
 
-  // Guard: Check AI credits
+  // Guard: Check AI credits (MAX plan = unlimited, skip check)
   const aiCredits = settings.aiCredits ?? 0;
   const expectedCost = 10;
   
-  if (aiCredits < expectedCost) {
+  if (user.stripePriceId !== PRICE_MAX && aiCredits < expectedCost) {
     console.log(`[Agent AI] ${user.email}: brak wystarczającej liczby kredytów (${aiCredits} < ${expectedCost}) — pomijam.`);
     return;
   }
@@ -187,9 +194,9 @@ async function processUser(user: any) {
   // Fetch new emails via POP3
   let messages: FetchedEmail[] = [];
   try {
-    messages = await fetchUnreadEmailsPOP3(user.email!, settings.appPassword!, knownUids);
+    messages = await fetchUnreadEmailsIMAP(user.email!, appPassword, knownUids);
   } catch (err: any) {
-    console.warn(`[Agent AI] ${user.email}: błąd POP3 — ${err.message}`);
+    console.warn(`[Agent AI] ${user.email}: błąd zaciągania poczty (IMAP) — ${err.message}`);
     return;
   }
 
@@ -216,17 +223,19 @@ async function processUser(user: any) {
 
   let replied = 0;
   for (const msg of messages) {
-    // Re-check limit before each message
-    const fresh = await prisma.userSettings
-      .findUnique({ where: { userId }, select: { aiCredits: true } })
-      .catch(() => null);
-    const currentCredits = fresh?.aiCredits ?? (aiCredits - (replied * expectedCost));
-    if (currentCredits < expectedCost) {
-      console.log(`[Agent AI] ${user.email}: kredyty wyczerpane w trakcie — zatrzymuję.`);
-      break;
+    // Re-check limit before each message (skip for MAX plan)
+    if (user.stripePriceId !== PRICE_MAX) {
+      const fresh = await prisma.userSettings
+        .findUnique({ where: { userId }, select: { aiCredits: true } })
+        .catch(() => null);
+      const currentCredits = fresh?.aiCredits ?? (aiCredits - (replied * expectedCost));
+      if (currentCredits < expectedCost) {
+        console.log(`[Agent AI] ${user.email}: kredyty wyczerpane w trakcie — zatrzymuję.`);
+        break;
+      }
     }
 
-    const wasReplied = await processMessage({ userId, user, settings, msg, websiteContent, expectedCost }).catch(err => {
+    const wasReplied = await processMessage({ userId, user, settings, msg, websiteContent, expectedCost, appPassword }).catch(err => {
       console.error(`[Agent AI] Błąd wiadomości ${msg.messageId}:`, err?.message ?? err);
       return false;
     });
@@ -249,6 +258,7 @@ async function processMessage({
   msg,
   websiteContent,
   expectedCost = 10,
+  appPassword,
 }: {
   userId: string;
   user: any;
@@ -256,6 +266,7 @@ async function processMessage({
   msg: FetchedEmail;
   websiteContent: string;
   expectedCost?: number;
+  appPassword: string;
 }): Promise<boolean> {
   // Sanitize null bytes (PostgreSQL does not support 0x00 bytes in text/varchar fields)
   msg.from = cleanString(msg.from);
@@ -477,7 +488,6 @@ async function processMessage({
   console.log(`[Agent AI] 🤖 Generuję odpowiedź: "${msg.subject}" od ${msg.from}`);
 
   try {
-    const { getOrderContextForEmail } = await import("./orders");
     const orderContext = await getOrderContextForEmail(
       user.id,
       msg.text || (msg as any).html || '',
@@ -485,11 +495,19 @@ async function processMessage({
     );
 
     let generatedReplyText = "";
-    const cronModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const cronModels = [
+        "models/gemini-3.5-flash-lite",
+        "models/gemini-3.1-flash-lite",
+        "models/gemini-2.5-flash-lite",
+        "models/gemini-3.6-flash",
+        "models/gemini-2.5-flash"
+    ];
 
     for (const modelName of cronModels) {
       try {
         console.log(`[Agent AI] Generowanie odpowiedzi za pomocą modelu: ${modelName}`);
+        const { generateText } = await import('ai');
+        const { google: googleAI } = await import('@ai-sdk/google');
         const { text } = await generateText({
           model: googleAI(modelName),
           system: buildSystemPrompt(settings, websiteContent, orderContext),
@@ -506,11 +524,13 @@ async function processMessage({
       throw new Error("Wszystkie modele AI dla automatycznej odpowiedzi zawiodły.");
     }
 
-    // Deduct AI credits immediately after successful generation (so it costs even if it's SPAM or REQUIRES_ATTENTION)
-    await prisma.userSettings.update({
-      where: { userId: user.id },
-      data: { aiCredits: { decrement: expectedCost } },
-    }).catch(() => {});
+    // Deduct AI credits (MAX plan = unlimited — skip deduction)
+    if (user.stripePriceId !== PRICE_MAX) {
+      await prisma.userSettings.update({
+        where: { userId: user.id },
+        data: { aiCredits: { decrement: expectedCost } },
+      }).catch(() => {});
+    }
 
 
     const cleanedAiText = cleanString(generatedReplyText.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim());
@@ -554,7 +574,7 @@ async function processMessage({
         try {
           const ackInfo = await sendReplySMTP(
             user.email!,
-            settings.appPassword!,
+            appPassword,
             replyTo,
             msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
             ackText,
@@ -615,7 +635,7 @@ async function processMessage({
     // Capture the real SMTP Message-ID so future client replies can be matched back here
     const smtpInfo = await sendReplySMTP(
       user.email!,
-      settings.appPassword!,
+      appPassword,
       replyTo,
       msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
       cleanedAiText,

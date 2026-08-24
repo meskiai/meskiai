@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { prisma } from "../../../lib/prisma";
+import { LeadStatus } from "@prisma/client";
 
 export async function GET(req: Request) {
   try {
@@ -40,6 +41,10 @@ export async function PATCH(req: Request) {
 
     if (!id || !status) {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    }
+
+    if (!Object.values(LeadStatus).includes(status)) {
+      return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
 
     const lead = await prisma.lead.findUnique({

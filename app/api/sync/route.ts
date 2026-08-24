@@ -18,16 +18,17 @@ export async function POST(req: Request) {
 
   try {
     const siteUrl = process.env.URL || process.env.NEXTAUTH_URL || 'https://meskiai.com';
+    const baseUrl = siteUrl.replace(/\/$/, '');
     const cronSecret = process.env.CRON_SECRET || '';
 
-    // Fire-and-forget: trigger background function (returns 202 immediately, runs for up to 15 min)
-    fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+    // Trigger background function (Netlify returns 202 immediately, so this does not block for long)
+    await fetch(`${baseUrl}/.netlify/functions/sync-background`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${cronSecret}`,
         'Content-Type': 'application/json',
       },
-    }).catch(() => {}); // Ignore errors — it's non-critical
+    }).catch((e) => { console.error('Fetch error:', e); });
 
     return NextResponse.json({ message: "Zsynchronizowano pomyślnie" });
   } catch (error: any) {

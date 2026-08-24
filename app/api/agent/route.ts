@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     
     if (user?.stripePriceId !== PRICE_MAX) {
       if (aiCredits < expectedCost) {
-        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
+        return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować wiadomości.` }, { status: 403 });
       }
 
       await prisma.userSettings.update({
@@ -53,7 +53,7 @@ Jeśli e-mail jest skargą, bądź empatyczny. Jeśli to zapytanie, udziel wycze
 Odpowiadaj bezpośrednio treścią e-maila, bez żadnych wstępów w stylu "Oto moja propozycja".`;
 
     const result = await streamText({
-      model: google('gemini-3.5-flash'),
+      model: google("models/gemini-3.5-flash-lite"),
       system: systemPrompt,
       prompt: `Oto treść wiadomości e-mail od klienta:\n\n"${prompt}"\n\nNapisz na nią odpowiedź:`,
     });

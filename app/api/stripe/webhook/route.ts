@@ -95,6 +95,19 @@ export async function POST(req: Request) {
               }
             }
           }
+        } else if (session.mode === "payment" && session.metadata?.type === "topup_credits") {
+          const userId = session.metadata?.userId;
+          const creditsToAdd = parseInt(session.metadata?.credits || "100", 10);
+
+          if (userId) {
+            await prisma.userSettings.update({
+              where: { userId },
+              data: {
+                aiCredits: { increment: creditsToAdd },
+              },
+            }).catch(() => {});
+            console.log(`[Stripe] Doładowano jednorazowo ${creditsToAdd} Kredytów AI dla userId=${userId}.`);
+          }
         }
         break;
       }
@@ -245,10 +258,12 @@ export async function POST(req: Request) {
       }
       
       case "invoice.payment_succeeded": {
-        // When a recurring payment succeeds
+        // When a recurring payment succeeds — reset credits, fix status, re-enable agent
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as any).subscription as string;
-        if (subscriptionId) {
+        // Skip if this is the very first invoice (handled by checkout.session.completed)
+        const billingReason = (invoice as any).billing_reason as string;
+        if (subscriptionId && billingReason !== 'subscription_create') {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const customerId = (subscription as any).customer as string;
           
@@ -257,14 +272,49 @@ export async function POST(req: Request) {
           });
           
           if (user) {
-            // Reset monthly quotas
             const priceId = (subscription as any).items?.data?.[0]?.price?.id;
+            const newStatus = (subscription as any).status as string;
+            const periodEndTs = (subscription as any).current_period_end || (Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
+
+            // Reset credits and fix subscription status (may have been past_due)
+            await Promise.all([
+              prisma.userSettings.update({
+                where: { userId: user.id },
+                data: {
+                  aiCredits: getPlanLimits(priceId).credits === Infinity ? 99999999 : getPlanLimits(priceId).credits,
+                  autoReply: true, // Re-enable agent if it was paused due to failed payment
+                }
+              }),
+              prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  subscriptionStatus: newStatus,
+                  stripePriceId: priceId,
+                  stripeCurrentPeriodEnd: new Date(periodEndTs * 1000),
+                }
+              })
+            ]);
+            console.log(`[Stripe] Płatność cykliczna zaliczona dla userId=${user.id}. Kredyty zresetowane, status=${newStatus}.`);
+          }
+        }
+        break;
+      }
+
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        
+        if (paymentIntent.metadata?.type === "topup_credits") {
+          const userId = paymentIntent.metadata?.userId;
+          const creditsToAdd = parseInt(paymentIntent.metadata?.credits || "100", 10);
+
+          if (userId) {
             await prisma.userSettings.update({
-              where: { userId: user.id },
+              where: { userId },
               data: {
-                aiCredits: getPlanLimits(priceId).credits === Infinity ? 99999999 : getPlanLimits(priceId).credits,
-              }
-            });
+                aiCredits: { increment: creditsToAdd },
+              },
+            }).catch(() => {});
+            console.log(`[Stripe] Doładowano jednorazowo (Elements PaymentIntent) ${creditsToAdd} Kredytów AI dla userId=${userId}.`);
           }
         }
         break;

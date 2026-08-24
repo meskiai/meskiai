@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { prisma } from '../../../../lib/prisma';
-import { validatePop3CredentialsDetailed } from '../../../../lib/mail';
+import { validateImapCredentialsDetailed } from '../../../../lib/mail';
+import { encrypt } from "../../../../lib/crypto";
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
     const cleanedPassword = appPassword.replace(/\s+/g, '');
 
     // Zwaliduj hasło logując się przez POP3
-    const validationResult = await validatePop3CredentialsDetailed(session.user.email, cleanedPassword);
+    const validationResult = await validateImapCredentialsDetailed(session.user.email, cleanedPassword);
 
     if (!validationResult.isValid) {
       console.error("[POP3 Validation Failed]", validationResult.error);
@@ -42,15 +45,16 @@ export async function POST(req: Request) {
     let lastError = null;
     for (let i = 0; i < 3; i++) {
       try {
+        const encryptedPassword = encrypt(cleanedPassword);
         await prisma.userSettings.upsert({
           where: { userId: session.user.id },
           update: { 
-            appPassword: cleanedPassword,
+            appPassword: encryptedPassword,
             autoReply: true // Automatycznie włącz agenta po podłączeniu
           },
           create: {
             userId: session.user.id,
-            appPassword: cleanedPassword,
+            appPassword: encryptedPassword,
             autoReply: true,
           }
         });

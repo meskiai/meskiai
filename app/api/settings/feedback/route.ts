@@ -36,8 +36,8 @@ export async function POST(req: Request) {
     const systemEmail = process.env.SYSTEM_SMTP_EMAIL;
     const systemPassword = process.env.SYSTEM_SMTP_PASSWORD;
 
-    const senderEmail = user.email && user.settings?.appPassword ? user.email : systemEmail;
-    const senderPassword = user.email && user.settings?.appPassword ? user.settings.appPassword : systemPassword;
+    const senderEmail = systemEmail;
+    const senderPassword = systemPassword;
 
     if (senderEmail && senderPassword) {
       try {

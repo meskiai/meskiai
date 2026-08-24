@@ -11,15 +11,12 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: {
     '*': [
       'node_modules/pdf-parse/test/**/*',
-      'node_modules/.prisma/client/libquery_engine-darwin*',
-      'node_modules/.prisma/client/libquery_engine-windows*',
+      'node_modules/.prisma/client/libquery_engine-*',
       'node_modules/.prisma/client/query_engine-*',
       'node_modules/@prisma/engines/**/*',
       'node_modules/typescript/**/*',
-      'node_modules/@prisma/client/runtime/*.wasm-base64.js',
-      'node_modules/@prisma/client/runtime/*.wasm-base64.mjs',
-      'node_modules/.prisma/client/*.wasm-base64.js',
-      'node_modules/.prisma/client/*.wasm',
+      'node_modules/@next/swc/**/*',
+      'node_modules/next/dist/compiled/webpack/**/*',
     ],
   },
   output: "standalone",

@@ -46,13 +46,13 @@ export async function POST(req: Request) {
     const aiCredits = user?.settings?.aiCredits ?? 0;
     const expectedCost = 30; // 3 leads * 10 credits
 
-    if (aiCredits < expectedCost) {
-      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów AI (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować leady.` }, { status: 403 });
+    if (user?.stripePriceId !== PRICE_MAX && aiCredits < expectedCost) {
+      return NextResponse.json({ error: `Brak wystarczającej liczby kredytów (Wymagane: ${expectedCost}, Posiadasz: ${aiCredits}). Zrób upgrade pakietu, aby generować leady.` }, { status: 403 });
     }
 
     // Krok 1: Wyszukanie rzeczywistych firm za pomocą wyszukiwarki Google i Gemini
     let searchResultText = "";
-    const searchModels = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"];
+    const searchModels = ["models/gemini-3.5-flash-lite", "models/gemini-3.1-flash-lite", "models/gemini-2.5-flash-lite", "models/gemini-3.6-flash", "models/gemini-2.5-flash"];
     
     for (const modelName of searchModels) {
       try {
@@ -140,7 +140,7 @@ ${searchResultText}`,
       savedLeads.push(saved);
     }
 
-    if (savedLeads.length > 0) {
+    if (savedLeads.length > 0 && user?.stripePriceId !== PRICE_MAX) {
       const totalCost = savedLeads.length * 10;
       await prisma.userSettings.update({
         where: { userId: session.user.id },

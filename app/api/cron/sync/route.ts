@@ -10,17 +10,20 @@ async function triggerBackgroundSync() {
   console.log('[Cron] Rozpoczynam synchronizację w tle...');
   try {
     const siteUrl = process.env.URL || process.env.NEXTAUTH_URL || 'https://meskiai.com';
+    const baseUrl = siteUrl.replace(/\/$/, '');
     const cronSecret = process.env.CRON_SECRET || '';
     
-    // Przekazanie zadania do Netlify Background Functions (15 min limit)
-    fetch(`${siteUrl}/.netlify/functions/sync-background`, {
+    // Przekazanie zadania do Netlify Background Functions (15 min limit).
+    // MUSIMY użyć await, inaczej Next.js Lambda ubije kontener przed wysłaniem requestu!
+    // Netlify Background zwraca 202 Accepted od razu, więc to nie zablokuje wykonania na 15 min.
+    const res = await fetch(`${baseUrl}/.netlify/functions/sync-background`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${cronSecret}`
       }
-    }).catch(() => {});
+    }).catch((err) => { console.error('[Cron] Błąd fetch:', err) });
     
-    console.log('[Cron] Przekazano do Background Function.');
+    console.log('[Cron] Przekazano do Background Function. Status:', res ? (res as Response).status : 'Brak');
   } catch (err) {
     console.error('[Cron] Błąd przekazywania do tła:', err);
   }
