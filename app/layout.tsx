@@ -1,19 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ 
-  subsets: ["latin", "latin-ext"], 
-  variable: "--font-inter", 
-  display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
-});
-const plusJakarta = Plus_Jakarta_Sans({ 
-  subsets: ["latin", "latin-ext"], 
-  variable: "--font-plus-jakarta", 
-  display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
-});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -53,8 +39,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://meskiai.com"),
 };
 
-
-
 import { Providers } from "./providers";
 import CookieBanner from "./components/CookieBanner";
 import { MetaPixel } from "./components/MetaPixel";
@@ -65,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" suppressHydrationWarning className={`${inter.variable} ${plusJakarta.variable}`}>
-      <body className={inter.className}>
+    <html lang="pl" suppressHydrationWarning>
+      <body>
         <Providers>
           <MetaPixel />
           {children}

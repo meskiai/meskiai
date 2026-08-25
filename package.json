@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "concurrently \"next dev\" \"npx tsx --env-file=.env.local worker.ts\"",
-    "build": "next build",
+    "build": "rm -rf .next && next build",
     "start": "concurrently \"next start\" \"npx tsx --env-file=.env.local worker.ts\"",
     "lint": "eslint",
     "deploy": "netlify deploy --prod --build"
