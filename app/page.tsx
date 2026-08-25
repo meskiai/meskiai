@@ -2,6 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Globe, MessageSquare, BarChart, Home as HomeIcon, LogOut, ChevronDown, Star, FileText, Users, Zap, TrendingUp, Shield, Tag, Code, Sparkles } from 'lucide-react';
 import React, { useEffect, useState, useRef } from "react";
@@ -86,7 +87,7 @@ const StripeProductGraphic = () => (
           <div className={styles.stripeAppSidebar}>
             <div className={styles.stripeAppLogo}>
               <span className={styles.stripeAppLogoIcon}>
-                <img src="/logo_white.png?v=4" alt="MESKIAI" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
+                <Image src="/logo_white.png?v=4" alt="MESKIAI" width={16} height={16} style={{ objectFit: 'contain' }} />
               </span>
               <span>MESKIAI</span>
             </div>
@@ -511,7 +512,7 @@ const DashboardSimulation = () => {
           {typingState !== 'idle' && (
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ width: 36, height: 36, borderRadius: '8px', background: '#F0EEFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo.png" alt="MESKIAI" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
+                <Image src="/logo.png" alt="MESKIAI" width={22} height={22} style={{ objectFit: 'contain' }} />
               </div>
               <div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
@@ -641,7 +642,7 @@ export default function Home() {
           <div className={styles.navInner}>
             {/* Brand */}
             <a href="/" className={styles.navBrand} onClick={(e) => { e.preventDefault(); window.location.href = "/"; }}>
-              <img src="/logo.png" alt="MESKIAI" className={styles.navBrandImg} />
+              <Image src="/logo.png" alt="MESKIAI" width={28} height={28} className={styles.navBrandImg} priority />
               MESKIAI
             </a>
 
@@ -904,7 +905,7 @@ export default function Home() {
         <div className={styles.footerGrid}>
           <div className={styles.footerColumn}>
             <div className={styles.footerLogo}>
-              <img src="/logo.png" alt="MESKIAI Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+              <Image src="/logo.png" alt="MESKIAI Logo" width={26} height={26} style={{ objectFit: 'contain' }} />
               MESKIAI
             </div>
             <p className={styles.footerDesc}>Twój wirtualny pracownik, który łączy i automatyzuje działania firmy w czasie rzeczywistym. Gotowość 24/7.</p>
@@ -913,8 +914,6 @@ export default function Home() {
             <h4 className={styles.footerHeading}>Firma</h4>
             <div className={styles.footerLinksList}>
               <Link href="/o-nas">O nas</Link>
-              <Link href="/kariera">Kariera</Link>
-              <Link href="/cennik">Cennik</Link>
               <Link href="/kontakt">Kontakt</Link>
             </div>
           </div>
@@ -924,7 +923,6 @@ export default function Home() {
               <Link href="/integracje">Integracje</Link>
               <Link href="/bezpieczenstwo">Bezpieczeństwo</Link>
               <Link href="/przypadki-uzycia">Przypadki użycia</Link>
-              <Link href="/dokumentacja">API / Dokumentacja</Link>
             </div>
           </div>
           <div className={styles.footerColumn}>

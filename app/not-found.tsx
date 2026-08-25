@@ -62,9 +62,9 @@ export default function NotFound() {
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-            <Link href="/cennik" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>Cennik &amp; Pakiety ›</div>
-              <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Plan Basic, Pro i Max</div>
+            <Link href="/o-nas" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>O nas ›</div>
+              <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Misja i wartości firmy</div>
             </Link>
 
             <Link href="/integracje" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
@@ -72,9 +72,9 @@ export default function NotFound() {
               <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Shopify, Gmail, BaseLinker</div>
             </Link>
 
-            <Link href="/dokumentacja" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>API &amp; Dokumentacja ›</div>
-              <div style={{ fontSize: '0.82rem', color: '#64748B' }}>REST API dla deweloperów</div>
+            <Link href="/przypadki-uzycia" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>Przypadki użycia ›</div>
+              <div style={{ fontSize: '0.82rem', color: '#64748B' }}>E-commerce, B2B i Usługi</div>
             </Link>
 
             <Link href="/kontakt" style={{ background: '#FFFFFF', border: '1px solid #E6EBF1', borderRadius: '14px', padding: '16px', textDecoration: 'none', color: '#0A2540', transition: 'all 0.2s' }}>
