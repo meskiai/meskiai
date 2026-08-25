@@ -86,7 +86,7 @@ const StripeProductGraphic = () => (
           <div className={styles.stripeAppSidebar}>
             <div className={styles.stripeAppLogo}>
               <span className={styles.stripeAppLogoIcon}>
-                <img src="/logo.png" alt="MESKIAI" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                <img src="/logo_white.png?v=4" alt="MESKIAI" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
               </span>
               <span>MESKIAI</span>
             </div>
@@ -511,7 +511,7 @@ const DashboardSimulation = () => {
           {typingState !== 'idle' && (
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ width: 36, height: 36, borderRadius: '8px', background: '#F0EEFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo.png" alt="MESKIAI" style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                <img src="/logo.png" alt="MESKIAI" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
               </div>
               <div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
